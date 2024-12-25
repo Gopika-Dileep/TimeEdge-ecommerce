@@ -1,0 +1,268 @@
+
+<%-include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+  
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.banner-area .single-banner {
+    margin-bottom: 30px;
+    overflow: hidden;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.banner-area .single-banner img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.banner-area .single-banner:hover {
+    transform: scale(1.05);
+}
+
+
+.product {
+    padding: 5rem 0;
+    background-color: #f8f8f8;
+}
+
+.product__filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.product-cart-wrap-mb-30 {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.product-cart-wrap-mb-30:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.product-img img {
+    width: 100%;
+    height: auto;
+}
+
+.product-content-wrap {
+    padding: 1rem;
+    text-align: center;
+}
+
+.product-content-wrap h6 {
+    font-size: 1rem;
+    color: #333;
+    margin: 0.5rem 0;
+}
+
+.product-content-wrap h5 {
+    font-size: 1.2rem;
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.product-content-wrap a {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #333;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.product-content-wrap a:hover {
+    background: #e74c3c;
+}
+
+
+.hero__items {
+    position: relative;
+    text-align: center;
+    width: 100%;
+    height: 600px; 
+}
+
+.hero__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    color: #fff;
+    background: rgba(0, 0, 0, 0.5); 
+    padding: 20px; 
+    border-radius: 10px; 
+}
+.primary-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #ff5733; 
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.primary-btn:hover {
+    background-color: #c13d1a; 
+}
+
+.arrow_right {
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+.price {
+    font-size: 1.2rem;
+    color: #e74c3c;
+    margin-top: 0.5rem;
+}
+
+.regular-price {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+
+</style>
+
+
+      
+<section class="hero">
+    <div class="hero__slider owl-carousel">
+        <% banner.slice(0, 2).forEach(bannerItem => { %>
+            <div class="hero__items set-bg" data-setbg="/uploads/productImages/<%= bannerItem.image %>">
+                <div class="container">
+                <div class="row">
+                    <div class="col-xl-5 col-lg-7 col-md-8">
+                        <div class="hero__text">
+                            <h2><%= bannerItem.title %></h2>
+                            <p><%= bannerItem.description %></p>
+                            <a href='<%= bannerItem.link %>' class="primary-btn">Shop now <span class="arrow_right"></span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+    </div>
+</section>  
+
+ 
+
+
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="filter__controls">
+                        <!-- <li class="active" data-filter="*">Best Sellers</li> -->
+                        <li data-filter=".new-arrivals">New Arrivals</li>
+                        <!-- <li data-filter=".hot-sales">Hot Sales</li> -->
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <% for (let i = 0; i < products.length; i++) { %>
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="product__item">
+                            <a href="/productDetails?id=<%=products[i]._id%>">
+                            <div class="product__item__pic set-bg" data-setbg="/uploads/productImages/<%= products[i].productImage[0] %>" >
+                                <ul class="product__hover">
+                                    <li><img src="img/icon/heart.png" alt=""><span>Whishlist</span></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><%= products[i].productName %></h6>
+                                <a href="/cart" class="add-cart" data-product-id="<%= products[i]._id %>"  data-quantity="1" data-price="<%= products[i].salePrice %>">
+                                    + Add To Cart
+                                  </a>
+                                <div class="rating">
+                                    <% for (let j = 0; j < 5; j++) { %>
+                                        <i class="fa <%= j < products[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
+                                    <% } %>
+                                </div>
+                                <p class="price">$<%= products[i].salePrice%><span class='text-muted regular-price'><strike><%= products[i].regularPrice%></strike></span></p>
+                                <div class="product__color__select">
+                                    <% if (products[i].color) { %>
+                                        <label class="<%= products[i].color %>" for="pc-<%= i %>">
+                                            <input type="radio" id="pc-<%= i %>">
+                                        </label>
+                                    <% } else { %>
+                                        <span>No color available</span>
+                                    <% } %>
+                                </div>
+
+                            </div>
+                           </a>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        document.querySelectorAll('.set-bg').forEach(function (element) {
+            const bg = element.getAttribute('data-setbg');
+            if (bg) {
+                element.style.backgroundImage = `url('${bg}')`;
+            }
+        });
+
+        $(document).ready(function() {
+ 
+  $('.add-cart').on('click', function(event) {
+    event.preventDefault(); 
+
+    alert('hlo')
+  
+    const productId = $(this).data('product-id');
+    const quantity = $(this).data('quantity');
+    const price = $(this).data('price');
+
+    $.ajax({
+      url: '/addToCart',
+      type: 'POST', 
+      contentType: 'application/json', 
+      data: JSON.stringify({ productId, quantity, price }), 
+      success: function(response) {
+      
+        alert('Item added to cart!');
+        window.location.href = '/cart'; 
+      },
+      error: function(error) {
+       
+        console.log('Error:', error);
+        alert('There was an error adding the item to the cart');
+      }
+    });
+  });
+});
+
+    </script>
+
+   <%-include("../../views/partials/user/footer") %>

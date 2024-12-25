@@ -1,0 +1,375 @@
+<%- include("../partials/admin/header") %>
+<style>
+    .dashboard-wrapper {
+        position: absolute;
+        top: 70px;
+        left: 240px;
+        width: calc(100% - 240px);
+        padding: 2rem;
+    }
+    @media (max-width: 1000px) {
+        .dashboard-wrapper {
+        position: absolute;
+        top: 50px;
+        left: 20px;
+        width: calc(100% - 30px);
+        padding: 2rem;
+    }
+    }
+</style>
+
+<div class="dashboard-wrapper">
+  
+    <div class="overview-grid">
+        <div class="overview-card">
+            <div class="overview-header">
+                <span class="title">Total Sales</span>
+                <span class="period">THIS MONTH</span>
+            </div>
+            <div class="overview-value">₹ 2,05,437</div>
+            <div class="overview-chart" id="salesChart"></div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-header">
+                <span class="title">Customers</span>
+                <span class="period">THIS MONTH</span>
+            </div>
+            <div class="overview-value">3656</div>
+            <div class="overview-chart" id="customersChart"></div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-header">
+                <span class="title">Orders</span>
+                <span class="period">THIS MONTH</span>
+            </div>
+            <div class="overview-value">823</div>
+            <div class="overview-chart" id="ordersChart"></div>
+        </div>
+    </div>
+
+   
+    <div class="main-grid">
+      
+        <div class="orders-section">
+            <div class="section-header">
+                <h2>Recent Orders</h2>
+                <a href="#" class="view-all">View all</a>
+            </div>
+            <div class="orders-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Daniel Klein</td>
+                            <td>28 Jan, 2024</td>
+                            <td>₹7,998.00</td>
+                            <td><span class="status-badge processing">Processing</span></td>
+                        </tr>
+                        <tr>
+                            <td>Sarah Parker</td>
+                            <td>27 Jan, 2024</td>
+                            <td>₹5,000.00</td>
+                            <td><span class="status-badge completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>James Wilson</td>
+                            <td>26 Jan, 2024</td>
+                            <td>₹4,122.00</td>
+                            <td><span class="status-badge completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Emma Thompson</td>
+                            <td>25 Jan, 2024</td>
+                            <td>₹3,445.00</td>
+                            <td><span class="status-badge processing">Processing</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+ 
+        <div class="best-selling-section">
+            <div class="section-header">
+                <h2>Best Selling</h2>
+                <span class="period">THIS MONTH</span>
+            </div>
+            <div class="sales-summary">
+                <div class="total-amount">
+                    <h3>₹2,05,437</h3>
+                    <span>Total Sales</span>
+                </div>
+                <div class="sales-breakdown">
+                    <div class="breakdown-item">
+                        <span class="item-code">SKFW</span>
+                        <span class="item-sales">₹750 Sales</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="item-code">LXMR</span>
+                        <span class="item-sales">₹650 Sales</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="item-code">SKTW</span>
+                        <span class="item-sales">₹450 Sales</span>
+                    </div>
+                </div>
+                <div id="bestSellingChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-wrapper {
+        padding: 2rem;
+    }
+
+    .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .overview-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .overview-header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .overview-header .title {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .overview-header .period {
+        color: #94a3b8;
+        font-size: 0.75rem;
+    }
+
+    .overview-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0.75rem 0;
+    }
+
+    .overview-chart {
+        height: 60px;
+        margin: 0 -1.5rem -1.5rem;
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .orders-section,
+    .best-selling-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .view-all {
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 0.875rem;
+    }
+
+    .orders-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .orders-table th {
+        text-align: left;
+        padding: 1rem;
+        color: #64748b;
+        font-weight: 500;
+        font-size: 0.875rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .orders-table td {
+        padding: 1rem;
+        color: #1e293b;
+        font-size: 0.875rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .status-badge.processing {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+    .status-badge.completed {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .sales-summary {
+        padding: 1rem 0;
+    }
+
+    .total-amount h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .total-amount span {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .sales-breakdown {
+        margin: 1.5rem 0;
+    }
+
+    .breakdown-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+
+    .item-code {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .item-sales {
+        color: #1e293b;
+        font-size: 0.875rem;
+    }
+
+    #bestSellingChart {
+        height: 200px;
+        margin-top: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+
+    new ApexCharts(document.querySelector("#salesChart"), {
+        chart: {
+            type: 'bar',
+            height: 60,
+            sparkline: { enabled: true },
+            toolbar: { show: false }
+        },
+        plotOptions: {
+            bar: { columnWidth: '60%' }
+        },
+        colors: ['#2563eb'],
+        series: [{
+            data: [25, 35, 45, 30, 25, 40, 35, 50, 45, 40, 35, 30]
+        }],
+        tooltip: { enabled: false }
+    }).render();
+
+    new ApexCharts(document.querySelector("#customersChart"), {
+        chart: {
+            type: 'line',
+            height: 60,
+            sparkline: { enabled: true },
+            toolbar: { show: false }
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 2
+        },
+        colors: ['#2563eb'],
+        series: [{
+            data: [25, 35, 25, 45, 30, 35, 30, 45, 35, 25, 35, 40]
+        }],
+        tooltip: { enabled: false }
+    }).render();
+
+   
+    new ApexCharts(document.querySelector("#ordersChart"), {
+        chart: {
+            type: 'line',
+            height: 60,
+            sparkline: { enabled: true },
+            toolbar: { show: false }
+        },
+        stroke: {
+            curve: 'straight',
+            width: 2
+        },
+        colors: ['#2563eb'],
+        series: [{
+            data: [30, 25, 35, 30, 45, 35, 40, 30, 35, 25, 35, 30]
+        }],
+        tooltip: { enabled: false }
+    }).render();
+
+    new ApexCharts(document.querySelector("#bestSellingChart"), {
+        chart: {
+            type: 'donut',
+            height: 200
+        },
+        colors: ['#2563eb', '#3b82f6', '#60a5fa'],
+        series: [44, 33, 23],
+        labels: ['SKFW', 'LXMR', 'SKTW'],
+        legend: { show: false },
+        dataLabels: { enabled: false },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '75%'
+                }
+            }
+        }
+    }).render();
+</script>
+
+<%- include("../partials/admin/footer") %>

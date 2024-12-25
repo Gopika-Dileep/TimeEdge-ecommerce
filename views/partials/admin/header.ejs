@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>TimeEdge</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="#">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --header-height: 60px;
+            --sidebar-width: 240px;
+            --body-bg: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --text-muted: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--body-bg);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-right {
+            display: flex;
+            justify-content: end;
+            width: 100%;
+        }
+
+        .toggle-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: #1e293b;
+        }
+
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            text-decoration: none;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            border-right: 1px solid #e5e7eb;
+            padding: 1.5rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin-top: 2rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: #f1f5f9;
+            color: #2563eb;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            background-color: #f8fafc;
+            transition: margin-left 0.3s ease;
+        }
+
+        @media (max-width: 1024px) {
+            .content-area {
+                margin-left: 0;
+            }
+            .sidebar-open .content-area {
+                margin-left: var(--sidebar-width);
+            }
+        }
+
+        /* Header Area */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .toggle-btn {
+                display: block;
+            }
+        }
+
+        /* Charts */
+        .chart-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1rem;
+            height: 200px;
+        }
+
+        .small-chart {
+            height: 50px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header" >
+            <div class="header-left">
+                <button class="toggle-btn" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="/admin" class="brand">TimeEdge</a>
+            </div>
+            <div class="header-right" >
+                <a href="/admin/logout" >Logout</button>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="/admin" class="brand">TimeEdge</a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/admin" class="nav-link active">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a href="/admin/addProducts" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>AddProducts</span>
+                    </a>
+                </li> -->
+                <li class="nav-item">
+                    <a href="/admin/Products" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/orders" class="nav-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/users" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/offers" class="nav-link">
+                        <i class="fas fa-tags"></i>
+                        <span>Offers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/coupons" class="nav-link">
+                        <i class="fas fa-star"></i>
+                        <span>Coupons</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/banner" class="nav-link">
+                        <i class="fas fa-images"></i>
+                        <span>Banner Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/category" class="nav-link">
+                        <i class="fas fa-list"></i>
+                        <span>Categories</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/brands" class="nav-link">
+                        <i class="fas fa-cogs"></i>
+                        <span>Brands</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <div class="content-main">
+            </div>
+        </main>
+
+        <script>
+            // Sidebar toggle functionality
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+
+            // Close sidebar on window resize if width > 1000px
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 1000) {
+                    document.getElementById('sidebar').classList.remove('active');
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

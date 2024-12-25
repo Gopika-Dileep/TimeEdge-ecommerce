@@ -1,0 +1,196 @@
+<%- include("../../views/partials/admin/header") %>
+<style>
+    .search-bar {
+    width: 500px;
+    margin: 0 auto;
+    border: 1px solid grey;
+    border-radius: 50px;
+}
+
+.search-bar .form-control {
+    border: none;
+    border-radius: 50px;
+}
+
+.table-responsive {
+    margin-top: 20px;
+}
+
+.pagination {
+    margin-top: 20px;
+}
+.content-header {
+        position: absolute;
+        top: 70px;
+        left: 240px;
+        width: calc(100% - 240px);
+        padding: 2rem;
+    }
+    @media (max-width: 1000px) {
+        .content-header {
+        position: absolute;
+        top: 50px;
+        left: 20px;
+        width: calc(100% - 30px);
+        padding: 2rem;
+    }
+    }
+</style>
+
+<div class="content-header row">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="content-title card-title">Customers</h2>
+    </div>
+
+
+<header class="card-header text-center mb-20">
+    <form action="/admin/users" method="get" class="d-inline">
+        <div class="input-group input-group-sm search-bar">
+            <input
+                type="text"
+                class="form-control"
+                placeholder="Search customers..."
+                name="search"
+                value="<%= search %>"
+                aria-label="Search customers"
+            />
+            <button class="btn btn-outline-primary" type="submit" aria-label="Search">Search</button>
+        </div>
+    </form>
+</header>
+
+<div class="table-responsive mt-5">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col"><b>Name</b></th>
+                <th scope="col"><b>Email</b></th>
+                <th scope="col"><b>Phone No</b></th>
+                <th scope="col"><b>Action</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (users && users.length > 0) { %>
+                <% users.forEach((customer) => { %>
+                    <tr>
+                        <td><%= customer.name || "N/A" %></td>
+                        <td><%= customer.email || "N/A" %></td>
+                        <td><%= customer.phone || "N/A" %></td>
+
+                        <td>
+                            <% if (customer.isBlocked) { %>
+                                <button 
+                                    class="btn btn-success btn-sm text-white text-decoration-none unblock-btn" 
+                                    data-id="<%= customer._id %>" 
+                                    aria-label="Unblock customer">
+                                    Unblock
+                                </button>
+                            <% } else { %>
+                                <button 
+                                    class="btn btn-danger btn-sm text-white text-decoration-none block-btn" 
+                                    data-id="<%= customer._id %>" 
+                                    aria-label="Block customer">
+                                    Block
+                                </button>
+                            <% } %>
+                        </td>
+                        
+                      
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4" class="text-center">No customers found</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<div class="container mt-3">
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <% if (pagination && pagination.totalpage > 1) { %>
+            
+                <li class="page-item <%= pagination.currentpage === 1 ? 'disabled' : '' %>">
+                    <a class="page-link" href="?page=<%= pagination.currentpage - 1 %>&search=<%= search %>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+               
+                <% for (let i = 1; i <= pagination.totalpage; i++) { %>
+                    <li class="page-item <%= i === pagination.currentpage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+                    </li>
+                <% } %>
+
+            
+                <li class="page-item <%= pagination.currentpage === pagination.totalpage ? 'disabled' : '' %>">
+                    <a class="page-link" href="?page=<%= pagination.currentpage + 1 %>&search=<%= search %>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            <% } else { %>
+                <li class="page-item disabled">
+                    <span class="page-link">No pages available</span>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+</div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded",function(){
+        
+        const blockbtn=document.querySelectorAll('.block-btn')
+            blockbtn.forEach(function (button){
+                button.addEventListener('click',function (){
+                    const userId=button.getAttribute('data-id');
+                  $.ajax({
+                    url:`/admin/user-block/${userId}`,
+                    method:'GET',
+                    success:function (response){
+                        location.reload()
+                    },
+                    error:function (xhr,status,error){
+                        console.error('error while blocking user',error)
+                    }
+                  })
+
+                })
+
+            })
+        
+    })
+      
+    document.addEventListener("DOMContentLoaded",function(){
+        const unblockbtn = document.querySelectorAll(".unblock-btn")
+        unblockbtn.forEach(function (button){
+            button.addEventListener('click',function(){
+                const userId =button.getAttribute('data-id');
+                $.ajax({
+                    url:`/admin/user-unblock/${userId}`,
+                    method:'GET',
+                    success: function(response){
+                        location.reload()
+                    },
+                    error: function (xhr,status,error){
+                        console.error("error while unblocking user",error)
+                    }
+
+                })
+            })
+        })
+    })
+    
+    
+    
+    
+    
+  
+</script>
+<%- include("../../views/partials/admin/footer") %>
