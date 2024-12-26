@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose")
 const User = require("../models/userSchema")
 const bcrypt = require("bcrypt")
 const Category = require("../models/categorySchema")
+const Brand = require('../models/brandSchema'); 
 
 const loadAdminLogin = async (req, res) => {
     try {
@@ -205,17 +206,17 @@ const editCategory = async (req,res)=>{
     try {
 
         const catid=req.params.categoryId
-        console(catid,"catid")
+        console.log(catid,"catid")
         const {name,description} = req.body
 
         const category = await Category.findById({_id:catid})
      
         if(category){
-            const updatedCategory = await Category.findByIdAndUpdate({_id:categoryId},{
+            const updatedCategory = await Category.findByIdAndUpdate({_id:category._id},{
                 name:name||category.name, description:description||category.description
             },{new:true})
             if(updatedCategory){
-                return res.redirect('/')
+                return res.redirect('/editCategory')
             }
         }
       
@@ -226,6 +227,68 @@ const editCategory = async (req,res)=>{
     }
 }
 
+const loadbrand=async (req,res)=>{
+       try {
+         const page = req.query.page||1;
+         const limit=3
+         const brand = await Brand.find({}).sort({createdAt:-1}).skip((page-1)*limit).limit(limit)
+         const count = await Brand.countDocuments({})
+         const totalpage= Math.ceil(count/limit)
+         res.render('brand',{
+            brand:brand,
+            currentpage:page,
+            totalpage:totalpage,
+            totalbrand:count,
+         })
+       } catch (error) {
+          console.error(error)
+          res.status(400).json({message:"error while loading brandpage"})
+       }
+}
+const addBrand = async (req,res)=>{
+    try {
+        const {name} = req.body
+        console.log(req.body,'name')
+            const existBrand = await Brand.findOne({name:name})
+            if(existBrand){
+                res.status(400).json({message:"Brand already exist"})
+            }else{
+                const newBrand = new Brand({name})
+                await newBrand.save()
+                res.redirect('/admin/brand')
+            }
+        
+    } catch (error) {
+        console.error(error)
+        res.status(400).json({message:"error while adding brand"})
+    }
+}
+
+const listBrand = async (req,res)=>{
+         try {
+            const brandId = req.params.brandId
+            if(brandId){
+                const updateBrand = await Brand.findByIdAndUpdate({_id:brandId},{isListed:true})
+                res.redirect("/admin/brand")
+            }
+         } catch (error) {
+            console.error(error)
+            res.status(400).json({message:"error while listing brand"})
+         }
+}
+const unlistBrand = async (req,res)=>{
+    try {
+        const brandId = req.params.brandId
+        if(brandId){
+            const updateBrand = await Brand.findByIdAndUpdate({_id:brandId},{isListed:false})
+            res.redirect("/admin/brand")
+        }
+        
+    } catch (error) {
+        console.error(error)
+        res.status(400).json({message:"error while unlisting brand"})
+    }
+}
 
 module.exports = {
     loadAdminLogin,
@@ -239,5 +302,9 @@ module.exports = {
     listCategory,
     addCategory,
     loadEditCategory,
-    editCategory
+    editCategory,
+    loadbrand,
+    addBrand,
+    listBrand,
+    unlistBrand
 }

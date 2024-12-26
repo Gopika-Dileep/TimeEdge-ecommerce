@@ -1,5 +1,6 @@
 const express = require("express")
 const router = express.Router()
+const upload = require('../helpers/multer')
 const adminController = require("../controller/adminController");
 
 router.get('/',adminController.loadAdminLogin)
@@ -14,4 +15,8 @@ router.post('/addCategory',adminController.addCategory)
 router.get('/listCategory/:catId',adminController.listCategory)
 router.get('/editCategory',adminController.loadEditCategory)
 router.post('/editCategory/:categoryId',adminController.editCategory)
+router.get('/brand',adminController.loadbrand)
+router.post('/addBrand',adminController.addBrand)
+router.post('/listBrand/:brandId',adminController.listBrand)
+router.post('/unlistBrand/:brandId',adminController.unlistBrand)
 module.exports=router

@@ -1,0 +1,155 @@
+<%- include("../../views/partials/admin/header") %>
+
+    <head>
+        <link rel="stylesheet" href="/styles/brands.css">
+        <style>
+            .content-main {
+                position: absolute;
+                top: 70px;
+                left: 240px;
+                width: calc(100% - 240px);
+                padding: 2rem;
+            }
+
+            @media (max-width: 1000px) {
+                .content-main {
+                    position: absolute;
+                    top: 50px;
+                    left: 20px;
+                    width: calc(100% - 30px);
+                    padding: 2rem;
+                }
+            }
+        </style>
+    </head>
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Brands</h2>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-3">
+                        <form method="POST" action="/admin/addBrand">
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Brand Name</label>
+                                <input type="text" name="name" placeholder="Type here" class="form-control" required />
+                            </div>
+                            <!-- <label for="brand_image" class="form-label">Brand Image</label>
+                            <div class="input-upload">
+                                <input class="form-control border" id="brand_image" name="image" type="file" required />
+                            </div> -->
+                            <div class="d-grid">
+                                <button class="btn btn-primary mt-3" type="submit">
+                                    Add Brand
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+
+                    <div class="col-md-7 offset-md-1">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Brand</th>
+                                        <!-- <th class="text-center">Logo</th> -->
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% brand.forEach((brand)=> { %>
+                                        <tr>
+                                            <td class="text-center">
+                                                <%= brand.name %>
+                                            </td>
+                                          
+                                            <td class="text-center">
+                                                <% if (!brand.isListed) { %>
+                                                    <span class="badge badge-danger"
+                                                        style="color: red; font-size: medium;">
+                                                        unlisted
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span class="badge badge-success"
+                                                            style="color: green; font-size: medium;">
+                                                            listed
+                                                        </span>
+                                                        <% } %>
+                                            </td>
+                                            <td class="text-center">
+                                                <% if (!brand.isListed) { %>
+                                                    <form method="POST" action="/admin/listBrand/<%= brand._id %>"
+                                                        style="display: inline;">
+                                                        <button class="btn btn-success" style="width: 90px;">
+                                                            list
+                                                        </button>
+                                                    </form>
+                                                    <% } else { %>
+                                                        <form method="POST"
+                                                            action="/admin/unlistBrand/<%= brand._id %>"
+                                                            style="display: inline;">
+                                                            <button class="btn btn-danger" style="width: 90px;">
+                                                                Unlist
+                                                            </button>
+                                                        </form>
+                                                        <% } %>
+
+                                                            <!-- Delete Button -->
+                                                            <!-- <form 
+                                                method="POST" 
+                                                action="/admin/deleteBrand/" 
+                                                style="display: inline;"
+                                            >
+                                                <button 
+                                                    class="btn btn-danger" 
+                                                    style="width: 90px;" 
+                                                    onclick="return confirmDelete()"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </form> -->
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="pagination-container text-center mt-4">
+            <% if (currentpage> 1) { %>
+                <a href="?page=<%= currentpage - 1 %>">&laquo; Previous</a>
+                <% } %>
+                    <% for (let i=1; i <=totalpage; i++) { %>
+                        <% if (i===currentpage) { %>
+                            <span class="current-page">
+                                <%= i %>
+                            </span>
+                            <% } else { %>
+                                <a href="?page=<%= i %>">
+                                    <%= i %>
+                                </a>
+                                <% } %>
+                                    <% } %>
+                                        <% if (currentpage < totalpage) { %>
+                                            <a href="?page=<%= currentpage + 1 %>">Next &raquo;</a>
+                                            <% } %>
+        </div>
+    </section>
+
+    <script>
+      
+    </script>
+
+    <%- include("../../views/partials/admin/footer") %>
