@@ -1,6 +1,8 @@
 const User = require("../models/userSchema");
 
 const userAuth = async (req,res,next)=>{
+    // alert("userAuth")
+    
     if(req.session.user){
         const user=await User.findById({_id:req.session.user})
             if(user && !user.isBlocked){

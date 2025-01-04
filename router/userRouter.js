@@ -45,8 +45,8 @@ router.post("/update-email",userAuth,profileController.updateEmail);
 router.get('/change-password',userAuth,profileController.changePassword)
 router.post("/change-password",userAuth,profileController.changePasswordValid);
 router.post("/verify-changepassword-otp",userAuth,profileController.verifychangePasswordOtp);
-router.get("/reset-password",userAuth,profileController.getResetPassPage)
-router.post("/reset-password",userAuth,profileController.postNewPassword);
+router.get("/reset-password",profileController.getResetPassPage)
+router.post("/reset-password",profileController.postNewPassword);
 router.get("/addAddress",userAuth,profileController.addAddress);
 router.post("/addAddress",userAuth,profileController.postAddAddress);
 router.get("/editAddress",userAuth,profileController.editAddress);

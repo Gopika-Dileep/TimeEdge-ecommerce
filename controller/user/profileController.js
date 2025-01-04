@@ -261,9 +261,9 @@ const changePasswordValid = async(req,res)=>{
 
 const verifychangePasswordOtp = async(req,res)=>{
     try {
-        const {otp}=req.body
+        const {otp,email}=req.body
         const userId = req.session.user;
-        const user = await User.findById({_id:userId})
+        const user = await User.findOne({email:email})
         const userOtp = user.otp
         if(userOtp===otp){
             res.json({success:true,redirectUrl:'/reset-password'})
@@ -304,11 +304,15 @@ const securepassword = async (password) => {
 
 const postNewPassword = async(req,res)=>{
     try {
-        const {newPassword,confirmPassword}=req.body
-        const userId = req.session.user
+        const {newPassword,confirmPassword,email}=req.body
+        console.log(newPassword,'newPassword')
+        console.log(confirmPassword,'confirmPassword')
         if (newPassword===confirmPassword){
          const passwordHash = await securepassword(newPassword);
-         const user = await User.findByIdAndUpdate({_id:userId},{$set:{password:passwordHash}},{new:true})
+         const userdata = await User.findOne({email:email})
+         console.log(userdata,'userdata')
+         const user = await User.updateOne({email:email},{$set:{password:passwordHash}})
+         console.log(user,'user')
          return res.json({ success: true, redirectUrl: "/login" });
         }else{
             res.render("reset-password",{message:"Passwords do not match"});
