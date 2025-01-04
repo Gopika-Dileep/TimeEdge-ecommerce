@@ -294,7 +294,7 @@ const unlistBrand = async (req,res)=>{
 const getOrders = async (req,res)=>{
     try {
         const orders = await Order.find().populate('orderedItems.products').populate('user')
-        console.log(orders,'oreds')
+       
         res.render('orderslist',{orders})
         
     } catch (error) {
@@ -303,6 +303,35 @@ const getOrders = async (req,res)=>{
     }
 }
 
+const getOrderDetails = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const order = await Order.findById(orderId).populate("user").populate("orderedItems.products").populate('address');
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+        res.render("productdetail", { order });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to fetch order details" });
+    }
+};
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { status } = req.body; 
+
+        const order = await Order.findByIdAndUpdate({_id:orderId},{status:status},{ new: true });
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        res.redirect(`/admin/order/${orderId}`);  
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to update order status" });
+    }
+};
 
 module.exports = {
     loadAdminLogin,
@@ -321,6 +350,8 @@ module.exports = {
     addBrand,
     listBrand,
     unlistBrand,
-    getOrders
+    getOrders,
+    getOrderDetails,
+    updateOrderStatus
     
 }

@@ -1,0 +1,69 @@
+<%- include("../partials/admin/header.ejs") %>\
+<style>
+        .container {
+        position: absolute;
+        top: 70px;
+        left: 240px;
+        width: calc(100% - 240px);
+        padding: 2rem;
+    }
+    @media (max-width: 1000px) {
+        .container {
+        position: absolute;
+        top: 50px;
+        left: 20px;
+        width: calc(100% - 30px);
+        padding: 2rem;
+    }
+    }
+</style>
+
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="h4 mb-0">Order Details</h1>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                <p><strong>Order ID:</strong> <%= order._id %></p>
+                <p><strong>User:</strong> <%= order.user?.name %></p>
+                <p><strong>Status:</strong> 
+                    <span class="badge <%= order.status === 'Delivered' ? 'bg-success' : order.status === 'Pending' ? 'bg-warning' : 'bg-secondary' %>">
+                        <%= order.status %>
+                    </span>
+                </p>
+            </div>
+
+            <h3 class="h5 mb-3">Items</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% order.orderedItems.forEach(function(item) { %>
+                            <tr>
+                                <td><%= item.products?.productName %></td>
+                                <td><%= item.quantity %></td>
+                                <td>&#8377;<%= item.price %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+
+
+        
+            <h3 class="h5 mt-4">Total Amount: <span class="text-success">&#8377;<%= order.finalAmount %></span></h3>
+
+         
+            <a href="/admin/orders" class="btn btn-outline-secondary mt-3">Back to Orders</a>
+        </div>
+    </div>
+</div>
+
+<%- include("../partials/admin/footer.ejs") %>

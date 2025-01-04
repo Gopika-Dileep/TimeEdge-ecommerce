@@ -118,15 +118,6 @@ const cancelOrder = async(req,res)=>{
         res.status(500).json({message:"server error"})
     }
 }
-// const listOrder = async(req,res)=>{
-//     try {
-//         const orders = await Order.find({}).populate('orderedItems.products')
-//         res.render('profile',{orders})
-//     } catch (error) {
-//         console.error(error)
-//         res.status(500).json({message:"server error"})
-//     }
-// }
 module.exports = {
     getCheckoutPage,
     getOrderConfirmationPage,

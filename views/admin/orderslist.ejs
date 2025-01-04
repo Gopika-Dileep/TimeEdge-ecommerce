@@ -198,9 +198,22 @@ h1 {
                 </td>
     
                 <td>
-                  <button class="btn view">View</button>
-                  <button class="btn update">Update</button>
-                </td>
+                  <a href="/admin/orders/<%= order._id %>" class="btn btn-outline-primary btn-sm">
+                      View Details
+                  </a>
+
+                 
+                  <form action="/admin/orders/<%= order._id %>/status" method="POST" class="d-inline">
+                      <select name="status" class="form-select form-select-sm d-inline w-auto">
+                          <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                          <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                          <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                          <option value="Canceled" <%= order.status === 'Canceled' ? 'selected' : '' %>>Canceled</option>
+                      </select>
+                      <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                  </form>
+              </td>
+          </tr>
               </tr>
             <% }); %>
           </tbody>

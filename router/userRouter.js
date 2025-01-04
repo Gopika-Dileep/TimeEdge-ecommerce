@@ -62,9 +62,7 @@ router.post('/create-order',userAuth, orderController.createOrder);
 router.get('/order-confirmation',userAuth,orderController.getOrderConfirmationPage);
 
 router.get('/order',userAuth,orderController.showOrder)
-// router.get('/orders',userAuth,orderController.listOrder)
 router.post('/cancelorder/:orderId',userAuth,orderController.cancelOrder)
-// router.get('/ordercancel',userAuth,orderController.getOrderCancelPage);
 
 
 

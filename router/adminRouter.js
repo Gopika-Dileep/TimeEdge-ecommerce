@@ -40,6 +40,9 @@ router.get('/listProduct',adminAuth,productController.listproduct)
 router.get('/unlistProduct',adminAuth,productController.unlistproduct)
 
 router.get('/orders',adminAuth,adminController.getOrders)
+router.get("/order/:orderId",  adminController.getOrderDetails)
+router.post("/orders/:orderId/status",adminController.updateOrderStatus);
+
 
 
 module.exports=router
