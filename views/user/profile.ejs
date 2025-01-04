@@ -191,12 +191,12 @@
                      <h5 class="mb-0 text-center">User Profile</h5>
                    </div>
                    <div class="card-body text-center">
-                     <h5 class="card-title"><%=userData.name%></h5>
+                     <h5 class="card-title"><%=user.name%></h5>
                      <p class="card-text">
-                       <strong>Phone:</strong><%=userData.phone%>
+                       <strong>Phone:</strong><%=user.phone%>
                      </p>
                      <p class="card-text">
-                       <strong>Email:</strong><%=userData.email%>
+                       <strong>Email:</strong><%=user.email%>
                      </p>
                      <a href="/change-email" class="btn btn-sm btn-success ml-2">Change Email</a>
                      <a href="/change-password" class="btn btn-sm btn-success">Change Password</a>
@@ -289,7 +289,7 @@
                           <% orders.forEach(order => { %>
                             <% order.orderedItems.forEach(item => { %>
                                 <tr>
-                                    <td><%= item.products.productName %></td>
+                                    <td><%= item.products?.productName %></td>
                                     <td><%= item.quantity %></td>
                                     <td><%= item.price %></td>
                                     <td><%= order.status %></td>

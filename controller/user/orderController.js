@@ -23,8 +23,9 @@ const getCheckoutPage = async(req,res)=>{
             cart.items.forEach(item=>{
                 subtotal+=item.price* item.quantity
             })
+            const user= await User.findById({_id:userId})
             let cartId = cart?._id
-            res.render('checkout',{cart:cart.items,address:address,total:subtotal,cartId:cartId})
+            res.render('checkout',{cart:cart.items,address:address,total:subtotal,cartId:cartId,user:user})
 
 
     } catch (error) {

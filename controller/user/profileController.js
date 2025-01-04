@@ -24,7 +24,7 @@ const userProfile = async (req,res)=>{
         
         const userAddress = await Address.findOne({userId:userId});
         res.render("profile",{
-            userData:userData,
+            user:userData,
             userAddress:userAddress,
             orders:orders})
     } catch (error) {
@@ -178,8 +178,6 @@ const verifyForgotPassOtp = async(req,res)=>{
         const {otp,email} = req.body
   
         const user = await User.findOne({email:email})
-
-        // console.log(user, 'user')
         const userOtp=user.otp
         if(userOtp===otp){
             res.json({success:true,redirectUrl:`/reset-password?email=${encodeURIComponent(email)}`});

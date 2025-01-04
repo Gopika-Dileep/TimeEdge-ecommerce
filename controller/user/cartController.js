@@ -16,8 +16,8 @@ const loadAddToCart = async (req, res) => {
 
         if (cart) {
             const totalPrice = cart.items.reduce((total, item) => total + item.price, 0);
-            console.log(totalPrice, "totalPrice")
-            res.render('cart', { cart: cart, totalPrice: totalPrice })
+            const user = await User.findById({_id:userId})
+            res.render('cart', { cart: cart, totalPrice: totalPrice,user:user})
         } else {
             res.render('cart', { message: "cart is empty" })
         }
