@@ -1,0 +1,388 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+.content-main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-header {
+    margin-bottom: 20px;
+}
+
+h2.content-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.error-message {
+    font-size: 12px;
+    color: red;
+    margin-top: 5px;
+    display: none;
+}
+
+
+.form-select {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+
+.card {
+    border: 1px solid #e3e3e3;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+.card-header {
+    background-color: #f5f5f5;
+    padding: 10px 15px;
+    border-bottom: 1px solid #e3e3e3;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+
+.thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+img {
+    max-width: 100%;
+    border-radius: 5px;
+}
+
+.image-cropper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #007bff;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #f5f5f5;
+}
+
+.image-cropper img {
+    max-width: 100%;
+    max-height: 200px;
+    margin-right: 10px;
+}
+
+.image-cropper button {
+    margin-left: 10px;
+}
+
+.card-body.align-items-center img {
+    display: block;
+    margin: 0 auto 10px;
+    max-width: 150px;
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.card-body.align-items-center input[type="file"] {
+    display: block;
+    margin: 10px auto;
+    max-width: 250px;
+}
+
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-lg-4, .col-sm-6, .col-lg-6 {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-lg-4 {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+}
+
+.col-sm-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+.col-lg-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+
+    .col-lg-6, .col-lg-4 {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .form-select, .form-control {
+        width: 100%;
+    }
+
+    .card-body.align-items-center input[type="file"] {
+        max-width: 100%;
+    }
+
+    .image-cropper {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .image-cropper button {
+        margin: 10px 0 0;
+    }
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+.content-main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-header {
+    margin-bottom: 20px;
+}
+
+h2.content-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.error-message {
+    font-size: 12px;
+    color: red;
+    margin-top: 5px;
+    display: none; 
+}
+
+
+.form-select {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+
+.card {
+    border: 1px solid #e3e3e3;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+.card-header {
+    background-color: #f5f5f5;
+    padding: 10px 15px;
+    border-bottom: 1px solid #e3e3e3;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+img {
+    max-width: 100%;
+    border-radius: 5px;
+}
+
+.image-cropper {
+    border: 1px dashed #007bff;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+}
+
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+
+    .col-lg-6, .col-lg-4 {
+        width: 100%;
+    }
+
+    .form-select, .form-control {
+        width: 100%;
+    }
+}
+
+
+
+
+
+
+.error-message{
+    color: red;
+}
+
+
+    .thumbnails-container {
+        display: flex;
+        overflow-x: auto;
+    }
+
+
+    .thumbnail {
+        margin-right: 10px;
+
+
+    }
+    .content-main{
+        position: absolute;
+        top: 70px;
+        left: 240px;
+        width: calc(100% - 240px);
+        padding: 2rem;
+    }
+    @media (max-width: 1000px) {
+        .content-main {
+        position: absolute;
+        top: 50px;
+        left: 20px;
+        width: calc(100% - 30px);
+        padding: 2rem;
+    }
+    }

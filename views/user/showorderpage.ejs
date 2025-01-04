@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Orders</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .order-details {
+            margin-top: 20px;
+        }
+
+        .order-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fdfdfd;
+        }
+
+        .order-card h3 {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .order-info span {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .order-info span.label {
+            font-weight: bold;
+        }
+
+        .order-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .order-buttons a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            width: 48%;
+        }
+
+        .order-buttons a:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .order-info {
+                flex-direction: column;
+            }
+
+            .order-buttons a {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Your Orders</h1>
+        </div>
+        <div class="order-details">
+            <% for (let i = 0; i < order.orderedItems.length; i++) { %>
+            <div class="order-card">
+                <h3>Product Name:<%= order.orderedItems[i].products.productName  %></h3>
+                <div class="order-info">
+                    <span><span class="label">Order Date:</span><%= order.createdOn%></span>
+                </div>
+
+                <div class="order-buttons">
+                    <% if (order.status !== 'Cancelled') { %>
+                      <a href="#" class="cancel-order" data-id="<%= order._id %>">Cancel Order</a>
+                    <% } %>
+                  </div>
+                  
+            </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    const cancelorderbtn = document.querySelectorAll('.cancel-order');
+    cancelorderbtn.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                alert('sdfgh')
+                const orderId = this.getAttribute('data-id');
+                $.ajax({
+
+                    url: `/cancelorder/${orderId}`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'order cancelled successfully',
+                            text: response.message,
+                            confirmButtonText: 'OK',
+                        }).then((confirmation) => {
+                            if (confirmation.isConfirmed) {
+                                window.location.href = '/shop';
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Error while cancelling order. Please try again!",
+                            confirmButtonText: 'OK',
+                        });
+                        console.error('Error while adding to Cart', error);
+                    }
+                });
+            });
+        });
+
+
+</script>
+</html>

@@ -1,0 +1,241 @@
+<%-include("../../views/partials/user/header") %>
+
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Shop</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <span><a href="/shop">Shop</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <section class="shop spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="shop__sidebar">
+                        <div class="shop__sidebar__search">
+                            <form action="#">
+                                <input type="text" placeholder="Search...">
+                                <button type="submit"><span class="icon_search"></span></button>
+                            </form>
+                        </div>
+                        <div class="shop__sidebar__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__categories">
+                                                <ul class="nice-scroll">
+                                                    <% for (let i=0; i < category.length; i++) { %>
+                                                        <li><a href="/filter?category=<%=category[i]._id%>">
+                                                                <%= category[i].name %>
+                                                            </a></li>
+                                                        <% } %>
+                                                </ul>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseTwo">Branding</a>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__brand">
+                                                <ul>
+                                                    <% for (let i=0; i < brand.length; i++) { %>
+                                                        <li><a href="/filter?brand=<%=brand[i]._id%>">
+                                                                <%= brand[i].name %>
+                                                            </a></li>
+                                                        <% } %>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseThree">Sort By Price</a>
+                                    </div>
+                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__price">
+                                                <ul>
+                                                    <li><a href="/filterPriceRange?sort=asc">Low to High</a></li>
+                                                    <li><a href="/filterPriceRange?sort=desc">High to Low</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
+                                    </div>
+                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__price">
+                                                <ul>
+                                                    <li><a href="/filterPrice?gt=1000&lt=3000">1000 - 3000</a></li>
+                                                    <li><a href="/filterPrice?gt=3000&lt=5000">3000 - 5000</a></li>
+                                                    <li><a href="/filterPrice?gt=5000&lt=10000">5000 - 10000</a></li>
+                                                    <li><a href="/filterPrice?gt=10000&lt=20000">10000 - 20000</a></li>
+                                                    <li><a href="/filterPrice?gt=20000">20000+</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="shop__product__option">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="shop__product__option__left">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <% for (let i=0; i < product.length; i++) { %>
+                            <div class="col-lg-4 col-md-6 col-sm-6">
+                                <div class="product__item">
+                                    <a href="/productDetails?id=<%= product[i]._id %>">
+                                        <div class="product__item__pic set-bg"
+                                            data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>">
+                                            <ul class="product__hover">
+                                                <li>
+
+                                                    <img src="img/icon/heart.png" alt=""><span>Wishlist</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </a>
+
+                                    </a>
+                                    <div class="product__item__text">
+                                        <h6>
+                                            <%= product[i].productName %>
+                                        </h6>
+                                        <a href="#" class="add-cart" data-id="<%= product[i]._id %>" data-quantity="1"
+                                            data-price="<%= product[i].salePrice %>">
+                                            + Add To Cart
+                                        </a>
+                                        <div class="rating">
+                                            <% for (let j=0; j < 5; j++) { %>
+                                                <i
+                                                    class="fa <%= j < product[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
+                                                <% } %>
+                                        </div>
+                                        <p>₹<%= product[i].salePrice%><span class='text-muted'><strike>
+                                                        <%= product[i].regularPrice%>
+                                                    </strike></span></p>
+
+                                    </div>
+                                    </a>
+                                </div>
+                            </div>
+                            <% } %>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="product__pagination">
+                                <% if (currentpage> 1) { %>
+                                    <a href="?page=<%= currentpage - 1 %>">&laquo;</a>
+                                    <% } %>
+
+                                        <% for (let i=1; i <=totalpage; i++) { %>
+                                            <a href="?page=<%= i %>" class="<%= currentpage === i ? 'active' : '' %>">
+                                                <%= i %>
+                                            </a>
+                                            <% } %>
+
+                                                <% if (currentpage < totalpage) { %>
+                                                    <a href="?page=<%= currentpage + 1 %>">&raquo;</a>
+                                                    <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+    <script>
+
+
+        document.querySelectorAll('.set-bg').forEach(function (element) {
+            const bg = element.getAttribute('data-setbg');
+            if (bg) {
+                element.style.backgroundImage = `url('${bg}')`;
+            }
+        });
+        const addToCartbtn = document.querySelectorAll('.add-cart');
+        addToCartbtn.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const productId = this.getAttribute('data-id');
+                const quantity = this.getAttribute('data-quantity');
+                $.ajax({
+
+                    url: `/addToCart/${productId}`,
+                    method: 'POST',
+                    data: JSON.stringify({ quantity: quantity }),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Added to Cart',
+                            text: response.message,
+                            confirmButtonText: 'OK',
+                        }).then((confirmation) => {
+                            if (confirmation.isConfirmed) {
+                                window.location.href = '/cart';
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Error while adding to cart. Please try again!",
+                            confirmButtonText: 'OK',
+                        });
+                        console.error('Error while adding to Cart', error);
+                    }
+                });
+            });
+        });
+
+
+    </script>
+    <%-include("../../views/partials/user/footer") %>

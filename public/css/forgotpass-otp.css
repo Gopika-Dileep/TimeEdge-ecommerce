@@ -1,0 +1,159 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f7f7f7;
+}
+
+.container {
+    background: #ffffff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 450px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 20px auto;
+}
+
+h3 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+}
+
+.otp-timer-wrapper {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.otp-timer {
+    display: inline-block;
+    padding: 5px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.alert {
+    margin-top: 15px;
+    padding: 10px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.text-muted {
+    font-size: 0.85rem;
+    margin-top: 15px;
+}
+
+.text-muted a {
+    color: #007bff;
+}
+
+.text-muted a:hover {
+    text-decoration: underline;
+}
+
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    h3 {
+        font-size: 1.6rem;
+    }
+
+    button {
+        font-size: 0.9rem;
+    }
+
+    input[type="text"] {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h3 {
+        font-size: 1.4rem;
+    }
+
+    button {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+
+    input[type="text"] {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+}

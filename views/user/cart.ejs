@@ -1,0 +1,289 @@
+<%- include("../../views/partials/user/header") %>
+<head>
+   <title>Shopping Cart</title> 
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"> 
+
+   
+   <style> 
+    * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Arial', sans-serif; 
+} 
+/* .total-price {
+    font-size: 1rem; 
+    font-weight: bold; 
+    color: #333; 
+    margin-top: 30px;
+} */
+    .cart-container { 
+        max-width: 900px; 
+        margin: 50px auto; 
+        padding: 20px; 
+        background-color: #fff; 
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+         border-radius: 8px; 
+        } 
+         .cart-header { 
+            text-align: center;
+             margin-bottom: 30px;
+             } 
+         .cart-header h1 {
+             font-size: 2rem; 
+             color: #333; 
+            } 
+         .cart-items {
+            margin-bottom: 20px; 
+        } 
+         .cart-item { 
+            display: flex;
+             justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 0; 
+            border-bottom: 1px solid #ddd; 
+        } 
+            .cart-item img { 
+                width: 80px; 
+                height: 80px; 
+                object-fit: cover; 
+                border-radius: 8px; 
+                margin-right: 20px;
+             } 
+            .item-details {
+                 flex: 1; 
+                 margin-right: 20px; 
+                } 
+            .item-details h3 { 
+                font-size: 1rem; 
+                color: #333; 
+                margin-bottom: 10px;
+             } 
+            .item-details p {
+                 font-size: 0.9rem; 
+                 color: #666; 
+                } 
+            .quantity-controls {
+                 display: flex; 
+                 align-items: center; 
+                } 
+            .quantity-controls button { 
+                width: 30px; 
+                height: 30px; 
+                border: none;
+                 background-color: #ddd; 
+                 color: #333; 
+                 font-size: 1.2rem; 
+                 cursor: pointer;
+                  border-radius: 4px;
+                   margin: 0 5px; 
+                } 
+                 .item-price { 
+                    font-size: 1rem; 
+                    font-weight: bold; 
+                    color: #333;
+                 } 
+                 .cart-footer {
+                     display: flex; 
+                     justify-content: space-between; 
+                     align-items: center; 
+                     padding-top: 20px; 
+                    } 
+                 .total-price {
+                     font-size: 1.2rem; 
+                     font-weight: bold; 
+                    }
+                  .btn-checkout { 
+                    padding: 10px 20px; 
+                    background-color: #28a745; 
+                    color: #fff; 
+                    border: none; 
+                    border-radius: 4px; 
+                    cursor: pointer; 
+                    font-size: 1rem; 
+                } 
+                    .btn-checkout:hover {
+                         background-color: #218838; 
+                        } 
+                    .empty-cart {
+                         text-align: center; 
+                         padding: 50px 0; 
+                         font-size: 1.2rem; 
+                         color: #666; 
+                        } 
+                    @media (max-width: 768px) {
+                         .cart-container {
+                             padding: 10px; 
+                            } 
+                    .cart-item { 
+                        flex-direction: column; 
+                        align-items: flex-start; 
+                    } 
+                    .item-details { 
+                        margin-bottom: 10px; 
+                    } 
+                    .quantity-controls {
+                         margin-bottom: 10px; 
+                        } 
+                    .item-price { 
+                        align-self: flex-end;
+                     }
+                     .cart-footer { 
+                        flex-direction: column; 
+                        align-items: flex-start;
+                     } 
+                     .total-price { 
+                        margin-bottom: 10px;
+                     } 
+                     .btn-checkout {
+                         width: 100%; 
+                         text-align: center;
+                         } 
+                 } 
+    .btn-remove { 
+        color: red;
+         cursor: pointer;
+          font-size: 1.2rem;
+         }
+    </style>
+</head>
+<body>
+    <div class="cart-container">
+        <div class="cart-header">
+            <h1>Shopping Cart</h1>
+           
+        </div>
+        <div class="cart-items">
+            <% if (typeof cart !== 'undefined' && cart.items && cart.items.length > 0) { %>
+                <% cart.items.forEach(item => { %>
+                    <div class="cart-item">
+                        <img src="<%= item.product.productImage && item.product.productImage.length > 0 ? '/uploads/productImages/' + item.product.productImage[0] : '/uploads/productImages/default.png' %>" alt="<%= item.product.productName %>">
+                        <div class="item-details">
+                            <h3><%= item.product.productName %></h3>
+                            <p><%= item.product.description %></p>
+                        </div>
+                        <div class="quantity-controls">
+                            <button onclick="decreaseQuantity('<%= item._id %>')">−</button>
+                            <span><%= item.quantity %></span>
+                            <button onclick="increaseQuantity('<%= item._id %>')">+</button>
+                        </div>
+                        <div class="item-price">₹<%= item.price %></div>
+                        <div class="btn-remove" onclick="removeItem('<%= item._id %>')"> 
+                            <i class="bi bi-trash"></i> </div>
+                    </div>
+                       
+                    <% }) %>
+                    <div class="cart-footer">
+                        <div class="total-price">
+                            <h3>Total: ₹<%= totalPrice %></h3>
+                        </div>
+                        <button id="btn-checkout" class="btn-checkout">Proceed to Checkout</button>
+    
+                    </div>
+                    
+                    <% } else { %>
+                        <div class="empty-cart">
+                            <h3>Your cart is empty!</h3>
+                        </div>
+            <% } %>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> 
+    <script>
+       
+       function increaseQuantity(itemId) {
+    $.ajax({
+        url: `/increment/${itemId}`,
+        type: 'PATCH',
+        contentType: 'application/json',
+        success: function (result) {
+            if (result.success) {
+                location.reload(); 
+            } else {
+                alert(result.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error incrementing quantity:', error);
+            alert('Something went wrong. Please try again later.');
+        },
+    });
+}
+
+
+
+function decreaseQuantity(itemId) {
+    $.ajax({
+        url: `/decrement/${itemId}`,
+        type: 'PATCH',
+        contentType: 'application/json',
+        success: function (result) {
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error decrementing quantity:', error);
+            alert('Something went wrong. Please try again later.');
+        },
+    });
+}
+
+
+function removeItem(itemId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to remove this item from the cart?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, remove it!',
+        cancelButtonText: 'No, keep it',
+    }).then((confirmation) => {
+        if (confirmation.isConfirmed) {
+            $.ajax({
+                url: `/remove/${itemId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.success) {
+                        Swal.fire('Removed!', 'The item has been removed from your cart.', 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error removing item:', error);
+                },
+            });
+        }
+    });
+}
+$(document).ready(function () {
+    $('#btn-checkout').on('click', function () {
+      $.ajax({
+        url: '/checkout', 
+        type: 'GET',
+        success: function (response) {
+            window.location.href = '/checkout';
+          console.log('Checkout successful:', response);
+        },
+        error: function (xhr, status, error) {
+          console.error('Error during checkout:', status, error);
+         
+        },
+      });
+    });
+  });
+
+    </script>
+</body>
+</html>
+<%- include("../../views/partials/user/footer") %>
