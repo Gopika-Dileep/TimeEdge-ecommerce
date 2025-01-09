@@ -1,0 +1,232 @@
+<%-include("../../views/partials/user/header") %>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+
+
+<style>
+  /* General Section Styling */
+.wishlist {
+  padding: 2rem 1rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.section--lg {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Table Container Styling */
+.table__container {
+  overflow-x: auto;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+/* Table Styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table thead {
+  background-color: #333;
+  color: #fff;
+}
+
+.table th {
+  padding: 1rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+
+.table td {
+  padding: 1rem;
+  font-size: 0.95rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #ddd;
+}
+
+.table__img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.table__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.table__description {
+  font-size: 0.85rem;
+  color: #777;
+  margin: 0.25rem 0 0;
+}
+
+.table__price {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.table__stock {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.table__trash {
+  font-size: 1.5rem;
+  color: #dc3545;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.table__trash:hover {
+  color: #ff0000;
+}
+
+/* Button Styling */
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn--sm {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .table__img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .table__title {
+    font-size: 0.9rem;
+  }
+
+  .table__description {
+    font-size: 0.8rem;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .table th, .table td {
+    font-size: 0.8rem;
+    padding: 0.75rem;
+  }
+}
+
+</style>
+
+<section class="wishlist section--lg container">
+    <div class="table__container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Stock Status</th>
+            <th>Action</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (wishlist && wishlist.products && wishlist.products.length > 0) { %>
+            <%wishlist.products.forEach(product=>{%>
+          <tr>
+            <td>
+              <img
+                src="<%= product.productId.productImage && product.productId.productImage.length >0 ?  '/uploads/productImages/' + product.productId.productImage[0]: '/uploads/productImages/default.png'%>"
+                alt="<%= product.productId.productName%>"
+                class="table__img"
+              />
+            </td>
+            <td>
+              <h3 class="table__title">
+             <%= product.productId.productName%>
+              </h3>
+              <p class="table__description">
+                <%= product.productId.description%>
+              </p>
+            </td>
+            <td>
+              <span class="table__price">₹<%= product.price%></span>
+            </td>
+            <td><span class="table__stock"><%= product.productId.status %></span></td>
+            <td><a href="#" class="btn btn--sm">Add to Cart</a></td>
+            <td><div class="btn-remove" onclick="removeItem('<%= product._id %>')">
+              <i class="fas fa-trash"></i>
+            </div></td>
+          </tr>
+          <%})%>
+       
+        </tbody>
+        <%}else{%>
+          <div class="empty wishlist">
+            <h3>Your wishlist is empty!</h3>
+          </div>
+        <%}%>
+      </table>
+    
+    </div>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function removeItem(itemId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to remove this item from the wishlist?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, remove it!',
+        cancelButtonText: 'No, keep it',
+    }).then((confirmation) => {
+        if (confirmation.isConfirmed) {
+            $.ajax({
+                url: `/removeitem/${itemId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.success) {
+                        Swal.fire('Removed!', 'The item has been removed from your cart.', 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error removing item:', error);
+                },
+            });
+        }
+    });
+}
+  </script>
+  <%-include("../../views/partials/user/footer") %>

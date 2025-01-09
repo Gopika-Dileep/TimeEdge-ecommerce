@@ -5,6 +5,7 @@ const productController = require('../controller/user/productController')
 const cartController = require('../controller/user/cartController')
 const profileController = require("../controller/user/profileController")
 const orderController = require("../controller/user/orderController")
+const wishlistController = require("../controller/user/wishlistController")
 const {userAuth,adminAuth} = require("../middleware/auth");
 
 
@@ -63,6 +64,10 @@ router.get('/order-confirmation',userAuth,orderController.getOrderConfirmationPa
 
 router.get('/order',userAuth,orderController.showOrder)
 router.post('/cancelorder/:orderId',userAuth,orderController.cancelOrder)
+
+router.get('/wishlist',userAuth,wishlistController.loadWishlist)
+router.post('/addToWishlist/:productId',userAuth,wishlistController.addToWishlist)
+router.post('/removeitem/:itemId',userAuth,wishlistController.removeItem)
 
 
 

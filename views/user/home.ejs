@@ -208,7 +208,7 @@ body {
                             <a href="/productDetails?id=<%=product[i]._id%>">
                             <div class="product__item__pic set-bg" data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>" >
                                 <ul class="product__hover">
-                                    <li><img src="/img/icon/heart.png" alt=""><span>Whishlist</span></li>
+                                    <li><img src="/img/icon/heart.png" alt="" class="add-to-wishlist" data-id="<%= product[i]._id %>"><span>Wishlist</span></li>
                                 </ul>
                             </div>
                             <div class="product__item__text">
@@ -221,7 +221,19 @@ body {
                                         <i class="fa <%= j < product[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
                                     <% } %>
                                 </div>
-                                <p class="price">$<%= product[i].salePrice%><span class='text-muted regular-price'><strike><%= product[i].regularPrice%></strike></span></p>
+                                <% 
+                                const productOffer = product[i].productOffer || 0;
+                                const categoryOffer = product[i].category.categoryOffer || 0;
+                                const bestOffer = Math.max(productOffer, categoryOffer);
+                                const salePrice = product[i].salePrice;
+                                const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
+                              %>
+                                <span class="price"><%= finalPrice %></span>
+                                <% if (finalPrice < salePrice) { %>
+                                    <span class="price">$<%= product[i].salePrice%></span>
+                                  <% } %>
+                                  <p><span class='text-muted regular-price'><strike><%= product[i].regularPrice%></strike></span>
+                                </p>
     
 
                             </div>
@@ -279,7 +291,49 @@ body {
             });
         });
 
-
+    const addToWishbtn = document.querySelectorAll('.add-to-wishlist')
+    addToWishbtn .forEach(function(button){
+        button.addEventListener('click',function(event){
+            event.preventDefault();
+            const productId = this.getAttribute('data-id')
+            $.ajax({
+                url:`/addToWishlist/${productId}`,
+                method:'POST',
+                data:JSON.stringify({productId:productId}),
+                contentType:"application/jason",
+                success:function(response){
+                    Swal.fire({
+                        icon:'success',
+                        title:"added to Whislist",
+                        text:response.message,
+                        confirmButtonText:'OK',
+                    }).then(()=>{
+                        Swal.fire({
+                            title:'Go to Wishlist?',
+                            text:'Do you Want to go to Wishlist?',
+                           showCancelButton:true,
+                           confirmButtonText:"YES",
+                           cancelButtonText:"NO",
+                        }).then((confirmation)=>{
+                            if(confirmation.isConfirmed){
+                                window.location.href = '/wishlist'
+                            }else{
+                                console.log('Stay on the current page')
+                            }
+                        })
+                    })
+                },
+                error:function(xhr,status,error){
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text :'Error while adding to wishlist.',
+                        confirmButtonText:"Ok",
+                    })
+                }
+            })
+        })
+    })
     </script>
 
    <%-include("../../views/partials/user/footer") %>

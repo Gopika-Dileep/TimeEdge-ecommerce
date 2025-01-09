@@ -18,6 +18,8 @@ router.post('/addCategory',adminAuth,adminController.addCategory)
 router.get('/listCategory/:catId',adminAuth,adminController.listCategory)
 router.get('/editCategory',adminAuth,adminController.loadEditCategory)
 router.post('/editCategory/:categoryId',adminAuth,adminController.editCategory)
+router.post('/addCategoryOffer',adminAuth,adminController.addOffer)
+router.post('/removeCategoryOffer',adminAuth,adminController.removeOffer)
 router.get('/brand',adminAuth,adminController.loadbrand)
 router.post('/addBrand',adminAuth,adminController.addBrand)
 router.post('/listBrand/:brandId',adminAuth,adminController.listBrand)
@@ -38,10 +40,14 @@ router.post('/deleteImage', (req, res, next) => {
 
 router.get('/listProduct',adminAuth,productController.listproduct)
 router.get('/unlistProduct',adminAuth,productController.unlistproduct)
+router.post('/addProductOffer',adminAuth,productController.addOffer)
+router.post('/removeProductOffer',adminAuth,productController.removeOffer)
 
 router.get('/orders',adminAuth,adminController.getOrders)
 router.get("/order/:orderId",  adminController.getOrderDetails)
 router.post("/orders/:orderId/status",adminController.updateOrderStatus);
+
+router.get('/coupon',adminAuth,coup)
 
 
 

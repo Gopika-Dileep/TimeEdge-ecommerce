@@ -228,6 +228,31 @@ const editCategory = async (req,res)=>{
         res.status(400).json({message:"error while eiting the category "})
     }
 }
+const addOffer = async(req,res)=>{
+    try {
+        const {categoryId,percentage} = req.body
+        const category = await Category.findById({_id:categoryId})
+        category.categoryOffer = percentage
+        category.save()
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({message:"Server error"})
+    }
+}
+const removeOffer = async(req,res)=>{
+    try {
+        const {categoryId} = req.body 
+        const category = await Category.findById({_id:categoryId})
+        category.categoryOffer = 0
+        category.save()
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({message:'server error'})
+    }
+
+}
+
 
 const loadbrand=async (req,res)=>{
        try {
@@ -346,12 +371,14 @@ module.exports = {
     addCategory,
     loadEditCategory,
     editCategory,
+    addOffer,
     loadbrand,
     addBrand,
     listBrand,
     unlistBrand,
     getOrders,
     getOrderDetails,
-    updateOrderStatus
+    updateOrderStatus,
+    removeOffer
     
 }

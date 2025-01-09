@@ -11,7 +11,7 @@ const loadhome = async (req,res)=>{
         const userId=  req.session.user
         const category = await Category.find({isListed:true})
         const brand = await Brand.find({isListed:true})
-        const product = await Product.find({isListed:true,quantity:{$gt:0}}).sort({createdAt:-1}).limit(9)
+        const product = await Product.find({isListed:true,quantity:{$gt:0}}).sort({createdAt:-1}).limit(9).populate('category').populate('brand');
         if(userId){
             const user = await User.findById({_id:userId})
             res.render('home',{user:user,product:product})
@@ -34,7 +34,7 @@ const loadshop = async (req,res)=>{
 
         const page = parseInt(req.query.page)||1
         const limit = 9
-        const product = await Product.find({isListed:true,quantity:{$gt:0}}).sort({createdAt:-1}).skip((page-1)*limit).limit(limit)
+        const product = await Product.find({isListed:true,quantity:{$gt:0}}).sort({createdAt:-1}).skip((page-1)*limit).limit(limit).populate('category').populate('brand');
 
         const totalproduct=await Product.countDocuments({isListed:true})
 

@@ -342,6 +342,33 @@ const unlistproduct = async (req,res)=>{
         res.status(400).json("server error")
       }
 }
+const addOffer = async(req,res)=>{
+    try {
+        const {productId,percentage} = req.body
+        const product = await Product.findById({_id:productId})
+        product.productOffer = percentage
+        product.offerAmount = Math.floor(product.salePrice*percentage/100)
+        product.save()
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({message:"Server error"})
+    }
+}
+
+const removeOffer = async(req,res)=>{
+    try {
+        const {productId} = req.body
+        const product = await Product.findById({_id:productId})
+        product.productOffer =0
+        product.offerAmount=0
+        product.save()
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"server error"})
+    }
+}
+
 module.exports={
     LoadProduct,
     addProducts,
@@ -351,5 +378,7 @@ module.exports={
     deleteSingleImage,
     updateproduct,
     listproduct,
-    unlistproduct
+    unlistproduct,
+    addOffer,
+    removeOffer
 }
