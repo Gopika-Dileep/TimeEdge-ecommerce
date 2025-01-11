@@ -5,7 +5,7 @@ const Brand = require("../../models/brandSchema");
 const Cart = require('../../models/cartSchema');
 const Address = require('../../models/addressSchema');
 const Order = require("../../models/orderSchema");
-
+const Coupon = require("../../models/couponSchema")
 
 
 const getCheckoutPage = async(req,res)=>{
@@ -13,6 +13,7 @@ const getCheckoutPage = async(req,res)=>{
         const userId = req.session.user
 
         const cart = await Cart.findOne({ user: userId }).populate('items.product')
+        const coupon = await Coupon.find({})
        
         if(!cart||cart.items.length==0){
             return res.render('cart',{message:"cart is empty"})
@@ -25,7 +26,7 @@ const getCheckoutPage = async(req,res)=>{
             })
             const user= await User.findById({_id:userId})
             let cartId = cart?._id
-            res.render('checkout',{cart:cart.items,address:address,total:subtotal,cartId:cartId,user:user})
+            res.render('checkout',{cart:cart.items,address:address,total:subtotal,cartId:cartId,user:user,coupon:coupon})
 
 
     } catch (error) {

@@ -3,7 +3,8 @@ const router = express.Router()
 const multer = require("multer")
 const upload = require('../helpers/multer')
 const adminController = require("../controller/admin/adminController");
-const productController = require("../controller/admin/productController")
+const productController = require("../controller/admin/productController");
+const couponController = require('../controller/admin/couponController')
 const {userAuth,adminAuth} = require("../middleware/auth");
 
 router.get('/',adminController.loadAdminLogin)
@@ -47,8 +48,11 @@ router.get('/orders',adminAuth,adminController.getOrders)
 router.get("/order/:orderId",  adminController.getOrderDetails)
 router.post("/orders/:orderId/status",adminController.updateOrderStatus);
 
-router.get('/coupon',adminAuth,coup)
-
+router.get('/coupon',adminAuth,couponController.loadCouponPage)
+router.post('/addCoupon',adminAuth,couponController.addCoupon)
+router.get('/editCoupon',adminAuth,couponController.loadEditCoupon)
+router.post('/editCoupon',adminAuth,couponController.editCoupon)
+router.get('/deleteCoupon',adminAuth,couponController.deleteCoupon)
 
 
 module.exports=router

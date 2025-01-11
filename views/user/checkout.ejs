@@ -5,142 +5,83 @@
      <style>
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+    margin: 20px;
     line-height: 1.6;
-    box-sizing: border-box;
 }
 
-h1, h2, h3 {
-    margin: 0.5em 0;
+h1, h2 {
+    color: #333;
 }
 
-button {
-    cursor: pointer;
-    padding: 0.5em 1em;
+#address-section, #order-summary, #coupons-section, #payment-options {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.address, .coupon {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.address p, .coupon label {
+    margin: 5px 0;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    color: white;
+    background: #007bff;
     border: none;
     border-radius: 5px;
-    background-color: #007bff;
-    color: #fff;
-    font-size: 1em;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
 }
 
-button:hover {
-    background-color: #0056b3;
-}
-
-body {
-    padding: 1em;
-    background-color: #f9f9f9;
-}
-
-section {
-    margin-bottom: 2em;
-    background: #fff;
-    padding: 1em;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-#saved-addresses .address {
-    border: 1px solid #ddd;
-    padding: 1em;
-    margin-bottom: 1em;
-    border-radius: 5px;
-    background-color: #f1f1f1;
-}
-
-#saved-addresses .address button {
-    margin-right: 0.5em;
+.btn:hover {
+    background: #0056b3;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1em;
+    margin-top: 10px;
 }
 
 table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
     text-align: left;
-    padding: 0.5em;
-    border: 1px solid #ddd;
 }
 
-p {
-    margin: 0.5em 0;
-}
-
-#coupons-section {
-    display: flex;
-    flex-direction: column;
-}
-
-#coupon-code {
-    padding: 0.5em;
-    margin-bottom: 0.5em;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-#payment-options div {
-    margin-bottom: 0.5em;
+table th {
+    background: #f4f4f4;
 }
 
 #place-order {
     width: 100%;
-    padding: 1em;
-    font-size: 1.2em;
-    background-color: #28a745;
+    padding: 15px;
+    background: #28a745;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #place-order:hover {
-    background-color: #218838;
+    background: #218838;
 }
 
-@media (min-width: 768px) {
-    body {
-        padding: 2em;
-    }
-
-    section {
-        padding: 2em;
-    }
-
-    #coupons-section {
-        flex-direction: row;
-        align-items: center;
-    }
-
-    #coupon-code {
-        flex: 1;
-        margin-right: 1em;
-    }
-
-    #apply-coupon {
-        flex-shrink: 0;
-    }
-}
-
-@media (min-width: 1024px) {
-    #saved-addresses {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1em;
-    }
-
-    #order-summary {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 1em;
-    }
-
-    #order-summary table {
-        grid-column: span 2;
-    }
-}
-
-
-     </style>
+</style>
 </head>
 <body>
     <h1>Checkout</h1>
@@ -163,10 +104,8 @@ p {
                     </div>
                 <% }) %>
             <% }) %>
-            
         </div>
         <a href="/addAddress" class="btn btn-primary">Add New Address</a>
-
     </section>
 
     <hr>
@@ -188,22 +127,28 @@ p {
                         <td><%= item.quantity %></td>
                         <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
                     </tr>
-                    <% }) %>
-                    <span hidden id="cart-id"><%= cartId %></span>
+                <% }) %>
             </tbody>
         </table>
-        <p>Subtotal: ₹<%= total.toFixed(2) %></p>
-        <!-- <p>Shipping: $10.00</p>
-        <p>Discount: $5.00</p> -->
-        <!-- <p><strong>Total: $</strong></p> -->
+        <p id="subtotal">Subtotal: ₹<%= total.toFixed(2) %></p>
     </section>
 
     <hr>
 
     <section id="coupons-section">
-        <h2>Apply Coupon</h2>
-        <input type="text" id="coupon-code" placeholder="Enter coupon code">
-        <button id="apply-coupon">Apply</button>
+        <h2>Available Coupons</h2>
+        <div id="coupon-list">
+            <% coupon.forEach(coupon => { %>
+                <div class="coupon">
+                    <input type="radio" name="coupon" value="<%= coupon._id %>" id="coupon-<%= coupon._id %>">
+                    <label for="coupon-<%= coupon._id %>">
+                        <strong><%= coupon.name %></strong> - Save ₹<%= coupon.offerPrice %> (Min Order: ₹<%= coupon.minimumPrice %>)
+                        <br>Valid until: <%= coupon.expireOn.toISOString().split('T')[0] %>
+                    </label>
+                </div>
+            <% }) %>
+        </div>
+        <button id="apply-coupon" data-id="<%= coupon._id%>"  class="btn">Apply Coupon</button>
     </section>
 
     <hr>
@@ -214,14 +159,11 @@ p {
             <input type="radio" id="cod" name="payment-method" value="cash-on-delivery">
             <label for="cod">Cash on Delivery</label>
         </div>
-        <!-- <div>
-            <input type="radio" id="razorpay" name="payment-method" value="razorpay">
-            <label for="razorpay">Razorpay</label>
-        </div> -->
     </section>
 
-
     <button class="place-order" id="place-order">Place Order</button>
+</body>
+
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -303,6 +245,7 @@ p {
         });
     });
 });
+
 
  </script>
 </body>
