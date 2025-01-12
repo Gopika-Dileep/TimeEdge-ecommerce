@@ -112,8 +112,8 @@ table th {
 
     <section id="order-summary">
         <h2>Order Summary</h2>
-        <table>
-            <thead>
+        <table data-cart-id="<%= cartId %>">
+         <thead>
                 <tr>
                     <th>Item</th>
                     <th>Quantity</th>
@@ -126,11 +126,14 @@ table th {
                         <td><%= item.product.productName %></td>
                         <td><%= item.quantity %></td>
                         <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
+
                     </tr>
                 <% }) %>
             </tbody>
         </table>
         <p id="subtotal">Subtotal: ₹<%= total.toFixed(2) %></p>
+        <p>Discount: ₹<span id="couponDiscount">0.00</span></p>
+    <p>Total: ₹<span id="final-total"><%= total.toFixed(2) %></span></p>
     </section>
 
     <hr>
@@ -183,8 +186,8 @@ table th {
 });
 
  $('.place-order').click(function() {
-    const selectedAddress = document.querySelector('input[name="deliveryAddress"]:checked');
-    if (!selectedAddress) {
+     const selectedAddress = document.querySelector('input[name="deliveryAddress"]:checked');
+     if (!selectedAddress) {
         Swal.fire({
             title: 'Error',
             text: 'Please select a delivery address.',
@@ -194,12 +197,17 @@ table th {
         return;
     }
     const addressId = selectedAddress.value;
+    alert("alert")
 
-    const cartId = document.querySelector('#cart-id').innerText;
+    const cartElement = document.querySelector('[data-cart-id]');
+    const cartId = cartElement.getAttribute('data-cart-id');
+        alert("alert1")
 
     const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
+    const selectedCoupon = document.querySelector('input[name="coupon"]:checked');
+    const couponId = selectedCoupon.value;
 
-
+alert("alert2")
     if (!selectedPayment) {
         Swal.fire({
             title: 'Error',
@@ -210,8 +218,9 @@ table th {
         return;
     }
     const paymentMethod = selectedPayment.value;
+    alert("alert3")
 
-
+alert("confirmation")
     Swal.fire({
         title: 'Order Placed Successfully!',
         text: 'Thank you for your order. You will be redirected shortly.',
@@ -228,6 +237,7 @@ table th {
                 addressId: addressId,
                 cartId: cartId,
                 paymentMethod: paymentMethod,
+                couponId:couponId,
             }),
             success: function(data) {
                 console.log(data.orderId)
@@ -245,7 +255,70 @@ table th {
         });
     });
 });
+let discount =0 ;
+const subtotalElement = document.getElementById('subtotal'); 
+const subtotal = parseFloat(subtotalElement.innerText.replace('Subtotal: ₹', '').trim());
+document.getElementById("apply-coupon").addEventListener("click",async (event)=>{
+    event.preventDefault()
+    const selectedCoupon = document.querySelector('input[name="coupon"]:checked');
+    if(!selectedCoupon){
+        Swal.fire({
+            title:"Error",
+            text:"Please select a coupon before applying.",
+            icon:"error"
+        })
+        return;
+    }
+    
+    const couponCode = selectedCoupon.value;
 
+    try {
+        const response = await fetch("/verifyCoupon",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({couponCode,subtotal})
+          
+
+        });
+        const data = await response.json();
+        if(data.success==true){
+            discount = data.discount;
+            document.getElementById("couponDiscount").textContent = `${discount.toFixed(2)}`;
+            
+            currentTotal = subtotal - discount 
+            updateTotalDisplay(currentTotal,discount)
+            Swal.fire({
+                title:"success",
+                text:"Coupon added Successfully",
+                icon:"Success"
+            });
+
+        }else{
+            Swal.fire({
+                title: "Error",
+                text: data.message || "Failed to apply the coupon.",
+                icon: "error",
+            });
+        }
+        
+
+    } catch (error) {
+        console.error(error)
+        Swal.fire({
+            title:"Error",
+            text:"An error occured while adding the coupon",
+            icon:"error"
+        })
+    }
+})
+
+function updateTotalDisplay(currentTotal,discount){
+    alert(currentTotal)
+    document.getElementById('final-total').textContent =`₹${currentTotal.toFixed(2)}`;
+    document.getElementById("couponDiscount").textContent =`₹${discount.toFixed(2)}`;
+}
 
  </script>
 </body>

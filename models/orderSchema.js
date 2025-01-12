@@ -25,13 +25,13 @@ const orderSchema = new Schema({
         }],
         // totalPrice:{
         //     type:Number,
-        //     required:true
+            
         // },
 
-        // discount:{
-        //     type:Number,
-        //     default:0
-        // },
+        discount:{
+            type:Number,
+            default:0
+        },
     finalAmount:{
         type:Number,
     },
@@ -58,10 +58,10 @@ const orderSchema = new Schema({
         default:Date.now,
         required:true
     },
-    // coupenApplied:{
-    //     type:Boolean,
-    //     default:false
-    // },
+    coupenApplied:{
+        type:Boolean,
+        default:false
+    },
     paymentMethod:{
         type:String,
     }

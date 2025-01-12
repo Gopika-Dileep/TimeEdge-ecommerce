@@ -8,9 +8,7 @@ const Cart = require('../../models/cartSchema')
 const loadAddToCart = async (req, res) => {
     try {
         const userId = req.session.user
-        console.log(userId, "userId")
         const cart = await Cart.findOne({ user: userId }).populate({ path: "items.product", populate: { path: "category", select: "categoryOffer" } })
-        console.log(cart, "cart")
 
 
 
@@ -38,7 +36,6 @@ const addToCart = async (req, res) => {
     }
 
     const product = await Product.findById(productId).populate('category')
-    console.log(product, "product")
     const productOffer = product.productOffer || 0
     const categoryOffer = product.category.categoryOffer || 0
 
@@ -106,7 +103,6 @@ const incrementQuantity = async (req, res) => {
             item.price = Math.floor(item.quantity * finalPrice);
 
             const test = await cart.save();
-            console.log(test)
             return res.status(200).json({ success: true, message: "Quantity incremented" });
         }
 

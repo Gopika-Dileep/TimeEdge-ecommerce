@@ -37,7 +37,8 @@ const getCheckoutPage = async(req,res)=>{
 
 const createOrder = async(req,res)=>{
     try {
-        const { cartId, addressId, paymentMethod } = req.body;
+        const { cartId, addressId, paymentMethod,couponId} = req.body;
+        const coupon = await Coupon.findById({_id:couponId})
         const cart = await Cart.findById({ _id: cartId }).populate("items.product");
         let totalPrice = 0;
         const user = cart.user
@@ -55,6 +56,11 @@ const createOrder = async(req,res)=>{
 
             totalPrice += product.salePrice * quantity;
 
+        }
+        let discount =0;
+        if(coupon){
+            discount = coupon.offerPrice
+            totalPrice = totalPrice-discount
         }
 
         const finalAmount = totalPrice;
@@ -76,7 +82,7 @@ const createOrder = async(req,res)=>{
         cart.items = [];
         await cart.save();
 
-         res.status(200).json({ success: true, orderId: newOrder._id });
+         res.status(200).json({ success: true, orderId: newOrder._id,finalAmount });
 
     } catch (error) {
         console.error(error)

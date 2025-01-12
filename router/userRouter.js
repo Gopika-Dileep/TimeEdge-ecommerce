@@ -6,6 +6,7 @@ const cartController = require('../controller/user/cartController')
 const profileController = require("../controller/user/profileController")
 const orderController = require("../controller/user/orderController")
 const wishlistController = require("../controller/user/wishlistController")
+const couponController = require("../controller/user/couponController")
 const {userAuth,adminAuth} = require("../middleware/auth");
 
 
@@ -69,7 +70,7 @@ router.get('/wishlist',userAuth,wishlistController.loadWishlist)
 router.post('/addToWishlist/:productId',userAuth,wishlistController.addToWishlist)
 router.post('/removeitem/:itemId',userAuth,wishlistController.removeItem)
 
-
+router.post('/verifyCoupon',userAuth,couponController.verifyCoupon)
 
 
 
