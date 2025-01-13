@@ -158,9 +158,17 @@ table th {
 
     <section id="payment-options">
         <h2>Payment Options</h2>
-        <div>
-            <input type="radio" id="cod" name="payment-method" value="cash-on-delivery">
-            <label for="cod">Cash on Delivery</label>
+        <div class="payment_option">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="cod"
+                    value="COD" checked>
+                <label class="form-check-label" for="cod">Cash on Delivery</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="razorPay"
+                    value="Online">
+                <label class="form-check-label" for="razorPay">Razor Pay</label>
+            </div>
         </div>
     </section>
 
@@ -184,10 +192,9 @@ table th {
   $('.add-new-address').click(function() {
     window.location.href = '/addAddress'; 
 });
-
- $('.place-order').click(function() {
-     const selectedAddress = document.querySelector('input[name="deliveryAddress"]:checked');
-     if (!selectedAddress) {
+$('.place-order').click(function() {
+    const selectedAddress = document.querySelector('input[name="deliveryAddress"]:checked');
+    if (!selectedAddress) {
         Swal.fire({
             title: 'Error',
             text: 'Please select a delivery address.',
@@ -197,17 +204,11 @@ table th {
         return;
     }
     const addressId = selectedAddress.value;
-    alert("alert")
 
     const cartElement = document.querySelector('[data-cart-id]');
     const cartId = cartElement.getAttribute('data-cart-id');
-        alert("alert1")
 
-    const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
-    const selectedCoupon = document.querySelector('input[name="coupon"]:checked');
-    const couponId = selectedCoupon.value;
-
-alert("alert2")
+    const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
     if (!selectedPayment) {
         Swal.fire({
             title: 'Error',
@@ -218,9 +219,11 @@ alert("alert2")
         return;
     }
     const paymentMethod = selectedPayment.value;
-    alert("alert3")
+    
 
-alert("confirmation")
+    const selectedCoupon = document.querySelector('input[name="coupon"]:checked');
+    const couponId = selectedCoupon ? selectedCoupon.value : "";
+
     Swal.fire({
         title: 'Order Placed Successfully!',
         text: 'Thank you for your order. You will be redirected shortly.',
@@ -237,14 +240,13 @@ alert("confirmation")
                 addressId: addressId,
                 cartId: cartId,
                 paymentMethod: paymentMethod,
-                couponId:couponId,
+                couponId: couponId, 
             }),
             success: function(data) {
-                console.log(data.orderId)
-                window.location.href = `/order-confirmation?orderId=${data.orderId}`; 
-},
+                console.log(data.orderId);
+                window.location.href = `/order-confirmation?orderId=${data.orderId}`;
+            },
             error: function(error) {
-                
                 Swal.fire({
                     title: 'Error',
                     text: 'An error occurred while placing your order.',
@@ -255,6 +257,7 @@ alert("confirmation")
         });
     });
 });
+
 let discount =0 ;
 const subtotalElement = document.getElementById('subtotal'); 
 const subtotal = parseFloat(subtotalElement.innerText.replace('Subtotal: ₹', '').trim());

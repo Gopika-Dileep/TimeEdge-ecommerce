@@ -38,7 +38,12 @@ const getCheckoutPage = async(req,res)=>{
 const createOrder = async(req,res)=>{
     try {
         const { cartId, addressId, paymentMethod,couponId} = req.body;
-        const coupon = await Coupon.findById({_id:couponId})
+        console.log("body",req.body)
+        let coupon = 0
+        if(couponId){
+            coupon = await Coupon.findById({_id:couponId});
+        }
+        
         const cart = await Cart.findById({ _id: cartId }).populate("items.product");
         let totalPrice = 0;
         const user = cart.user
@@ -116,9 +121,28 @@ const showOrder = async(req,res)=>{
 const cancelOrder = async(req,res)=>{
     try {
         const orderId = req.params.orderId
+        const{productId}=req.body
+        console.log(productId,'priduct id')
         console.log(orderId,'orderid')
-        const order = await Order.findByIdAndUpdate({_id:orderId},{status:"Cancelled"},{new:true})
-         
+        const order = await Order.findById({_id:orderId})
+        const orderItems = order.orderedItems
+        let updatedQuantity;
+        for(let item of orderItems){
+            console.log(item.products==productId,'prducts item id')
+
+            if(item.products.toString()==productId){
+                item.status="Cancelled"
+                updatedQuantity=item.quantity
+                console.log('true ano',item)
+            }
+        }
+        const orderSaved=await order.save()
+        const productUpdate = await Product.findById({_id:productId})
+        console.log('entero ento ',productUpdate.quantity)
+        productUpdate.quantity+=updatedQuantity;
+        await productUpdate.save()
+        console.log('productUpdate',productUpdate.quantity)
+
         res.status(200).json({success:true,message:"order cancelled successfully"})
     } catch (error) {
         console.error(error)

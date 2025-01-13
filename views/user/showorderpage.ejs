@@ -106,21 +106,21 @@
         </div>
         <div class="order-details">
             <% for (let i = 0; i < order.orderedItems.length; i++) { %>
-            <div class="order-card">
-                <h3>Product Name:<%= order.orderedItems[i].products.productName  %></h3>
-                <div class="order-info">
-                    <span><span class="label">Order Date:</span><%= order.createdOn%></span>
+                <div class="order-card" data-product-id="<%= order.orderedItems[i].products._id %>">
+                    <h3>Product Name: <%= order.orderedItems[i].products.productName %></h3>
+                    <div class="order-info">
+                        <span><span class="label">Order Date:</span> <%= order.createdOn %></span>
+                    </div>
+                    <div class="order-buttons">
+                        <% if (order.orderedItems[i].status !== 'Cancelled') { %>
+                            <a href="#" class="cancel-order" data-id="<%= order._id %>">Cancel Order</a>
+                        <% } %>
+                    </div>
                 </div>
-
-                <div class="order-buttons">
-                    <% if (order.status !== 'Cancelled') { %>
-                      <a href="#" class="cancel-order" data-id="<%= order._id %>">Cancel Order</a>
-                    <% } %>
-                  </div>
-                  
-            </div>
+                
             <% } %>
         </div>
+        
     </div>
 </body>
 
@@ -133,13 +133,17 @@
     cancelorderbtn.forEach(function (button) {
             button.addEventListener('click', function (event) {
                 event.preventDefault();
-                alert('sdfgh')
+                const orderCard = this.closest('.order-card');
                 const orderId = this.getAttribute('data-id');
+                const productId = orderCard.getAttribute('data-product-id');
+
+                alert(productId)
                 $.ajax({
 
                     url: `/cancelorder/${orderId}`,
                     method: 'POST',
                     contentType: 'application/json',
+                    data:JSON.stringify({productId}),
                     success: function (response) {
                         Swal.fire({
                             icon: 'success',
