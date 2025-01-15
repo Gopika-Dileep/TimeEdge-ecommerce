@@ -39,6 +39,7 @@ const loadDashboard = async (req, res) => {
         res.status(400).json({ message: "error while loading dashboard" })
     }
 }
+
 const loadUsers = async (req, res) => {
     try {
         let search = req.query.search || ""
@@ -346,10 +347,19 @@ const updateOrderStatus = async (req, res) => {
         const { orderId } = req.params;
         const { status } = req.body; 
 
-        const order = await Order.findByIdAndUpdate({_id:orderId},{status:status},{ new: true });
+        const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ error: "Order not found" });
         }
+
+        order.orderedItems.forEach(item => {
+           
+            item.status = status;
+           
+        });
+
+        await order.save();
+        console.log(order,'order')
 
         res.redirect(`/admin/order/${orderId}`);  
     } catch (error) {

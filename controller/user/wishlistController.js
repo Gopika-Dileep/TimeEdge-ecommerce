@@ -23,6 +23,10 @@ const addToWishlist = async(req,res)=>{
         const productId = req.params.productId
         const wishlist = await Wishlist.findOne({userId:userId})
         const product = await Product.findById({_id:productId})
+        // console.log(productId,'product')
+        // console.log(product,'product')
+        // console.log(wishlist,'whislist')
+
         if(!product){
             return res.status(404).json({success:false,message:"Product not found"})
         }
@@ -44,6 +48,7 @@ const addToWishlist = async(req,res)=>{
 
             ]
         })
+        // console.log(newWishlist,'new wishlist')
         await newWishlist.save()
        return  res.status(200).json({success:true,message:"product added to wishlist"})
      } catch (error) {

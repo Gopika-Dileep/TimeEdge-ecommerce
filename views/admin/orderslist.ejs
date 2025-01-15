@@ -162,7 +162,7 @@ h1 {
             <th>Products</th>
             <th>Quantity</th>
             <th>Total Price</th>
-            <th>Status</th>
+            <!-- <th>Status</th> -->
             <th>Actions</th>
           </tr>
         </thead>
@@ -193,9 +193,7 @@ h1 {
                 <td>$<%= order.finalAmount %></td>
     
               
-                <td class="status <%= order.status.toLowerCase() %>">
-                  <%= order.status %>
-                </td>
+              
     
                 <td>
                   <a href="/admin/orders/<%= order._id %>" class="btn btn-outline-primary btn-sm">
@@ -207,7 +205,7 @@ h1 {
                       <select name="status" class="form-select form-select-sm d-inline w-auto">
                           <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
                           <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                          <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                          <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
                           <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
                       </select>
                       <button type="submit" class="btn btn-primary btn-sm">Update</button>

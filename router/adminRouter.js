@@ -5,6 +5,7 @@ const upload = require('../helpers/multer')
 const adminController = require("../controller/admin/adminController");
 const productController = require("../controller/admin/productController");
 const couponController = require('../controller/admin/couponController')
+const salesController = require('../controller/admin/salesController')
 const {userAuth,adminAuth} = require("../middleware/auth");
 
 router.get('/',adminController.loadAdminLogin)
@@ -53,6 +54,8 @@ router.post('/addCoupon',adminAuth,couponController.addCoupon)
 router.get('/editCoupon',adminAuth,couponController.loadEditCoupon)
 router.post('/editCoupon',adminAuth,couponController.editCoupon)
 router.get('/deleteCoupon',adminAuth,couponController.deleteCoupon)
-
+router.get('/salesreport',adminAuth,salesController.loadSalesReport)
+router.get('/filterOrder',adminAuth,salesController.filterOrder)
+router.get('/filterbyDate',adminAuth,salesController.filterbyDate)
 
 module.exports=router

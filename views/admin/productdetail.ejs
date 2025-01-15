@@ -25,13 +25,8 @@
         </div>
         <div class="card-body">
             <div class="mb-4">
-                <p><strong>Order ID:</strong> <%= order._id %></p>
-                <p><strong>User:</strong> <%= order.user?.name %></p>
-                <p><strong>Status:</strong> 
-                    <span class="badge <%= order.status === 'Delivered' ? 'bg-success' : order.status === 'Pending' ? 'bg-warning' : 'bg-secondary' %>">
-                        <%= order.status %>
-                    </span>
-                </p>
+                   <p><strong>User:</strong> <%= order.user?.name %></p>
+               
             </div>
 
             <h3 class="h5 mb-3">Items</h3>
@@ -41,6 +36,7 @@
                         <tr>
                             <th>Product</th>
                             <th>Quantity</th>
+                            <th>Status</th>
                             <th>Price</th>
                         </tr>
                     </thead>
@@ -49,6 +45,7 @@
                             <tr>
                                 <td><%= item.products?.productName %></td>
                                 <td><%= item.quantity %></td>
+                                <td><%= item.status %></td>
                                 <td>&#8377;<%= item.price %></td>
                             </tr>
                         <% }); %>

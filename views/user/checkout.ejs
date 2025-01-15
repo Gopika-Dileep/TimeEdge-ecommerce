@@ -180,6 +180,8 @@ table th {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 
 
     <script>
@@ -223,13 +225,22 @@ $('.place-order').click(function() {
 
     const selectedCoupon = document.querySelector('input[name="coupon"]:checked');
     const couponId = selectedCoupon ? selectedCoupon.value : "";
+    const subtotal = parseFloat(document.getElementById('subtotal').innerText.replace('Subtotal: ₹', '').trim());
+    let discount = 0;
+    if (paymentMethod === 'COD') {
+        placeOrder(addressId, cartId, paymentMethod, couponId, subtotal, discount);
+    } else if (paymentMethod === 'Online') {
+        initiateRazorpayPayment(addressId, cartId, paymentMethod, couponId, subtotal, discount);
+    }
 
-    Swal.fire({
+    function placeOrder(addressId, cartId, paymentMethod, couponId, subtotal, discount) {
+        
+        Swal.fire({
         title: 'Order Placed Successfully!',
         text: 'Thank you for your order. You will be redirected shortly.',
         icon: 'success',
         confirmButtonText: 'OK',
-        timer: 3000, 
+        timer: 3000,
         timerProgressBar: true
     }).then(() => {
         $.ajax({
@@ -240,13 +251,13 @@ $('.place-order').click(function() {
                 addressId: addressId,
                 cartId: cartId,
                 paymentMethod: paymentMethod,
-                couponId: couponId, 
+                couponId: couponId,
             }),
-            success: function(data) {
+            success: function (data) {
                 console.log(data.orderId);
                 window.location.href = `/order-confirmation?orderId=${data.orderId}`;
             },
-            error: function(error) {
+            error: function (error) {
                 Swal.fire({
                     title: 'Error',
                     text: 'An error occurred while placing your order.',
@@ -256,6 +267,120 @@ $('.place-order').click(function() {
             }
         });
     });
+}
+
+async function initiateRazorpayPayment(addressId, cartId, paymentMethod, couponId, subtotal, discount) {
+    const currentTotal = subtotal - discount;
+
+    try {
+        const response = await fetch("/placeOrderRazorPay", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ totalAmount: currentTotal })
+        });
+        const data = await response.json();
+        if (data.success) {
+            const { orderId, amount, currency, key } = data;
+            
+            
+            const options = {
+                key,
+                amount,
+                currency,
+                name: "Frame Fury",
+                description: "Order Payment",
+                order_id: orderId,
+                handler: async function(response) {
+                    const paymentId = response.razorpay_payment_id;
+                    const razorpaySignature = response.razorpay_signature;
+                    const orderId = response.razorpay_order_id;
+
+                    const verifyResponse = await fetch("/verifyRazorPayOrder", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            addressId,
+                            paymentMethod,
+                            couponId,
+                            orderId,
+                            paymentId,
+                            cartId,
+                            razorpaySignature
+                        })
+                    });
+                  
+                  const verifyData = await verifyResponse.json();
+                    if (verifyData.success) {
+                        alert(verifyData)
+                        Swal.fire({
+                            title: "Payment Success",
+                            text: `Order Placed Successfully. Your OrderId is : ${verifyData.orderId}`,
+                            icon: "success",
+                            confirmButtonText: "OK"
+                        }).then(() => window.location.href = "/cart");
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Payment Failed",
+                            text: "Payment verification failed. Please try again.",
+                            confirmButtonText: "OK"
+                        });
+                    }
+                },
+                modal: {
+                    ondismiss: async function () {
+                        const cancelResponse = await fetch("/verifyRazorPayOrder", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                addressId,
+                                paymentMethod,
+                                couponId,
+                                orderId,
+                                paymentId: null,
+                                razorpaySignature: null,
+                                paymentStatus: "Failed"
+                            })
+                        });
+
+                        const cancelData = await cancelResponse.json();
+                        Swal.fire({
+                            icon: "error",
+                            title: "Payment Failed",
+                            text: "Your payment was unsuccessful. Order has been placed with status 'Payment Failed'.",
+                            confirmButtonText: "OK"
+                        }).then(() => window.location.href = "/cart");
+                    }
+                },
+                theme: { color: "#3399cc" },
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message,
+                confirmButtonText: "OK",
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            title: "Error",
+            text: "An error occurred while processing the payment.",
+            icon: "error",
+            confirmButtonText: "OK"
+        });
+    }
+}
 });
 
 let discount =0 ;

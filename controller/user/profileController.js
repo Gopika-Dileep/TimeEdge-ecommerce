@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const Cart = require("../../models/cartSchema");
 const env = require("dotenv").config();
+const Wallet = require('../../models/walletSchema')
 
 
 
@@ -23,8 +24,11 @@ const userProfile = async (req,res)=>{
         console.log(orders,'orders')
         
         const userAddress = await Address.findOne({userId:userId});
+        const wallet = await Wallet.findOne({ userId: req.session.user });
+        
         res.render("profile",{
             user:userData,
+            wallet,
             userAddress:userAddress,
             orders:orders})
     } catch (error) {

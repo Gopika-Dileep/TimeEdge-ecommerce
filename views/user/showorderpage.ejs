@@ -108,14 +108,19 @@
             <% for (let i = 0; i < order.orderedItems.length; i++) { %>
                 <div class="order-card" data-product-id="<%= order.orderedItems[i].products._id %>">
                     <h3>Product Name: <%= order.orderedItems[i].products.productName %></h3>
+                    <span class="label"><%= order.paymentMethod %></span>
                     <div class="order-info">
                         <span><span class="label">Order Date:</span> <%= order.createdOn %></span>
+
                     </div>
                     <div class="order-buttons">
-                        <% if (order.orderedItems[i].status !== 'Cancelled') { %>
+                        <% if (order.orderedItems[i].status === 'delivered') { %>
+                            <a href="#" class="return-order" data-id="<%= order._id %>">Return Order</a>
+                        <% } else if (order.orderedItems[i].status !== 'Cancelled' && order.orderedItems[i].status !== 'Returned' && order.orderedItems[i].status !== 'delivered') { %>
                             <a href="#" class="cancel-order" data-id="<%= order._id %>">Cancel Order</a>
                         <% } %>
                     </div>
+                    
                 </div>
                 
             <% } %>
@@ -169,6 +174,45 @@
             });
         });
 
+        const returnorderbtn = document.querySelectorAll('.return-order');
+        returnorderbtn.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const orderCard = this.closest('.order-card');
+                const orderId = this.getAttribute('data-id');
+                const productId = orderCard.getAttribute('data-product-id');
+
+                alert(productId)
+                $.ajax({
+
+                    url: `/returnorder/${orderId}`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data:JSON.stringify({productId}),
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'order returned successfully',
+                            text: response.message,
+                            confirmButtonText: 'OK',
+                        }).then((confirmation) => {
+                            if (confirmation.isConfirmed) {
+                                window.location.href = '/shop';
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Error while return order. Please try again!",
+                            confirmButtonText: 'OK',
+                        });
+                        console.error('Error while adding to Cart', error);
+                    }
+                });
+            });
+        });
 
 </script>
 </html>

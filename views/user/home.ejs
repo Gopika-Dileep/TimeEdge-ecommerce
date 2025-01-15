@@ -296,6 +296,7 @@ body {
         button.addEventListener('click',function(event){
             event.preventDefault();
             const productId = this.getAttribute('data-id')
+            alert(productId,'product')
             $.ajax({
                 url:`/addToWishlist/${productId}`,
                 method:'POST',
