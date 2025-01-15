@@ -260,7 +260,7 @@
                                 <div class="detail-info">
                                     <h2 class="title-detail"><%= product.productName %></h2>
                                     <div class="product-detail-rating d-flex align-items-center justify-content-between">
-                                        <span class="font-weight-bold">Brand: <a href="#"><%= product.brand %></a></span>
+                                        <span class="font-weight-bold">Brand: <a href="#"><%= product.brand.name %></a></span>
                                         <div class="product-rate">
                                             <span class="font-small ml-5 text-muted">(n reviews)</span>
                                         </div>
@@ -293,7 +293,7 @@
                                     </div>
                                     <ul class="product-meta mt-4">
                                         <li>Stock Code: FWM15VKT</li>
-                                        <li>Tags: <%= product.category %></li>
+                                        <li>Tags: <%= product.category.name %></li>
                                         <li>Availability: <span class="text-success"><%= product.quantity > 0 ? 'In Stock' : 'Out of Stock' %></span></li>
                                     </ul>
                                 </div>

@@ -131,7 +131,7 @@ const decrementQuantity = async (req, res) => {
         if (item.quantity === 1) {
             return res.status(400).json("Minimum quantity reached")
         }
-        const product = await Product.findById(item.product).populate(category)
+        const product = await Product.findById(item.product).populate('category')
 
         const currentQuantity = item.quantity
 
@@ -157,11 +157,16 @@ const decrementQuantity = async (req, res) => {
 const removeItem = async (req, res) => {
     try {
         const itemId = req.params.itemId
+        
 
         const userId = req.session.user
+       
+
 
 
         const cart = await Cart.findOne({ user: userId });
+       
+
 
         if (cart) {
             const cartLength = cart.items.length
@@ -170,6 +175,7 @@ const removeItem = async (req, res) => {
             if (cart.items.length < cartLength) {
 
                 await cart.save()
+             
 
 
                 return res.json({ success: true, message: "item removed successfully" })

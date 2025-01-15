@@ -19,8 +19,8 @@ body, html {
 .cart-container {
     min-height: 100vh; /* Ensures the container takes the full height */
     display: flex;
+    gap : 20px;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
     padding: 20px;
     background-color: #ffffff;
@@ -230,11 +230,13 @@ body, html {
 
 
 function decreaseQuantity(itemId) {
+    alert(itemId)
     $.ajax({
         url: `/decrement/${itemId}`,
         type: 'PATCH',
         contentType: 'application/json',
         success: function (result) {
+            alert("dfg")
             if (result.success) {
                 location.reload();
             } else {
@@ -250,6 +252,7 @@ function decreaseQuantity(itemId) {
 
 
 function removeItem(itemId) {
+   
     Swal.fire({
         title: 'Are you sure?',
         text: 'Do you want to remove this item from the cart?',

@@ -183,7 +183,8 @@ const productDetails = async(req,res)=>{
         const userId = req.session.user
         const productId = req.query.id
 
-        const product = await Product.findById({_id:productId}).populate('category')
+        const product = await Product.findById({_id:productId, isListed:true}).populate('category').populate('brand')
+        console.log(product,'product')
 
         const findCategory = product.category
         

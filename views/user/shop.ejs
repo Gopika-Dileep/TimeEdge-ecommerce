@@ -126,10 +126,7 @@
                                         <div class="product__item__pic set-bg"
                                             data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>">
                                             <ul class="product__hover">
-                                                <li>
-
-                                                    <img src="img/icon/heart.png" alt=""><span>Wishlist</span>
-                                                </li>
+                                                <li><img src="/img/icon/heart.png" alt="" class="add-to-wishlist" data-id="<%= product[i]._id %>"><span>Wishlist</span></li>
                                             </ul>
                                         </div>
                                     </a>
@@ -247,6 +244,49 @@
             });
         });
 
-
+        const addToWishbtn = document.querySelectorAll('.add-to-wishlist')
+    addToWishbtn .forEach(function(button){
+        button.addEventListener('click',function(event){
+            event.preventDefault();
+            const productId = this.getAttribute('data-id')
+            alert(productId,'product')
+            $.ajax({
+                url:`/addToWishlist/${productId}`,
+                method:'POST',
+                data:JSON.stringify({productId:productId}),
+                contentType:"application/jason",
+                success:function(response){
+                    Swal.fire({
+                        icon:'success',
+                        title:"added to Whislist",
+                        text:response.message,
+                        confirmButtonText:'OK',
+                    }).then(()=>{
+                        Swal.fire({
+                            title:'Go to Wishlist?',
+                            text:'Do you Want to go to Wishlist?',
+                           showCancelButton:true,
+                           confirmButtonText:"YES",
+                           cancelButtonText:"NO",
+                        }).then((confirmation)=>{
+                            if(confirmation.isConfirmed){
+                                window.location.href = '/wishlist'
+                            }else{
+                                console.log('Stay on the current page')
+                            }
+                        })
+                    })
+                },
+                error:function(xhr,status,error){
+                    Swal.fire({
+                        icon:'error',
+                        title:'Error',
+                        text :'Error while adding to wishlist.',
+                        confirmButtonText:"Ok",
+                    })
+                }
+            })
+        })
+    })
     </script>
     <%-include("../../views/partials/user/footer") %>
