@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt")
 const loadlogin = async (req,res)=>{
     try {
      
-        res.render("login")
+        res.render("login", { message: null });
     } catch (error) {
         console.error(error);
         res.status(400).json({message:"an error occured while loading loginpage"})
@@ -14,27 +14,44 @@ const loadlogin = async (req,res)=>{
 }
 const login = async (req,res)=>{
     try {
-        const {email,password } = req.body
-        const user = await User.findOne({email,isVerified:true})
-        if(user){
-            if(user.isBlocked==true){
-                res.render('login',{message:"User is blocked by admin"})
-            }else{
-                const userPassword = await bcrypt.compare(password,user.password)
-                if(userPassword){
-                    req.session.user= user._id
-                    res.redirect("/")
+        const { email, password } = req.body;
+        const user = await User.findOne({ email, isVerified: true });
+    
+        if (user) {
+            if (user.isBlocked === true) {
+                res.render('login', { message: "User is blocked by admin" });
+            } else {
+                const userPassword = await bcrypt.compare(password, user.password);
+                if (userPassword) {
+                    req.session.user = user._id;
+                    res.redirect("/");
+                } else {
+                    return res.render("login", { message: "Incorrect password" });
                 }
             }
-        }else{
-            res.status(400).json({message:"user not found"})
+        } else {
+            res.render("login", { message: "User not found" });
         }
     } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: "An error occurred while loading the home page" });
+    }
+    
+}
+const logout = async(req,res)=>{
+    try {
+        req.session.destroy((err)=>{
+            if(err){
+                return res.json({message:"error"})
+            }else{
+                return res.redirect('/')
+            }
+        })
+    } catch (error) {
         console.error(error)
-        res.status(400).json({message:"an error occured while loading home page"})
+        res.status(500).json({message:"server error"})
     }
 }
-
 const loadSignup = async(req,res)=>{
     try {
         res.render("signup")
@@ -139,5 +156,5 @@ module.exports={
     loadotp,
     otpverify,
     login,
-   
+    logout
 }

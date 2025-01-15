@@ -13,6 +13,8 @@ const {userAuth,adminAuth} = require("../middleware/auth");
 
 router.get("/login",userController.loadlogin)
 router.post("/login",userController.login)
+router.get("/logout",userController.logout);
+
 router.get("/signup",userController.loadSignup)
 router.post("/signup",userController.signup)
 router.get('/otpverify',userController.loadotp)

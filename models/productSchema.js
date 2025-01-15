@@ -22,10 +22,6 @@ const productSchema = mongoose.Schema({
         ref:"Brand",
         required:true
     },
-    // brandName:{
-    //     type:String,
-    //     required:false
-    // },
     category:{
         type:Schema.Types.ObjectId,
         ref:"Category",

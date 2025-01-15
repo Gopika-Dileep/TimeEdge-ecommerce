@@ -10,18 +10,22 @@
 <body>
     <div class="login">
         <form id="loginform" action="/login" method="post">
+    
             <label for="chk" aria-hidden="true">Login</label>
+            <% if (message) { %>
+                <p style="color: red;"><%= message %></p>
+            <% } %>
             <input type="email" id="email" name="email" placeholder="Email" required="">
             <input type="password" id="password" name="password" placeholder="Password" required="">
             <button>Login</button>
             <div class="mb-3">
                 <a href="/forgot-password" class="text-center">Forgot password?</a>
             </div>
-                <div class="text-center">
-                    <p>Don't have an account? <a href="/signup" class="text-primary">Sign up here</a></p>
-                </div>
-            </form>
-        </div>
+            <div class="text-center">
+                <p>Don't have an account? <a href="/signup" class="text-primary">Sign up here</a></p>
+            </div>
+        </form>
     </div>
+    
 </body>
 </html>

@@ -12,11 +12,12 @@ const Wallet = require('../../models/walletSchema')
 
 const userProfile = async (req,res)=>{
     try {
-        
+        const page = req.query.page||1
+        const limit = 3
         const userId = req.session.user;
       
         const userData= await User.findById({_id:userId});
-        const orders = await Order.find({ user: userId }) 
+        const orders = await Order.find({ user: userId }).sort({createdAt:-1}).skip((page-1)*limit).limit(limit)
         .populate({
             path: 'orderedItems.products', 
             model: 'Product' 
@@ -25,12 +26,16 @@ const userProfile = async (req,res)=>{
         
         const userAddress = await Address.findOne({userId:userId});
         const wallet = await Wallet.findOne({ userId: req.session.user });
-        
+        const count = await Order.countDocuments({})
+        const totalPage = Math.ceil(count/limit)
         res.render("profile",{
             user:userData,
             wallet,
             userAddress:userAddress,
-            orders:orders})
+            orders:orders,
+            currentPage:page,
+            totalPage:totalPage
+        })
     } catch (error) {
         console.error(error)
         res.status(500).json({message:"server error"})

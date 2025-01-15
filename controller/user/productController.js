@@ -183,7 +183,7 @@ const productDetails = async(req,res)=>{
         const userId = req.session.user
         const productId = req.query.id
 
-        const product = await Product.findById({_id:productId, isListed:true}).populate('category').populate('brand')
+        const product = await Product.findById({_id:productId, isListed : true}).populate('category').populate('brand')
         console.log(product,'product')
 
         const findCategory = product.category
@@ -194,8 +194,10 @@ const productDetails = async(req,res)=>{
         const relatedProducts = await Product.find({category:findCategory._id,_id :{$ne:productId}}).limit(3)
 
         if(userId){
-            const user = await User.findById({_id:userId})
-            res.render('productdetails',{
+            if(product&&isListed==="true"){
+
+                const user = await User.findById({_id:userId})
+                res.render('productdetails',{
                 user:user,
                 product:product,
                 quantity:product.quantity,
@@ -203,6 +205,7 @@ const productDetails = async(req,res)=>{
                 brand:findBrand,
                 relatedProducts:relatedProducts
             })
+        }
         }else{
             res.render('productdetails',{
                 product:product,
