@@ -5,29 +5,37 @@ const fs = require("fs");
 const path = require("path")
 const sharp = require("sharp");
 
-const LoadProduct = async (req,res)=>{
+const LoadProduct = async (req, res) => {
     try {
-     const page=req.query.page|| 1
-     const limit = 3
-     const product = await Product.find({}).sort({createdAt:-1}).skip((page-1)*limit).limit(limit).populate('category').populate('brand')
-     console.log(product ,'admi')
-     const count = await Product.countDocuments({})
-     const totalpage = Math.ceil(count/limit)
-     const category = await Category.find({isListed:true})
-     const brand = await Brand.find({isListed:true})
-    
-     //console.log(brandname,"brandname")
-     if(category&&brand){
-         res.render('product',{
-             product:product,
-             currentpage:page,
-             totalpage:totalpage,
-             totalproduct:count,
-            })
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const search = req.query.search || '';
+        const query = search ? { productName: { $regex: search, $options: 'i' } } : {};
+
+        const product = await Product.find(query)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .populate('category')
+            .populate('brand');
+
+        const count = await Product.countDocuments(query);
+        const totalpage = Math.ceil(count / limit);
+        const category = await Category.find({ isListed: true });
+        const brand = await Brand.find({ isListed: true });
+
+        if (category && brand) {
+            res.render('product', {
+                product: product,
+                currentpage: page,
+                totalpage: totalpage,
+                totalproduct: count,
+                search: search
+            });
         }
     } catch (error) {
-        console.error(error)
-        res.status(400).json('error while loading')
+        console.error(error);
+        res.status(400).json('error while loading');
     }
 }
 
@@ -45,63 +53,6 @@ const loadAddProduct = async (req,res)=>{
         res.status(400).json({message:"error loading addproduct page"})
      }
 }
-
-// const addProducts = async (req,res)=>{
-//     try {
-//         const products = req.body
-
-//         const productExists = await Product.findOne({
-//             productName:products.productName
-//         })
-//         if(!productExists){
-//             const images = [];
-//             console.log(req.files,"req.file")
-//             if(req.files&&req.files.length>0){
-//                 for(let i=0;i<req.files[i].length;i++){
-//                     const originalImagePath = req.files[i].path;
-
-//                     const uploadDir = path.join("public","uploads","productImages")
-//                     const resizedFilename = `resized-${Date.now()}-${req.files[i].filename}`;
-//                     const resizedImagePath = path.join(uploadDir, resizedFilename);
-                    
-//                     await sharp(originalImagePath)
-//                     .resize({width:1000,height:1000})
-//                     .toFile(resizedImagePath);
-//                     images.push(resizedFilename)
-//                 }
-
-//             }
-//             const categoryId = await Category.findOne({name:products.category})
-//             const brandId = await Brand.findOne({name:products.name})
-             
-//             if(!categoryId){
-//                 return res.status(400).json("Invalid category name")
-//             }
-
-//             const newProduct = new Product({
-//                 productName:products.productName,
-//                 description:products.description,
-//                 brand:products.brandId._id,
-//                 category:categoryId._id,
-//                 regularPrice:products.regularprice,
-//                 salePrice:products.salePrice,
-//                 createdOn:new Date,
-//                 quantity:products.quantity,
-//                 size:products.size,
-
-//                 productImage:images,
-//                 status:"Avaliable"
-//             })
-//             await newProduct.save();
-//             return res.redirect("/admin/products");
-//         }else{
-//             return res.status(400).json("product already exist.")
-//         }
-//     } catch (error) {
-//        console.error(error) 
-//        res.status(400).json({message:"error while adding product"})
-//     }
-// }
 
 const addProducts = async (req, res) => {
     try {
@@ -181,36 +132,6 @@ const loadeditproduct = async (req,res)=>{
         res.status(500).json("server error")
     }
 }
-// const editproduct = async (req,res)=>{
-//     try {
-//        const productId = req.params.productId
-//        const data= req.body
- 
-//        const product = await Product.findById({_id:productId})
-       
-
-//         if(product){
-//             const updateProduct = await Product.findByIdAndUpdate({_id:productId},{
-
-//                 productName: productName || product.productName,
-//                 productImage: updatedImages,
-//                 description: description || product.description,
-//                 brand: brand || product.brand,
-//                 category: category || product.category,
-//                 regularPrice: regularPrice || product.regularPrice,
-//                 salePrice: salePrice || product.salePrice,
-//                 productOffer: productOffer || product.productOffer,
-//                 quantity: quantity || product.quantity,
-//                 maxQtyPerPerson: maxQtyPerPerson || product.maxQtyPerPerson,
-//             },{new:true})
-//         }
-       
-        
-//     } catch (error) {
-//         console.error(error)
-//         res.status(500).json("server error")
-//     }
-// }
 
 const editproduct = async (req, res) => {
     try {
@@ -369,7 +290,7 @@ const removeOffer = async(req,res)=>{
     }
 }
 
-module.exports={
+module.exports = {
     LoadProduct,
     addProducts,
     loadAddProduct,
