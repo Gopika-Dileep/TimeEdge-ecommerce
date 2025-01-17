@@ -6,9 +6,9 @@ const adminController = require("../controller/admin/adminController");
 const productController = require("../controller/admin/productController");
 const couponController = require('../controller/admin/couponController')
 const salesController = require('../controller/admin/salesController')
-const {userAuth,adminAuth} = require("../middleware/auth");
+const {userAuth,adminAuth, checkAdmin} = require("../middleware/auth");
 
-router.get('/',adminController.loadAdminLogin)
+router.get('/', checkAdmin, adminController.loadAdminLogin)
 router.post('/',adminController.adminLogin)
 router.get('/dashboard',adminAuth,adminController.loadDashboard)
 router.get('/users',adminAuth,adminController.loadUsers)

@@ -15,6 +15,22 @@ const userAuth = async (req,res,next)=>{
     }
 }
 
+const checkUser = async (req, res, next) => {
+    if(req.session.user) {
+        res.redirect('/')
+    } else {
+        next();
+    }
+}
+
+const checkAdmin = async (req, res, next) => {
+    if(req.session.admin) {
+        res.redirect('/admin/dashboard')
+    } else {
+        next();
+    }
+}
+
 
 
 const adminAuth = (req,res,next)=>{
@@ -35,5 +51,7 @@ const adminAuth = (req,res,next)=>{
 
 module.exports ={
     userAuth,
-    adminAuth
+    adminAuth,
+    checkUser,
+    checkAdmin
 }

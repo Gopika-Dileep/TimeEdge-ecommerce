@@ -1,220 +1,206 @@
 <%- include("../../views/partials/admin/header") %>
 
-<style>
-    /* General Reset */
-* {
+  <style>
+/* General Styling */
+body {
+  font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-body {
-  background-color: #f4f4f9;
-  color: #333;
-  padding: 20px;
+  background-color: #f8f9fc;
 }
 
 .container {
-  max-width: 1200px;
-  margin: auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  margin: 20px auto;
   padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-  margin-bottom: 20px;
   text-align: center;
-  color: #444;
+  color: #333333;
+  margin-bottom: 20px;
+  font-size: 24px;
 }
 
+/* Table Styling */
 .orders-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.orders-table thead tr {
-  background-color: #444;
-  color: #fff;
+  font-size: 14px;
 }
 
 .orders-table th,
 .orders-table td {
-  padding: 10px;
+  padding: 14px 12px;
   text-align: left;
-  border: 1px solid #ddd;
 }
 
-.orders-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+.orders-table th {
+  background-color: #f1f5f9;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 12px;
+  border-bottom: 2px solid #e5e7eb;
 }
 
-.orders-table tbody tr:hover {
-  background-color: #f1f1f1;
+.orders-table td {
+  color: #374151;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.status {
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 5px;
-  text-align: center;
+.orders-table tr:nth-child(odd) td {
+  background-color: #f9fafb;
 }
 
-.status.pending {
-  color: #ff9800;
-  background-color: #fff3e0;
+.orders-table tr:hover td {
+  background-color: #e5e7eb;
 }
 
-.status.shipped {
-  color: #2196f3;
-  background-color: #e3f2fd;
-}
-
-.status.delivered {
-  color: #4caf50;
-  background-color: #e8f5e9;
-}
-
-.btn {
-  padding: 6px 12px;
-  border: none;
+/* Button Styling */
+.orders-table .btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #2563eb;
+  text-decoration: none;
+  border: 1px solid #2563eb;
   border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-right: 5px;
+  transition: background-color 0.3s ease;
 }
 
-.btn.view {
-  background-color: #03a9f4;
-  color: #fff;
+.orders-table .btn:hover {
+  background-color: #2563eb;
+  color: #ffffff;
 }
 
-.btn.view:hover {
-  background-color: #0288d1;
+/* Badge for Status */
+.orders-table td.pending {
+  color: #f59e0b; /* Yellow for Pending */
+  font-weight: bold;
 }
 
-.btn.update {
-  background-color: #4caf50;
-  color: #fff;
+.orders-table td.processing {
+  color: #3b82f6; /* Blue for Processing */
+  font-weight: bold;
 }
 
-.btn.update:hover {
-  background-color: #388e3c;
+.orders-table td.shipped {
+  color: #6366f1; /* Purple for Shipped */
+  font-weight: bold;
 }
 
-@media screen and (max-width: 768px) {
+.orders-table td.delivered {
+  color: #10b981; /* Green for Delivered */
+  font-weight: bold;
+}
+
+.orders-table td.cancelled {
+  color: #ef4444; /* Red for Cancelled */
+  font-weight: bold;
+}
+
+.orders-table td.return-request {
+  color: #f97316; /* Orange for Return Request */
+  font-weight: bold;
+}
+
+.orders-table td.returned {
+  color: #6b7280; /* Gray for Returned */
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .orders-table thead {
     display: none;
   }
 
   .orders-table tr {
     display: block;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
   }
 
   .orders-table td {
-    display: block;
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
     padding: 10px;
-    border: none;
+    font-size: 12px;
   }
 
-  .orders-table td::before {
+  .orders-table td:before {
     content: attr(data-label);
-    float: left;
-    text-transform: uppercase;
     font-weight: bold;
-    color: #444;
+    text-transform: uppercase;
+    color: #6b7280;
+    flex: 1;
   }
 
-  .orders-table tbody tr:nth-child(even) {
-    background-color: transparent;
+  .orders-table td {
+    flex: 2;
+  }
+
+  .btn {
+    display: block;
+    text-align: center;
   }
 }
-.container {
-        position: absolute;
-        top: 70px;
-        left: 240px;
-        width: calc(100% - 240px);
-        padding: 2rem;
+
+    .container {
+      position: absolute;
+      top: 70px;
+      left: 240px;
+      width: calc(100% - 240px);
+      padding: 2rem;
     }
+
     @media (max-width: 1000px) {
-        .container {
+      .container {
         position: absolute;
         top: 50px;
         left: 20px;
         width: calc(100% - 30px);
         padding: 2rem;
+      }
     }
-    }
-</style>
+  </style>
 
-<body>
+  <body>
     <div class="container">
       <h1>Orders List</h1>
       <table class="orders-table">
         <thead>
           <tr>
             <th>User</th>
-            <th>Products</th>
-            <th>Quantity</th>
+            <th>Order Id</th>
+            <th>Status</th>
             <th>Total Price</th>
-            <!-- <th>Status</th> -->
+            <th>Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-            <% orders.forEach(order => { %>
-              <tr>
-                
-                <td>
-                  <p><strong>Name:</strong> <%= order.user?.name %></p>
-                  <p><strong>Email:</strong> <%= order.user?.email  %></p>
-                </td>
-                
-              
-                <td>
-                  <% order.orderedItems.forEach(item => { %>
-                    <p><strong>Product:</strong> <%= item.products ? item.products.productName : 'Product Not Found' %></p>
-                  <% }); %>
-                </td>
-    
-             
-                <td>
-                  <% order.orderedItems.forEach(item => { %>
-                    <p><%= item.quantity %></p>
-                  <% }); %>
-                </td>
-                
-               
-                <td>$<%= order.finalAmount %></td>
-    
-              
-              
-    
-                <td>
-                  <a href="/admin/orders/<%= order._id %>" class="btn btn-outline-primary btn-sm">
-                      View Details
-                  </a>
-
-                 
-                  <form action="/admin/orders/<%= order._id %>/status" method="POST" class="d-inline">
-                      <select name="status" class="form-select form-select-sm d-inline w-auto">
-                          <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                          <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                          <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
-                          <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                      </select>
-                      <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                  </form>
+          <% orders.forEach(order => { %>
+            <tr>
+              <td data-label="User"><%= order.user?.name %></td>
+              <td data-label="Order Id"><%= order._id %></td>
+              <td data-label="Status" class="<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
+                <%= order.status %>
               </td>
-          </tr>
-              </tr>
-            <% }); %>
-          </tbody>
+              
+              <td data-label="Total Price">₹<%= order.finalAmount %></td>
+              <td data-label="Date"><%= order.createdOn.toLocaleDateString() %></td>
+              <td data-label="Actions">
+                <a href="/admin/orders/<%= order._id %>" class="btn">View Details</a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
       </table>
     </div>
   </body>

@@ -323,20 +323,6 @@
 
                           </table>
                         </div>
-
-                        <div class="pagination">
-                          <% if (currentPage> 1) { %>
-                            <a href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
-                            <% } %>
-                              <% for (let i=1; i <=totalPage; i++) { %>
-                                <a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>">
-                                  <%= i %>
-                                </a>
-                                <% } %>
-                                  <% if (currentPage < totalPage) { %>
-                                    <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
-                                    <% } %>
-                        </div>
                       </div>
                     </div>
                   </div>

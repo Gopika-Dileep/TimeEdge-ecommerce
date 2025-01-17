@@ -7,15 +7,15 @@ const profileController = require("../controller/user/profileController")
 const orderController = require("../controller/user/orderController")
 const wishlistController = require("../controller/user/wishlistController")
 const couponController = require("../controller/user/couponController")
-const walletController = require("../controller/user/walletController")
-const {userAuth,adminAuth} = require("../middleware/auth");
+
+const {userAuth,adminAuth,checkUser} = require("../middleware/auth");
 
 
-router.get("/login",userController.loadlogin)
+router.get("/login",checkUser,userController.loadlogin)
 router.post("/login",userController.login)
 router.get("/logout",userController.logout);
 
-router.get("/signup",userController.loadSignup)
+router.get("/signup",checkUser,userController.loadSignup)
 router.post("/signup",userController.signup)
 router.get('/otpverify',userController.loadotp)
 router.post('/otpverify',userController.otpverify)
@@ -78,7 +78,7 @@ router.post('/addToWishlist/:productId',userAuth,wishlistController.addToWishlis
 router.post('/removeitem/:itemId',userAuth,wishlistController.removeItem)
 
 router.post('/verifyCoupon',userAuth,couponController.verifyCoupon)
-// router.get('/wallet', userAuth, walletController.showWalletHistory)
+
 
 
 module.exports=router
