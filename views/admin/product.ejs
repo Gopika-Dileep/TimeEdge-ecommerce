@@ -245,7 +245,7 @@
             </thead>
             <tbody>
                 <% for(let i = 0; i < product.length; i++) { %>
-                <tr>
+                <tr data-product-id="<%= product[i]._id %>">
                     <td>001</td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
@@ -383,12 +383,8 @@ async function addOffer(productId) {
 
     if (amount) { 
         $.ajax({
-            url: "/admin/addProductOffer",
-            method: "POST",
-            data: {
-                percentage: amount,
-                productId: productId,
-            },
+            url: `/admin/addProductOffer?id=${productId}&percentage=${amount}`,
+            method: "GET",
             success: (response) => {
                 if (response.status === true) {
                     Swal.fire({
@@ -425,11 +421,8 @@ function removeOffer(productId) {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: "/admin/removeProductOffer",
-                method: 'POST',
-                data: {
-                    productId: productId
-                },
+                url: `/admin/removeProductOffer?id=${productId}`,
+                method: 'GET',
                 success: (response) => {
                     if (response.status === true) {
                         Swal.fire({

@@ -11,7 +11,7 @@ const couponController = require("../controller/user/couponController")
 const {userAuth,adminAuth,checkUser} = require("../middleware/auth");
 
 
-router.get("/login",checkUser,userController.loadlogin)
+router.get("/login",userController.loadlogin)
 router.post("/login",userController.login)
 router.get("/logout",userController.logout);
 

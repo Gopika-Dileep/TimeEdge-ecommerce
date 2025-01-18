@@ -39,11 +39,10 @@ router.post('/deleteImage', (req, res, next) => {
     next();
 },adminAuth, productController.deleteSingleImage);
 
-
 router.get('/listProduct',adminAuth,productController.listproduct)
 router.get('/unlistProduct',adminAuth,productController.unlistproduct)
-router.post('/addProductOffer',adminAuth,productController.addOffer)
-router.post('/removeProductOffer',adminAuth,productController.removeOffer)
+router.get('/addProductOffer',adminAuth,productController.addOffer)
+router.get('/removeProductOffer',adminAuth,productController.removeOffer)
 
 router.get('/orders',adminAuth,adminController.getOrders)
 router.get("/order/:orderId",  adminController.getOrderDetails)

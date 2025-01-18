@@ -263,30 +263,32 @@ const unlistproduct = async (req,res)=>{
         res.status(400).json("server error")
       }
 }
-const addOffer = async(req,res)=>{
+const addOffer = async (req, res) => {
     try {
-        const {productId,percentage} = req.body
-        const product = await Product.findById({_id:productId})
-        product.productOffer = percentage
-        product.offerAmount = Math.floor(product.salePrice*percentage/100)
-        product.save()
+        const productId = req.query.id;
+        const percentage = req.query.percentage;
+        const product = await Product.findById({ _id: productId });
+        product.productOffer = percentage;
+        product.offerAmount = Math.floor(product.salePrice * percentage / 100);
+        await product.save();
+        res.json({ status: true });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"Server error"})
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
     }
 }
 
-const removeOffer = async(req,res)=>{
+const removeOffer = async (req, res) => {
     try {
-        const {productId} = req.body
-        const product = await Product.findById({_id:productId})
-        product.productOffer =0
-        product.offerAmount=0
-        product.save()
-        
+        const productId = req.query.id;
+        const product = await Product.findById({ _id: productId });
+        product.productOffer = 0;
+        product.offerAmount = 0;
+        await product.save();
+        res.json({ status: true });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({message:"server error"})
+        console.log(error);
+        res.status(500).json({ message: "Server error" });
     }
 }
 

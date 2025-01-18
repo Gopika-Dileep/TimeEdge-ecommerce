@@ -15,11 +15,11 @@ const userAuth = async (req,res,next)=>{
     }
 }
 
-const checkUser = async (req, res, next) => {
+const checkUser = (req, res, next) => {
     if(req.session.user) {
-        res.redirect('/')
+        next()
     } else {
-        next();
+        res.redirect('/login')
     }
 }
 
@@ -34,18 +34,11 @@ const checkAdmin = async (req, res, next) => {
 
 
 const adminAuth = (req,res,next)=>{
-    User.findOne({isAdmin:true})
-    .then(data=>{
-        if(data){
-            next();
-        }else{
-            res.redirect("/admin/login")
-        }
-    })
-    .catch(error=>{
-        console.log("Error in adminAuth middleware");
-        res.status(500).send("internal Server Error")
-    })
+    if(!req.session.admin){
+        res.redirect('/admin/login')
+    }else{
+        next()
+    }
 }
 
 

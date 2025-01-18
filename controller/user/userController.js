@@ -4,12 +4,14 @@ const bcrypt = require("bcrypt")
 
 
 const loadlogin = async (req,res)=>{
-    try {
+   if(!req.session.user) {try {
      
         res.render("login", { message: null });
     } catch (error) {
         console.error(error);
         res.status(400).json({message:"an error occured while loading loginpage"})
+    }}else{
+        res.redirect('/')
     }
 }
 const login = async (req,res)=>{
