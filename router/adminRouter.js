@@ -45,8 +45,9 @@ router.get('/addProductOffer',adminAuth,productController.addOffer)
 router.get('/removeProductOffer',adminAuth,productController.removeOffer)
 
 router.get('/orders',adminAuth,adminController.getOrders)
-router.get("/order/:orderId",  adminController.getOrderDetails)
-router.post("/orders/:orderId/status",adminController.updateOrderStatus);
+router.get("/orders/:orderId",  adminController.getOrderDetails)
+
+router.post("/orders/update-status/:itemId", adminAuth, adminController.changeStatus);
 
 router.get('/coupon',adminAuth,couponController.loadCouponPage)
 router.post('/addCoupon',adminAuth,couponController.addCoupon)

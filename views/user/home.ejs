@@ -272,11 +272,22 @@ body {
                             title: 'Added to Cart',
                             text: response.message,
                             confirmButtonText: 'OK',
-                        }).then((confirmation) => {
+                        }).then(()=>{
+                        Swal.fire({
+                            title:'Go to cart?',
+                            text:'Do you Want to go to cart?',
+                           showCancelButton:true,
+                           confirmButtonText:"YES",
+                           cancelButtonText:"NO",
+                        })
+                        .then((confirmation) => {
                             if (confirmation.isConfirmed) {
                                 window.location.href = '/cart';
+                            }else{
+                                console.log('stay on the current page')
                             }
                         });
+                    })
                     },
                     error: function (xhr, status, error) {
                         Swal.fire({

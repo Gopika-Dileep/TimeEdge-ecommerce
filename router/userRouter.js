@@ -15,7 +15,7 @@ router.get("/login",userController.loadlogin)
 router.post("/login",userController.login)
 router.get("/logout",userController.logout);
 
-router.get("/signup",checkUser,userController.loadSignup)
+router.get("/signup",userController.loadSignup)
 router.post("/signup",userController.signup)
 router.get('/otpverify',userController.loadotp)
 router.post('/otpverify',userController.otpverify)
@@ -68,8 +68,9 @@ router.post('/placeOrderRazorPay',userAuth,orderController.orderRazorpay)
 router.post('/verifyRazorPayOrder',userAuth,orderController.verifyRazorPayOrder)
 router.get('/order-confirmation',userAuth,orderController.getOrderConfirmationPage);
 
-router.get('/order',userAuth,orderController.showOrder)
-router.post('/cancelorder/:orderId',userAuth,orderController.cancelOrder)
+// router.get('/order',userAuth,orderController.showOrder)
+router.get('/orders',userAuth,orderController.showOrder)
+router.post('/orders/:itemId/cancel-item', userAuth, orderController.cancelOrderItem);
 router.post('/returnorder/:orderId',userAuth,orderController.returnOrder)
 
 

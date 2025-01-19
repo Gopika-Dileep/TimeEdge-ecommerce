@@ -301,24 +301,20 @@
                               </tr>
                             </thead>
                             <tbody>
-                              <% orders.forEach(order=> { %>
-                                <% order.orderedItems.forEach(item=> { %>
+                              <% orders.forEach(item=> { %>
                                   <tr>
                                     <td>
-                                      <%= item.products?.productName %>
+                                      <%= item._id %>
                                     </td>
                                     <td>
-                                      <%= item.quantity %>
-                                    </td>
-                                    <td>
-                                      <%= item.price %>
+                                      <%= item.finalAmount %>
                                     </td>
                                     <td>
                                       <%= item.status %>
                                     </td>
-                                    <td><a href="/order?id=<%= order._id%>" class="btn-primary">view</a></td>
+                                    <td><a href="/orders?id=<%= item._id%>" class="btn-primary">view</a></td>
                                   </tr>
-                                  <% }); %>
+                              
                                     <% }); %>
 
                           </table>

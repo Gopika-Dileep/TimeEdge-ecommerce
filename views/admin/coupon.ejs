@@ -198,8 +198,8 @@ body {
                     <tr>
                         <td><%= coupon.name%></td>
                         <td><%= coupon.offerPrice%></td>
-                        <td><%= coupon.createon%></td>
-                        <td><%= coupon.expireOn%></td>
+                        <td><%= coupon.createon.toLocaleDateString()%></td>
+                        <td><%= coupon.expireOn.toLocaleDateString()%></td>
                         <td><%= coupon.minimumPrice%></td>
                         <td><%=coupon.UsageLimit%></td>
                         <td><%=coupon.isList%></td>

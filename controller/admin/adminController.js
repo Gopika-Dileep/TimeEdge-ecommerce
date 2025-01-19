@@ -336,32 +336,54 @@ const getOrderDetails = async (req, res) => {
         if (!order) {
             return res.status(404).json({ error: "Order not found" });
         }
-        res.render("productdetail", { order });
+
+        res.render("orderdetails", { order });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to fetch order details" });
     }
 };
-const updateOrderStatus = async (req, res) => {
+const changeStatus = async (req, res) => {
     try {
-        const { orderId } = req.params;
+        const { itemId } = req.params;
         const { status } = req.body; 
 
-        const order = await Order.findById(orderId);
+        const order = await Order.findOne({ "orderedItems._id": itemId });
         if (!order) {
             return res.status(404).json({ error: "Order not found" });
         }
 
-        order.orderedItems.forEach(item => {
-           
-            item.status = status;
-           
-        });
+        if (order.status === "Cancelled") {
+            return res.status(400).json({ error: "Cannot change status of a cancelled order" });
+        }
 
+        const item = order.orderedItems.id(itemId);
+        if (!item) {
+            return res.status(404).json({ error: "Item not found" });
+        }
+
+        if (item.status === "Returned") {
+            return res.status(400).json({ error: "Cannot change status of a returned item" });
+        }
+         
+         
+        item.status = status;
         await order.save();
-        console.log(order,'order')
-
-        res.redirect(`/admin/order/${orderId}`);  
+        
+        const itemStatuses = order.orderedItems.map(item => item.status);
+        if (itemStatuses.every(s => s === "delivered")) {
+            order.status = "delivered";
+        } else if (itemStatuses.some(s => s === "Processing" || s === "Shipped")) {
+            order.status = "Processing";
+        } else if (itemStatuses.some(s => s === "Pending")) {
+            order.status = "Pending";
+        } else if (itemStatuses.some(s => s === "Cancelled" || s === "Return request" || s === "Returned")) {
+            order.status = "Cancelled";
+        } else {
+            order.status = "pending";
+        }
+        await order.save();
+        res.json({ success: true });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to update order status" });
@@ -388,7 +410,6 @@ module.exports = {
     unlistBrand,
     getOrders,
     getOrderDetails,
-    updateOrderStatus,
+    changeStatus,
     removeOffer
-    
 }

@@ -46,7 +46,6 @@ const getCheckoutPage = async (req, res) => {
 const createOrder = async (req, res) => {
     try {
         const { cartId, addressId, paymentMethod, couponId } = req.body;
-        console.log("body", req.body)
         let coupon = 0
         if (couponId) {
             coupon = await Coupon.findById({ _id: couponId });
@@ -90,8 +89,8 @@ const createOrder = async (req, res) => {
             discount,
             user
         });
-
-        await newOrder.save();
+        
+        const ordersaving =await newOrder.save();
         cart.items = [];
         await cart.save();
 
@@ -212,55 +211,112 @@ const getOrderConfirmationPage = async (req, res) => {
 
 const showOrder = async (req, res) => {
     try {
-        const orderId = req.query.id
-        const order = await Order.findById({ _id: orderId }).populate('orderedItems.products')
-        console.log(order.orderedItems, 'order')
-        res.render('showorderpage', { order })
-    } catch (error) {
+            const orderId = req.query.id
+            const order = await Order.findById({ _id: orderId }).populate('orderedItems.products')
+            const address = await Address.findOne({userId:req.session.user})
+           
+            const addressess = address.address
+
+            const specificAddress= addressess.find((addr)=>addr._id.toString()==order.address.toString())
+
+           
+            res.render('showorderpage', { order ,specificAddress})
+        } catch (error) {
         console.error(error)
         res.status(500).json({ message: "server error" })
     }
 }
-const cancelOrder = async (req, res) => {
+const cancelOrderItem = async (req, res) => {
     try {
-        const orderId = req.params.orderId
-        const { productId } = req.body
-        const order = await Order.findById({ _id: orderId })
-        const orderItems = order.orderedItems
-        let updatedQuantity;
-        for (let item of orderItems) {
-            if (item.products.toString() == productId) {
-                item.status = "Cancelled"
-                updatedQuantity = item.quantity
-                if (order.paymentMethod !== 'COD') {
-                    const cancelamount = item.price;
-                    const transactionType = 'credit';
-                    const userId = req.session.user;
-                    await walletHelper.updateWalletBalance(userId, cancelamount, transactionType)
-                }
-            }
+        const orderId = req.params.itemId;
+        console.log(orderId,'orderid')
+        const { itemId, reason } = req.body;
+
+        if (!reason.trim()) {
+            return res.status(400).json({ success: false, message: "Cancellation reason is required" });
         }
-        await order.save()
-        const productUpdate = await Product.findById({ _id: productId })
-        productUpdate.quantity += updatedQuantity;
-        await productUpdate.save()
-        res.status(200).json({ success: true, message: "order cancelled successfully" })
+
+        
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        
+        const orderItem = order.orderedItems.find(item => item._id.toString() === itemId);
+        
+        if (!orderItem) {
+            return res.status(404).json({ success: false, message: "Order item not found" });
+        }
+
+        
+        if (['cancelled', 'delivered', 'returned'].includes(orderItem.status.toLowerCase())) {
+            return res.status(400).json({ success: false, message: "Item cannot be cancelled" });
+        }
+
+   
+        orderItem.status = "Cancelled";
+        orderItem.cancelReason = reason;
+
+        if (order.paymentMethod !== 'COD') {
+            const cancelAmount = orderItem.price;
+            const transactionType = 'credit';
+            const userId = req.session.user;
+            await walletHelper.updateWalletBalance(userId, cancelAmount, transactionType);
+        }
+
+        await order.save();
+        const itemStatuses = order.orderedItems.map(item => item.status);
+        if (itemStatuses.every(s => s === "delivered")) {
+            order.status = "delivered";
+        } else if (itemStatuses.some(s => s === "Processing" || s === "Shipped")) {
+            order.status = "Processing";
+        } else if (itemStatuses.some(s => s === "Pending")) {
+            order.status = "Pending";
+        } else if (itemStatuses.some(s => s === "Cancelled" || s === "Return request" || s === "Returned")) {
+            order.status = "Cancelled";
+        } else {
+            order.status = "pending";
+        }
+        await order.save();
+
+     
+        const product = await Product.findById(orderItem.products);
+        if (product) {
+            product.quantity += orderItem.quantity;
+            await product.save();
+        }
+
+        res.status(200).json({ success: true, message: "Order item cancelled successfully" });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ message: "server error" })
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
     }
-}
+};
+
 
 const returnOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId
+     
         const { productId } = req.body
         const order = await Order.findById({ _id: orderId })
         const orderItems = order.orderedItems
         const userId=req.session.user;
         let updatedQuantity;
+        const currentDate = new Date();
         for (let item of orderItems) {
             if (item.products.toString() == productId) {
+                if (item.status === "delivered") {
+                    const deliveryDate = new Date(item.deliveryDate); 
+                    const diffTime = currentDate - deliveryDate;
+                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                    if (diffDays > 10) {
+                        return res.status(400).json({ message: "You cannot return an item after 10 days of delivery" });
+                    }
+                }
+
                 item.status = "Returned"
                 updatedQuantity = item.quantity
                 const cancelamount = item.price;
@@ -284,7 +340,7 @@ module.exports = {
     getOrderConfirmationPage,
     createOrder,
     showOrder,
-    cancelOrder,
+    cancelOrderItem,
     returnOrder,
     orderRazorpay,
     verifyRazorPayOrder

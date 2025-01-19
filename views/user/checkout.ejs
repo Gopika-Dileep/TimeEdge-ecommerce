@@ -151,7 +151,9 @@ table th {
                 </div>
             <% }) %>
         </div>
-        <button id="apply-coupon" data-id="<%= coupon._id%>"  class="btn">Apply Coupon</button>
+        <button id="apply-coupon" class="btn">Apply Coupon</button>
+        <button id="remove-coupon" class="btn">Remove Coupon</button>
+
     </section>
 
     <hr>
@@ -243,6 +245,7 @@ $('.place-order').click(function() {
         timer: 3000,
         timerProgressBar: true
     }).then(() => {
+       
         $.ajax({
             url: '/create-order',
             method: 'POST',
@@ -383,69 +386,163 @@ async function initiateRazorpayPayment(addressId, cartId, paymentMethod, couponI
 }
 });
 
-let discount =0 ;
-const subtotalElement = document.getElementById('subtotal'); 
-const subtotal = parseFloat(subtotalElement.innerText.replace('Subtotal: ₹', '').trim());
-document.getElementById("apply-coupon").addEventListener("click",async (event)=>{
-    event.preventDefault()
+// let discount =0 ;
+// const subtotalElement = document.getElementById('subtotal'); 
+// const subtotal = parseFloat(subtotalElement.innerText.replace('Subtotal: ₹', '').trim());
+// document.getElementById("apply-coupon").addEventListener("click",async (event)=>{
+//     event.preventDefault()
+//     const selectedCoupon = document.querySelector('input[name="coupon"]:checked');
+//     if(!selectedCoupon){
+//         Swal.fire({
+//             title:"Error",
+//             text:"Please select a coupon before applying.",
+//             icon:"error"
+//         })
+//         return;
+//     }
+    
+//     const couponCode = selectedCoupon.value;
+
+//     try {
+//         const response = await fetch("/verifyCoupon",{
+//             method:"POST",
+//             headers:{
+//                 "Content-Type":"application/json"
+//             },
+//             body:JSON.stringify({couponCode,subtotal})
+          
+
+//         });
+//         const data = await response.json();
+//         if(data.success==true){
+//             discount = data.discount;
+//             document.getElementById("couponDiscount").textContent = `${discount.toFixed(2)}`;
+            
+//             currentTotal = subtotal - discount 
+//             updateTotalDisplay(currentTotal,discount)
+//             Swal.fire({
+//                 title:"success",
+//                 text:"Coupon added Successfully",
+//                 icon:"Success"
+//             });
+
+//         }else{
+//             Swal.fire({
+//                 title: "Error",
+//                 text: data.message || "Failed to apply the coupon.",
+//                 icon: "error",
+//             });
+//         }
+        
+
+//     } catch (error) {
+//         console.error(error)
+//         Swal.fire({
+//             title:"Error",
+//             text:"An error occured while adding the coupon",
+//             icon:"error"
+//         })
+//     }
+// })
+
+// function updateTotalDisplay(currentTotal,discount){
+//     alert(currentTotal)
+//     document.getElementById('final-total').textContent =`₹${currentTotal.toFixed(2)}`;
+//     document.getElementById("couponDiscount").textContent =`₹${discount.toFixed(2)}`;
+// }
+
+let discount = 0;
+let appliedCoupon = null; // Track the applied coupon
+
+const subtotalElement = document.getElementById('subtotal');
+let subtotal = parseFloat(subtotalElement.innerText.replace('Subtotal: ₹', '').trim());
+
+// Apply Coupon
+document.getElementById("apply-coupon").addEventListener("click", async (event) => {
+    event.preventDefault();
     const selectedCoupon = document.querySelector('input[name="coupon"]:checked');
-    if(!selectedCoupon){
+
+    if (!selectedCoupon) {
         Swal.fire({
-            title:"Error",
-            text:"Please select a coupon before applying.",
-            icon:"error"
-        })
+            title: "Error",
+            text: "Please select a coupon before applying.",
+            icon: "error"
+        });
         return;
     }
-    
+
     const couponCode = selectedCoupon.value;
 
     try {
-        const response = await fetch("/verifyCoupon",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
+        const response = await fetch("/verifyCoupon", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
             },
-            body:JSON.stringify({couponCode,subtotal})
-          
-
+            body: JSON.stringify({ couponCode, subtotal })
         });
-        const data = await response.json();
-        if(data.success==true){
-            discount = data.discount;
-            document.getElementById("couponDiscount").textContent = `${discount.toFixed(2)}`;
-            
-            currentTotal = subtotal - discount 
-            updateTotalDisplay(currentTotal,discount)
-            Swal.fire({
-                title:"success",
-                text:"Coupon added Successfully",
-                icon:"Success"
-            });
 
-        }else{
+        const data = await response.json();
+
+        if (data.success === true) {
+            discount = data.discount;
+            appliedCoupon = couponCode; // Save the applied coupon ID
+            document.getElementById("couponDiscount").textContent = `${discount.toFixed(2)}`;
+
+            const currentTotal = subtotal - discount;
+            updateTotalDisplay(currentTotal, discount);
+
+            Swal.fire({
+                title: "Success",
+                text: "Coupon added successfully.",
+                icon: "success"
+            });
+        } else {
             Swal.fire({
                 title: "Error",
                 text: data.message || "Failed to apply the coupon.",
                 icon: "error",
             });
         }
-        
 
     } catch (error) {
-        console.error(error)
+        console.error(error);
         Swal.fire({
-            title:"Error",
-            text:"An error occured while adding the coupon",
-            icon:"error"
-        })
+            title: "Error",
+            text: "An error occurred while adding the coupon",
+            icon: "error"
+        });
     }
-})
+});
 
-function updateTotalDisplay(currentTotal,discount){
-    alert(currentTotal)
-    document.getElementById('final-total').textContent =`₹${currentTotal.toFixed(2)}`;
-    document.getElementById("couponDiscount").textContent =`₹${discount.toFixed(2)}`;
+// Remove Coupon
+document.getElementById("remove-coupon").addEventListener("click", async (event) => {
+    if (!appliedCoupon) {
+        Swal.fire({
+            title: "Error",
+            text: "No coupon applied.",
+            icon: "error"
+        });
+        return;
+    }
+
+    // Reset the discount and applied coupon
+    appliedCoupon = null;
+    discount = 0;
+
+    const currentTotal = subtotal; // Revert to the original subtotal
+    updateTotalDisplay(currentTotal, discount);
+
+    Swal.fire({
+        title: "Success",
+        text: "Coupon removed successfully.",
+        icon: "success"
+    });
+});
+
+function updateTotalDisplay(currentTotal, discount) {
+    document.getElementById('final-total').textContent = `₹${currentTotal.toFixed(2)}`;
+    document.getElementById("couponDiscount").textContent = `₹${discount.toFixed(2)}`;
 }
 
  </script>

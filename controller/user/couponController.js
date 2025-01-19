@@ -19,7 +19,8 @@ const verifyCoupon = async(req,res)=>{
         if(coupon.UsageLimit<=0){
             return res.status(400).json({success:false,message:"coupon limit is reached"})
         }
-        coupon.save()
+        coupon.UsageLimit -= 1;
+        await coupon.save()
         console.log(coupon,"coupon")
         return res.status(200).json({success:true,discount:coupon.offerPrice})
     } catch (error) {

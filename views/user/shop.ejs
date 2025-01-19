@@ -1,5 +1,20 @@
 <%-include("../../views/partials/user/header") %>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
+<style>
+.bi-heart, .bi-heart-fill {
+    font-size: 2rem;
+    cursor: pointer;
+    color: #ff2a68; /* Red color */
+}
+
+.bi-heart-fill {
+    color: #ff0000; /* Solid red for filled heart */
+}
+
+</style>
 
     <section class="breadcrumb-option">
         <div class="container">
@@ -119,19 +134,22 @@
                         </div>
                     </div>
                     <div class="row">
-                        <% for (let i=0; i < product.length; i++) { %>
+                        <% for (let i = 0; i < product.length; i++) { %>
                             <div class="col-lg-4 col-md-6 col-sm-6">
                                 <div class="product__item">
                                     <a href="/productDetails?id=<%= product[i]._id %>">
                                         <div class="product__item__pic set-bg"
                                             data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>">
                                             <ul class="product__hover">
-                                                <li><img src="/img/icon/heart.png" alt="" class="add-to-wishlist" data-id="<%= product[i]._id %>"><span>Wishlist</span></li>
+                                                <li>
+                                                    <!-- Heart icon with dynamic class based on wishlist status -->
+                                                    <i class="bi <%= product[i].inWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" id="wishlist-icon-<%= product[i]._id %>" data-id="<%= product[i]._id %>"></i>
+                                                    <span>Wishlist</span>
+                                                </li>
                                             </ul>
                                         </div>
                                     </a>
-
-                                    </a>
+                    
                                     <div class="product__item__text">
                                         <h6>
                                             <%= product[i].productName %>
@@ -141,10 +159,9 @@
                                             + Add To Cart
                                         </a>
                                         <div class="rating">
-                                            <% for (let j=0; j < 5; j++) { %>
-                                                <i
-                                                    class="fa <%= j < product[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
-                                                <% } %>
+                                            <% for (let j = 0; j < 5; j++) { %>
+                                                <i class="fa <%= j < product[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
+                                            <% } %>
                                         </div>
                                         <% 
                                         const productOffer = product[i].productOffer || 0;
@@ -152,21 +169,19 @@
                                         const bestOffer = Math.max(productOffer, categoryOffer);
                                         const salePrice = product[i].salePrice;
                                         const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
-                                      %>
+                                        %>
                                         <span><%= finalPrice %></span>
                                         <% if (finalPrice < salePrice) { %>
-                                        <p>₹<%= product[i].salePrice%>
-                                            <span class='text-muted'><strike>
-                                                        <%= product[i].regularPrice%>
-                                                    </strike></span></p>
-                                                    <% } %>
+                                            <p>₹<%= product[i].salePrice %>
+                                                <span class='text-muted'><strike><%= product[i].regularPrice %></strike></span>
+                                            </p>
+                                        <% } %>
                                     </div>
-                                    </a>
                                 </div>
                             </div>
-                            <% } %>
+                        <% } %>
                     </div>
-
+                    
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="product__pagination">
@@ -225,11 +240,22 @@
                             title: 'Added to Cart',
                             text: response.message,
                             confirmButtonText: 'OK',
-                        }).then((confirmation) => {
+                        }).then(()=>{
+                        Swal.fire({
+                            title:'Go to cart?',
+                            text:'Do you Want to go to cart?',
+                           showCancelButton:true,
+                           confirmButtonText:"YES",
+                           cancelButtonText:"NO",
+                        })
+                        .then((confirmation) => {
                             if (confirmation.isConfirmed) {
                                 window.location.href = '/cart';
+                            }else{
+                                console.log('stay on the current page')
                             }
                         });
+                    })
                     },
                     error: function (xhr, status, error) {
                         Swal.fire({
@@ -244,49 +270,99 @@
             });
         });
 
-        const addToWishbtn = document.querySelectorAll('.add-to-wishlist')
-    addToWishbtn .forEach(function(button){
-        button.addEventListener('click',function(event){
-            event.preventDefault();
-            const productId = this.getAttribute('data-id')
-            alert(productId,'product')
-            $.ajax({
-                url:`/addToWishlist/${productId}`,
-                method:'POST',
-                data:JSON.stringify({productId:productId}),
-                contentType:"application/jason",
-                success:function(response){
-                    Swal.fire({
-                        icon:'success',
-                        title:"added to Whislist",
-                        text:response.message,
-                        confirmButtonText:'OK',
-                    }).then(()=>{
+    //     const addToWishbtn = document.querySelectorAll('.add-to-wishlist')
+    // addToWishbtn .forEach(function(button){
+    //     button.addEventListener('click',function(event){
+    //         event.preventDefault();
+    //         const productId = this.getAttribute('data-id')
+    //         alert(productId,'product')
+    //         $.ajax({
+    //             url:`/addToWishlist/${productId}`,
+    //             method:'POST',
+    //             data:JSON.stringify({productId:productId}),
+    //             contentType:"application/jason",
+    //             success:function(response){
+    //                 Swal.fire({
+    //                     icon:'success',
+    //                     title:"added to Whislist",
+    //                     text:response.message,
+    //                     confirmButtonText:'OK',
+    //                 }).then(()=>{
+    //                     Swal.fire({
+    //                         title:'Go to Wishlist?',
+    //                         text:'Do you Want to go to Wishlist?',
+    //                        showCancelButton:true,
+    //                        confirmButtonText:"YES",
+    //                        cancelButtonText:"NO",
+    //                     }).then((confirmation)=>{
+    //                         if(confirmation.isConfirmed){
+    //                             window.location.href = '/wishlist'
+    //                         }else{
+    //                             console.log('Stay on the current page')
+    //                         }
+    //                     })
+    //                 })
+    //             },
+    //             error:function(xhr,status,error){
+    //                 Swal.fire({
+    //                     icon:'error',
+    //                     title:'Error',
+    //                     text :'Error while adding to wishlist.',
+    //                     confirmButtonText:"Ok",
+    //                 })
+    //             }
+    //         })
+    //     })
+    // })
+    const addToWishbtn = document.querySelectorAll('.bi-heart, .bi-heart-fill');
+
+addToWishbtn.forEach(function(button) {
+    button.addEventListener('click', function(event) {
+        event.preventDefault();
+        const productId = this.getAttribute('data-id');
+        const icon = document.getElementById(`wishlist-icon-${productId}`);
+
+        // Send AJAX request to either add or remove the product from wishlist
+        $.ajax({
+            url: `/addToWishlist/${productId}`,
+            method: 'POST',
+            data: JSON.stringify({ productId: productId }),
+            contentType: "application/json",
+            success: function(response) {
+                if (response.success) {
+                    if (response.action === 'added') {
+                        // If product added, change icon to filled (red heart)
+                        icon.classList.remove('bi-heart');
+                        icon.classList.add('bi-heart-fill', 'text-danger');
                         Swal.fire({
-                            title:'Go to Wishlist?',
-                            text:'Do you Want to go to Wishlist?',
-                           showCancelButton:true,
-                           confirmButtonText:"YES",
-                           cancelButtonText:"NO",
-                        }).then((confirmation)=>{
-                            if(confirmation.isConfirmed){
-                                window.location.href = '/wishlist'
-                            }else{
-                                console.log('Stay on the current page')
-                            }
-                        })
-                    })
-                },
-                error:function(xhr,status,error){
-                    Swal.fire({
-                        icon:'error',
-                        title:'Error',
-                        text :'Error while adding to wishlist.',
-                        confirmButtonText:"Ok",
-                    })
+                            icon: 'success',
+                            title: "Added to Wishlist",
+                            text: response.message,
+                            confirmButtonText: 'OK',
+                        });
+                    } else if (response.action === 'removed') {
+                        // If product removed, change icon back to empty heart
+                        icon.classList.remove('bi-heart-fill', 'text-danger');
+                        icon.classList.add('bi-heart');
+                        Swal.fire({
+                            icon: 'success',
+                            title: "Removed from Wishlist",
+                            text: response.message,
+                            confirmButtonText: 'OK',
+                        });
+                    }
                 }
-            })
-        })
-    })
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error while updating the wishlist.',
+                    confirmButtonText: "Ok",
+                });
+            }
+        });
+    });
+});
     </script>
     <%-include("../../views/partials/user/footer") %>
