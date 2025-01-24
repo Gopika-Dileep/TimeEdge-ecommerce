@@ -57,5 +57,8 @@ router.get('/deleteCoupon',adminAuth,couponController.deleteCoupon)
 router.get('/salesreport',adminAuth,salesController.loadSalesReport)
 router.get('/filterOrder',adminAuth,salesController.filterOrder)
 router.get('/filterbyDate',adminAuth,salesController.filterbyDate)
+router.post('/sales-report/pdf',adminAuth,salesController.downloadpdf)
+router.post('/sales-report/excel',adminAuth,salesController.downloadexcel)
+
 
 module.exports=router

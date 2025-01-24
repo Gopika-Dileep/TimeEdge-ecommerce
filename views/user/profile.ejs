@@ -319,6 +319,54 @@
 
                           </table>
                         </div>
+                        <div class="pagination">
+                          <% 
+                              const prevPage = currentpage > 1 ? currentpage - 1 : 1;
+                              const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage;
+                          %>
+                          
+                          <% if (currentpage > 1) { %>
+                              <a href="?page=<%= prevPage %>" class="btn">
+                                  <i class="bi bi-chevron-left"></i> Previous
+                              </a>
+                          <% } %>
+
+                          <div class="page-numbers">
+                              <% 
+                              let startPage = Math.max(1, currentpage - 2);
+                              let endPage = Math.min(totalpage, startPage + 4);
+                              
+                              if (endPage - startPage < 4) {
+                                  startPage = Math.max(1, endPage - 4);
+                              }
+                              
+                              if (startPage > 1) { %>
+                                  <a href="?page=1">1</a>
+                                  <% if (startPage > 2) { %>
+                                      <span>...</span>
+                                  <% } %>
+                              <% } %>
+
+                              <% for(let i = startPage; i <= endPage; i++) { %>
+                                  <a href="?page=<%= i %>" class="<%= (i === currentpage) ? 'active' : '' %>">
+                                      <%= i %>
+                                  </a>
+                              <% } %>
+
+                              <% if (endPage < totalpage) { %>
+                                  <% if (endPage < totalpage - 1) { %>
+                                      <span>...</span>
+                                  <% } %>
+                                  <a href="?page=<%= totalpage %>"><%= totalpage %></a>
+                              <% } %>
+                          </div>
+
+                          <% if (currentpage < totalpage) { %>
+                              <a href="?page=<%= nextPage %>" class="btn">
+                                  Next <i class="bi bi-chevron-right"></i>
+                              </a>
+                          <% } %>
+                      </div>
                       </div>
                     </div>
                   </div>
@@ -382,6 +430,54 @@
                         </tbody>
                       </table>
                     </div>
+                    <div class="pagination">
+                      <% 
+                          const prevPage = currentpage > 1 ? currentpage - 1 : 1;
+                          const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage;
+                      %>
+                      
+                      <% if (currentpage > 1) { %>
+                          <a href="?page=<%= prevPage %>" class="btn">
+                              <i class="bi bi-chevron-left"></i> Previous
+                          </a>
+                      <% } %>
+
+                      <div class="page-numbers">
+                          <% 
+                          let startPage = Math.max(1, currentpage - 2);
+                          let endPage = Math.min(totalpage, startPage + 4);
+                          
+                          if (endPage - startPage < 4) {
+                              startPage = Math.max(1, endPage - 4);
+                          }
+                          
+                          if (startPage > 1) { %>
+                              <a href="?page=1">1</a>
+                              <% if (startPage > 2) { %>
+                                  <span>...</span>
+                              <% } %>
+                          <% } %>
+
+                          <% for(let i = startPage; i <= endPage; i++) { %>
+                              <a href="?page=<%= i %>" class="<%= (i === currentpage) ? 'active' : '' %>">
+                                  <%= i %>
+                              </a>
+                          <% } %>
+
+                          <% if (endPage < totalpage) { %>
+                              <% if (endPage < totalpage - 1) { %>
+                                  <span>...</span>
+                              <% } %>
+                              <a href="?page=<%= totalpage %>"><%= totalpage %></a>
+                          <% } %>
+                      </div>
+
+                      <% if (currentpage < totalpage) { %>
+                          <a href="?page=<%= nextPage %>" class="btn">
+                              Next <i class="bi bi-chevron-right"></i>
+                          </a>
+                      <% } %>
+                  </div>
                     <% } else { %>
                       <p class="text-center text-muted">No transactions found in your wallet history.</p>
                       <% } %>

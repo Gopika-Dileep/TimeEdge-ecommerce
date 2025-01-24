@@ -229,32 +229,31 @@ const editCategory = async (req,res)=>{
         res.status(400).json({message:"error while eiting the category "})
     }
 }
-const addOffer = async(req,res)=>{
+const addOffer = async (req, res) => {
     try {
-        const {categoryId,percentage} = req.body
-        const category = await Category.findById({_id:categoryId})
-        category.categoryOffer = percentage
-        category.save()
+        const { categoryId, percentage } = req.body;
+        const category = await Category.findById(categoryId);
+        category.categoryOffer = percentage;
+        await category.save();
+        res.status(200).json({ status: true });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"Server error"})
+        console.error(error);
+        res.status(500).json({ status: false, message: "Server error" });
     }
-}
-const removeOffer = async(req,res)=>{
+};
+
+const removeOffer = async (req, res) => {
     try {
-        const {categoryId} = req.body 
-        const category = await Category.findById({_id:categoryId})
-        category.categoryOffer = 0
-        category.save()
-
+        const { categoryId } = req.body;
+        const category = await Category.findById(categoryId);
+        category.categoryOffer = 0;
+        await category.save();
+        res.status(200).json({ status: true });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({message:'server error'})
+        console.error(error);
+        res.status(500).json({ status: false, message: "Server error" });
     }
-
-}
-
-
+};
 const loadbrand=async (req,res)=>{
        try {
          const page = req.query.page||1;

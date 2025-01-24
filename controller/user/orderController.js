@@ -43,6 +43,31 @@ const getCheckoutPage = async (req, res) => {
     }
 }
 
+const addAddress= async(req,res)=>{
+      try {
+        const { name, phone, altPhone, landMark, city, state, pincode } = req.body;
+        const newAddress = new Address({
+            userId: req.session.userId, 
+            address: [{
+                name,
+                phone,
+                altPhone,
+                landMark,
+                city,
+                state,
+                pincode
+            }]
+        });
+        
+        await newAddress.save();
+        res.render('checkout')
+      } catch (error) {
+        console.error(error)
+        res.status(500).json({message:"server error"})
+      }
+}
+
+
 const createOrder = async (req, res) => {
     try {
         const { cartId, addressId, paymentMethod, couponId } = req.body;
@@ -54,10 +79,11 @@ const createOrder = async (req, res) => {
         const cart = await Cart.findById({ _id: cartId }).populate("items.product");
         let totalPrice = 0;
         const user = cart.user
+        let discountTotalPrice;
         for (let item of cart.items) {
             const product = item.product;
-
             const quantity = item.quantity;
+            discountTotalPrice= item.product.salePrice-item.price
 
             if (product.quantity < quantity) {
                 return res.status(400).send(`Not enough stock for product ${product.name}`);
@@ -81,6 +107,7 @@ const createOrder = async (req, res) => {
                 quantity: item.quantity,
                 price: item.product.salePrice,
             })),
+            productdiscount:discountTotalPrice,
             finalAmount,
             address: addressId,
             invoiceDate: new Date(),
@@ -151,10 +178,14 @@ const verifyRazorPayOrder = async (req, res) => {
             const cart = await Cart.findById({ _id: cartId }).populate("items.product");
             let totalPrice = 0;
             const user = cart.user
+            let discountTotalPrice;
+
             for (let item of cart.items) {
                 const product = item.product;
 
                 const quantity = item.quantity;
+                discountTotalPrice= item.product.salePrice-item.price
+
 
                 if (product.quantity < quantity) {
                     return res.status(400).send(`Not enough stock for product ${product.name}`);
@@ -178,6 +209,7 @@ const verifyRazorPayOrder = async (req, res) => {
                     quantity: item.quantity,
                     price: item.product.salePrice,
                 })),
+                productdiscount:discountTotalPrice,
                 finalAmount,
                 address: addressId,
                 invoiceDate: new Date(),
@@ -212,6 +244,8 @@ const getOrderConfirmationPage = async (req, res) => {
 const showOrder = async (req, res) => {
     try {
             const orderId = req.query.id
+            const userId = req.session.user
+            const user= await User.findById({_id:userId})
             const order = await Order.findById({ _id: orderId }).populate('orderedItems.products')
             const address = await Address.findOne({userId:req.session.user})
            
@@ -220,7 +254,7 @@ const showOrder = async (req, res) => {
             const specificAddress= addressess.find((addr)=>addr._id.toString()==order.address.toString())
 
            
-            res.render('showorderpage', { order ,specificAddress})
+            res.render('showorderpage', { order ,specificAddress,user})
         } catch (error) {
         console.error(error)
         res.status(500).json({ message: "server error" })
@@ -297,18 +331,21 @@ const cancelOrderItem = async (req, res) => {
 
 const returnOrder = async (req, res) => {
     try {
-        const orderId = req.params.orderId
-     
-        const { productId } = req.body
-        const order = await Order.findById({ _id: orderId })
-        const orderItems = order.orderedItems
-        const userId=req.session.user;
+        const orderId = req.params.orderId;
+        const { productId, reason } = req.body;
+        console.log(productId,'productid')
+
+        const order = await Order.findById({ _id: orderId });
+        const orderItems = order.orderedItems;
+        const userId = req.session.user;
         let updatedQuantity;
+
         const currentDate = new Date();
+
         for (let item of orderItems) {
-            if (item.products.toString() == productId) {
+            if (item.products.toString() === productId) {
                 if (item.status === "delivered") {
-                    const deliveryDate = new Date(item.deliveryDate); 
+                    const deliveryDate = new Date(item.deliveryDate);
                     const diffTime = currentDate - deliveryDate;
                     const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
@@ -317,26 +354,34 @@ const returnOrder = async (req, res) => {
                     }
                 }
 
-                item.status = "Returned"
-                updatedQuantity = item.quantity
-                const cancelamount = item.price;
+                item.status = "Returned";
+                item.returnReason = reason; 
+                updatedQuantity = item.quantity;
+
+                const refundAmount = item.price;
                 const transactionType = 'credit';
-                    await walletHelper.updateWalletBalance(userId, cancelamount, transactionType)
-                
+                await walletHelper.updateWalletBalance(userId, refundAmount, transactionType);
             }
         }
-        await order.save()
-        const productUpdate = await Product.findById({ _id: productId })
+
+        await order.save();
+
+        const productUpdate = await Product.findById({ _id: productId });
+        console.log(productUpdate,'fshahhhafy');
+        
         productUpdate.quantity += updatedQuantity;
-        await productUpdate.save()
-        res.status(200).json({ success: true, message: "order returned successfully" })
+        await productUpdate.save();
+
+        res.status(200).json({ success: true, message: "Order returned successfully" });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ message: "server error" })
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
     }
-}
+};
+
 module.exports = {
     getCheckoutPage,
+    addAddress,
     getOrderConfirmationPage,
     createOrder,
     showOrder,

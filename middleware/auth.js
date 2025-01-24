@@ -35,7 +35,7 @@ const checkAdmin = async (req, res, next) => {
 
 const adminAuth = (req,res,next)=>{
     if(!req.session.admin){
-        res.redirect('/admin/login')
+        res.redirect('/admin')
     }else{
         next()
     }

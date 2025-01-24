@@ -89,7 +89,7 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>Description</th>
-                    <th>Offer Price</th>
+                    <th>Offer Percentage</th>
                     <th>Status</th>
                     <th>Offer</th>
                     <th>Actions</th>
@@ -102,7 +102,7 @@
                         <td class="text-center"><%= index + 1 %></td>
                         <td class="text-center"><%= category.name %></td>
                         <td class="text-center"><%= category.description %></td>
-                        <td><%= category.categoryOffer %></td>
+                        <td id="offer-<%= category._id %>"><%= category.categoryOffer %></td>
                        
                         <td class="text-center">
                           <% if (category.isListed) { %>
@@ -111,7 +111,7 @@
                             <span class="badge bg-danger">Unlisted</span>
                           <% } %>
                         </td>
-                        <td>
+                        <td id="offer-btn-<%= category._id %>">
                           <% if (category.categoryOffer) { %>
                               <button onclick="removeOffer('<%= category._id %>')" class="btn btn-danger btn-icon">
                                   <i class="bi bi-trash"></i>
@@ -279,7 +279,8 @@
             success: (response) => {
                 if (response.status === true) {
                     Swal.fire('Offer added', 'The offer has been added successfully', 'success').then(() => {
-                        location.reload();
+                        $(`#offer-${categoryId}`).text(amount);
+                        $(`#offer-btn-${categoryId}`).html('<button onclick="removeOffer(\'' + categoryId + '\')" class="btn btn-danger btn-icon"><i class="bi bi-trash"></i></button>');
                     });
                 } else {
                     Swal.fire('Failed', 'Unable to add the offer', 'error');
@@ -314,7 +315,9 @@ function removeOffer(categoryId) {
                     success: (response) => {
                         if (response.status === true) {
                             Swal.fire("Removed!", "The offer has been removed.", "success").then(() => {
-                                location.reload();
+                                // Update the offer percentage in the table
+                                $(`#offer-${categoryId}`).text('0');
+                                $(`#offer-btn-${categoryId}`).html('<button onclick="addOffer(\'' + categoryId + '\')" class="btn btn-success btn-icon"><i class="bi bi-plus"></i></button>');
                             });
                         } else {
                             Swal.fire('Failed', 'Unable to remove the offer', 'error');

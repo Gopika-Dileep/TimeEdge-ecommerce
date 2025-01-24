@@ -32,6 +32,10 @@
                 type:Number,
                 default:0
             },
+            productdiscount:{
+                type:Number,
+                default:0
+            },
         finalAmount:{
             type:Number,
         },
@@ -69,6 +73,11 @@
             type: Date 
         }
     })
+    
 
     const Order = mongoose.model("order",orderSchema);
+
+   
     module.exports = Order;
+
+  

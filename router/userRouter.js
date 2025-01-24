@@ -21,6 +21,7 @@ router.get('/otpverify',userController.loadotp)
 router.post('/otpverify',userController.otpverify)
 router.get('/',productController.loadhome)
 router.get('/shop',productController.loadshop)
+router.get('/shop/search', productController.searchProducts);
 router.get('/filter',productController.filterProduct)
 router.get('/filterPriceRange',productController.filterProductByPrice)
 
@@ -48,8 +49,8 @@ router.post('/change-email',userAuth,profileController.changeEmailValid)
 router.post("/verify-email-otp",userAuth,profileController.verifyEmailOtp);
 router.post("/update-email",userAuth,profileController.updateEmail);
 router.get('/change-password',userAuth,profileController.changePassword)
-router.post("/change-password",userAuth,profileController.changePasswordValid);
-router.post("/verify-changepassword-otp",userAuth,profileController.verifychangePasswordOtp);
+// router.post("/change-password",userAuth,profileController.changePasswordValid);
+// router.post("/verify-changepassword-otp",userAuth,profileController.verifychangePasswordOtp);
 router.get("/reset-password",profileController.getResetPassPage)
 router.post("/reset-password",profileController.postNewPassword);
 router.get("/addAddress",userAuth,profileController.addAddress);
@@ -79,6 +80,8 @@ router.post('/addToWishlist/:productId',userAuth,wishlistController.addToWishlis
 router.post('/removeitem/:itemId',userAuth,wishlistController.removeItem)
 
 router.post('/verifyCoupon',userAuth,couponController.verifyCoupon)
+router.post('/changepassword',userAuth,profileController.newChangePassword)
+router.post('/addAddressCheckout',userAuth,orderController.addAddress)
 
 
 

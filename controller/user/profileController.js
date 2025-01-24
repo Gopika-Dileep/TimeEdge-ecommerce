@@ -1,41 +1,42 @@
-const User=require("../../models/userSchema");
+const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
-const Order = require("../../models/orderSchema")
+const Order = require("../../models/orderSchema");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const Cart = require("../../models/cartSchema");
 const env = require("dotenv").config();
-const Wallet = require('../../models/walletSchema')
+const Wallet = require('../../models/walletSchema');
 
-
-
-
-const userProfile = async (req,res)=>{
+const userProfile = async (req, res) => {
     try {
-       
         const userId = req.session.user;
-      
-        const userData= await User.findById({_id:userId});
-        const orders = await Order.find({ user: userId }).sort({createdAt:-1})
-        .populate({
-            path: 'orderedItems.products', 
-            model: 'Product' 
-        });
-        console.log(orders,'orders')
-        
-        const userAddress = await Address.findOne({userId:userId});
+        const userData = await User.findById({ _id: userId });
+        const orders = await Order.find({ user: userId }).sort({ createdOn: -1 })
+            .populate({
+                path: 'orderedItems.products',
+                model: 'Product'
+            });
+
+        const userAddress = await Address.findOne({ userId: userId });
         const wallet = await Wallet.findOne({ userId: req.session.user });
-      
-        res.render("profile",{
-            user:userData,
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const totalOrders = orders.length;
+        const totalpage = Math.ceil(totalOrders / limit);
+        const currentOrders = orders.slice((page - 1) * limit, page * limit);
+
+        res.render("profile", {
+            user: userData,
             wallet,
-            userAddress:userAddress,
-            orders:orders,
-           
-        })
+            userAddress: userAddress,
+            orders: currentOrders,
+            currentpage: page,
+            totalpage: totalpage
+        });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"server error"})
+        console.error(error);
+        res.status(500).json({ message: "server error" });
     }
 }
 
@@ -74,7 +75,7 @@ async function sendVerificationMail(email,otp){
             text:`your otp is ${otp}`,
             html: `<b>Your OTP: ${otp}</b>`
         })
-    
+        
         return sendemail.accepted.length>0;
     } catch (error) {
         console.error("Error sending mail", error);
@@ -145,6 +146,44 @@ const updateEmail=async(req,res)=>{
 
 }
 
+const securepassword = async (password) => {
+    try {
+        const passwordHash = await bcrypt.hash(password, 10)
+        return passwordHash;
+    } catch (error) {
+           console.error(error)
+           res.status(500).json({message:"server error"})
+    }
+}
+
+const newChangePassword = async(req,res)=>{
+    try {
+        const userId = req.session.user
+
+        const {confirmPassword,newPassword,currentPassword} = req.body
+        const user = await User.findById({_id:userId})
+        const passwordMatch = await bcrypt.compare(currentPassword,user.password)
+        if(!passwordMatch){
+               return res.status(400).json({message:"current password is not matching"})
+        }
+        if(newPassword!==confirmPassword){
+            return res.status(400).json({message:"confirmpassword not matching"})
+        }
+        // const diffpass = await bcrypt.compare(currentPassword,newPassword)
+        // if(diffpass){
+        //    return res.status(400).json({message:"new password should be different from old password"})
+        // }
+        const passwordHash= await securepassword(newPassword)
+        user.password = passwordHash
+
+        await user.save()
+       return res.redirect('/profile')
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({message:'server error'})
+    }
+}
+
 const getForgotPassPage = async (req,res)=>{
     try {
         res.render("forgot-password");
@@ -157,12 +196,15 @@ const forgotEmailValid = async(req,res)=>{
      try {
         const {email} = req.body;
         const findUser = await User.findOne({email:email});
+
         if(findUser){
             const otp = generateOtp()
             const emailsend = await sendVerificationMail(email,otp);
-            console.log('otp',otp)
+            console.log(otp,'otp')
             if(emailsend){
+
                await User.updateOne({email:email},{$set:{otp:otp}})
+
                setTimeout(async()=>{
                 await User.updateOne({email:email},{$unset:{otp:1}})
                },60000)
@@ -205,7 +247,6 @@ const resendOtp = async(req,res)=>{
         if(findUser){
             const otp = generateOtp()
             const emailsend = await sendVerificationMail(email,otp);
-            console.log('resendOtp',otp)
             if(emailsend){
                 await User.updateOne({email:email},{$set:{otp:otp}})
 
@@ -226,7 +267,7 @@ const resendOtp = async(req,res)=>{
 
 const changePassword = async(req,res)=>{
     try {
-        res.render('change-password');
+        res.render('newchangepassword');
     } catch (error) {
        console.error(error)
        res.status(500).json({message:"server error"})
@@ -294,46 +335,23 @@ const getResetPassPage = async (req,res)=>{
 
 
 
-
-
-
-const securepassword = async (password) => {
-    try {
-        const passwordHash = await bcrypt.hash(password, 10)
-        return passwordHash;
-    } catch (error) {
-           console.error(error)
-           res.status(500).json({message:"server error"})
-    }
-}
-
-
 const postNewPassword = async(req,res)=>{
     try {
         const {newPassword,confirmPassword,email}=req.body
-        console.log(newPassword,'newPassword')
-        console.log(confirmPassword,'confirmPassword')
         if (newPassword===confirmPassword){
          const passwordHash = await securepassword(newPassword);
          const userdata = await User.findOne({email:email})
-         console.log(userdata,'userdata')
          const user = await User.updateOne({email:email},{$set:{password:passwordHash}})
-         console.log(user,'user')
          return res.json({ success: true, redirectUrl: "/login" });
         }else{
             res.render("reset-password",{message:"Passwords do not match"});
         }
-
 
     } catch (error) {
         console.error(error)
         res.status(500).json({message:"server error"})
     }
 }
-
-
-
-
 
 const addAddress = async (req,res)=>{
     try {
@@ -457,7 +475,6 @@ const deleteAddress = async(req,res)=>{
     }
 }
 
-
 module.exports={
     userProfile,
     changeEmail,
@@ -477,5 +494,6 @@ module.exports={
     getForgotPassPage,
     forgotEmailValid,
     verifyForgotPassOtp,
-    resendOtp
+    resendOtp,
+    newChangePassword
 }

@@ -40,8 +40,8 @@
                 <div class="col-lg-3">
                     <div class="shop__sidebar">
                         <div class="shop__sidebar__search">
-                            <form action="#">
-                                <input type="text" placeholder="Search...">
+                            <form action="/shop/search" method="GET">
+                                <input type="text" name="search" placeholder="Search...">
                                 <button type="submit"><span class="icon_search"></span></button>
                             </form>
                         </div>
@@ -185,19 +185,56 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="product__pagination">
-                                <% if (currentpage> 1) { %>
-                                    <a href="?page=<%= currentpage - 1 %>">&laquo;</a>
+                                <% 
+                                    const searchParam = typeof search !== 'undefined' && search ? `&search=${search}` : '';
+                                    const prevPage = currentpage > 1 ? currentpage - 1 : 1;
+                                    const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage;
+                                %>
+                                
+                                <% if (currentpage > 1) { %>
+                                    <a href="?page=<%= prevPage %><%= searchParam %>" class="btn">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </a>
+                                <% } %>
+
+                                <div class="page-numbers">
+                                    <% 
+                                    let startPage = Math.max(1, currentpage - 2);
+                                    let endPage = Math.min(totalpage, startPage + 4);
+                                    
+                                    if (endPage - startPage < 4) {
+                                        startPage = Math.max(1, endPage - 4);
+                                    }
+                                    
+                                    if (startPage > 1) { %>
+                                        <a href="?page=1<%= searchParam %>">1</a>
+                                        <% if (startPage > 2) { %>
+                                            <span>...</span>
+                                        <% } %>
                                     <% } %>
 
-                                        <% for (let i=1; i <=totalpage; i++) { %>
-                                            <a href="?page=<%= i %>" class="<%= currentpage === i ? 'active' : '' %>">
-                                                <%= i %>
-                                            </a>
-                                            <% } %>
+                                    <% for(let i = startPage; i <= endPage; i++) { %>
+                                        <a href="?page=<%= i %><%= searchParam %>" 
+                                           class="<%= (i === currentpage) ? 'active' : '' %>">
+                                            <%= i %>
+                                        </a>
+                                    <% } %>
 
-                                                <% if (currentpage < totalpage) { %>
-                                                    <a href="?page=<%= currentpage + 1 %>">&raquo;</a>
-                                                    <% } %>
+                                    <% if (endPage < totalpage) { %>
+                                        <% if (endPage < totalpage - 1) { %>
+                                            <span>...</span>
+                                        <% } %>
+                                        <a href="?page=<%= totalpage %><%= searchParam %>">
+                                            <%= totalpage %>
+                                        </a>
+                                    <% } %>
+                                </div>
+
+                                <% if (currentpage < totalpage) { %>
+                                    <a href="?page=<%= nextPage %><%= searchParam %>" class="btn">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -314,6 +351,7 @@
     //         })
     //     })
     // })
+   
     const addToWishbtn = document.querySelectorAll('.bi-heart, .bi-heart-fill');
 
 addToWishbtn.forEach(function(button) {
@@ -322,7 +360,6 @@ addToWishbtn.forEach(function(button) {
         const productId = this.getAttribute('data-id');
         const icon = document.getElementById(`wishlist-icon-${productId}`);
 
-        // Send AJAX request to either add or remove the product from wishlist
         $.ajax({
             url: `/addToWishlist/${productId}`,
             method: 'POST',
@@ -331,7 +368,6 @@ addToWishbtn.forEach(function(button) {
             success: function(response) {
                 if (response.success) {
                     if (response.action === 'added') {
-                        // If product added, change icon to filled (red heart)
                         icon.classList.remove('bi-heart');
                         icon.classList.add('bi-heart-fill', 'text-danger');
                         Swal.fire({
@@ -341,7 +377,6 @@ addToWishbtn.forEach(function(button) {
                             confirmButtonText: 'OK',
                         });
                     } else if (response.action === 'removed') {
-                        // If product removed, change icon back to empty heart
                         icon.classList.remove('bi-heart-fill', 'text-danger');
                         icon.classList.add('bi-heart');
                         Swal.fire({

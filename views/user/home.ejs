@@ -6,244 +6,264 @@
 
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-}
-
-.banner-area .single-banner {
-    margin-bottom: 30px;
-    overflow: hidden;
-    border-radius: 10px;
-    transition: transform 0.3s ease;
-}
-
-.banner-area .single-banner img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.banner-area .single-banner:hover {
-    transform: scale(1.05);
-}
-
-
-.product {
-    padding: 5rem 0;
-    background-color: #f8f8f8;
-}
-
-.product__filter {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-}
-
-.product-cart-wrap-mb-30 {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-    transition: box-shadow 0.3s ease;
-}
-
-.product-cart-wrap-mb-30:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.product-img img {
-    width: 100%;
-    height: auto;
-}
-
-.product-content-wrap {
-    padding: 1rem;
-    text-align: center;
-}
-
-.product-content-wrap h6 {
-    font-size: 1rem;
-    color: #333;
-    margin: 0.5rem 0;
-}
-
-.product-content-wrap h5 {
-    font-size: 1.2rem;
-    color: #e74c3c;
-    margin-bottom: 1rem;
-}
-
-.product-content-wrap a {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background: #333;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background 0.3s ease;
-}
-
-.product-content-wrap a:hover {
-    background: #e74c3c;
-}
-.hero__text {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.primary-btn {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #000;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.primary-btn:hover {
-    background-color: #333;
-}
-
-.hero__items {
-    position: relative;
-    text-align: center;
-    width: 100%;
-    height: 100vh;
-    background: url('img/Banner for watch.jpg') no-repeat center center/cover; 
-}
-
-.hero__text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); 
-    color: #fff;
-    background: rgba(0, 0, 0, 0.5); 
-    padding: 20px; 
-    border-radius: 10px; 
-    text-align: center;
-}
-
-.primary-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    color: #fff;
-    background-color: #ff5733; 
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 5px;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.primary-btn:hover {
-    background-color: #c13d1a; 
-}
-
-.arrow_right {
-    margin-left: 5px;
-    font-size: 14px;
-}
-
-.price {
-    font-size: 1.2rem;
-    color: #e74c3c;
-    margin-top: 0.5rem;
-}
-
-.regular-price {
-    font-size: 0.9rem;
-    color: #999;
-}
-
-
-</style>
-
-
-<section class="hero">
-    <div>
-        <div class="hero__items">
-            <div class="container">
-                <div class="row">
-                    <div class="col-xl-5 col-lg-7 col-md-8">
-                        <div class="hero__text">
-                           <img src="img/Banner for watch.jpg" class="img-fluid" style="width: 100%; height: auto; object-fit: cover;">
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+    }
+    
+    .banner-area .single-banner {
+        margin-bottom: 30px;
+        overflow: hidden;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+    
+    .banner-area .single-banner img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .banner-area .single-banner:hover {
+        transform: scale(1.05);
+    }
+    
+    .product {
+        padding: 5rem 0;
+        background-color: #f8f8f8;
+    }
+    
+    .product__filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+    
+    .product-cart-wrap-mb-30 {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .product-cart-wrap-mb-30:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-img img {
+        width: 100%;
+        height: auto;
+    }
+    
+    .product-content-wrap {
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .product-content-wrap h6 {
+        font-size: 1rem;
+        color: #333;
+        margin: 0.5rem 0;
+    }
+    
+    .product-content-wrap h5 {
+        font-size: 1.2rem;
+        color: #e74c3c;
+        margin-bottom: 1rem;
+    }
+    
+    .product-content-wrap a {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #333;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background 0.3s ease;
+    }
+    
+    .product-content-wrap a:hover {
+        background: #e74c3c;
+    }
+    .hero__text {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .primary-btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #000;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    
+    .primary-btn:hover {
+        background-color: #333;
+    }
+    
+    .hero__items {
+        position: relative;
+        text-align: center;
+        width: 100%;
+        height: 100vh;
+        background: url('img/Banner for watch.jpg') no-repeat center center/cover; 
+    }
+    
+    .hero__text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); 
+        color: #fff;
+        background: rgba(0, 0, 0, 0.5); 
+        padding: 20px; 
+        border-radius: 10px; 
+        text-align: center;
+    }
+    
+    .primary-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        color: #fff;
+        background-color: #ff5733; 
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .primary-btn:hover {
+        background-color: #c13d1a; 
+    }
+    
+    .arrow_right {
+        margin-left: 5px;
+        font-size: 14px;
+    }
+    
+    .price {
+        font-size: 1.2rem;
+        color: #e74c3c;
+        margin-top: 0.5rem;
+    }
+    
+    .regular-price {
+        font-size: 0.9rem;
+        color: #999;
+    }
+    .product__item__pic {
+        position: relative;
+    }
+    
+    .add-to-cart-wrap {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s;
+        z-index: 10;
+    }
+    
+    .product__item__pic:hover .add-to-cart-wrap {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Updated Add to Cart styles */
+    .add-cart {
+        color: red !important;
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .add-cart:hover {
+        color: red !important;
+    }
+    
+    </style>
+    
+    <section class="hero">
+        <div>
+            <div class="hero__items">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-5 col-lg-7 col-md-8">
+                            <div class="hero__text">
+                               <img src="img/Banner for watch.jpg" class="img-fluid" style="width: 100%; height: auto; object-fit: cover;">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-
- 
-
-
+    </section>
+    
     <section class="product spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
                     <ul class="filter__controls">
-                        <!-- <li class="active" data-filter="*">Best Sellers</li> -->
                         <li data-filter=".new-arrivals">New Arrivals</li>
-                        <!-- <li data-filter=".hot-sales">Hot Sales</li> -->
                     </ul>
                 </div>
             </div>
             <div class="row">
                 <% for (let i = 0; i < product.length; i++) { %>
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product__item">
-                            <a href="/productDetails?id=<%=product[i]._id%>">
-                            <div class="product__item__pic set-bg" data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>" >
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="product__item">
+                        <a href="/productDetails?id=<%=product[i]._id%>">
+                            <div class="product__item__pic set-bg" data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>">
                                 <ul class="product__hover">
                                     <li><img src="/img/icon/heart.png" alt="" class="add-to-wishlist" data-id="<%= product[i]._id %>"><span>Wishlist</span></li>
                                 </ul>
+                                <div class="add-to-cart-wrap">
+                                    <a href="/cart" class="add-cart" data-id="<%= product[i]._id %>" data-quantity="1" data-price="<%= product[i].salePrice %>">+ Add To Cart</a>
+                                </div>
                             </div>
                             <div class="product__item__text">
                                 <h6><%= product[i].productName %></h6>
-                                <a href="/cart" class="add-cart" data-id="<%= product[i]._id %>"  data-quantity="1" data-price="<%= product[i].salePrice %>">
-                                    + Add To Cart
-                                  </a>
-                                <div class="rating">
-                                    <% for (let j = 0; j < 5; j++) { %>
-                                        <i class="fa <%= j < product[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
-                                    <% } %>
-                                </div>
                                 <% 
                                 const productOffer = product[i].productOffer || 0;
                                 const categoryOffer = product[i].category.categoryOffer || 0;
                                 const bestOffer = Math.max(productOffer, categoryOffer);
                                 const salePrice = product[i].salePrice;
                                 const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
-                              %>
-                                <span class="price"><%= finalPrice %></span>
+                                %>
+                                <span class="price text-danger">$<%= finalPrice %></span>
                                 <% if (finalPrice < salePrice) { %>
-                                    <span class="price">$<%= product[i].salePrice%></span>
-                                  <% } %>
-                                  <p><span class='text-muted regular-price'><strike><%= product[i].regularPrice%></strike></span>
-                                </p>
-    
-
+                                <span class="price"><strike class="text-muted">$<%= product[i].regularPrice %></strike></span>
+                                <% } %>
+                                <div class="rating">
+                                    <% for (let j = 0; j < 5; j++) { %>
+                                    <i class="fa <%= j < product[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
+                                    <% } %>
+                                </div>
                             </div>
-                           </a>
-                        </div>
+                        </a>
                     </div>
+                </div>
                 <% } %>
             </div>
         </div>
     </section>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
