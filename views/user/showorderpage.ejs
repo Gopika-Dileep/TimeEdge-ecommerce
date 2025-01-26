@@ -341,34 +341,44 @@
 
         <!-- Order items -->
         <div class="order-items" data-order-id="<%= order._id %>">
-            <% order.orderedItems.forEach((item) => { %>
+            <% order.orderedItems.forEach((item)=> { %>
                 <div class="item-card" data-item-id="<%= item._id %>">
-                    <img src="/uploads/productImages/<%= item.products.productImage[0] %>" alt="<%= item.products.productName %>">
+                    <img src="/uploads/productImages/<%= item.products.productImage[0] %>"
+                        alt="<%= item.products.productName %>">
                     <div class="item-details">
                         <div class="item-info">
-                            <h4><%= item.products.productName %></h4>
-                            <p class="item-price">Quantity: <%= item.quantity %> | Price: ₹<%= item.price.toFixed(2) %></p>
+                            <h4>
+                                <%= item.products.productName %>
+                            </h4>
+                            <p class="item-price">Quantity: <%= item.quantity %> | Price: ₹<%= item.price.toFixed(2) %>
+                            </p>
                             <span class="status <%= item.status.toLowerCase().replace(' ', '-') %>">
                                 <span class="status-dot <%= item.status.toLowerCase().replace(' ', '-') %>"></span>
                                 <%= item.status %>
                             </span>
                             <% if (item.cancelReason) { %>
-                                <p class="cancel-reason"><%= item.cancelReason %></p>
+                                <p class="cancel-reason">
+                                    <%= item.cancelReason %>
+                                </p>
+                                <% } %>
+                        </div>
+                        <% if (!item.cancelReason && item.status==='delivered' && item.status.toLowerCase()
+                            !=='returned' ) { %>
+                            <button class="item-return-btn"
+                                onclick="showReturnModal('<%= item.products._id %>')">Return</button>
                             <% } %>
-                            </div>
-                            <% if (!item.cancelReason && item.status === 'delivered' && item.status.toLowerCase() !== 'returned') { %>
-                                <button class="item-return-btn" onclick="showReturnModal('<%= item.products._id %>')">Return</button>
-                            <% } %>
-                            <% if (!item.cancelReason && !['cancelled', 'delivered', 'returned'].includes(item.status.toLowerCase())) { %>
-                                <button class="item-cancel-btn" onclick="showCancelModal('<%= item._id %>')">Cancel</button>
-                            <% } %>
-                            </div>
-                            
+                                <% if (!item.cancelReason && !['cancelled', 'delivered' , 'returned'
+                                    ].includes(item.status.toLowerCase())) { %>
+                                    <button class="item-cancel-btn"
+                                        onclick="showCancelModal('<%= item._id %>')">Cancel</button>
+                                    <% } %>
                     </div>
+
                 </div>
-            <% }); %>
-            
         </div>
+        <% }); %>
+
+    </div>
     </div>
     </div>
     </div>
@@ -421,18 +431,21 @@
                     modal.style.display = "none";
                 }
             }
-
             confirmBtn.onclick = function () {
                 const reason = reasonText.value;
                 if (!reason.trim()) {
-                    alert('Please provide a reason for cancellation');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Reason',
+                        text: 'Please provide a reason for cancellation.',
+                    });
                     return;
                 }
+
 
                 // const orderId =  window.location.pathname.split('/')[2];
                 const orderItemsContainer = document.querySelector('.order-items');
                 const orderId = orderItemsContainer.getAttribute('data-order-id');
-
                 fetch(`/orders/${orderId}/cancel-item`, {
                     method: 'POST',
                     headers: {
@@ -451,64 +464,81 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Failed to cancel item. Please try again.');
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Failed to cancel item. Please try again.'
+                        });
                     });
+
             }
         });
         function showReturnModal(itemId) {
-    currentItemId = itemId;
-    document.getElementById('returnModal').style.display = 'block';
-    document.getElementById('returnReason').value = '';
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const returnModal = document.getElementById('returnModal');
-    const closeReturnBtn = document.getElementById('closeReturnModal');
-    const confirmReturnBtn = document.getElementById('confirmReturn');
-    const returnReasonText = document.getElementById('returnReason');
-
-    closeReturnBtn.onclick = function () {
-        returnModal.style.display = "none";
-    }
-
-    window.onclick = function (event) {
-        if (event.target == returnModal) {
-            returnModal.style.display = "none";
-        }
-    }
-
-    confirmReturnBtn.onclick = function () {
-        const reason = returnReasonText.value;
-        if (!reason.trim()) {
-            alert('Please provide a reason for returning the item');
-            return;
+            currentItemId = itemId;
+            document.getElementById('returnModal').style.display = 'block';
+            document.getElementById('returnReason').value = '';
         }
 
-        const orderItemsContainer = document.querySelector('.order-items');
-        const orderId = orderItemsContainer.getAttribute('data-order-id');
+        document.addEventListener('DOMContentLoaded', function () {
+            const returnModal = document.getElementById('returnModal');
+            const closeReturnBtn = document.getElementById('closeReturnModal');
+            const confirmReturnBtn = document.getElementById('confirmReturn');
+            const returnReasonText = document.getElementById('returnReason');
 
-        fetch(`/returnorder/${orderId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                productId: currentItemId,
-                reason: reason
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
+            closeReturnBtn.onclick = function () {
+                returnModal.style.display = "none";
+            }
+
+            window.onclick = function (event) {
+                if (event.target == returnModal) {
+                    returnModal.style.display = "none";
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to return item. Please try again.');
-            });
-    }
-});
+            }
+            confirmReturnBtn.onclick = function () {
+                const reason = returnReasonText.value;
+                if (!reason.trim()) {
+                    swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Reason',
+                        text: 'Please provide a reason for returning the item',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+
+
+                const orderItemsContainer = document.querySelector('.order-items');
+                const orderId = orderItemsContainer.getAttribute('data-order-id');
+
+                fetch(`/returnorder/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: currentItemId,
+                        reason: reason
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Failed to return item. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+
+            }
+        });
     </script>
 
     <%- include("../../views/partials/user/footer") %>

@@ -17,6 +17,7 @@ const loadCouponPage = async(req,res)=>{
 const addCoupon = async (req,res)=>{
     try {
         const {code,offerPrice,createon,expireOn,minimumPrice,UsageLimit,isList} = req.body
+       
         const coupon  = new Coupon({
             name:code,
             offerPrice:offerPrice, 
@@ -38,9 +39,7 @@ const loadEditCoupon = async(req,res)=>{
     try {
        const couponId = req.query.id
 
-       console.log(couponId,'dfghj')
        const coupon = await Coupon.findById({_id:couponId})
-       console.log(coupon,'coupon')
        res.render('editcoupon',{coupon:coupon})
     } catch (error) {
         console.error(error)

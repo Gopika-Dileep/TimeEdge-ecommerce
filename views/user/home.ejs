@@ -1,8 +1,11 @@
-   <%-include("../../views/partials/user/header") %>
+<%-include("../../views/partials/user/header") %>
 
 
 <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 
 <style>
@@ -185,7 +188,6 @@
         visibility: visible;
     }
     
-    /* Updated Add to Cart styles */
     .add-cart {
         color: red !important;
         font-weight: bold;
@@ -195,6 +197,16 @@
     
     .add-cart:hover {
         color: red !important;
+    }
+
+    .bi-heart, .bi-heart-fill {
+        font-size: 2rem;
+        cursor: pointer;
+        color: #ff2a68; 
+    }
+
+    .bi-heart-fill {
+        color: #ff0000; 
     }
     
     </style>
@@ -231,7 +243,11 @@
                         <a href="/productDetails?id=<%=product[i]._id%>">
                             <div class="product__item__pic set-bg" data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>">
                                 <ul class="product__hover">
-                                    <li><img src="/img/icon/heart.png" alt="" class="add-to-wishlist" data-id="<%= product[i]._id %>"><span>Wishlist</span></li>
+                                    <li>
+                                        <!-- Heart icon with dynamic class based on wishlist status -->
+                                        <i class="bi <%= product[i].inWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" id="wishlist-icon-<%= product[i]._id %>" data-id="<%= product[i]._id %>"></i>
+                                        <span>Wishlist</span>
+                                    </li>
                                 </ul>
                                 <div class="add-to-cart-wrap">
                                     <a href="/cart" class="add-cart" data-id="<%= product[i]._id %>" data-quantity="1" data-price="<%= product[i].salePrice %>">+ Add To Cart</a>
@@ -322,50 +338,60 @@
             });
         });
 
-    const addToWishbtn = document.querySelectorAll('.add-to-wishlist')
-    addToWishbtn .forEach(function(button){
-        button.addEventListener('click',function(event){
+    const addToWishbtn = document.querySelectorAll('.bi-heart, .bi-heart-fill');
+
+    addToWishbtn.forEach(function(button) {
+        button.addEventListener('click', function(event) {
             event.preventDefault();
-            const productId = this.getAttribute('data-id')
-            alert(productId,'product')
+            const productId = this.getAttribute('data-id');
+            const icon = document.getElementById(`wishlist-icon-${productId}`);
+
             $.ajax({
-                url:`/addToWishlist/${productId}`,
-                method:'POST',
-                data:JSON.stringify({productId:productId}),
-                contentType:"application/jason",
-                success:function(response){
-                    Swal.fire({
-                        icon:'success',
-                        title:"added to Whislist",
-                        text:response.message,
-                        confirmButtonText:'OK',
-                    }).then(()=>{
-                        Swal.fire({
-                            title:'Go to Wishlist?',
-                            text:'Do you Want to go to Wishlist?',
-                           showCancelButton:true,
-                           confirmButtonText:"YES",
-                           cancelButtonText:"NO",
-                        }).then((confirmation)=>{
-                            if(confirmation.isConfirmed){
-                                window.location.href = '/wishlist'
-                            }else{
-                                console.log('Stay on the current page')
-                            }
-                        })
-                    })
+                url: `/addToWishlist/${productId}`,
+                method: 'POST',
+                data: JSON.stringify({ productId: productId }),
+                contentType: "application/json",
+                success: function(response) {
+                    if (response.success) {
+                        if (response.action === 'added') {
+                            icon.classList.remove('bi-heart');
+                            icon.classList.add('bi-heart-fill', 'text-danger');
+                            Swal.fire({
+                                icon: 'success',
+                                title: "Added to Wishlist",
+                                text: response.message,
+                                confirmButtonText: 'OK',
+                            });
+                        } else if (response.action === 'removed') {
+                            icon.classList.remove('bi-heart-fill', 'text-danger');
+                            icon.classList.add('bi-heart');
+                            Swal.fire({
+                                icon: 'success',
+                                title: "Removed from Wishlist",
+                                text: response.message,
+                                confirmButtonText: 'OK',
+                            });
+                        }
+                    }
                 },
-                error:function(xhr,status,error){
+                error: function(xhr, status, error) {
                     Swal.fire({
-                        icon:'error',
-                        title:'Error',
-                        text :'Error while adding to wishlist.',
-                        confirmButtonText:"Ok",
-                    })
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error while updating the wishlist.',
+                        confirmButtonText: "Ok",
+                    });
                 }
-            })
-        })
-    })
+            });
+        });
+    });
+
+ 
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.bi-heart-fill').forEach(function(icon) {
+            icon.classList.add('text-danger');
+        });
+    });
     </script>
 
    <%-include("../../views/partials/user/footer") %>

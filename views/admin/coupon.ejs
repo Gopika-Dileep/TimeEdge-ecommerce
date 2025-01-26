@@ -144,26 +144,37 @@ body {
         padding: 2rem;
     }
     }
+    .error-message {
+        color: red;
+        font-size: 0.875rem;
+        margin-bottom: 10px;
+    }
 </style>
 <body>
     <div class="coupon-page">
         <div class="coupon-form">
             <h2>Add a Coupon</h2>
-            <form id="add-coupon-form" method="POST" action="/admin/addCoupon">
+            <form id="add-coupon-form" method="POST" action="/admin/addCoupon" onsubmit="return validateForm()">
+                
+                <div id="code-error" class="error-message"></div>
                 <label for="coupon-code">Coupon Code:</label>
-                <input type="text" id="coupon-code" name="code" placeholder="Enter coupon code" required>
+                <input type="text" id="coupon-code" name="code" placeholder="Enter coupon code" >
     
+                <div id="offer-price-error" class="error-message"></div>
                 <label for="offer-price">Offer Price (₹):</label>
-                <input type="number" id="offer-price" name="offerPrice" placeholder="Enter offer price" required>
+                <input type="number" id="offer-price" name="offerPrice" placeholder="Enter offer price" >
     
+                <div id="start-date-error" class="error-message"></div>
                 <label for="start-date">Start Date:</label>
-                <input type="date" id="start-date" name="createon" required>
+                <input type="date" id="start-date" name="createon">
     
+                <div id="expiry-date-error" class="error-message"></div>
                 <label for="expiry-date">Expiry Date:</label>
-                <input type="date" id="expiry-date" name="expireOn" required>
+                <input type="date" id="expiry-date" name="expireOn" >
     
+                <div id="min-amount-error" class="error-message"></div>
                 <label for="min-amount">Minimum Amount (₹):</label>
-                <input type="number" id="min-amount" name="minimumPrice" placeholder="Enter minimum order amount" required>
+                <input type="number" id="min-amount" name="minimumPrice" placeholder="Enter minimum order amount" >
     
                 <label for="usage-limit">Usage Limit (Optional):</label>
                 <input type="number" id="usage-limit" name="UsageLimit" placeholder="Enter usage limit">
@@ -213,6 +224,52 @@ body {
             </table>
         </div>
     </div>
-    
+    <script>
+        function validateForm() {
+            let isValid = true;
+
+            const code = document.getElementById('coupon-code').value;
+            const offerPrice = document.getElementById('offer-price').value;
+            const startDate = document.getElementById('start-date').value;
+            const expiryDate = document.getElementById('expiry-date').value;
+            const minAmount = document.getElementById('min-amount').value;
+
+            document.getElementById('code-error').innerText = '';
+            document.getElementById('offer-price-error').innerText = '';
+            document.getElementById('start-date-error').innerText = '';
+            document.getElementById('expiry-date-error').innerText = '';
+            document.getElementById('min-amount-error').innerText = '';
+
+            if (!code) {
+                document.getElementById('code-error').innerText = 'Please enter a coupon code.';
+                isValid = false;
+            }
+
+            if (!offerPrice || offerPrice <= 0) {
+                document.getElementById('offer-price-error').innerText = 'Please enter a valid offer price.';
+                isValid = false;
+            }
+
+            if (!startDate) {
+                document.getElementById('start-date-error').innerText = 'Please select a start date.';
+                isValid = false;
+            }
+
+            if (!expiryDate) {
+                document.getElementById('expiry-date-error').innerText = 'Please select an expiry date.';
+                isValid = false;
+            } else if (new Date(startDate) > new Date(expiryDate)) {
+                document.getElementById('expiry-date-error').innerText = 'Start date cannot be later than expiry date.';
+                isValid = false;
+            }
+
+            if (!minAmount || minAmount <= 0) {
+                document.getElementById('min-amount-error').innerText = 'Please enter a valid minimum amount.';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+    </script>
 </body>
 <%- include("../../views/partials/admin/footer") %>

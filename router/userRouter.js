@@ -81,7 +81,9 @@ router.post('/removeitem/:itemId',userAuth,wishlistController.removeItem)
 
 router.post('/verifyCoupon',userAuth,couponController.verifyCoupon)
 router.post('/changepassword',userAuth,profileController.newChangePassword)
-router.post('/addAddressCheckout',userAuth,orderController.addAddress)
+// router.post('/addAddressCheckout',userAuth,orderController.addAddress)
+router.post('/addAddressCheckout',userAuth,orderController.postNewAddress)
+
 
 
 

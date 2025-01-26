@@ -463,10 +463,10 @@
         console.log(addToWishbtn);
         addToWishbtn.forEach(function (button) {
             button.addEventListener('click', function (event) {
-                alert("dfghj")
+              
                 event.preventDefault();
                 const productId = this.getAttribute('data-id')
-                alert("dfghj")
+                
                 $.ajax({
                     url: `/addToWishlist/${productId}`,
                     method: 'POST',

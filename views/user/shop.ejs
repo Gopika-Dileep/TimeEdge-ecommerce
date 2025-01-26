@@ -307,51 +307,6 @@
             });
         });
 
-    //     const addToWishbtn = document.querySelectorAll('.add-to-wishlist')
-    // addToWishbtn .forEach(function(button){
-    //     button.addEventListener('click',function(event){
-    //         event.preventDefault();
-    //         const productId = this.getAttribute('data-id')
-    //         alert(productId,'product')
-    //         $.ajax({
-    //             url:`/addToWishlist/${productId}`,
-    //             method:'POST',
-    //             data:JSON.stringify({productId:productId}),
-    //             contentType:"application/jason",
-    //             success:function(response){
-    //                 Swal.fire({
-    //                     icon:'success',
-    //                     title:"added to Whislist",
-    //                     text:response.message,
-    //                     confirmButtonText:'OK',
-    //                 }).then(()=>{
-    //                     Swal.fire({
-    //                         title:'Go to Wishlist?',
-    //                         text:'Do you Want to go to Wishlist?',
-    //                        showCancelButton:true,
-    //                        confirmButtonText:"YES",
-    //                        cancelButtonText:"NO",
-    //                     }).then((confirmation)=>{
-    //                         if(confirmation.isConfirmed){
-    //                             window.location.href = '/wishlist'
-    //                         }else{
-    //                             console.log('Stay on the current page')
-    //                         }
-    //                     })
-    //                 })
-    //             },
-    //             error:function(xhr,status,error){
-    //                 Swal.fire({
-    //                     icon:'error',
-    //                     title:'Error',
-    //                     text :'Error while adding to wishlist.',
-    //                     confirmButtonText:"Ok",
-    //                 })
-    //             }
-    //         })
-    //     })
-    // })
-   
     const addToWishbtn = document.querySelectorAll('.bi-heart, .bi-heart-fill');
 
 addToWishbtn.forEach(function(button) {

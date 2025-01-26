@@ -386,34 +386,51 @@
         }
 
         function updateStatus() {
-            const newStatus = document.getElementById('statusSelect').value;
+    const newStatus = document.getElementById('statusSelect').value;
 
-            fetch(`/admin/orders/update-status/${currentItemId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: newStatus })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error updating status');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error updating status');
+    fetch(`/admin/orders/update-status/${currentItemId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Status Updated',
+                    text: 'The order status has been successfully updated.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload(); 
                 });
-        }
-
-        window.onclick = function (event) {
-            if (event.target == document.getElementById('status')) {
-                changeStatus();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error updating status. Please try again.',
+                });
             }
-        }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong. Please try again later.',
+            });
+        });
+}
+
+window.onclick = function (event) {
+    if (event.target == document.getElementById('status')) {
+        changeStatus();
+    }
+};
+
     </script>
 
     <%- include("../../views/partials/admin/footer") %>

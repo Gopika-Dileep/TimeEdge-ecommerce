@@ -215,14 +215,30 @@ body, html {
         contentType: 'application/json',
         success: function (result) {
             if (result.success) {
-                location.reload(); 
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Quantity Updated',
+                    text: 'The quantity has been successfully incremented.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload(); 
+                });
             } else {
-                alert(result.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message,
+                });
             }
         },
         error: function (xhr, status, error) {
             console.error('Error incrementing quantity:', error);
-            alert('Something went wrong. Please try again later.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong. Please try again later.',
+            });
         },
     });
 }
@@ -230,29 +246,42 @@ body, html {
 
 
 function decreaseQuantity(itemId) {
-    alert(itemId)
     $.ajax({
         url: `/decrement/${itemId}`,
         type: 'PATCH',
         contentType: 'application/json',
         success: function (result) {
-            alert("dfg")
             if (result.success) {
-                location.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Quantity Updated',
+                    text: 'The quantity has been successfully decremented.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload(); 
+                });
             } else {
-                alert(result.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message,
+                });
             }
         },
         error: function (xhr, status, error) {
             console.error('Error decrementing quantity:', error);
-            alert('Something went wrong. Please try again later.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong. Please try again later.',
+            });
         },
     });
 }
 
 
 function removeItem(itemId) {
-   
     Swal.fire({
         title: 'Are you sure?',
         text: 'Do you want to remove this item from the cart?',
@@ -268,20 +297,36 @@ function removeItem(itemId) {
                 contentType: 'application/json',
                 success: function (result) {
                     if (result.success) {
-                        Swal.fire('Removed!', 'The item has been removed from your cart.', 'success').then(() => {
-                            location.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Removed!',
+                            text: 'The item has been removed from your cart.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload(); 
                         });
                     } else {
-                        alert(result.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: result.message,
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
                     console.error('Error removing item:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong. Please try again later.',
+                    });
                 },
             });
         }
     });
 }
+
 $(document).ready(function () {
     $('#btn-checkout').on('click', function () {
       $.ajax({

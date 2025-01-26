@@ -40,31 +40,42 @@
 	<script>
 
 
-		$(document).ready(function () {
-			$('#otpform').on('submit', function (e) {
-				e.preventDefault();
+$(document).ready(function () {
+    $('#otpform').on('submit', function (e) {
+        e.preventDefault();
 
-				const urlParams = new URLSearchParams(window.location.search);
-				const userId = urlParams.get('id');
-				const otp = document.getElementById('otp').value
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+        const otp = document.getElementById('otp').value;
 
-				$.ajax({
-					url: '/otpverify',
-					type: 'POST',
-					contentType: 'application/json',
-					data: JSON.stringify({ userId,otp}),
-					success: function (result) {
-						alert('success')
-						window.location.href='/login'
+        $.ajax({
+            url: '/otpverify',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ userId, otp }),
+            success: function (result) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'OTP verified successfully. Redirecting to login...',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = '/login'; 
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error while verifying OTP:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong. Please try again later.',
+                });
+            },
+        });
+    });
+});
 
-					},
-					error: function (xhr, status, error) {
-						console.error('Error while signup:', error);
-						alert('Something went wrong. Please try again later.');
-					},
-				});
-			})
-		})
 	</script>
 </body>
 

@@ -237,7 +237,7 @@ body {
   </section>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    function removeItem(itemId) {
+   function removeItem(itemId) {
     Swal.fire({
         title: 'Are you sure?',
         text: 'Do you want to remove this item from the wishlist?',
@@ -257,16 +257,28 @@ body {
                             location.reload();
                         });
                     } else {
-                        alert(result.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: result.message,
+                            confirmButtonText: 'OK'
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
                     console.error('Error removing item:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
                 },
             });
         }
     });
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   const addToCartButtons = document.querySelectorAll('.add-to-cart');
   

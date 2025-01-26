@@ -138,11 +138,17 @@
         });
 
         document.getElementById('resendLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('OTP resent!');
-            timeRemaining = 60;
-            startOtpTimer();
-        });
+    e.preventDefault();
+    Swal.fire({
+        icon: 'success',
+        title: 'OTP Resent!',
+        text: 'A new OTP has been sent to your registered contact.',
+        showConfirmButton: false,
+        timer: 1500
+    });
+    timeRemaining = 60;
+    startOtpTimer();
+});
 
         document.getElementById('verifyBtn').addEventListener('click', () => {
             const otpInput = document.getElementById('otp').value.trim();

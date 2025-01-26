@@ -94,7 +94,7 @@ table th {
 
 .modal-content {
   background-color: #fff;
-  margin: 15% auto;
+  margin: 4% auto;
   padding: 20px;
   border-radius: 5px;
   width: 80%;
@@ -131,6 +131,10 @@ table th {
 .form-group input[type="tel"]::placeholder {
   color: #999;
   font-size: 0.9em;
+}
+.group-input{
+    display: flex;
+    justify-content: space-between;
 }
 </style>
 </head>
@@ -232,9 +236,17 @@ table th {
           <h2>Add New Address</h2>
           <form id="addressForm">
             <div class="form-group">
-              <label for="name">Full Name</label>
-              <input type="text" id="name" name="name" required>
+              <label for="addressType">Address Type</label>
+              <input type="text" id="addressType" name="addressType" required>
             </div>
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+              </div>
+           
+
+            <div class="group-input">
             <div class="form-group">
                 <label for="city">City</label>
                 <input type="text" id="city" name="city" required>
@@ -245,18 +257,20 @@ table th {
               <label for="landMark">Landmark</label>
               <input type="text" id="landMark" name="landMark" required>
             </div>
-            
+        </div>
           
-            
-            <div class="form-group">
-              <label for="state">State</label>
-              <input type="text" id="state" name="state" required>
+            <div class="group-input">
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" id="state" name="state" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="pincode">Pincode</label>
+                    <input type="text" id="pincode" name="pincode" required pattern="[0-9]{6}">
+                  </div>
             </div>
             
-            <div class="form-group">
-              <label for="pincode">Pincode</label>
-              <input type="text" id="pincode" name="pincode" required pattern="[0-9]{6}">
-            </div>
             
             <div class="form-group">
                 <label for="phone">Phone Number</label>
@@ -416,7 +430,6 @@ async function initiateRazorpayPayment(addressId, cartId, paymentMethod, couponI
                   
                   const verifyData = await verifyResponse.json();
                     if (verifyData.success) {
-                        alert(verifyData)
                         Swal.fire({
                             title: "Payment Success",
                             text: `Order Placed Successfully. Your OrderId is : ${verifyData.orderId}`,
@@ -691,6 +704,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const formData = {
+            addressType: document.getElementById('addressType').value,
+
             name: document.getElementById('name').value,
             phone: phone,
             altPhone: altPhone || null,
@@ -717,14 +732,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 addressDiv.innerHTML = `
                     <input type="radio" name="deliveryAddress" value="${newAddress._id}" id="address-${newAddress._id}">
                     <p><strong>${newAddress.name}</strong></p>
+                    <p>${newAddress.landMark}, ${newAddress.city}, ${newAddress.state}, ${newAddress.pincode}</p>
                     <p>Phone: ${newAddress.phone}</p>
                     ${newAddress.altPhone ? `<p>Alt Phone: ${newAddress.altPhone}</p>` : ''}
-                    <p>
-                        ${newAddress.landMark},
-                        ${newAddress.city},
-                        ${newAddress.state},
-                        ${newAddress.pincode}
-                    </p>
                     <button class="edit-address" data-id="${newAddress._id}">Edit</button>
                 `;
                 

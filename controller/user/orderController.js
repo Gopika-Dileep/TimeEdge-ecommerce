@@ -8,6 +8,7 @@ const Order = require("../../models/orderSchema");
 const Coupon = require("../../models/couponSchema")
 const crypto = require("crypto");
 const walletHelper = require('../../helpers/walletHelper');
+const mongoose = require("mongoose");
 
 const dotenv = require("dotenv")
 dotenv.config()
@@ -41,30 +42,6 @@ const getCheckoutPage = async (req, res) => {
         console.error(error)
         res.status(500).json({ message: "server error" })
     }
-}
-
-const addAddress= async(req,res)=>{
-      try {
-        const { name, phone, altPhone, landMark, city, state, pincode } = req.body;
-        const newAddress = new Address({
-            userId: req.session.userId, 
-            address: [{
-                name,
-                phone,
-                altPhone,
-                landMark,
-                city,
-                state,
-                pincode
-            }]
-        });
-        
-        await newAddress.save();
-        res.render('checkout')
-      } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"server error"})
-      }
 }
 
 
@@ -379,15 +356,54 @@ const returnOrder = async (req, res) => {
     }
 };
 
+const postNewAddress = async (req, res) => {
+    try {
+        const { addressType, name, phone, altPhone, landMark, city, state, pincode } = req.body;
+        const userId = req.session.user;
+        
+        const userAddress = await Address.findOne({ userId });
+        let newAddress;
+        
+        if (!userAddress) {
+            newAddress = new Address({
+                userId,
+                address: [{ addressType, name, phone, altPhone, landMark, city, state, pincode }]
+            });
+            await newAddress.save();
+        } else {
+            newAddress = {
+                _id: new mongoose.Types.ObjectId(),
+                addressType,
+                name,
+                phone,
+                altPhone,
+                landMark,
+                city,
+                state,
+                pincode
+            };
+            userAddress.address.push(newAddress);
+            await userAddress.save();
+        }
+
+        res.status(200).json(newAddress);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "server error" });
+    }
+};
+
+
 module.exports = {
     getCheckoutPage,
-    addAddress,
+    // addAddress,
     getOrderConfirmationPage,
     createOrder,
     showOrder,
     cancelOrderItem,
     returnOrder,
     orderRazorpay,
-    verifyRazorPayOrder
+    verifyRazorPayOrder,
+    postNewAddress
 }
 
