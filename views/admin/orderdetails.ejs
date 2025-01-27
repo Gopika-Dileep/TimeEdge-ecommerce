@@ -8,6 +8,11 @@
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        .status-select {
+            height: 50px;
+            border-radius: 6px;
+        }
+
         .breadcrumb {
             color: #4b5563;
             margin-bottom: 1.5rem;
@@ -114,6 +119,7 @@
             background-color: #fecaca;
             color: #7f1d1d;
         }
+
         .status-return-request {
             background-color: #fee2e2;
             /* Soft pink */
@@ -190,6 +196,14 @@
             font-size: 1rem;
             color: #1f2937;
             border-top: 2px solid #d1d5db;
+        }
+
+        .modal {
+            display: none;
+            position: absolute;
+            top: 30%;
+            left: 30%;
+            width: 450px;
         }
 
         .modal-content {
@@ -359,6 +373,7 @@
             <div class="modal-content">
                 <span class="close-modal" onclick="changeStatus()">&times;</span>
                 <h2>Edit Status</h2>
+                <br>
                 <select id="statusSelect" class="status-select">
                     <option value="pending">Pending</option>
                     <option value="Processing">Processing</option>
@@ -368,10 +383,15 @@
                     <option value="Return request">Return Request</option>
                     <option value="Returned">Returned</option>
                 </select>
+                <br>
                 <button class="save-status-btn" onclick="updateStatus()">Save Changes</button>
             </div>
         </div>
     </div>
+    <!-- Add these script tags before your custom script -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         let currentItemId = '';
@@ -386,51 +406,52 @@
         }
 
         function updateStatus() {
-    const newStatus = document.getElementById('statusSelect').value;
+            const newStatus = document.getElementById('statusSelect').value;
 
-    fetch(`/admin/orders/update-status/${currentItemId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Status Updated',
-                    text: 'The order status has been successfully updated.',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    location.reload(); 
-                });
-            } else {
+            fetch(`/admin/orders/update-status/${currentItemId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated',
+                        text: 'The order status has been successfully updated.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        changeStatus();
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(data.error || 'Error updating status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Error updating status. Please try again.',
+                    text: error.message || 'Something went wrong. Please try again.',
                 });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Something went wrong. Please try again later.',
             });
-        });
-}
+        }
 
-window.onclick = function (event) {
-    if (event.target == document.getElementById('status')) {
-        changeStatus();
-    }
-};
-
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('status')) {
+                changeStatus();
+            }
+        };
     </script>
 
     <%- include("../../views/partials/admin/footer") %>

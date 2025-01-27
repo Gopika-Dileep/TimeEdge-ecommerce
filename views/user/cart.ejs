@@ -209,6 +209,8 @@ body, html {
     <script>
        
        function increaseQuantity(itemId) {
+    alert(itemId)
+
     $.ajax({
         url: `/increment/${itemId}`,
         type: 'PATCH',
@@ -246,6 +248,7 @@ body, html {
 
 
 function decreaseQuantity(itemId) {
+    alert(itemId)
     $.ajax({
         url: `/decrement/${itemId}`,
         type: 'PATCH',

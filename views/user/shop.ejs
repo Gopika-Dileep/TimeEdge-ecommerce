@@ -172,7 +172,7 @@
                                         %>
                                         <span><%= finalPrice %></span>
                                         <% if (finalPrice < salePrice) { %>
-                                            <p>₹<%= product[i].salePrice %>
+                                            <p  class='text-muted'><strike>><%= product[i].salePrice %></strike>
                                                 <span class='text-muted'><strike><%= product[i].regularPrice %></strike></span>
                                             </p>
                                         <% } %>

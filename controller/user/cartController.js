@@ -73,8 +73,12 @@ const addToCart = async (req, res) => {
 const incrementQuantity = async (req, res) => {
     try {
         const itemId = req.params.itemId
+        console.log(itemId,'itemId')
         const userId = req.session.user
+        console.log(userId,'userId')
+
         const cart = await Cart.findOne({ user: userId }).populate({ path: "items.product", populate: { path: "category", select: "categoryOffer" } })
+        console.log(cart,'cart')
 
         if (!cart) {
             return res.status(404).json("Cart not found");
@@ -87,12 +91,13 @@ const incrementQuantity = async (req, res) => {
 
         const product = await Product.findById(item.product).populate('category')
 
+
         const currentQuantity = item.quantity
 
         if (currentQuantity >= product.quantity) {
-            return res.status(400).json("Quantity exceeded");
+            return res.status(400).json({message:"Quantity exceeded"});
         } else if (currentQuantity >= product.maxQtyPerPerson) {
-            return res.status(400).json("Maximum quantity for one product exceeded");
+            return res.status(400).json({message:"Maximum quantity for one product exceeded"});
         } else {
             const productOffer = product.productOffer || 0
             const categoryOffer = product.category.categoryOffer || 0
@@ -101,8 +106,9 @@ const incrementQuantity = async (req, res) => {
             const finalPrice = bestOffer > 0 ? product.salePrice - (product.salePrice * bestOffer / 100) : product.salePrice
             item.quantity += 1;
             item.price = Math.floor(item.quantity * finalPrice);
-
+           
             const test = await cart.save();
+
             return res.status(200).json({ success: true, message: "Quantity incremented" });
         }
 

@@ -316,17 +316,30 @@ const unlistBrand = async (req,res)=>{
         res.status(400).json({message:"error while unlisting brand"})
     }
 }
-const getOrders = async (req,res)=>{
+const getOrders = async (req, res) => {
     try {
-        const orders = await Order.find().populate('orderedItems.products').populate('user')
-       
-        res.render('orderslist',{orders})
-        
+        const page = parseInt(req.query.page) || 1;
+        const limit = 7;
+        const orders = await Order.find()
+            .populate('orderedItems.products')
+            .populate('user')
+            .sort({ createdOn: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        const count = await Order.countDocuments();
+        const totalpage = Math.ceil(count / limit);
+
+        res.render('orderslist', {
+            orders,
+            currentpage: page,
+            totalpage: totalpage
+        });
     } catch (error) {
-        console.error(error)
-        res.status(400).json({message:"error while getting orders"})
+        console.error(error);
+        res.status(400).json({ message: "error while getting orders" });
     }
-}
+};
 
 const getOrderDetails = async (req, res) => {
     try {
@@ -345,30 +358,26 @@ const getOrderDetails = async (req, res) => {
 const changeStatus = async (req, res) => {
     try {
         const { itemId } = req.params;
-        const { status } = req.body; 
+        const { status } = req.body;
 
         const order = await Order.findOne({ "orderedItems._id": itemId });
         if (!order) {
-            return res.status(404).json({ error: "Order not found" });
-        }
-
-        if (order.status === "Cancelled") {
-            return res.status(400).json({ error: "Cannot change status of a cancelled order" });
+            return res.status(404).json({ success: false, error: "Order not found" });
         }
 
         const item = order.orderedItems.id(itemId);
         if (!item) {
-            return res.status(404).json({ error: "Item not found" });
+            return res.status(404).json({ success: false, error: "Item not found" });
         }
 
         if (item.status === "Returned") {
-            return res.status(400).json({ error: "Cannot change status of a returned item" });
+            return res.status(400).json({ success: false, error: "Cannot change status of a returned item" });
         }
-         
-         
+
         item.status = status;
         await order.save();
-        
+
+        // Update overall order status
         const itemStatuses = order.orderedItems.map(item => item.status);
         if (itemStatuses.every(s => s === "delivered")) {
             order.status = "delivered";
@@ -382,10 +391,13 @@ const changeStatus = async (req, res) => {
             order.status = "pending";
         }
         await order.save();
-        res.json({ success: true });
+
+        res.setHeader('Content-Type', 'application/json');
+        return res.json({ success: true });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to update order status" });
+        console.error('Error in changeStatus:', error);
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(500).json({ success: false, error: "Failed to update order status" });
     }
 };
 
