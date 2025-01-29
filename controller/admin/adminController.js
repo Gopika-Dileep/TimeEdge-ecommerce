@@ -374,10 +374,13 @@ const changeStatus = async (req, res) => {
             return res.status(400).json({ success: false, error: "Cannot change status of a returned item" });
         }
 
+        if (item.status === "Cancelled") {
+            return res.status(400).json({ success: false, error: "Cannot change status of a cancelled item" });
+        }
+
         item.status = status;
         await order.save();
 
-        // Update overall order status
         const itemStatuses = order.orderedItems.map(item => item.status);
         if (itemStatuses.every(s => s === "delivered")) {
             order.status = "delivered";
@@ -400,7 +403,23 @@ const changeStatus = async (req, res) => {
         return res.status(500).json({ success: false, error: "Failed to update order status" });
     }
 };
-
+const logout = async (req,res)=>{
+    try {
+        req.session.destroy(err =>{
+            if(err){
+                console.log("Error desroying session",err);
+                return res.status(400).json({message:"error while logout"})
+            }else{
+                console.log('back to lgin')
+            res.redirect("/admin")
+            }
+        })
+    } catch (error) {
+        console.log("unexpected error during logout",error);
+        res.status(500).json({message:"server error"})
+        
+    }
+}
 module.exports = {
     loadAdminLogin,
     adminLogin,
@@ -422,5 +441,6 @@ module.exports = {
     getOrders,
     getOrderDetails,
     changeStatus,
-    removeOffer
+    removeOffer,
+    logout
 }

@@ -267,7 +267,7 @@
                     <div class="info-item">
                         <div class="info-label">Order ID:</div>
                         <div class="info-value">
-                            <%= order._id %>
+                            <%= order.orderId %>
                         </div>
                     </div>
                     <div class="info-item">
@@ -306,12 +306,12 @@
                             <%= order.user.phone %>
                         </div>
                     </div>
-                    <div class="info-item">
+                    <!-- <div class="info-item">
                         <div class="info-label">Address:</div>
                         <div class="info-value">
-                            <%= order.shippingAddress %>
+                           
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -388,7 +388,6 @@
             </div>
         </div>
     </div>
-    <!-- Add these script tags before your custom script -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -417,7 +416,7 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('Cannot change status of a cancelled or returned item');
                 }
                 return response.json();
             })

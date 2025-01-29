@@ -194,26 +194,115 @@ const filterbyDate = async (req, res) => {
 const downloadpdf = async (req, res) => {
     try {
         const salesData = req.body.salesData;
-        console.log(req.body.salesData,'salesdata')
-
-        const pdfDoc = new PDFDocument();
+        const PDFDocument = require('pdfkit');
+        const doc = new PDFDocument({
+            margins: { top: 50, bottom: 50, left: 50, right: 50 },
+            size: 'A4'
+        });
 
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
 
-        pdfDoc.pipe(res);
+        doc.pipe(res);
 
-        pdfDoc.fontSize(18).text('Sales Report', { align: 'center' });
-        pdfDoc.moveDown();
+        const startX = 50;
+        const columnWidths = [100, 100, 150, 100, 100];
+        const rowHeight = 42;
+        const itemsPerPage = 12; 
+        const tableWidth = columnWidths.reduce((a, b) => a + b, 0);
 
-        salesData.forEach((order) => {
-            pdfDoc
-                .fontSize(12)
-                .text(`Order ID: ${order._id} | User: ${order.userId.name} | Total: ${order.totalAmount} | Status: ${order.status}`);
-            pdfDoc.moveDown();
+        const createHeader = (pageNum) => {
+            doc.fontSize(18)
+               .font('Helvetica-Bold')
+               .text('Sales Report', { align: 'center' });
+            
+            doc.moveDown(0.5);
+            doc.fontSize(10)
+               .font('Helvetica')
+               .text(`Generated on: ${new Date().toLocaleDateString()} | Page ${pageNum}`, { align: 'right' });
+
+            const startY = 100;
+            doc.rect(startX, startY, tableWidth, rowHeight)
+               .fill('#e0e0e0');
+
+            doc.fillColor('black').font('Helvetica-Bold');
+            const headers = ['Date', 'Product', 'Customer', 'Amount', 'Discount'];
+            let currentX = startX;
+
+            headers.forEach((header, i) => {
+                doc.text(header, currentX + 5, startY + 7, { 
+                    width: columnWidths[i], 
+                    align: 'left' 
+                });
+                currentX += columnWidths[i];
+            });
+
+            return startY + rowHeight; 
+        };
+
+        const drawTableRow = (order, currentY) => {
+            let currentX = startX;
+            const rowData = [
+                order.date.toString().substring(0, 10),
+                order.product,
+                order.userId.name,
+                `₹${order.totalAmount}`,
+                `₹${order.discount || 0}`
+            ];
+
+            doc.rect(startX, currentY, tableWidth, rowHeight)
+               .strokeColor('#cccccc')
+               .stroke();
+
+            doc.font('Helvetica').fontSize(10);
+            rowData.forEach((data, i) => {
+                doc.text(data, currentX + 5, currentY + 7, {
+                    width: columnWidths[i],
+                    align: 'left'
+                });
+                currentX += columnWidths[i];
+            });
+
+            return currentY + rowHeight;
+        };
+
+        const createSummary = (currentY) => {
+            doc.font('Helvetica-Bold')
+               .fontSize(12)
+               .text('Summary', startX, currentY + 20);
+            
+            const totalAmount = salesData.reduce((sum, order) => sum + order.totalAmount, 0);
+            const totalDiscount = salesData.reduce((sum, order) => sum + (order.discount || 0), 0);
+
+            doc.font('Helvetica')
+               .fontSize(10)
+               .text(`Total Orders: ${salesData.length}`, startX, currentY + 40)
+               .text(`Total Amount: ₹${totalAmount}`, startX + 200, currentY + 40)
+               .text(`Total Discount: ₹${totalDiscount}`, startX + 400, currentY + 40);
+        };
+
+        let currentPage = 1;
+        let currentY = createHeader(currentPage);
+
+        salesData.forEach((order, index) => {
+            if (currentY > 700) { 
+                doc.addPage();
+                currentPage++;
+                currentY = createHeader(currentPage);
+            }
+
+            currentY = drawTableRow(order, currentY);
+
+            if (index === salesData.length - 1) {
+                if (currentY > 650) { 
+                    currentPage++;
+                    currentY = 100;
+                }
+                createSummary(currentY);
+            }
         });
 
-        pdfDoc.end();
+        doc.end();
     } catch (error) {
         console.error('Error generating PDF:', error);
         res.status(500).send('Failed to generate PDF');

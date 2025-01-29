@@ -59,6 +59,8 @@ router.get('/filterOrder',adminAuth,salesController.filterOrder)
 router.get('/filterbyDate',adminAuth,salesController.filterbyDate)
 router.post('/sales-report/pdf',adminAuth,salesController.downloadpdf)
 router.post('/sales-report/excel',adminAuth,salesController.downloadexcel)
+router.get("/logout",adminController.logout);
+
 
 
 module.exports=router

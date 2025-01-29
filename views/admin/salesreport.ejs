@@ -328,12 +328,11 @@
           }
         });
 
-        document.querySelector('.text-primary').innerHTML = response.saleCount; // Total Orders
-        document.querySelector('.text-success').innerHTML = `₹ ${response.totalSalePrice}`; // Total Sale Revenue
-        document.querySelector('.text-warning').innerHTML = `₹ ${response.totalDiscount}`; // Total Discount
-        document.querySelector('.text-danger').innerHTML = `₹ ${response.couponDiscount}`; // Coupon Discount
+        document.querySelector('.text-primary').innerHTML = response.saleCount; 
+        document.querySelector('.text-success').innerHTML = `₹ ${response.totalSalePrice}`; 
+        document.querySelector('.text-warning').innerHTML = `₹ ${response.totalDiscount}`; 
+        document.querySelector('.text-danger').innerHTML = `₹ ${response.couponDiscount}`; 
 
-        // Update pagination
         updatePagination(response.totalPage, 1);
       }
     }
@@ -377,7 +376,6 @@
         document.querySelector('.text-warning').innerHTML = `₹ ${response.totalDiscount}`; // Total Discount
         document.querySelector('.text-danger').innerHTML = `₹ ${response.couponDiscount}`; // Coupon Discount
 
-        // Update pagination
         updatePagination(response.totalPage, 1);
       }
     }
@@ -448,12 +446,11 @@
           }
         });
 
-        document.querySelector('.text-primary').innerHTML = response.saleCount; // Total Orders
-        document.querySelector('.text-success').innerHTML = `₹ ${response.totalSalePrice}`; // Total Sale Revenue
-        document.querySelector('.text-warning').innerHTML = `₹ ${response.totalDiscount}`; // Total Discount
-        document.querySelector('.text-danger').innerHTML = `₹ ${response.couponDiscount}`; // Coupon Discount
+        document.querySelector('.text-primary').innerHTML = response.saleCount;
+        document.querySelector('.text-success').innerHTML = `₹ ${response.totalSalePrice}`; 
+        document.querySelector('.text-warning').innerHTML = `₹ ${response.totalDiscount}`; 
+        document.querySelector('.text-danger').innerHTML = `₹ ${response.couponDiscount}`; 
 
-        // Update pagination
         updatePagination(response.totalPage, page);
       }
     }
@@ -465,9 +462,10 @@
       tableRows.forEach((row) => {
         const cells = row.querySelectorAll('td');
         salesData.push({
-          _id: cells[0].innerText,
+          date: cells[0].innerText,
+          product: cells[2].innerText,
           userId: { name: cells[1].innerText },
-          totalAmount: cells[4].innerText,
+          totalAmount: Number(cells[4].innerText.slice(2)),
           status: cells[7].innerText,
         });
       });
