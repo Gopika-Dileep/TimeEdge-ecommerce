@@ -267,7 +267,12 @@ const resendOtp = async(req,res)=>{
 
 const changePassword = async(req,res)=>{
     try {
-        res.render('newchangepassword');
+        const userId = req.session.user
+        const user = await User.findById({_id:userId})
+        res.render('newchangepassword',{
+            path:'/password',
+            user
+        });
     } catch (error) {
        console.error(error)
        res.status(500).json({message:"server error"})
@@ -474,6 +479,78 @@ const deleteAddress = async(req,res)=>{
         res.status(500).json({message:"server error"})
     }
 }
+// -------------------------------------------
+const getOrderlistPage = async (req, res) => {
+  try {
+    const userId = req.session.user;
+    const user = await User.findById({_id:userId});
+    
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const search = req.query.search || '';
+    
+    // Query with skip and limit like admin product controller
+    const orders = await Order.find({ user: userId })
+      .sort({ createdOn: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate('orderedItems.products');
+
+    const count = await Order.countDocuments({ user: userId });
+    const totalpage = Math.ceil(count / limit);
+
+    res.render('userorderlist', {
+      path: '/orders',
+      user,
+      orders,
+      currentpage: page,
+      totalpage,
+      totalOrders: count,
+      search
+    });
+    
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+const getAddressPage = async(req,res)=>{
+    try {
+        const userId = req.session.user
+    const user = await User.findById({_id:userId})
+
+        const userAddress = await Address.findOne({ userId: userId });
+        res.render('useraddress',{path:'/address',userAddress,user})
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message:"server error"})
+    }
+}
+ 
+const getProfilePage = async(req,res)=>{
+    try {
+        const userId = req.session.user
+        const user = await User.findById({_id:userId})
+        res.render('userprofile',{path:'/accountdetails',user})
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({message:"server error"})
+    }
+}
+const getWalletPage = async(req,res)=>{
+    try {
+        const userId = req.session.user
+        const user = await User.findById({_id:userId})
+        const wallet = await Wallet.findOne({ userId:userId});
+        res.render('userwallet',{path:"/wallet",user,wallet})
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({message:"server error"})
+    }
+}
+
 
 module.exports={
     userProfile,
@@ -495,5 +572,9 @@ module.exports={
     forgotEmailValid,
     verifyForgotPassOtp,
     resendOtp,
-    newChangePassword
+    newChangePassword,
+    getOrderlistPage,
+    getAddressPage,
+    getProfilePage,
+    getWalletPage
 }

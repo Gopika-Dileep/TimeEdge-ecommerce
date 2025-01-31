@@ -15,12 +15,18 @@ async function updateWalletBalance(userId, amount, transactionType) {
         transactions: [], 
       });0
     }
-    if (transactionType === 'credit') {
+    
+    if (transactionType === 'debit') {
+      if (wallet.balance >= amount) {
+        wallet.balance -= Math.abs(amount); 
+      } else {
+        throw new Error('Insufficient balance in wallet');
+      }
+    } else if (transactionType === 'credit') {
       wallet.balance += Math.abs(amount);
     } else {
       throw new Error('Invalid transaction type');
     }
-
     const newTransaction = {
       date: new Date(),
       type: transactionType,

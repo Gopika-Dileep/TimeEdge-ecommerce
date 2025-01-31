@@ -48,7 +48,7 @@ router.get('/change-email',userAuth,profileController.changeEmail)
 router.post('/change-email',userAuth,profileController.changeEmailValid)
 router.post("/verify-email-otp",userAuth,profileController.verifyEmailOtp);
 router.post("/update-email",userAuth,profileController.updateEmail);
-router.get('/change-password',userAuth,profileController.changePassword)
+router.get('/password',userAuth,profileController.changePassword)
 // router.post("/change-password",userAuth,profileController.changePasswordValid);
 // router.post("/verify-changepassword-otp",userAuth,profileController.verifychangePasswordOtp);
 router.get("/reset-password",profileController.getResetPassPage)
@@ -67,10 +67,11 @@ router.get('/checkout',userAuth,orderController.getCheckoutPage);
 router.post('/create-order',userAuth, orderController.createOrder);
 router.post('/placeOrderRazorPay',userAuth,orderController.orderRazorpay)
 router.post('/verifyRazorPayOrder',userAuth,orderController.verifyRazorPayOrder)
+router.post('/walletPayment',userAuth,orderController.walletPayment)
 router.get('/order-confirmation',userAuth,orderController.getOrderConfirmationPage);
 
 // router.get('/order',userAuth,orderController.showOrder)
-router.get('/orders',userAuth,orderController.showOrder)
+router.get('/orders-details',userAuth,orderController.showOrder)
 router.post('/orders/:itemId/cancel-item', userAuth, orderController.cancelOrderItem);
 router.post('/returnorder/:orderId',userAuth,orderController.returnOrder)
 
@@ -83,6 +84,19 @@ router.post('/verifyCoupon',userAuth,couponController.verifyCoupon)
 router.post('/changepassword',userAuth,profileController.newChangePassword)
 // router.post('/addAddressCheckout',userAuth,orderController.addAddress)
 router.post('/addAddressCheckout',userAuth,orderController.postNewAddress)
+
+
+
+
+// -------------------------------
+router.get('/orders',userAuth,profileController.getOrderlistPage)
+router.get('/address',userAuth,profileController.getAddressPage)
+router.get('/accountdetails',userAuth,profileController.getProfilePage)
+router.get('/wallet',userAuth,profileController.getWalletPage)
+
+
+
+
 
 
 

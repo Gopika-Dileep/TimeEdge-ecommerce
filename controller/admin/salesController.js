@@ -59,7 +59,7 @@ const loadSalesReport = async (req, res) => {
         const totalSalePrice = totalOrders.reduce((sum, order) => sum + order.finalAmount, 0);
         const saleCount = totalOrders.length;
         const couponDiscount = totalOrders.reduce((sum, order) => sum + order.discount, 0);
-        const totalDiscount = totalOrders.reduce((sum, order) => sum + order.productdiscount, 0);
+        const totalDiscount = totalOrders.reduce((sum, order) => sum + order.productdiscount, 0)
         const totalOrder = saleCount;
         const totalPage = Math.ceil(totalOrder / limit);
 

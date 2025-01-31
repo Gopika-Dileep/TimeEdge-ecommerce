@@ -6,9 +6,6 @@ const dotenv = require("dotenv")
 const userRouter = require("./router/userRouter")
 const adminRouter = require("./router/adminRouter")
 
-
- 
-
 const dbconnect = require("./config/db")
 dotenv.config()
 dbconnect()
@@ -33,7 +30,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/",userRouter)
 app.use("/admin",adminRouter)
-
 
 app.listen(PORT,()=>{
     console.log(`server is running ${PORT}` );

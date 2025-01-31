@@ -81,8 +81,8 @@
         <h2 class="content-title card-title">Admin Sales Report</h2>
       </div>
       <div class="download-buttons">
-        <button id="downloadPdf">Download PDF</button>
-        <button id="downloadExcel">Download Excel</button>
+        <button class="btn btn-primary" id="downloadPdf">Download PDF</button>
+        <button class="btn btn-primary" id="downloadExcel">Download Excel</button>
       </div>
     </div>
 
@@ -145,7 +145,7 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Total Discounts</h5>
-              <h3 class="text-warning">₹ <%= totalDiscount %>
+              <h3 class="text-warning">₹ <%= Math.round(totalDiscount) %>
               </h3>
             </div>
           </div>

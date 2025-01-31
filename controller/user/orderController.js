@@ -6,6 +6,7 @@ const Cart = require('../../models/cartSchema');
 const Address = require('../../models/addressSchema');
 const Order = require("../../models/orderSchema");
 const Coupon = require("../../models/couponSchema")
+const Wallet = require("../../models/walletSchema")
 const crypto = require("crypto");
 const walletHelper = require('../../helpers/walletHelper');
 const mongoose = require("mongoose");
@@ -56,10 +57,14 @@ const createOrder = async (req, res) => {
         const cart = await Cart.findById({ _id: cartId }).populate("items.product");
         let totalPrice = 0;
         const user = cart.user
+        let itemdiscountprice;
+
         let discountTotalPrice;
         for (let item of cart.items) {
             const product = item.product;
             const quantity = item.quantity;
+        itemdiscountprice=item.price
+
             discountTotalPrice= item.product.salePrice-item.price
 
             if (product.quantity < quantity) {
@@ -68,7 +73,7 @@ const createOrder = async (req, res) => {
             product.quantity -= quantity;
             await product.save();
 
-            totalPrice += product.salePrice * quantity;
+            totalPrice +=itemdiscountprice * quantity
 
         }
         let discount = 0;
@@ -155,12 +160,16 @@ const verifyRazorPayOrder = async (req, res) => {
             const cart = await Cart.findById({ _id: cartId }).populate("items.product");
             let totalPrice = 0;
             const user = cart.user
+        let itemdiscountprice;
+
             let discountTotalPrice;
 
             for (let item of cart.items) {
                 const product = item.product;
 
                 const quantity = item.quantity;
+        itemdiscountprice=item.price
+
                 discountTotalPrice= item.product.salePrice-item.price
 
 
@@ -170,8 +179,7 @@ const verifyRazorPayOrder = async (req, res) => {
                 product.quantity -= quantity;
                 await product.save();
 
-                totalPrice += product.salePrice * quantity;
-
+            totalPrice +=itemdiscountprice * quantity 
             }
             let discount = 0;
             if (coupon) {
@@ -206,6 +214,85 @@ const verifyRazorPayOrder = async (req, res) => {
 
     }
 }
+
+const walletPayment = async(req,res)=>{
+    try {
+        const {addressId, cartId, paymentMethod, couponId, totalAmount}= req.body
+        const userId = req.session.user
+        const user = await User.findById({_id:userId})
+        const wallet= await Wallet.findOne({userId:userId})
+        if(!wallet&&wallet.balance<totalAmount){
+            return res.status(400).json({message:"insufficient blance in your wallet"})
+
+        }
+        let coupon = 0
+        if(couponId){
+            coupon = await Coupon.findById({_id:couponId});
+        }
+        const cart = await Cart.findById({_id:cartId}).populate('items.product');
+        let totalPrice = 0 
+        let itemdiscountprice;
+        let discountTotalPrice;
+        for(let item of cart.items){
+            const product = item.product;
+
+            const quantity = item.quantity;
+
+        itemdiscountprice=item.price
+            discountTotalPrice= item.product.salePrice-item.price
+
+
+            if(product.quantity < quantity){
+                return res.status(400).send('Not enough stock for product ${product.name}')
+            }
+            product.quantity -= quantity;
+            await product.save();
+
+
+            totalPrice +=itemdiscountprice * quantity
+        }
+        let discount =0;
+        if(coupon){
+            discount = coupon.offerPrice
+            totalPrice = totalPrice - discount                                                                                                                                                                                                                                                                                        
+        }
+        const finalAmount = totalPrice;
+
+        const transactionType ='debit';
+
+        await walletHelper.updateWalletBalance(userId,finalAmount,transactionType)
+
+        const newOrder = new Order ({
+            orderedItems: cart.items.map(item => ({
+                products: item.product,
+                quantity: item.quantity,
+                price: item.product.salePrice,
+            })),
+            productdiscount:discountTotalPrice,
+            finalAmount,
+            address: addressId,
+            invoiceDate: new Date(),
+            status: "pending",
+            paymentMethod,
+            discount,
+            user
+        })
+
+        const ordersaving = await newOrder.save();
+        cart.items =[];
+        await cart.save();
+
+        res.status(200).json({success: true, orderId:newOrder._id,finalAmount})
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({message:"server error"})
+    }
+}
+
+
+
+
 const getOrderConfirmationPage = async (req, res) => {
     try {
         const orderId = req.query.orderId;
@@ -310,7 +397,6 @@ const returnOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const { productId, reason } = req.body;
-        console.log(productId,'productid')
 
         const order = await Order.findById({ _id: orderId });
         const orderItems = order.orderedItems;
@@ -344,7 +430,6 @@ const returnOrder = async (req, res) => {
         await order.save();
 
         const productUpdate = await Product.findById({ _id: productId });
-        console.log(productUpdate,'fshahhhafy');
         
         productUpdate.quantity += updatedQuantity;
         await productUpdate.save();
@@ -404,6 +489,7 @@ module.exports = {
     returnOrder,
     orderRazorpay,
     verifyRazorPayOrder,
+    walletPayment,
     postNewAddress
 }
 

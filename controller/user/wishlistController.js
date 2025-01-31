@@ -10,7 +10,7 @@ const loadWishlist = async(req,res)=>{
         const userId = req.session.user
         const user = await User.findById({_id:userId})
         const wishlist = await Wishlist.findOne({userId:userId}).populate('products.productId')
-        res.render ('wishlist',{user:user,wishlist:wishlist})
+        res.render ('wishlist',{path: '/wishlist', user:user,wishlist:wishlist})
     } catch (error) {
         console.error(error)
         res.status(500).json({message:"Server error"})
