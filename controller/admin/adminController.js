@@ -112,25 +112,62 @@ const unblockUser = async (req, res) => {
         res.status(400).json("error while unblocking user")
     }
 }
+// const loadcategory = async (req, res) => {
+//     try {
+//         const page = parseInt(req.query.page) || 1
+//         const limit = 3
+//         const category = await Category.find({}).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit)
+//         const count = await Category.countDocuments({})
+//         const totalpage = Math.ceil(count / limit)
+//         res.render('category', {
+//             category: category,
+//             currentpage: page,
+//             totalpage: totalpage,
+//             totalcategories: count,
+
+//         })
+//     } catch (error) {
+//         console.error(error)
+//         res.status(400).json("error while loading category")
+//     }
+// }
 const loadcategory = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1
-        const limit = 3
-        const category = await Category.find({}).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit)
-        const count = await Category.countDocuments({})
-        const totalpage = Math.ceil(count / limit)
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
+        const searchQuery = req.query.search || '';
+
+        let condition = {};
+        if (searchQuery) {
+            condition = {
+                $or: [
+                    { name: { $regex: searchQuery, $options: 'i' } },
+                    { description: { $regex: searchQuery, $options: 'i' } }
+                ]
+            };
+        }
+
+        const category = await Category.find(condition)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+    
+        const count = await Category.countDocuments(condition);
+        const totalpage = Math.ceil(count / limit);
+
         res.render('category', {
             category: category,
             currentpage: page,
             totalpage: totalpage,
             totalcategories: count,
-
-        })
+            searchQuery: searchQuery 
+        });
     } catch (error) {
-        console.error(error)
-        res.status(400).json("error while loading category")
+        console.error('Error in loadcategory:', error);
+        res.status(500).json({ error: "Error while loading categories" });
     }
-}
+};
 
 const unlistCategory = async (req, res) => {
     try {

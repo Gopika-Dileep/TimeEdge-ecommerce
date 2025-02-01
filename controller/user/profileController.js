@@ -543,7 +543,33 @@ const getWalletPage = async(req,res)=>{
         const userId = req.session.user
         const user = await User.findById({_id:userId})
         const wallet = await Wallet.findOne({ userId:userId});
-        res.render('userwallet',{path:"/wallet",user,wallet})
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; 
+        if (wallet && wallet.transactions) {
+            const totalTransactions = wallet.transactions.length;
+            const totalpage = Math.ceil(totalTransactions / limit);
+            
+            wallet.transactions = wallet.transactions
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice((page - 1) * limit, page * limit);
+
+            res.render('userwallet', {
+                path: "/wallet",
+                user,
+                wallet,
+                currentpage: page,
+                totalpage
+            });
+        } else {
+            res.render('userwallet', {
+                path: "/wallet",
+                user,
+                wallet,
+                currentpage: 1,
+                totalpage: 1
+            });
+        }
 
     } catch (error) {
         console.error(error)

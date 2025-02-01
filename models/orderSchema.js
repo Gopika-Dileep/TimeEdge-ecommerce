@@ -23,12 +23,11 @@
                 enum:["pending","Processing","Shipped","delivered","Cancelled","Return request","Returned"]
             }
             }],
-            // totalPrice:{
-            //     type:Number,
-                
-            // },
-
-            discount:{
+            subtotal:{
+                type:Number,
+                default: 0
+            },
+            couponDiscount:{
                 type:Number,
                 default:0
             },
@@ -65,9 +64,9 @@
             default:Date.now,
             required:true
         },
-        coupenApplied:{
-            type:Boolean,
-            default:false
+        couponId :{
+           type:Schema.Types.ObjectId,
+            ref:"Coupen",
         },
         paymentMethod:{
             type:String,
@@ -87,7 +86,7 @@
         const todayEnd = new Date(date.setHours(23, 59, 59, 999));
         
         const count = await mongoose.model('order').countDocuments({
-          createdAt: {
+            createdOn: {
             $gte: todayStart,
             $lte: todayEnd
           }

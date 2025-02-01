@@ -275,7 +275,7 @@
             </thead>
             <tbody>
                 <% order.orderedItems.forEach((item) => { %>
-                <tr>
+                <tr data-item-id="<%= item._id %>">
                     <td>
                         <div class="product-cell">
                             <img src="/uploads/productImages/<%= item.products.productImage[0] %>" 
@@ -283,12 +283,12 @@
                                  class="product-image">
                             <div class="product-info">
                                 <div class="name"><%= item.products.productName %></div>
-                                <div class="price">₹<%= item.price.toFixed(2) %></div>
+                                <div class="price">₹<%= order.finalAmount.toFixed(2) %></div>
                             </div>
                         </div>
                     </td>
                     <td><%= item.quantity %></td>
-                    <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
+                    <td>₹<%= (order.finalAmount * item.quantity).toFixed(2) %></td>
                     <td>
                         <span class="status-badge"><%= item.status %></span>
                         <% if (item.cancelReason) { %>
@@ -366,6 +366,26 @@
                     modal.style.display = "none";
                 }
             }
+
+            function updateItemStatus(itemId, status, reason) {
+                const itemRow = document.querySelector(`tr[data-item-id="${itemId}"]`);
+                if (itemRow) {
+                    const statusCell = itemRow.querySelector('td:nth-child(4)');
+                    const actionsCell = itemRow.querySelector('td:nth-child(5)');
+                    
+                    // Update status badge
+                    statusCell.innerHTML = `
+                        <span class="status-badge">${status}</span>
+                        ${reason ? `<div style="color: #991b1b; font-size: 0.85rem; margin-top: 0.5rem;">
+                            ${reason}
+                        </div>` : ''}
+                    `;
+
+                    // Remove action buttons
+                    actionsCell.innerHTML = '';
+                }
+            }
+
             confirmBtn.onclick = function () {
                 const reason = reasonText.value;
                 if (!reason.trim()) {
@@ -377,10 +397,9 @@
                     return;
                 }
 
-
-                // const orderId =  window.location.pathname.split('/')[2];
-                const orderItemsContainer = document.querySelector('.order-items');
-                const orderId = orderItemsContainer.getAttribute('data-order-id');
+                // Get order ID directly from URL
+                const orderId = window.location.search.split('id=')[1];
+                
                 fetch(`/orders/${orderId}/cancel-item`, {
                     method: 'POST',
                     headers: {
@@ -391,21 +410,34 @@
                         reason: reason
                     })
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.reload();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Failed to cancel item. Please try again.'
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        modal.style.display = "none";
+                        updateItemStatus(currentItemId, 'Cancelled', reason);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Product Cancelled',
+                            text: 'The product has been cancelled successfully.',
+                            showConfirmButton: false,
+                            timer: 2000
                         });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to cancel item'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Failed to cancel item. Please try again.'
                     });
-
+                });
             }
         });
         function showReturnModal(itemId) {
