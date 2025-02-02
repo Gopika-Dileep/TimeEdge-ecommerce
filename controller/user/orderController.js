@@ -446,7 +446,8 @@ const cancelOrderItem = async (req, res) => {
 
     if (order.paymentMethod !== "COD") {
       const cancelAmount = isCouponRemoved ? (itemSaleprice * itemQuantity) - couponRefudAmount : itemSaleprice * itemQuantity
-
+      order.finalAmount -= cancelAmount
+      await order.save()
       const transactionType = "credit";
       const userId = req.session.user;
       await walletHelper.updateWalletBalance(
@@ -583,7 +584,6 @@ const returnOrder = async (req, res) => {
         if (newtotal < coupon.minimumPrice) {
 
           couponRefundAmount = order.couponDiscount;
-          console.log(couponRefundAmount, "asdfghjsdfgh")
           order.couponDiscount = 0;
           order.couponId = null;
           isCouponRemoved = true;
@@ -592,6 +592,8 @@ const returnOrder = async (req, res) => {
       }
 
         const refundAmount = isCouponRemoved ? (itemSalePrice * updatedQuantity) - couponRefundAmount : itemSalePrice * updatedQuantity;
+        order.finalAmount -= refundAmount
+        await order.save()
         await walletHelper.updateWalletBalance(userId, refundAmount, "credit");
   
       // Restore stock

@@ -12,7 +12,10 @@ const loadSalesReport = async (req, res) => {
         const startDate = req.query.startDate || '';
         const endDate = req.query.endDate || '';
 
-        let query = {};
+        let query = {
+            status: "delivered" // Add status filter for delivered orders
+        };
+
         if (filtervalue !== 'custom') {
             const today = new Date();
             let start, end;
@@ -58,7 +61,7 @@ const loadSalesReport = async (req, res) => {
         const totalOrders = await Order.find(query).sort({ createdOn: -1 }).populate('user').populate('orderedItems.products');
         const totalSalePrice = totalOrders.reduce((sum, order) => sum + order.finalAmount, 0);
         const saleCount = totalOrders.length;
-        const couponDiscount = totalOrders.reduce((sum, order) => sum + order.discount, 0);
+        const couponDiscount = totalOrders.reduce((sum, order) => sum + order.couponDiscount, 0);
         const totalDiscount = totalOrders.reduce((sum, order) => sum + order.productdiscount, 0)
         const totalOrder = saleCount;
         const totalPage = Math.ceil(totalOrder / limit);
@@ -67,7 +70,7 @@ const loadSalesReport = async (req, res) => {
 
         res.render('salesreport', {
             order,
-            totalSalePrice,
+            totalSalePrice : Math.round(totalSalePrice),
             saleCount,
             couponDiscount,
             totalDiscount,
@@ -89,6 +92,10 @@ const filterOrder = async (req, res) => {
         const { filtervalue, startDate, endDate } = req.query;
         const today = new Date();
         let start, end;
+
+        let query = {
+            status: "delivered" // Add status filter for delivered orders
+        };
 
         switch (filtervalue) {
             case "daily":
@@ -127,9 +134,9 @@ const filterOrder = async (req, res) => {
             end.setUTCHours(23, 59, 59, 999);
         }
 
-        const orders = await Order.find({
-            createdOn: { $gte: start, $lte: end }
-        })
+        query.createdOn = { $gte: start, $lte: end };
+
+        const orders = await Order.find(query)
             .sort({ createdOn: -1 })
             .populate('user')
             .populate('orderedItems.products');
@@ -165,10 +172,17 @@ const filterbyDate = async (req, res) => {
 
         const start = new Date(startDate);
         const end = new Date(endDate);
-
         end.setUTCHours(23, 59, 59, 999);
 
-        const orders = await Order.find({ createdOn: { $gte: start, $lte: end } }).sort({ createdOn: -1 })``.populate('user').populate('orderedItems.products');
+        const query = {
+            status: "delivered", 
+            createdOn: { $gte: start, $lte: end }
+        };
+
+        const orders = await Order.find(query)
+            .sort({ createdOn: -1 })
+            .populate('user')
+            .populate('orderedItems.products');
 
         const totalSalePrice = orders.reduce((sum, order) => sum + order.finalAmount, 0);
         const saleCount = orders.length;
