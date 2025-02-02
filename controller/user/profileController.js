@@ -473,7 +473,7 @@ const deleteAddress = async(req,res)=>{
             await Address.updateOne({"address._id":addressId},{$pull:{address:{_id:addressId}}})
 
         }
-        res.redirect("/profile")
+        res.redirect("/address")
     } catch (error) {
         console.error(error)
         res.status(500).json({message:"server error"})

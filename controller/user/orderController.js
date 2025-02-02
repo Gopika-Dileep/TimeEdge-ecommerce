@@ -84,7 +84,6 @@ const createOrder = async (req, res) => {
             coupon = await Coupon.findOne({ name: couponCode });
         }
 
-        console.log(coupon._id);
         const newOrder = new Order({
             orderedItems: cart.items.map(item => ({
                 products: item.product,
@@ -99,7 +98,7 @@ const createOrder = async (req, res) => {
             status: "pending",
             paymentMethod,
             couponDiscount,
-            couponId : coupon._id || null,
+            couponId : coupon?._id || null,
             user
         });
 
@@ -207,7 +206,7 @@ const verifyRazorPayOrder = async (req, res) => {
                 status: "pending",
                 paymentMethod,
                 couponDiscount : discount,
-            couponId : coupon._id || null,
+            couponId : coupon?._id || null,
 
                 user
             });
@@ -240,7 +239,6 @@ const walletPayment = async(req,res)=>{
             coupon = await Coupon.findOne({name:couponCode});
         }
 
-        console.log(coupon)
         const cart = await Cart.findById({_id:cartId}).populate('items.product');
         let totalPrice = 0 
         let itemdiscountprice;
@@ -283,7 +281,7 @@ const walletPayment = async(req,res)=>{
             status: "pending",
             paymentMethod,
             couponDiscount,
-            couponId : coupon._id || null,
+            couponId : coupon?._id || null,
             user
         })
 
@@ -493,18 +491,166 @@ const postNewAddress = async (req, res) => {
             userAddress.address.push(newAddress);
             await userAddress.save();
         }
+        console.log('fgjgh')
+        
 
-        res.status(200).json(newAddress);
+      res.status(200).json({
+            _id: newAddress._id,
+            name: newAddress.name,
+            addressType: newAddress.addressType,
+            phone: newAddress.phone,
+            altPhone: newAddress.altPhone,
+            landMark: newAddress.landMark,
+            city: newAddress.city,
+            state: newAddress.state,
+            pincode: newAddress.pincode
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "server error" });
     }
 };
 
+const posteditAddress = async(req,res)=>{
+    try {
+        const addressId = req.params.addressId;
+        const updatedData = req.body;
+
+        // Validate the request body
+        if (!updatedData.name || !updatedData.phone || !updatedData.landMark || 
+            !updatedData.city || !updatedData.state || !updatedData.pincode || 
+            !updatedData.addressType) {
+            return res.status(400).json({
+                success: false,
+                message: "All required fields must be provided"
+            });
+        }
+
+        // Validate phone number format
+        if (!/^\d{10}$/.test(updatedData.phone)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid phone number format"
+            });
+        }
+
+        // Validate alternative phone if provided
+        if (updatedData.altPhone && !/^\d{10}$/.test(updatedData.altPhone)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid alternative phone number format"
+            });
+        }
+
+        // Find and update the address
+        const result = await Address.findOneAndUpdate(
+            {
+                "address._id": addressId
+            },
+            {
+                $set: {
+                    "address.$": {
+                        _id: addressId,
+                        name: updatedData.name,
+                        addressType: updatedData.addressType,
+                        phone: updatedData.phone,
+                        altPhone: updatedData.altPhone || null,
+                        landMark: updatedData.landMark,
+                        city: updatedData.city,
+                        state: updatedData.state,
+                        pincode: updatedData.pincode
+                    }
+                }
+            },
+            { new: true } // Return the updated document
+        );
+
+        if (!result) {
+            return res.status(404).json({
+                success: false,
+                message: "Address not found"
+            });
+        }
+
+        // Find the updated address in the array
+        const updatedAddress = result.address.find(
+            addr => addr._id.toString() === addressId
+        );
+
+        // Send the updated address back to the client
+        res.status(200).json({
+            success: true,
+            _id: updatedAddress._id,
+            name: updatedAddress.name,
+            addressType: updatedAddress.addressType,
+            phone: updatedAddress.phone,
+            altPhone: updatedAddress.altPhone,
+            landMark: updatedAddress.landMark,
+            city: updatedAddress.city,
+            state: updatedAddress.state,
+            pincode: updatedAddress.pincode
+        });
+
+    } catch (error) {
+        console.error('Error in editAddressCheckout:', error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+}
+
+const getAddress = async(req, res) => {
+    try {
+        const addressId = req.params.addressId;
+        console.log('iam here')
+            const currAddress = await Address.findOne({
+                "address._id": addressId,
+            });
+    
+            if(!currAddress){
+                return res.status(404).json({
+                    success: false,
+                    message: "Address not found"
+                });
+            }
+            
+            const addressData = currAddress.address.find((item)=>{
+                return item._id.toString() === addressId.toString();
+            });
+    
+            if(!addressData){
+                return res.status(404).json({
+                    success: false,
+                    message: "Address not found"
+                });
+            }
+    
+            res.status(200).json({
+                success: true,
+                address: {
+                    _id: addressData._id,
+                    name: addressData.name,
+                    addressType: addressData.addressType,
+                    phone: addressData.phone,
+                    altPhone: addressData.altPhone,
+                    landMark: addressData.landMark,
+                    city: addressData.city,
+                    state: addressData.state,
+                    pincode: addressData.pincode
+                }
+            });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
 
 module.exports = {
     getCheckoutPage,
-    // addAddress,
     getOrderConfirmationPage,
     createOrder,
     showOrder,
@@ -513,6 +659,8 @@ module.exports = {
     orderRazorpay,
     verifyRazorPayOrder,
     walletPayment,
-    postNewAddress
+    postNewAddress,
+    posteditAddress,
+    getAddress
 }
 

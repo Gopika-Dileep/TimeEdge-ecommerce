@@ -85,6 +85,9 @@ router.post('/remove-coupon',userAuth,couponController.removecoupon)
 router.post('/changepassword',userAuth,profileController.newChangePassword)
 // router.post('/addAddressCheckout',userAuth,orderController.addAddress)
 router.post('/addAddressCheckout',userAuth,orderController.postNewAddress)
+router.put('/editAddressCheckout/:addressId',userAuth,orderController.posteditAddress)
+router.get('/getAddress/:addressId', userAuth, orderController.getAddress)
+
 
 
 
