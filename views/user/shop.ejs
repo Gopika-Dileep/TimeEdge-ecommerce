@@ -170,11 +170,10 @@
                                         const salePrice = product[i].salePrice;
                                         const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
                                         %>
-                                        <span><%= finalPrice %></span>
+                                        <span class="price text-danger">₹<%= finalPrice %></span>
                                         <% if (finalPrice < salePrice) { %>
-                                            <p  class='text-muted'><strike>><%= product[i].salePrice %></strike>
-                                                <span class='text-muted'><strike><%= product[i].regularPrice %></strike></span>
-                                            </p>
+                                            <span class="price"><strike class="text-muted">₹<%= product[i].salePrice %></strike></span>
+
                                         <% } %>
                                     </div>
                                 </div>
