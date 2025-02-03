@@ -15,16 +15,34 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const Razorpay = require("razorpay");
-// const { default: mongoose } = require("mongoose");
 
 const getCheckoutPage = async (req, res) => {
   try {
     const userId = req.session.user;
 
     const cart = await Cart.findOne({ user: userId }).populate("items.product");
-    const coupon = await Coupon.find({});
-    console.timeLog(coupon, "coupon");
+    const currentDate = new Date();
 
+    const coupon = await Coupon.find({
+    expireOn: { $gt: currentDate },  
+    $or: [
+        { UsageLimit: { $gt: 0 } },  
+        { UsageLimit: { $exists: false } }  
+    ]
+    }); 
+
+
+    let filteredCoupons = [] 
+
+    for(let c of coupon) {
+      const couponUsed = await Order.countDocuments({couponId:c._id, user: userId})
+      if(couponUsed <  c.UsageLimit) {
+        filteredCoupons.push(c)
+      }
+    }
+
+    console.log(filteredCoupons, "filtered coupon")
+   
     if (!cart || cart.items.length == 0) {
       return res.render("cart", { message: "cart is empty" });
     }
@@ -46,7 +64,7 @@ const getCheckoutPage = async (req, res) => {
       total: subtotal,
       cartId: cartId,
       user: user,
-      coupon: coupon,
+      coupon: filteredCoupons,
     });
   } catch (error) {
     console.error(error);
@@ -534,13 +552,11 @@ const returnOrder = async (req, res) => {
       item.returnReason = reason;
       updatedQuantity = item.quantity;
   
-      // Fetch product details
       const product = await Product.findById(productId).populate("category");
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
   
-      // Calculate sale price with offers
       const getSalePrice = (product) => {
         const productOffer = product.productOffer || 0;
         const categoryOffer = product.category?.categoryOffer || 0;
@@ -551,7 +567,6 @@ const returnOrder = async (req, res) => {
       const itemSalePrice = getSalePrice(product);
       await order.save();
   
-      // Coupon Refund Logic
       let couponRefundAmount = 0;
       let isCouponRemoved = false;
 
@@ -596,7 +611,6 @@ const returnOrder = async (req, res) => {
         await order.save()
         await walletHelper.updateWalletBalance(userId, refundAmount, "credit");
   
-      // Restore stock
       product.quantity += updatedQuantity;
       await product.save();
   
@@ -681,7 +695,6 @@ const posteditAddress = async (req, res) => {
     const addressId = req.params.addressId;
     const updatedData = req.body;
 
-    // Validate the request body
     if (
       !updatedData.name ||
       !updatedData.phone ||
@@ -697,7 +710,6 @@ const posteditAddress = async (req, res) => {
       });
     }
 
-    // Validate phone number format
     if (!/^\d{10}$/.test(updatedData.phone)) {
       return res.status(400).json({
         success: false,
@@ -705,7 +717,6 @@ const posteditAddress = async (req, res) => {
       });
     }
 
-    // Validate alternative phone if provided
     if (updatedData.altPhone && !/^\d{10}$/.test(updatedData.altPhone)) {
       return res.status(400).json({
         success: false,
@@ -713,7 +724,6 @@ const posteditAddress = async (req, res) => {
       });
     }
 
-    // Find and update the address
     const result = await Address.findOneAndUpdate(
       {
         "address._id": addressId,
@@ -733,7 +743,7 @@ const posteditAddress = async (req, res) => {
           },
         },
       },
-      { new: true } // Return the updated document
+      { new: true } 
     );
 
     if (!result) {
@@ -743,12 +753,10 @@ const posteditAddress = async (req, res) => {
       });
     }
 
-    // Find the updated address in the array
     const updatedAddress = result.address.find(
       (addr) => addr._id.toString() === addressId
     );
 
-    // Send the updated address back to the client
     res.status(200).json({
       success: true,
       _id: updatedAddress._id,

@@ -120,7 +120,6 @@
         </div>
       </div>
 
-      <!-- Metrics Cards -->
       <div class="row">
         <div class="col-md-3">
           <div class="card">
@@ -162,7 +161,6 @@
         </div>
       </div>
 
-      <!-- Sales Report Table -->
       <div class="row mt-4">
         <div class="col-lg-12">
           <div class="card">
@@ -204,9 +202,9 @@
                           </td>
                           <td>₹ <%= item.price %>
                           </td>
-                          <td>₹ <%= item.discount || 0 %>
+                          <td>₹ <%= item.products.offerAmount || 0 %>
                           </td>
-                          <td>₹ <%= item.price * item.quantity - (item.discount || 0) %>
+                          <td>₹ <%= (item.price - (item.products.offerAmount || 0) ) * item.quantity %>
                           </td>
                           <td>
                             <%= order.status || "Pending" %>
@@ -318,8 +316,8 @@
               <td>${item.products.productName}</td>
               <td>${item.quantity}</td>
               <td>₹ ${item.price}</td>
-              <td>₹ ${item.discount || 0}</td>
-              <td>₹ ${item.price * item.quantity - (item.discount || 0)}</td>
+              <td>₹ ${item.products.offerAmount || 0}</td>
+              <td>₹ ${(item.price - (item.products.offerAmount || 0) ) * item.quantity}</td>
               <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;
@@ -361,8 +359,8 @@
               <td>${item.products.productName}</td>
               <td>${item.quantity}</td>
               <td>₹ ${item.price}</td>
-              <td>₹ ${item.discount || 0}</td>
-              <td>₹ ${item.price * item.quantity - (item.discount || 0)}</td>
+              <td>₹ ${item.products.offerAmount || 0}</td>
+              <td>₹ ${(item.price - (item.products.offerAmount || 0) ) * item.quantity}</td>
               <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;
@@ -436,8 +434,8 @@
               <td>${item.products.productName}</td>
               <td>${item.quantity}</td>
               <td>₹ ${item.price}</td>
-              <td>₹ ${item.discount || 0}</td>
-              <td>₹ ${item.price * item.quantity - (item.discount || 0)}</td>
+              <td>₹ ${item.products.offerAmount || 0}</td>
+              <td>₹ ${(item.price - (item.products.offerAmount || 0) ) * item.quantity}</td>
               <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;

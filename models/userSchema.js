@@ -11,11 +11,16 @@ const userSchema = mongoose.Schema({
     },
     phone:{
         type:Number,
-        required:true
+        required:false,
     },
     password:{
         type:String,
-        required:true
+        required:false,
+    },
+    googleId: { 
+        type: String, 
+        unique: true, 
+        sparse: true 
     },
     otp:{
         type:String,

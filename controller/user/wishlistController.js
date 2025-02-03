@@ -68,7 +68,6 @@ const addToWishlist = async (req, res) => {
         }
 
         if (!wishlist) {
-            // If the wishlist doesn't exist, create it
             const newWishlist = new Wishlist({
                 userId: userId,
                 products: [{ productId, price: product.salePrice, stockStatus: product.status }]

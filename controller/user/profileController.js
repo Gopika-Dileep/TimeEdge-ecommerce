@@ -26,7 +26,7 @@ const userProfile = async (req, res) => {
         const totalpage = Math.ceil(totalOrders / limit);
         const currentOrders = orders.slice((page - 1) * limit, page * limit);
 
-        res.render("profile", {
+        res.render("", {
             user: userData,
             wallet,
             userAddress: userAddress,
@@ -137,7 +137,7 @@ const updateEmail=async(req,res)=>{
         const {newEmail}=req.body
         const userId = req.session.user
         const user=await User.findByIdAndUpdate({_id:userId},{$set:{email:newEmail}},{new:true})
-        res.redirect('/profile')
+        res.redirect('/')
 
     } catch (error) {
         console.error(error)
@@ -177,7 +177,7 @@ const newChangePassword = async(req,res)=>{
         user.password = passwordHash
 
         await user.save()
-       return res.redirect('/profile')
+       return res.redirect('/accountdetails')
     } catch (error) {
         console.error(error)
         res.status(500).json({message:'server error'})
@@ -384,7 +384,7 @@ const postAddAddress = async(req,res)=>{
            userAddress.address.push({addressType,name,city,landMark,state,pincode,phone,altPhone})
             await userAddress.save()
         }
-        res.redirect('/profile')
+        res.redirect('/address')
 
     } catch (error) {
         console.error(error)
@@ -456,7 +456,7 @@ const postEditAddress = async(req,res)=>{
 
                  
             })
-          res.redirect("/profile")
+          res.redirect("/address")
 
         }
     } catch (error) {
@@ -489,7 +489,6 @@ const getOrderlistPage = async (req, res) => {
     const limit = 5;
     const search = req.query.search || '';
     
-    // Query with skip and limit like admin product controller
     const orders = await Order.find({ user: userId })
       .sort({ createdOn: -1 })
       .skip((page - 1) * limit)

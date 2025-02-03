@@ -7,8 +7,23 @@ const profileController = require("../controller/user/profileController")
 const orderController = require("../controller/user/orderController")
 const wishlistController = require("../controller/user/wishlistController")
 const couponController = require("../controller/user/couponController")
+const passport = require('passport')
+
 
 const {userAuth,adminAuth,checkUser} = require("../middleware/auth");
+
+
+router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}));
+router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/signup" }),
+    (req, res) => {
+      console.log("Google callback reached"); 
+      res.redirect("/");
+    }
+  );
+
+
 
 
 router.get("/login",userController.loadlogin)

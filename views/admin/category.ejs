@@ -203,7 +203,6 @@
       </div>
     </div>
 
-    <!-- Pagination -->
      <% if (searchQuery) { %>
     <% const searchParam = `&search=${searchQuery}`; %>
     <li class="page-item">
@@ -220,7 +219,6 @@
         </li>
     <% } %>
 <% } else { %>
-    <!-- Your existing pagination code -->
 <% } %>
     <div class="pagination-container mt-4">
       <ul class="pagination justify-content-center">
@@ -242,7 +240,6 @@
       </ul>
     </div>
 
-    <!-- Add Category Modal -->
     <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -278,7 +275,6 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
 
   <script>
-    // Your existing JavaScript code remains the same
     function handleFormSubmit(event) {
         event.preventDefault(); 
         if (!validateForm()) {

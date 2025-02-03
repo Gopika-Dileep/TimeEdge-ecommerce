@@ -8,12 +8,12 @@ const loadSalesReport = async (req, res) => {
     try {
         const page = req.query.page || 1;
         const limit = 5;    
-        const filtervalue = req.query.filtervalue || 'custom';
+        const filtervalue = req.query.filtervalue || 'monthly';
         const startDate = req.query.startDate || '';
         const endDate = req.query.endDate || '';
 
         let query = {
-            status: "delivered" // Add status filter for delivered orders
+            status: "delivered" 
         };
 
         if (filtervalue !== 'custom') {
@@ -65,7 +65,6 @@ const loadSalesReport = async (req, res) => {
         const totalDiscount = totalOrders.reduce((sum, order) => sum + order.productdiscount, 0)
         const totalOrder = saleCount;
         const totalPage = Math.ceil(totalOrder / limit);
-
         const order = await Order.find(query).sort({ createdOn: -1 }).skip((page - 1) * limit).limit(limit).populate('user').populate('orderedItems.products');
 
         res.render('salesreport', {
@@ -94,7 +93,7 @@ const filterOrder = async (req, res) => {
         let start, end;
 
         let query = {
-            status: "delivered" // Add status filter for delivered orders
+            status: "delivered" 
         };
 
         switch (filtervalue) {
@@ -143,7 +142,7 @@ const filterOrder = async (req, res) => {
 
         const totalSalePrice = orders.reduce((sum, order) => sum + order.finalAmount, 0);
         const saleCount = orders.length;
-        const couponDiscount = orders.reduce((sum, order) => sum + order.discount, 0);
+        const couponDiscount = orders.reduce((sum, order) => sum + order.couponDiscount, 0);
         const totalDiscount = orders.reduce((sum, order) => sum + order.productdiscount, 0);
         const totalPage = Math.ceil(saleCount / 5);
 
@@ -186,7 +185,7 @@ const filterbyDate = async (req, res) => {
 
         const totalSalePrice = orders.reduce((sum, order) => sum + order.finalAmount, 0);
         const saleCount = orders.length;
-        const couponDiscount = orders.reduce((sum, order) => sum + order.discount, 0);
+        const couponDiscount = orders.reduce((sum, order) => sum + order.couponDiscount, 0);
         const totalDiscount = orders.reduce((sum, order) => sum + order.productdiscount, 0);
         const totalPage = Math.ceil(saleCount / 5);
 
@@ -208,6 +207,8 @@ const filterbyDate = async (req, res) => {
 const downloadpdf = async (req, res) => {
     try {
         const salesData = req.body.salesData;
+
+        console.log(salesData[0], "saleshshgdhsd")
         const PDFDocument = require('pdfkit');
         const doc = new PDFDocument({
             margins: { top: 50, bottom: 50, left: 50, right: 50 },
@@ -260,8 +261,8 @@ const downloadpdf = async (req, res) => {
                 order.date.toString().substring(0, 10),
                 order.product,
                 order.userId.name,
-                `₹${order.totalAmount}`,
-                `₹${order.discount || 0}`
+                `${order.totalAmount}`,
+                `${order.couponDiscount || 0}`
             ];
 
             doc.rect(startX, currentY, tableWidth, rowHeight)
@@ -291,8 +292,8 @@ const downloadpdf = async (req, res) => {
             doc.font('Helvetica')
                .fontSize(10)
                .text(`Total Orders: ${salesData.length}`, startX, currentY + 40)
-               .text(`Total Amount: ₹${totalAmount}`, startX + 200, currentY + 40)
-               .text(`Total Discount: ₹${totalDiscount}`, startX + 400, currentY + 40);
+               .text(`Total Amount: ${totalAmount}`, startX + 200, currentY + 40)
+               .text(`Total Discount: ${totalDiscount}`, startX + 400, currentY + 40);
         };
 
         let currentPage = 1;

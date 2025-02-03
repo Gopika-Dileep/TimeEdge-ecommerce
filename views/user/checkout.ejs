@@ -591,7 +591,6 @@
 <script>
 
   $(document).ready(function () {
-  // =============== Coupon Management ===============
   let appliedCoupon = null;
 
   $(".apply-coupon-btn").on("click", function () {
@@ -599,14 +598,11 @@
     const couponCode = couponItem.data("coupon-code");
     const discountAmount = parseFloat(couponItem.data("discount"));
     
-    // Get the current subtotal
     const subtotal = parseFloat($("#subtotal").text());
     
-    // Get minimum purchase amount
     const minimumPurchaseText = couponItem.find(".coupon-conditions small").first().text();
     const minimumPurchaseAmount = parseFloat(minimumPurchaseText.split("₹")[1]);
 
-    // Validate minimum purchase
     if (subtotal < minimumPurchaseAmount) {
       Swal.fire({
         icon: "warning",
@@ -616,21 +612,17 @@
       return;
     }
 
-    // Calculate final total
     const finalTotal = subtotal - discountAmount;
 
-    // Update UI
     $("#couponDiscount").text(discountAmount.toFixed(2));
     $("#final-total").text(`₹${finalTotal.toFixed(2)}`);
     $("#total").val(finalTotal.toFixed(2));
 
-    // Store coupon details
     appliedCoupon = {
       code: couponCode,
       discountAmount: discountAmount
     };
 
-    // Update applied coupon display with data attribute
     $("#applied-coupon-display").html(`
       <div class="alert alert-success" data-coupon-code="${couponCode}">
         ${couponCode} applied: ₹${discountAmount.toFixed(2)}
@@ -640,7 +632,6 @@
 
     $("#couponModal").modal("hide");
 
-    // Send coupon application to server
     $.ajax({
       url: "/apply-coupon",
       method: "POST",
@@ -669,13 +660,11 @@
     });
   });
 
-  // Function to get current applied coupon code
   function getAppliedCouponCode() {
     const couponDisplay = $("#applied-coupon-display .alert-success");
     return couponDisplay.length > 0 ? couponDisplay.data("coupon-code") : "";
   }
 
-  // Remove Coupon Function
   function removeCoupon() {
     const subtotal = parseFloat($("#subtotal").text());
     
@@ -686,7 +675,6 @@
     appliedCoupon = null;
   }
 
-  // Remove Coupon Click Handler
   $(document).on("click", ".remove-coupon-btn", function () {
     removeCoupon();
 
@@ -705,11 +693,9 @@
     });
   });
 
-   // =============== Address Modal Management ===============
   const addressModal = $("#addressModal");
   const addressForm = $("#addressForm");
   
-  // Show modal for new address
   $(".btn-outline-info").click(function(e) {
     e.preventDefault();
     $("#addressModalLabel").text("Add New Address");
@@ -722,7 +708,6 @@
     const addressId = $(this).data("id");
     $("#addressModalLabel").text("Edit Address");
     
-    // Fetch address details
     $.ajax({
         url: `/getAddress/${addressId}`,
         method: "GET",
@@ -775,28 +760,23 @@
     `;
   }
 
-  // Function to add new address to DOM
   function addAddressToDom(address) {
     const savedAddressesContainer = $("#saved-addresses");
     const newAddressHTML = createAddressHTML(address);
     
-    // If this is the first address, create the container
     if (savedAddressesContainer.children().length === 0) {
       savedAddressesContainer.html(newAddressHTML);
     } else {
-      // Append to existing addresses
       savedAddressesContainer.append(newAddressHTML);
     }
   }
 
-  // Function to update existing address in DOM
   function updateAddressInDom(addressId, updatedAddress) {
     const existingAddressCard = $(`#address-${addressId}`).closest('.address-card');
     const updatedAddressHTML = createAddressHTML(updatedAddress);
     existingAddressCard.replaceWith(updatedAddressHTML);
   }
 
-  // Modified form submission handler
   addressForm.submit(function(e) {
     e.preventDefault();
     
@@ -812,7 +792,6 @@
       pincode: $("#pincode").val()
     };
 
-    // Validate phone numbers
     if (!/^[0-9]{10}$/.test(formData.phone)) {
       Swal.fire({
         icon: "error",
@@ -831,7 +810,6 @@
       return;
     }
 
-    // Determine if this is an add or edit operation
     const url = addressId ? `/editAddressCheckout/${addressId}` : '/addAddressCheckout';
     const method = addressId ? 'PUT' : 'POST';
 
@@ -842,17 +820,14 @@
       contentType: 'application/json',
       success: function(response) {
         if (response && (response._id || response.address)) {
-          // If it's an edit operation
           if (addressId) {
             updateAddressInDom(addressId, response);
           } else {
-            // If it's a new address
-            // If response has nested address array, use the last added address
+          s
             const newAddress = response.address ? response.address[response.address.length - 1] : response;
             addAddressToDom(newAddress);
           }
 
-          // Close modal and show success message
           addressModal.modal("hide");
           Swal.fire({
             icon: "success",
@@ -862,7 +837,6 @@
             showConfirmButton: false
           });
 
-          // Reset form
           addressForm[0].reset();
         } else {
           Swal.fire({
@@ -883,14 +857,11 @@
     });
   });
 
-  // Close modal handler
   $(".close").click(function() {
     addressModal.modal("hide");
   });
 
-  // =============== Order Placement ===============
   $("#place-order").click(function () {
-    // Validate address selection
     const selectedAddress = document.querySelector('input[name="deliveryAddress"]:checked');
     if (!selectedAddress) {
       Swal.fire({
@@ -903,11 +874,9 @@
     }
     const addressId = selectedAddress.value;
 
-    // Get cart ID
     const cartElement = document.querySelector("[data-cart-id]");
     const cartId = cartElement.getAttribute("data-cart-id");
 
-    // Validate payment method
     const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
     if (!selectedPayment) {
       Swal.fire({
@@ -925,7 +894,6 @@
     const finalTotal = parseFloat($("#total").val());
     const couponCode = getAppliedCouponCode();
 
-    // Process based on payment method
     if (paymentMethod === "COD") {
       placeOrder(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal);
     } else if (paymentMethod === "Online") {
@@ -935,7 +903,6 @@
     }
   });
 
-  // =============== Payment Processing Functions ===============
   function placeOrder(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal) {
     Swal.fire({
       title: "Order Placed Successfully!",

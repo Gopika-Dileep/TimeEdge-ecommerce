@@ -228,7 +228,6 @@
         </div>
     </div>
 
-    <!-- Products Table -->
     <div class="table-responsive">
         <table>
             <thead>
@@ -266,7 +265,7 @@
                         <% } %>
                     </td>
                     <td><%= product[i].quantity %></td>
-                    <td><%= product[i].category.name %></td>
+                    <td><%= product[i].category?.name %></td>
                     <td>
                         <span class="status-badge <%= product[i].isListed ? 'status-listed' : 'status-unlisted' %>">
                             <%= product[i].isListed ? 'Listed' : 'Unlisted' %>
@@ -306,7 +305,6 @@
         </table>
     </div>
 
-    <!-- Pagination -->
     <div class="pagination">
         <% 
             const searchParam = typeof search !== 'undefined' && search ? `&search=${search}` : '';

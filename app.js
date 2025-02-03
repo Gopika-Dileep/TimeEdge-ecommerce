@@ -2,7 +2,8 @@ const express = require("express")
 const session = require("express-session")
 const app = express()
 const path = require("path")
-const dotenv = require("dotenv")
+const dotenv = require("dotenv");
+const passport = require('./config/passport');
 const userRouter = require("./router/userRouter")
 const adminRouter = require("./router/adminRouter")
 
@@ -18,6 +19,11 @@ app.use(session({
     saveUninitialized:true,
    
 }))
+
+
+
+app.use(passport.initialize());
+app.use(passport.session())
 
 
 app.use(express.json())

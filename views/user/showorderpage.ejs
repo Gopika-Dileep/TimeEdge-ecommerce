@@ -374,29 +374,24 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Cancel Modal Elements
     const cancelModal = document.getElementById("cancelModal");
     const closeBtn = document.getElementById("closeModal");
     const confirmBtn = document.getElementById("confirmCancel");
     const cancelReasonText = document.getElementById("cancelReason");
 
-    // Return Modal Elements
     const returnModal = document.getElementById("returnModal");
     const closeReturnBtn = document.getElementById("closeReturnModal");
     const confirmReturnBtn = document.getElementById("confirmReturn");
     const returnReasonText = document.getElementById("returnReason");
 
-    // Close modal functions
     closeBtn.onclick = () => (cancelModal.style.display = "none");
     closeReturnBtn.onclick = () => (returnModal.style.display = "none");
 
-    // Close modals when clicking outside
     window.onclick = function (event) {
       if (event.target == cancelModal) cancelModal.style.display = "none";
       if (event.target == returnModal) returnModal.style.display = "none";
     };
 
-    // Cancel Order Functionality
     confirmBtn.onclick = function () {
       const reason = cancelReasonText.value;
       if (!reason.trim()) {
@@ -453,7 +448,6 @@
         });
     };
 
-    // Return Order Functionality
     confirmReturnBtn.onclick = function () {
       const reason = returnReasonText.value;
       if (!reason.trim()) {
