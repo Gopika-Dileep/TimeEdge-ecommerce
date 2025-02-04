@@ -58,15 +58,15 @@ const loadSalesReport = async (req, res) => {
             query.createdOn = { $gte: new Date(startDate), $lte: new Date(endDate) };
         }
 
-        const totalOrders = await Order.find(query).sort({ createdOn: -1 }).populate('user').populate('orderedItems.products');
+        const totalOrders = await Order.find(query).sort({ createdOn: -1 }).populate('user').populate({path:'orderedItems.products',populate:{path:'category',model:'Category'}});
         const totalSalePrice = totalOrders.reduce((sum, order) => sum + order.finalAmount, 0);
         const saleCount = totalOrders.length;
         const couponDiscount = totalOrders.reduce((sum, order) => sum + order.couponDiscount, 0);
         const totalDiscount = totalOrders.reduce((sum, order) => sum + order.productdiscount, 0)
         const totalOrder = saleCount;
         const totalPage = Math.ceil(totalOrder / limit);
-        const order = await Order.find(query).sort({ createdOn: -1 }).skip((page - 1) * limit).limit(limit).populate('user').populate('orderedItems.products');
-
+        const order = await Order.find(query).sort({ createdOn: -1 }).skip((page - 1) * limit).limit(limit).populate('user').populate({path:'orderedItems.products',populate:{path:'category',model:'Category'}});
+        
         res.render('salesreport', {
             order,
             totalSalePrice : Math.round(totalSalePrice),

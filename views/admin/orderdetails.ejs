@@ -1,13 +1,12 @@
 <%- include("../../views/partials/admin/header") %>
 
     <style>
-        .content-header {
-            padding: 2rem;
-            background: #f4f4f4;
-            border-radius: 0.5rem;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
+      .content-header {
+        padding: 2rem;
+        background: #f4f4f4;
+        border-radius: 0.5rem;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
         .status-select {
             height: 50px;
             border-radius: 6px;
@@ -235,6 +234,9 @@
             width: calc(100% - 240px);
             padding: 2rem;
         }
+        .negative-value {
+        color: #16a34a;
+    }
 
         @media (max-width: 1000px) {
             .content-header {
@@ -247,74 +249,78 @@
         }
     </style>
 
-    <div class="content-header">
-        <div style="width: 100%;">
+<div class="content-header">
+    <div style="width: 100%;">
+        <div class="breadcrumb">
+            <span>Admin</span> &gt; <span>Orders</span>
+        </div>
 
+        <a href="/admin/orders" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Orders
+        </a>
 
-            <div class="breadcrumb">
-                <span>Admin</span> &gt; <span>Orders</span>
-            </div>
+        <h1 class="page-title">Order Details</h1>
 
-            <a href="/admin/orders" class="back-link">
-                <i class="fas fa-arrow-left"></i> Back to Orders
-            </a>
-
-            <h1 class="page-title">Order Details</h1>
-
-            <div class="cards-container">
-                <div class="info-card">
-                    <h2 class="card-title">Order Information</h2>
-                    <div class="info-item">
-                        <div class="info-label">Order ID:</div>
-                        <div class="info-value">
-                            <%= order.orderId %>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Date:</div>
-                        <div class="info-value">
-                            <%= new Date(order.date).toLocaleDateString() %>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Payment Method:</div>
-                        <div class="info-value">
-                            <%= order.paymentMethod %>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Overall Status:</div>
-                        <div class="info-value">
-                            <span class="status-badge status-<%= order.status.toLowerCase() %>">
-                                <%= order.status %>
-                            </span>
-                        </div>
-                    </div>
+        <div class="cards-container">
+            <div class="info-card">
+                <h2 class="card-title">Order Information</h2>
+                <div class="info-item">
+                    <div class="info-label">Order ID:</div>
+                    <div class="info-value"><%= order.orderId %></div>
                 </div>
-
-                <div class="info-card">
-                    <h2 class="card-title">Customer Details</h2>
-                    <div class="info-item">
-                        <div class="info-label">Name:</div>
-                        <div class="info-value">
-                            <%= order.user.name %>
-                        </div>
+                <div class="info-item">
+                    <div class="info-label">Date:</div>
+                    <div class="info-value"><%= new Date(order.date).toLocaleDateString() %></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Payment Method:</div>
+                    <div class="info-value"><%= order.paymentMethod %></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Overall Status:</div>
+                    <div class="info-value">
+                        <span class="status-badge status-<%= order.status.toLowerCase() %>">
+                            <%= order.status %>
+                        </span>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Phone:</div>
-                        <div class="info-value">
-                            <%= order.user.phone %>
-                        </div>
-                    </div>
-                    <!-- <div class="info-item">
-                        <div class="info-label">Address:</div>
-                        <div class="info-value">
-                           
-                        </div>
-                    </div> -->
                 </div>
             </div>
 
+            <div class="info-card">
+                <h2 class="card-title">Customer Details</h2>
+                <div class="info-item">
+                    <div class="info-label">Name:</div>
+                    <div class="info-value"><%= order.user.name %></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Phone:</div>
+                    <div class="info-value"><%= order.user.phone %></div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h2 class="card-title">Order Summary</h2>
+                <div class="info-item">
+                    <div class="info-label">Subtotal:</div>
+                    <div class="info-value">₹<%= order.subtotal.toFixed(2)  %></div>
+                </div>
+                <% if (order.productdiscount>0) { %>
+                <div class="info-item">
+                    <div class="info-label">Product Discount:</div>
+                    <div class="info-value negative-value">-₹<%= order.productdiscount.toFixed(2) %></div>
+                </div>
+                <% } %> <% if (order.couponDiscount > 0) { %>
+                <div class="info-item">
+                    <div class="info-label">Coupon Discount:</div>
+                    <div class="info-value">-₹<%= order.couponDiscount.toFixed(2) %></div>
+                </div>
+                <% } %>
+                <div class="info-item">
+                    <div class="info-label">Total:</div>
+                    <div class="info-value">₹<%= order.finalAmount.toFixed(2) %></div>
+                </div>
+            </div>
+        </div>
             <div class="items-card">
                 <table class="items-table">
                     <thead>

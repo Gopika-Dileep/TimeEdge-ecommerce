@@ -83,7 +83,7 @@ const createOrder = async (req, res) => {
       couponDiscount,
       subtotal,
     } = req.body;
-    console.log(req.body);
+    console.log(req.body,'dfdddddddd');
 
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");
     console.log(cart, "cart");

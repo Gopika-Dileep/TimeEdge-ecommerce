@@ -152,7 +152,6 @@ const loadcategory = async (req, res) => {
             .skip((page - 1) * limit)
             .limit(limit);
 
-    
         const count = await Category.countDocuments(condition);
         const totalpage = Math.ceil(count / limit);
 
@@ -161,14 +160,13 @@ const loadcategory = async (req, res) => {
             currentpage: page,
             totalpage: totalpage,
             totalcategories: count,
-            searchQuery: searchQuery 
+            searchQuery: searchQuery
         });
     } catch (error) {
         console.error('Error in loadcategory:', error);
         res.status(500).json({ error: "Error while loading categories" });
     }
 };
-
 const unlistCategory = async (req, res) => {
     try {
         const categoryId = req.params.catId

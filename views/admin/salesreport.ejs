@@ -176,7 +176,8 @@
                     <th>Product</th>
                     <th>Quantity</th>
                     <th>Price</th>
-                    <th>Discount</th>
+                    <th>productDiscount</th>
+                    <th>couponDiscount</th>
                     <th>Total</th>
                     <th>Status</th>
                     <th>Payment Method</th>
@@ -201,10 +202,21 @@
                             <%= item.quantity %>
                           </td>
                           <td>₹ <%= item.price %>
+                          </td> 
+                          <% 
+                          const productOffer = item.products.productOffer || 0;
+                          const categoryOffer = item.products.category.categoryOffer || 0;
+                          const bestOffer = Math.max(productOffer, categoryOffer);
+                          const salePrice = item.price;
+                          const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
+                          const finaloffer = item.price - finalPrice
+                          const coupondiscount = order.couponDiscount || 0
+                          %>
+                          <td>₹ <%= finaloffer  || 0 %>
                           </td>
-                          <td>₹ <%= item.products.offerAmount || 0 %>
+                          <td>₹ <%= coupondiscount || 0 %>
                           </td>
-                          <td>₹ <%= (item.price - (item.products.offerAmount || 0) ) * item.quantity %>
+                          <td>₹ <%= ((item.price - (finaloffer || 0) ) * item.quantity)-coupondiscount %>
                           </td>
                           <td>
                             <%= order.status || "Pending" %>
@@ -309,6 +321,13 @@
         response.orders.forEach(order => {
           if (order.orderedItems && Array.isArray(order.orderedItems)) {
             order.orderedItems.forEach(item => {
+              const productOffer = item.products.productOffer || 0;
+                          const categoryOffer = item.products.category.categoryOffer || 0;
+                          const bestOffer = Math.max(productOffer, categoryOffer);
+                          const salePrice = item.price;
+                          const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
+                          const finaloffer = item.price - finalPrice
+                          const coupondiscount = order.couponDiscount || 0
               const row = `
             <tr>
               <td>${new Date(order.createdOn).toLocaleDateString()}</td>
@@ -316,8 +335,12 @@
               <td>${item.products.productName}</td>
               <td>${item.quantity}</td>
               <td>₹ ${item.price}</td>
-              <td>₹ ${item.products.offerAmount || 0}</td>
-              <td>₹ ${(item.price - (item.products.offerAmount || 0) ) * item.quantity}</td>
+             <td>₹  ${finaloffer  || 0 }
+                          </td>
+                          <td>₹ ${coupondiscount || 0}
+                          </td>
+                          <td>₹  ${((item.price - (finaloffer || 0) ) * item.quantity)-coupondiscount} 
+                          </td>
               <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;
@@ -352,6 +375,13 @@
         response.orders.forEach(order => {
           if (order.orderedItems && Array.isArray(order.orderedItems)) {
             order.orderedItems.forEach(item => {
+              const productOffer = item.products.productOffer || 0;
+                          const categoryOffer = item.products.category.categoryOffer || 0;
+                          const bestOffer = Math.max(productOffer, categoryOffer);
+                          const salePrice = item.price;
+                          const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
+                          const finaloffer = item.price - finalPrice
+                          const coupondiscount = order.couponDiscount || 0
               const row = `
             <tr>
               <td>${new Date(order.createdOn).toLocaleDateString()}</td>
@@ -359,8 +389,12 @@
               <td>${item.products.productName}</td>
               <td>${item.quantity}</td>
               <td>₹ ${item.price}</td>
-              <td>₹ ${item.products.offerAmount || 0}</td>
-              <td>₹ ${(item.price - (item.products.offerAmount || 0) ) * item.quantity}</td>
+              <td>₹  ${finaloffer  || 0 }
+                          </td>
+                          <td>₹ ${coupondiscount || 0}
+                          </td>
+                          <td>₹  ${((item.price - (finaloffer || 0) ) * item.quantity)-coupondiscount} 
+                          </td>
               <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;
@@ -427,6 +461,13 @@
         response.orders.forEach(order => {
           if (order.orderedItems && Array.isArray(order.orderedItems)) {
             order.orderedItems.forEach(item => {
+              const productOffer = item.products.productOffer || 0;
+                          const categoryOffer = item.products.category.categoryOffer || 0;
+                          const bestOffer = Math.max(productOffer, categoryOffer);
+                          const salePrice = item.price;
+                          const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
+                          const finaloffer = item.price - finalPrice
+                          const coupondiscount = order.couponDiscount || 0
               const row = `
             <tr>
               <td>${new Date(order.createdOn).toLocaleDateString()}</td>
@@ -434,8 +475,12 @@
               <td>${item.products.productName}</td>
               <td>${item.quantity}</td>
               <td>₹ ${item.price}</td>
-              <td>₹ ${item.products.offerAmount || 0}</td>
-              <td>₹ ${(item.price - (item.products.offerAmount || 0) ) * item.quantity}</td>
+             <td>₹  ${finaloffer  || 0 }
+                          </td>
+                          <td>₹ ${coupondiscount || 0}
+                          </td>
+                          <td>₹  ${((item.price - (finaloffer || 0) ) * item.quantity)-coupondiscount} 
+                          </td>
               <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;
