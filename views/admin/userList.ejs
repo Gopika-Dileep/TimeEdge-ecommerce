@@ -127,8 +127,15 @@
         color: #9b1c1c;
     }
 
-    /* Dropdown styles */
-    .action-btn {
+/* Existing styles remain the same */
+
+/* Updated dropdown styles */
+.action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.action-btn {
     background: none;
     border: none;
     padding: 8px;
@@ -164,11 +171,12 @@
     top: 100%;
     background-color: white;
     min-width: 120px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     border-radius: 6px;
     border: 1px solid #e5e7eb;
     display: none;
     z-index: 1000;
+    transform: translateY(8px);
 }
 
 .dropdown-menu.show {
@@ -185,10 +193,17 @@
     cursor: pointer;
     color: #374151;
     font-size: 14px;
+    transition: background-color 0.2s;
 }
 
 .dropdown-item:hover {
     background-color: #f9fafb;
+}
+
+/* Fix for table cell containing dropdown */
+.table tbody td:last-child {
+    position: relative;
+    min-width: 100px;
 }
 .content-header {
         position: absolute;

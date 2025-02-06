@@ -212,22 +212,41 @@ const listCategory = async (req, res) => {
 
 const addCategory = async (req, res) => {
     try {
-        const { name, description } = req.body
+        const { name, description } = req.body;
+        console.log(req.body, 'cat body');
+
         if (!name || !description) {
-            res.status(400).json({ message: "name and description is needed" })
-        } else {
-            const existCategory = await Category.findOne({ name })
-            if (existCategory) {
-                res.status(400).json({ message: "category already exist" })
-            } else {
-                const category = new Category({ name, description })
-                category.save()
-                res.redirect("/admin/category")
-            }
+            return res.status(400).json({ 
+                success: false, 
+                message: "Name and description are required" 
+            });
         }
+        const existCategory = await Category.findOne({ 
+            name: { $regex: new RegExp(`^${name}$`, 'i') } 
+        });
+        console.log(existCategory, 'cat existCategory');
+
+        if (existCategory) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Category already exists" 
+            });
+        }
+
+        const category = new Category({ name, description });
+        console.log(category, 'cat category');
+        
+        await category.save();
+        return res.status(200).json({
+            success: true,
+            message: "Category added successfully"
+        });
     } catch (error) {
-        console.error(error)
-        req.status(400).json({ message: "error while adding category" })
+        console.error(error);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Error while adding category" 
+        });
     }
 }
 const loadEditCategory = async (req,res)=>{
@@ -289,24 +308,35 @@ const removeOffer = async (req, res) => {
         res.status(500).json({ status: false, message: "Server error" });
     }
 };
-const loadbrand=async (req,res)=>{
-       try {
-         const page = req.query.page||1;
-         const limit=3
-         const brand = await Brand.find({}).sort({createdAt:-1}).skip((page-1)*limit).limit(limit)
-         const count = await Brand.countDocuments({})
-         const totalpage= Math.ceil(count/limit)
-         res.render('brand',{
-            brand:brand,
-            currentpage:page,
-            totalpage:totalpage,
-            totalbrand:count,
-         })
-       } catch (error) {
-          console.error(error)
-          res.status(400).json({message:"error while loading brandpage"})
-       }
-}
+const loadbrand = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
+        const skip = (page - 1) * limit;
+        
+        const brand = await Brand.find({})
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+            
+        const totalBrands = await Brand.countDocuments({});
+        const totalPages = Math.ceil(totalBrands / limit);
+
+        if (page < 1 || page > totalPages) {
+            return res.redirect('/admin/brand?page=1');
+        }
+
+        res.render('brand', {
+            brand,
+            currentpage: page,
+            totalpage: totalPages,
+            totalbrand: totalBrands,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error while loading brand page" });
+    }
+};
 const addBrand = async (req,res)=>{
     try {
         const {name} = req.body

@@ -1,155 +1,366 @@
 <%- include("../../views/partials/admin/header") %>
 
-    <head>
-        <link rel="stylesheet" href="/styles/brands.css">
-        <style>
-            .content-main {
-                position: absolute;
-                top: 70px;
-                left: 240px;
-                width: calc(100% - 240px);
-                padding: 2rem;
-            }
+<style>
+    .content-main {
+        padding: 20px;
+    }
+    
+    /* Add Brand button styling */
+    .add-brand-btn {
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    
+    /* Table styling */
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+        padding: 12px 15px;
+        font-weight: 500;
+        color: #333;
+        border-bottom: 1px solid #dee2e6;
+        text-align: left;
+    }
+    
+    .table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #dee2e6;
+        text-align: left;
+    }
+    
+    /* Status badge styling */
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: normal;
+        font-size: 14px;
+    }
+    .badge-success {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+    .badge-danger {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+    
+    /* Dropdown styling */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .three-dots {
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #333;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+    }
+    
+    .three-dots::after {
+        display: none !important;
+    }
+    
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: white;
+        min-width: 120px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        border-radius: 4px;
+        z-index: 1;
+        margin-top: 2px;
+    }
+    
+    .dropdown-menu form {
+        display: block;
+    }
+    
+    .dropdown-menu button {
+        width: 100%;
+        padding: 8px 16px;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        color: #333;
+        font-size: 14px;
+    }
+    
+    .dropdown-menu button:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .show {
+        display: block;
+    }
+    
+    /* Updated Pagination styling */
+    .pagination-container {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .pagination-container a,
+    .pagination-container span {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 14px;
+        text-decoration: none;
+        color: #1a1a1a;
+        background: transparent;
+        transition: all 0.2s ease;
+        border: 1px solid #dee2e6;
+        font-weight: 500;
+    }
 
-            @media (max-width: 1000px) {
-                .content-main {
-                    position: absolute;
-                    top: 50px;
-                    left: 20px;
-                    width: calc(100% - 30px);
-                    padding: 2rem;
+    .pagination-container a:hover {
+        background: #f8f9fa;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .pagination-container .current-page {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+
+    .pagination-container .disabled {
+        color: #9e9e9e;
+        cursor: not-allowed;
+        pointer-events: none;
+        border-color: #e9ecef;
+        background: #f8f9fa;
+    }
+
+    .pagination-container .previous,
+    .pagination-container .next {
+        padding: 0 12px;
+        min-width: 80px;
+    }
+
+    /* Page title styling */
+    .content-title {
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+
+    /* Modal styling */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 400px;
+    }
+    .content-main {
+        position: absolute;
+        top: 70px;
+        left: 240px;
+        width: calc(100% - 240px);
+        padding: 2rem;
+    }
+    @media (max-width: 1000px) {
+        .content-main {
+            position: absolute;
+            top: 50px;
+            left: 20px;
+            width: calc(100% - 30px);
+            padding: 2rem;
+        }
+    }
+</style>
+
+<div class="content-main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="content-title">Brands</h2>
+        <button class="add-brand-btn" onclick="document.getElementById('addBrandModal').style.display='block'">+ Add Brand</button>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Brand</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% brand.forEach((brand) => { %>
+                <tr>
+                    <td><%= brand.name %></td>
+                    <td class="text-center">
+                        <% if (!brand.isListed) { %>
+                            <span class="badge badge-danger">Unlisted</span>
+                        <% } else { %>
+                            <span class="badge badge-success">Listed</span>
+                        <% } %>
+                    </td>
+                    <td class="text-center">
+                        <div class="dropdown">
+                            <button class="three-dots" onclick="toggleDropdown(event, '<%= brand._id %>')">⋮</button>
+                            <div id="dropdown-<%= brand._id %>" class="dropdown-menu">
+                                <% if (!brand.isListed) { %>
+                                    <form method="POST" action="/admin/listBrand/<%= brand._id %>">
+                                        <button type="submit">List</button>
+                                    </form>
+                                <% } else { %>
+                                    <form method="POST" action="/admin/unlistBrand/<%= brand._id %>">
+                                        <button type="submit">Unlist</button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <div id="addBrandModal" class="modal">
+        <div class="modal-content">
+            <form method="POST" action="/admin/addBrand">
+                <div class="mb-4">
+                    <label for="brand_name" class="form-label">Brand Name</label>
+                    <input type="text" name="name" placeholder="Enter brand name" class="form-control" required />
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addBrandModal').style.display='none'">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Add Brand</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="pagination-container">
+        <% if (currentpage > 1) { %>
+            <a href="?page=<%= currentpage - 1 %>" class="previous">Previous</a>
+        <% } else { %>
+            <span class="disabled previous">Previous</span>
+        <% } %>
+    
+        <% 
+        let startPage = Math.max(1, currentpage - 2);
+        let endPage = Math.min(totalpage, startPage + 4);
+        
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+        
+        if (startPage > 1) { %>
+            <a href="?page=1">1</a>
+            <% if (startPage > 2) { %>
+                <span>...</span>
+            <% } %>
+        <% } %>
+    
+        <% for (let i = startPage; i <= endPage; i++) { %>
+            <% if (i === currentpage) { %>
+                <span class="current-page"><%= i %></span>
+            <% } else { %>
+                <a href="?page=<%= i %>"><%= i %></a>
+            <% } %>
+        <% } %>
+    
+        <% if (endPage < totalpage) { %>
+            <% if (endPage < totalpage - 1) { %>
+                <span>...</span>
+            <% } %>
+            <a href="?page=<%= totalpage %>"><%= totalpage %></a>
+        <% } %>
+    
+        <% if (currentpage < totalpage) { %>
+            <a href="?page=<%= currentpage + 1 %>" class="next">Next</a>
+        <% } else { %>
+            <span class="disabled next">Next</span>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    // Close all dropdowns when clicking outside
+    window.onclick = function(event) {
+        if (!event.target.matches('.three-dots')) {
+            var dropdowns = document.getElementsByClassName("dropdown-menu");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
                 }
             }
-        </style>
-    </head>
+        }
+        
+        if (event.target.className === 'modal') {
+            event.target.style.display = 'none';
+        }
+    }
 
-    <section class="content-main">
-        <div class="content-header">
-            <div>
-                <h2 class="content-title card-title">Brands</h2>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
+    // Toggle specific dropdown
+    function toggleDropdown(event, brandId) {
+        event.stopPropagation();
+        var dropdown = document.getElementById('dropdown-' + brandId);
+        
+        var dropdowns = document.getElementsByClassName("dropdown-menu");
+        for (var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown !== dropdown && openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+        
+        dropdown.classList.toggle("show");
+    }
+</script>
 
-                    <div class="col-md-3">
-                        <form method="POST" action="/admin/addBrand">
-                            <div class="mb-4">
-                                <label for="product_name" class="form-label">Brand Name</label>
-                                <input type="text" name="name" placeholder="Type here" class="form-control" required />
-                            </div>
-                            <!-- <label for="brand_image" class="form-label">Brand Image</label>
-                            <div class="input-upload">
-                                <input class="form-control border" id="brand_image" name="image" type="file" required />
-                            </div> -->
-                            <div class="d-grid">
-                                <button class="btn btn-primary mt-3" type="submit">
-                                    Add Brand
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-
-                    <div class="col-md-7 offset-md-1">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">Brand</th>
-                                        <!-- <th class="text-center">Logo</th> -->
-                                        <th class="text-center">Status</th>
-                                        <th class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% brand.forEach((brand)=> { %>
-                                        <tr>
-                                            <td class="text-center">
-                                                <%= brand.name %>
-                                            </td>
-                                          
-                                            <td class="text-center">
-                                                <% if (!brand.isListed) { %>
-                                                    <span class="badge badge-danger"
-                                                        style="color: red; font-size: medium;">
-                                                        unlisted
-                                                    </span>
-                                                    <% } else { %>
-                                                        <span class="badge badge-success"
-                                                            style="color: green; font-size: medium;">
-                                                            listed
-                                                        </span>
-                                                        <% } %>
-                                            </td>
-                                            <td class="text-center">
-                                                <% if (!brand.isListed) { %>
-                                                    <form method="POST" action="/admin/listBrand/<%= brand._id %>"
-                                                        style="display: inline;">
-                                                        <button class="btn btn-success" style="width: 90px;">
-                                                            list
-                                                        </button>
-                                                    </form>
-                                                    <% } else { %>
-                                                        <form method="POST"
-                                                            action="/admin/unlistBrand/<%= brand._id %>"
-                                                            style="display: inline;">
-                                                            <button class="btn btn-danger" style="width: 90px;">
-                                                                Unlist
-                                                            </button>
-                                                        </form>
-                                                        <% } %>
-
-                                                            <!-- Delete Button -->
-                                                            <!-- <form 
-                                                method="POST" 
-                                                action="/admin/deleteBrand/" 
-                                                style="display: inline;"
-                                            >
-                                                <button 
-                                                    class="btn btn-danger" 
-                                                    style="width: 90px;" 
-                                                    onclick="return confirmDelete()"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </form> -->
-                                            </td>
-                                        </tr>
-                                        <% }); %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="pagination-container text-center mt-4">
-            <% if (currentpage> 1) { %>
-                <a href="?page=<%= currentpage - 1 %>">&laquo; Previous</a>
-                <% } %>
-                    <% for (let i=1; i <=totalpage; i++) { %>
-                        <% if (i===currentpage) { %>
-                            <span class="current-page">
-                                <%= i %>
-                            </span>
-                            <% } else { %>
-                                <a href="?page=<%= i %>">
-                                    <%= i %>
-                                </a>
-                                <% } %>
-                                    <% } %>
-                                        <% if (currentpage < totalpage) { %>
-                                            <a href="?page=<%= currentpage + 1 %>">Next &raquo;</a>
-                                            <% } %>
-        </div>
-    </section>
-
-    <script>
-      
-    </script>
-
-    <%- include("../../views/partials/admin/footer") %>
+<%- include("../../views/partials/admin/footer") %>

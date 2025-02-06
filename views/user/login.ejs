@@ -1,31 +1,35 @@
-<!DOCTYPE html>
 <html>
-
 <head>
-    <link href="css/login.css" rel="stylesheet">
+    <title>Login Page</title>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
-<body>
-    <div class="login">
-        <form id="loginform" action="/login" method="post">
-    
-            <label for="chk" aria-hidden="true">Login</label>
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 font-jost">
+    <div class="w-full max-w-md p-8 space-y-6 bg-[#27303F] rounded-lg shadow-lg">
+        <form id="loginform" action="/login" method="post" class="space-y-6">
+            <h2 class="text-2xl font-bold text-center text-white">Login</h2>
             <% if (message) { %>
-                <p style="color: red;"><%= message %></p>
+                <p class="text-red-500"><%= message %></p>
             <% } %>
-            <input type="email" id="email" name="email" placeholder="Email" required="">
-            <input type="password" id="password" name="password" placeholder="Password" required="">
-            <button>Login</button>
-            <div class="mb-3">
-                <a href="/forgot-password" class="text-center">Forgot password?</a>
+            <div class="space-y-4">
+                <input type="email" id="email" name="email" placeholder="Email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="password" id="password" name="password" placeholder="Password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <button type="submit" class="w-full py-2 text-white bg-[#6d44b8] rounded-lg hover:bg-[#573b8a] focus:outline-none focus:ring-2 focus:ring-indigo-500">Login</button>
+            <div class="flex items-center justify-center w-full py-2 mt-4 bg-white border border-gray-300 rounded-lg">
+                <a href="/auth/google" class="flex items-center space-x-2">
+                    <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google Icon">
+                    <span>Sign up with Google</span>
+                </a>
             </div>
             <div class="text-center">
-                <p>Don't have an account? <a href="/signup" class="text-primary">Sign up here</a></p>
+                <a href="/forgot-password" class="text-indigo-600 hover:underline">Forgot password?</a>
             </div>
+            <p class="text-center text-white">
+                Don't have an account? <a href="/signup" class="text-indigo-600 hover:underline">Sign up here</a>
+            </p>
         </form>
     </div>
-    
 </body>
 </html>

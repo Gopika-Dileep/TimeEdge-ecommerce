@@ -902,43 +902,51 @@
       processWalletPayment(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal);
     }
   });
-
   function placeOrder(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal) {
-    Swal.fire({
-      title: "Order Placed Successfully!",
-      text: "Thank you for your order. You will be redirected shortly.",
-      icon: "success",
-      confirmButtonText: "OK",
-      timer: 3000,
-      timerProgressBar: true,
-    }).then(() => {
-      $.ajax({
-        url: "/create-order",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({
-          addressId: addressId,
-          cartId: cartId,
-          paymentMethod: paymentMethod,
-          couponCode: couponCode,
-          subtotal: subtotal,
-          couponDiscount: couponDiscount,
-          finalAmount: finalTotal
-        }),
-        success: function (data) {
-          window.location.href = `/order-confirmation?orderId=${data.orderId}`;
-        },
-        error: function (error) {
-          Swal.fire({
-            title: "Error",
-            text: "An error occurred while placing your order.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-        },
+  $.ajax({
+    url: "/create-order",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      addressId: addressId,
+      cartId: cartId,
+      paymentMethod: paymentMethod,
+      couponCode: couponCode,
+      subtotal: subtotal,
+      couponDiscount: couponDiscount,
+      finalAmount: finalTotal
+    }),
+    success: function (data) {
+      if (data.success) {
+        Swal.fire({
+          title: "Order Placed Successfully!",
+          text: "Thank you for your order. You will be redirected shortly.",
+          icon: "success",
+          confirmButtonText: "OK",
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        window.location.href = `/order-confirmation?orderId=${data.orderId}`;
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: data.message || "An error occurred while placing your order.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      }
+    },
+    error: function (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.responseJSON?.message || "An error occurred while placing your order.",
+        icon: "error",
+        confirmButtonText: "OK",
       });
-    });
-  }
+    },
+  });
+}
+
 
   async function initiateRazorpayPayment(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal) {
     try {

@@ -84,6 +84,9 @@ const createOrder = async (req, res) => {
       subtotal,
     } = req.body;
     console.log(req.body,'dfdddddddd');
+    if(finalAmount<=2000){
+      return res.status(400).json({success:false,message:"item below 2000 cant be in COD "})
+    }
 
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");
     console.log(cart, "cart");
@@ -143,7 +146,6 @@ const createOrder = async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 };
-
 const razorpayInstance = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
   key_secret: process.env.RAZORPAY_SECRET_KEY,
@@ -189,6 +191,7 @@ const verifyRazorPayOrder = async (req, res) => {
       couponDiscount,
       subtotal,
     } = req.body;
+    console.log('sdfghjk')
 
     // const userId = req.session.user;
     const generatedSignature = crypto
