@@ -34,6 +34,7 @@ router.get("/signup",userController.loadSignup)
 router.post("/signup",userController.signup)
 router.get('/otpverify',userController.loadotp)
 router.post('/otpverify',userController.otpverify)
+router.post('/resend-otp',userController.resendOtp);
 router.get('/',productController.loadhome)
 router.get('/shop',productController.loadshop)
 router.get('/shop/search', productController.searchProducts);

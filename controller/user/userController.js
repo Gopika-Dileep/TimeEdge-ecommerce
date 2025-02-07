@@ -54,102 +54,164 @@ const logout = async(req,res)=>{
         res.status(500).json({message:"server error"})
     }
 }
-const loadSignup = async(req,res)=>{
+const loadSignup = async (req, res) => {
     try {
-        res.render("signup")
+        res.render("signup");
     } catch (error) {
-        console.error(error)
-        res.status(400).json({message:"error while loading signup "})
+        console.error("Error loading signup page:", error);
+        res.status(500).json({ message: "Error loading signup page" });
     }
-}
+};
 
-function  generateOtp() {
+const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
-}
-
-async function sendVerificationMail(email,otp){
+const sendVerificationMail = async (email, otp) => {
     try {
         const transporter = nodemailer.createTransport({
-            service:"gmail",
-            port:587,
-            secure:true,
-            requireTLS:true,
-            auth:{
-                user:process.env.NODEMAILER_EMAIL,
-                pass:process.env.NODEMAILER_PASSWORD
+            service: "gmail",
+            port: 587,
+            secure: false, // Changed to false for TLS
+            auth: {
+                user: process.env.NODEMAILER_EMAIL,
+                pass: process.env.NODEMAILER_PASSWORD
             }
-        })
+        });
 
-        const sendemail = await transporter.sendMail({
-            from:process.env.NODEMAILER_EMAIL,
-            to:email,
-            subject:"verify your account",
-            text:`your otp is ${otp}`,
+        const mailOptions = {
+            from: process.env.NODEMAILER_EMAIL,
+            to: email,
+            subject: "Verify your account",
+            text: `Your OTP is ${otp}`,
             html: `<b>Your OTP: ${otp}</b>`
-        })
-    
-        return sendemail.accepted.length>0;
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        return info.accepted.length > 0;
     } catch (error) {
-        console.error("Error sending mail", error);
+        console.error("Error sending mail:", error);
         return false;
     }
-}
+};
 
-const signup = async(req,res)=>{
+const signup = async (req, res) => {
     try {
-        const {name,email,password,phone}=req.body
-        const existUser=await User.findOne({email},{isVerified:true})
-        if(existUser){
-            res.status(400).json({message:"user already exist"})   
-        }else{
-            const securepassword= await bcrypt.hash(password,10)
-            const otp = generateOtp()
-            console.log(otp,"otp")
-            const emailsend= await sendVerificationMail(email,otp)
-            const newUser = await new User({
-                name,
-                email,
-                phone,
-                password:securepassword,
-                otp
-            }).save()
-            setTimeout(async ()=>{
-               await User.updateOne({email:email},{$unset:{otp:1}})
-            },60000)
-            const userId=newUser._id
-            
-            res.status(200).json({ userId }); 
+        const { name, email, password, phone } = req.body;
+        
+        
+        const existingUser = await User.findOne({ email, isVerified: true });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
         }
+
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+      
+        const otp = generateOtp();
+        const emailSent = await sendVerificationMail(email, otp);
+        console.log(otp,"otp")
+        
+        if (!emailSent) {
+            return res.status(500).json({ message: "Failed to send verification email" });
+        }
+
+       
+        const newUser = await new User({
+            name,
+            email,
+            phone,
+            password: hashedPassword,
+            otp
+        }).save();
+
+       
+        setTimeout(async () => {
+            await User.updateOne({ _id: newUser._id }, { $unset: { otp: 1 } });
+        }, 60000); 
+        
+
+        res.status(200).json({ userId: newUser._id });
     } catch (error) {
-        console.error(error)
-        res.status(400).json({message:"error while creating user "})
+        console.error("Error in signup:", error);
+        res.status(500).json({ message: "Error creating user" });
     }
-}
-const loadotp = async (req,res)=>{
-   try {
-        res.render("otpVerification")
-   } catch (error) {
-    console.error(error);
-    res.status(400).json({message:"cannot find email"})
-   }
-}
-const otpverify= async(req,res)=>{ 
+};
+
+const loadotp = async (req, res) => {
     try {
-        const {userId,otp}=req.body
-        const user=await User.findById({_id:userId})
-        const userOtp=user.otp
-        if(userOtp===otp){
-            const saveUser = await User.findByIdAndUpdate({_id:userId},{isVerified:true},{new:true})
-       return res.status(200).json({message:"succesfull"})
-        }else{
-            return res.status(404).json({message:"invalid otp"})
-        }
+        const userId = req.query.id;
+        res.render("otpVerification", { userId });
     } catch (error) {
-        console.error(error);
-        res.status(400).json({message:"cannot find email"})
+        console.error("Error loading OTP page:", error);
+        res.status(500).json({ message: "Error loading OTP verification page" });
     }
-}
+};
+
+const otpverify = async (req, res) => {
+    try {
+        const { userId, otp } = req.body;
+        
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (!user.otp) {
+            return res.status(400).json({ message: "OTP has expired" });
+        }
+
+        if (user.otp !== otp) {
+            return res.status(400).json({ message: "Invalid OTP" });
+        }
+
+        await User.findByIdAndUpdate(userId, {
+            isVerified: true,
+            $unset: { otp: 1 }
+        });
+
+        res.status(200).json({ message: "succesfull" });
+    } catch (error) {
+        console.error("Error in OTP verification:", error);
+        res.status(500).json({ message: "Error verifying OTP" });
+    }
+};
+
+
+
+const resendOtp = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const otp = generateOtp();
+        const emailSent = await sendVerificationMail(user.email, otp);
+        console.log(otp,"otp")
+        
+        if (!emailSent) {
+            return res.status(500).json({ message: "Failed to send OTP" });
+        }
+
+        user.otp = otp;
+        await user.save();
+
+        
+        setTimeout(async () => {
+            await User.updateOne({ _id: userId }, { $unset: { otp: 1 } });
+        },60000); 
+
+       
+        res.status(200).json({ message: "OTP sent successfully" });
+    } catch (error) {
+        console.error("Error in resend OTP:", error);
+        res.status(500).json({ message: "Error sending OTP" });
+    }
+};
 
 module.exports={
     loadlogin,
@@ -158,5 +220,6 @@ module.exports={
     loadotp,
     otpverify,
     login,
-    logout
+    logout,
+    resendOtp
 }

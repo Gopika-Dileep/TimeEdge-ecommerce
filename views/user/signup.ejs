@@ -1,9 +1,12 @@
+<!-- signup.ejs -->
+<!DOCTYPE html>
 <html>
 <head>
     <title>Sign Up Page</title>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 font-jost">
     <div class="w-full max-w-md p-8 space-y-6 bg-[#27303F] rounded-lg shadow-lg">
@@ -50,32 +53,36 @@
             }
         }
 
-        $(document).ready(function () {
-            $('#signupform').on('submit', function (e) {
+        $(document).ready(function() {
+            $('#signupform').on('submit', function(e) {
                 e.preventDefault();
-                const name = $('input[name="name"]').val();
-                const email = $('input[name="email"]').val();
-                const phone = $('input[name="phone"]').val();
-                const password = $('input[name="password"]').val();
+                
+                const formData = {
+                    name: $('input[name="name"]').val(),
+                    email: $('input[name="email"]').val(),
+                    phone: $('input[name="phone"]').val(),
+                    password: $('input[name="password"]').val()
+                };
 
                 $.ajax({
                     url: '/signup',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({ name, email, phone, password }),
-                    success: function (result) {
-                        const userId = result.userId;
-                        window.location.href = `/otpverify?id=${userId}`;
+                    data: JSON.stringify(formData),
+                    success: function(result) {
+                        if (result.userId) {
+                            window.location.href = `/otpverify?id=${result.userId}`;
+                        }
                     },
-                    error: function (xhr, status, error) {
-                        console.error('Error while signup:', error);
-                        swal.fire({
+                    error: function(xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again later.';
+                        Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            text: 'Something went wrong. Please try again later.',
+                            text: errorMessage,
                             confirmButtonText: 'OK'
                         });
-                    },
+                    }
                 });
             });
         });
