@@ -73,6 +73,11 @@
         },
         deliveryDate: { 
             type: Date 
+        },
+        paymentStatus: {
+            type: String,
+            enum: ["Pending", "Paid", "Failed"],
+            default: "Pending"
         }
     })
     

@@ -12,9 +12,19 @@
         new Date(order.createdOn).toLocaleTimeString() %>
       </p>
     </div>
-    <span class="badge bg-secondary px-3 py-2 text-uppercase"
-      ><%= order.status %></span
+    <% if (order.paymentStatus === 'Failed') { %>
+      <div class="d-flex align-items-center">
+        <button 
+          class="btn btn-outline-primary btn-sm" 
+          onclick="initiateRepayment('<%= order.orderId %>')">
+                  Repay
+        </button>
+      </div>
+    <% } else { %>
+      <span class="badge bg-secondary px-3 py-2 text-uppercase"
+        ><%= order.status %></span
     >
+    <% } %>
   </div>
 
   <!-- Order Items -->
@@ -89,7 +99,7 @@
             <i class="bi bi-wallet2 me-2"></i>
             <%= order.paymentMethod %>
           </p>
-          <p class="mb-0">Status: <span class="text-success">N/A</span></p>
+          <p class="mb-0">Status:<span class="text-success"><%=order.paymentStatus%> </span></p>
         </div>
       </div>
     </div>
@@ -354,6 +364,7 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   let currentItemId = null;
   let currentOrderId = null;
@@ -502,6 +513,95 @@
         });
     };
   });
+
+  function initiateRepayment(orderId) {
+  fetch('/initiateRepayment', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ orderId })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const { orderId,orderCreatedId, amount, currency, key } = data;
+
+      const options = {
+        key,
+        amount: amount,
+        currency,
+        name: "Time Edge",
+        description: "Order Repayment",
+        order_id: orderId,
+        handler: async function (response) {
+          const paymentId = response.razorpay_payment_id;
+          const razorpaySignature = response.razorpay_signature;
+
+          const verifyResponse = await fetch("/verifyRepaymentOrder", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              orderId:orderCreatedId,
+              razorpayOrderId:orderId,
+              paymentId,
+              razorpaySignature
+            }),
+          });
+
+          const verifyData = await verifyResponse.json();
+          if (verifyData.success) {
+            Swal.fire({
+              title: "Payment Success",
+              text: "Order Repayment Successful.",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then(() => window.location.reload());
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Payment Failed",
+              text: "Payment verification failed. Please try again.",
+              confirmButtonText: "OK",
+            });
+          }
+        },
+        modal: {
+          ondismiss: async function () {
+            Swal.fire({
+              icon: "error",
+              title: "Payment Cancelled",
+              text: "Repayment was cancelled.",
+              confirmButtonText: "OK",
+            });
+          }
+        },
+        theme: { color: "#3399cc" },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: data.message,
+        confirmButtonText: "OK",
+      });
+    }
+  })
+  .catch(error => {
+    console.error("Error initiating repayment:", error);
+    Swal.fire({
+      title: "Error",
+      text: "An error occurred while processing the repayment.",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+  });
+}
 </script>
 
 <%- include("../../views/partials/user/footer") %>
