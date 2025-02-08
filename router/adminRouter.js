@@ -6,11 +6,11 @@ const adminController = require("../controller/admin/adminController");
 const productController = require("../controller/admin/productController");
 const couponController = require('../controller/admin/couponController')
 const salesController = require('../controller/admin/salesController')
+const dashboardController = require('../controller/admin/dashboardController')
 const {userAuth,adminAuth, checkAdmin} = require("../middleware/auth");
 
 router.get('/', checkAdmin, adminController.loadAdminLogin)
 router.post('/',adminController.adminLogin)
-router.get('/dashboard',adminAuth,adminController.loadDashboard)
 router.get('/users',adminAuth,adminController.loadUsers)
 router.get('/user-block/:userId',adminAuth,adminController.blockUser)
 router.get('/user-unblock/:userId',adminAuth,adminController.unblockUser)
@@ -59,8 +59,15 @@ router.get('/filterOrder',adminAuth,salesController.filterOrder)
 router.get('/filterbyDate',adminAuth,salesController.filterbyDate)
 router.post('/sales-report/pdf',adminAuth,salesController.downloadpdf)
 router.post('/sales-report/excel',adminAuth,salesController.downloadexcel)
-router.get("/logout",adminController.logout);
 
+
+router.get('/dashboard',adminAuth,dashboardController.loadDashboard)
+    
+router.get('/filterData',adminAuth,dashboardController.filterData)
+
+// router.get('/admin/dashboard/filter',adminAuth,dashboardController.loadDashboard)
+
+router.get("/logout",adminController.logout);
 
 
 module.exports=router
