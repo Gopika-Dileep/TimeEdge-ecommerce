@@ -245,7 +245,7 @@
             <tbody>
                 <% for(let i = 0; i < product.length; i++) { %>
                 <tr data-product-id="<%= product[i]._id %>">
-                    <td>001</td>
+                    <td><%= i + 1 %></td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <% if (product[i].productImage && product[i].productImage.length > 0) { %>
