@@ -7,23 +7,49 @@ const Cart = require('../../models/cartSchema')
 
 const loadAddToCart = async (req, res) => {
     try {
-        const userId = req.session.user
-        const cart = await Cart.findOne({ user: userId }).populate({ path: "items.product", populate: { path: "category", select: "categoryOffer" } })
-
-
+        const userId = req.session.user;
+        const itemsPerPage = 2; // Number of items per page
+        const page = parseInt(req.query.page) || 1; // Get page from query params, default to 1
+        
+        const cart = await Cart.findOne({ user: userId }).populate({
+            path: "items.product",
+            populate: { path: "category", select: "categoryOffer" }
+        });
 
         if (cart) {
             const totalPrice = cart.items.reduce((total, item) => total + item.price, 0);
-            const user = await User.findById({ _id: userId })
-            res.render('cart', { cart: cart, totalPrice: Math.floor(totalPrice), user: user })
+            const user = await User.findById({ _id: userId });
+            
+            // Implement pagination on cart items
+            const totalItems = cart.items.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            
+            // Slice the items array for pagination
+            const paginatedItems = cart.items.slice(startIndex, endIndex);
+            const paginatedCart = {
+                ...cart.toObject(),
+                items: paginatedItems
+            };
+
+            res.render('cart', {
+                cart: paginatedCart,
+                totalPrice: Math.floor(totalPrice),
+                user: user,
+                currentPage: page,
+                totalPages: totalPages,
+                hasNextPage: endIndex < totalItems,
+                hasPrevPage: page > 1
+            });
         } else {
-            res.render('cart', { message: "cart is empty" })
+            res.render('cart', { message: "cart is empty" });
         }
     } catch (error) {
-        console.error(error)
-        res.status(500).json("server error")
+        console.error(error);
+        res.status(500).json("server error");
     }
-}
+};
 
 const addToCart = async (req, res) => {
     const userId = req.session.user
