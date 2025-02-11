@@ -48,7 +48,6 @@ body {
     color: var(--text);
 }
 
-/* Modal Styles */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -109,7 +108,6 @@ body {
     gap: 1rem;
 }
 
-/* Form Styles */
 .form-group {
     margin-bottom: 1.25rem;
 }
@@ -131,6 +129,11 @@ body {
     transition: border-color 0.15s ease-in-out;
 }
 
+.form-control.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
 .form-control:focus {
     outline: none;
     border-color: var(--primary);
@@ -144,38 +147,12 @@ body {
     border-radius: 8px;
     font-size: 0.875rem;
     background-color: var(--card);
+    appearance: none; /* Hides the default dropdown arrow */
+    -webkit-appearance: none; /* For Safari */
+    -moz-appearance: none; /* For Firefox */
+    background-image: none; /* Ensures no background arrow */
 }
 
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.15s ease-in-out;
-    border: none;
-}
-
-.btn-primary {
-    background-color: var(--primary);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: var(--primary-hover);
-}
-
-.btn-secondary {
-    background-color: var(--text-light);
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: var(--text);
-}
 
 /* Table Styles */
 .card {
@@ -255,11 +232,43 @@ body {
     background-color: var(--danger-hover);
 }
 
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+    background-color: var(--text-light);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--text);
+}
+
 .error-message {
     color: var(--danger);
     font-size: 0.75rem;
     margin-top: 0.25rem;
 }
+
 .action-dropdown {
     position: relative;
     display: inline-block;
@@ -273,20 +282,12 @@ body {
     font-size: 16px;
     color: #666;
     font-weight: bold;
-    /* Remove default button appearance */
-    -webkit-appearance: none;
+        /* Remove default button appearance */
+        -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     /* Prevent text selection */
     user-select: none;
-}
-
-.dropdown-toggle::after {
-    display: none; /* This removes any arrow that might be added by browsers */
-}
-
-.dropdown-toggle:hover {
-    color: #333;
 }
 
 .dropdown-menu {
@@ -300,6 +301,14 @@ body {
     border-radius: 4px;
     z-index: 1000;
     border: 1px solid #eee;
+}
+
+.dropdown-toggle::after {
+    display: none; /* This removes any arrow that might be added by browsers */
+}
+
+.dropdown-toggle:hover {
+    color: #333;
 }
 
 .dropdown-menu.show {
@@ -330,6 +339,7 @@ body {
 .dropdown-item.delete:hover {
     background-color: #fee2e2;
 }
+
 @media (max-width: 1000px) {
     .coupon-page {
         position: absolute;
@@ -352,7 +362,6 @@ body {
         <button class="btn btn-primary" onclick="openModal()">Add New Coupon</button>
     </div>
 
-   
     <div class="card">
         <div class="table-container">
             <table class="table">
@@ -360,7 +369,7 @@ body {
                     <tr>
                         <th>Code</th>
                         <th>Offer Price</th>
-                        <th>start Date</th>
+                        <th>Start Date</th>
                         <th>End Date</th>
                         <th>Min Amount</th>
                         <th>Usage</th>
@@ -373,13 +382,8 @@ body {
                     <tr>
                         <td><strong><%= coupon.name %></strong></td>
                         <td>₹<%= coupon.offerPrice %></td>
-                        <td>
-                            <%= coupon.createon.toLocaleDateString() %>
-                        </td>
-                        <td>
-
-                            <%= coupon.expireOn.toLocaleDateString() %>
-                        </td>
+                        <td><%= coupon.createon.toLocaleDateString() %></td>
+                        <td><%= coupon.expireOn.toLocaleDateString() %></td>
                         <td>₹<%= coupon.minimumPrice %></td>
                         <td><%= coupon.UsageLimit || 'Unlimited' %></td>
                         <td>
@@ -411,7 +415,7 @@ body {
         <h2 class="modal-title">Add New Coupon</h2>
         <button class="modal-close" onclick="closeModal()">&times;</button>
     </div>
-    <form id="add-coupon-form" method="POST" action="/admin/addCoupon" onsubmit="return validateForm()">
+    <form id="add-coupon-form" method="POST" action="/admin/addCoupon">
         <div class="modal-body">
             <div class="form-group">
                 <label class="form-label" for="coupon-code">Coupon Code</label>
@@ -444,8 +448,8 @@ body {
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="usage-limit">Usage Limit</label>
-                <input class="form-control" type="number" id="usage-limit" name="UsageLimit" placeholder="Enter usage limit ">
+                <label class="form-label" for="usage-limit">Usage Limit (Optional)</label>
+                <input class="form-control" type="number" id="usage-limit" name="UsageLimit" placeholder="Enter usage limit">
             </div>
 
             <div class="form-group">
@@ -467,13 +471,13 @@ body {
 function openModal() {
     document.getElementById('modalOverlay').style.display = 'block';
     document.getElementById('couponModal').style.display = 'block';
-    document.body.style.overflow = 'hidden'; 
+    document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
     document.getElementById('modalOverlay').style.display = 'none';
     document.getElementById('couponModal').style.display = 'none';
-    document.body.style.overflow = 'auto'; 
+    document.body.style.overflow = 'auto';
     document.getElementById('add-coupon-form').reset();
     clearErrors();
 }
@@ -486,43 +490,74 @@ document.getElementById('couponModal').addEventListener('click', function(e) {
 
 function clearErrors() {
     const errorElements = document.getElementsByClassName('error-message');
+    const inputElements = document.getElementsByClassName('form-control');
+    
     for (let element of errorElements) {
         element.innerText = '';
     }
+    
+    for (let input of inputElements) {
+        input.classList.remove('error');
+    }
 }
 
-function validateForm() {
-    let isValid = true;
-    const fields = {
-        'coupon-code': 'Please enter a coupon code.',
-        'offer-price': 'Please enter a valid offer price.',
-        'start-date': 'Please select a start date.',
-        'expiry-date': 'Please select an expiry date.',
-        'min-amount': 'Please enter a valid minimum amount.'
+document.getElementById('add-coupon-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const validations = {
+        'coupon-code': {
+            element: document.getElementById('coupon-code'),
+            errorElement: document.getElementById('code-error'),
+            validate: (value) => value.trim() !== '',
+            errorMessage: 'Please enter a coupon code.'
+        },
+        'offer-price': {
+            element: document.getElementById('offer-price'),
+            errorElement: document.getElementById('offer-price-error'),
+            validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
+            errorMessage: 'Please enter a valid offer price.'
+        },
+        'start-date': {
+            element: document.getElementById('start-date'),
+            errorElement: document.getElementById('start-date-error'),
+            validate: (value) => value.trim() !== '',
+            errorMessage: 'Please select a start date.'
+        },
+        'expiry-date': {
+            element: document.getElementById('expiry-date'),
+            errorElement: document.getElementById('expiry-date-error'),
+            validate: (value) => {
+                const startDate = new Date(document.getElementById('start-date').value);
+                const expiryDate = new Date(value);
+                return value.trim() !== '' && expiryDate > startDate;
+            },
+            errorMessage: 'Expiry date must be after start date.'
+        },
+        'min-amount': {
+            element: document.getElementById('min-amount'),
+            errorElement: document.getElementById('min-amount-error'),
+            validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
+            errorMessage: 'Please enter a valid minimum amount.'
+        }
     };
 
     clearErrors();
+    let isValid = true;
 
-    Object.keys(fields).forEach(id => {
-        const element = document.getElementById(id);
-        const value = element.value.trim();
-
-        if (!value || (element.type === 'number' && value <= 0)) {
-            document.getElementById(`${id}-error`).innerText = fields[id];
+    Object.values(validations).forEach(validation => {
+        const value = validation.element.value;
+        if (!validation.validate(value)) {
+            validation.element.classList.add('error');
+            validation.errorElement.innerText = validation.errorMessage;
             isValid = false;
         }
     });
 
-    const startDate = new Date(document.getElementById('start-date').value);
-    const expiryDate = new Date(document.getElementById('expiry-date').value);
-    
-    if (startDate > expiryDate) {
-        document.getElementById('expiry-date-error').innerText = 'Expiry date must be after start date';
-        isValid = false;
+    if (isValid) {
+        this.submit();
     }
+});
 
-    return isValid;
-}
 function toggleDropdown(event) {
     event.stopPropagation(); 
     const button = event.currentTarget;
@@ -553,5 +588,8 @@ document.addEventListener('click', function(event) {
         }
     }
 });
+
+
+
 </script>
 <%- include("../../views/partials/admin/footer") %>

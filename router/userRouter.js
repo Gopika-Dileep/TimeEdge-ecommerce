@@ -118,6 +118,7 @@ router.get('/wallet',userAuth,profileController.getWalletPage)
 
 router.post('/initiateRepayment',userAuth,orderController.initiateRepayment);
 router.post('/verifyRepaymentOrder',userAuth,orderController.verifyRepaymentOrder);
+router.get('/download-invoice/:orderId',userAuth, orderController.downloadInvoice);
 
 
 

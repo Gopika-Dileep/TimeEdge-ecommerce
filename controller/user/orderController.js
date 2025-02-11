@@ -15,6 +15,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const Razorpay = require("razorpay");
+const PDFDocument = require('pdfkit');
+
 
 const getCheckoutPage = async (req, res) => {
   try {
@@ -969,8 +971,139 @@ const verifyRepaymentOrder = async (req, res) => {
   }
 };
 
+const downloadInvoice = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const userId = req.session.user;
+    
+    const order = await Order.findOne({ orderId: orderId })
+      .populate('orderedItems.products')
+      .populate('user');
+    
+    const address = await Address.findOne({userId: order.user});
+    const addressess = address.address;
+    const specificAddress = addressess.find(
+      (addr) => addr._id.toString() === order.address.toString()
+    );
 
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
 
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
+    doc.pipe(res);
+
+    // Company Header
+    doc.font('Helvetica-Bold')
+      .fontSize(24)
+      .text('TIME EDGE', { align: 'left' })
+      .moveDown(0.5)
+      .fontSize(12)
+      .text('Private Limited', { align: 'left' });
+
+    // Invoice Details
+    doc.moveDown(1)
+      .fontSize(18)
+      .text('Invoice', { align: 'right' })
+      .fontSize(10)
+      .text(`Invoice#: ${order.orderId}`, { align: 'right' })
+      .text(`Date: ${new Date(order.createdOn).toLocaleDateString()}`, { align: 'right' });
+
+    // Shipping Address
+    doc.moveDown(2)
+      .fontSize(12)
+      .text('Shipping Address:', { continued: false })
+      .fontSize(10)
+      .font('Helvetica');
+    
+    if (specificAddress) {
+      doc.text(`${order.user.name}`)
+         .text(`${specificAddress.addressLine || ''}`)
+         .text(`${specificAddress.city || ''}, ${specificAddress.state || ''}, ${specificAddress.pincode || ''}`)
+         .text(`${specificAddress.phone || ''}`);
+    }
+
+    // Item Table Header
+    doc.moveDown(2)
+      .font('Helvetica-Bold')
+      .fontSize(10);
+
+    // Create table header
+    const tableTop = doc.y;
+    doc.text('ITEM DESCRIPTION', 50, tableTop, { width: 250 })
+       .text('PRICE', 300, tableTop, { width: 100, align: 'right' })
+       .text('QTY', 400, tableTop, { width: 50, align: 'right' })
+       .text('TOTAL', 450, tableTop, { width: 100, align: 'right' });
+
+    // Underline header
+    doc.moveDown(0.5)
+       .strokeColor('#000000')
+       .lineWidth(1)
+       .moveTo(50, doc.y)
+       .lineTo(550, doc.y)
+       .stroke();
+
+    // Item Details
+    doc.font('Helvetica');
+    let yPosition = doc.y + 15;
+
+    order.orderedItems.forEach((item) => {
+      doc.text(item.products.productName, 50, yPosition, { width: 250 })
+         .text(`₹${item.price.toFixed(2)}`, 300, yPosition, { width: 100, align: 'right' })
+         .text(item.quantity.toString(), 400, yPosition, { width: 50, align: 'right' })
+         .text(`₹${(item.price * item.quantity).toFixed(2)}`, 450, yPosition, { width: 100, align: 'right' });
+      yPosition += 20;
+    });
+
+    // Totals Section
+    doc.moveDown(2)
+       .strokeColor('#000000')
+       .lineWidth(1)
+       .moveTo(300, doc.y)
+       .lineTo(550, doc.y)
+       .stroke();
+
+    const totalsStart = doc.y + 15;
+    doc.font('Helvetica')
+       .text('SUB TOTAL', 300, totalsStart, { width: 150, align: 'left' })
+       .text(`₹${order.subtotal.toFixed(2)}`, 450, totalsStart, { width: 100, align: 'right' })
+       .text('Discount', 300, totalsStart + 20, { width: 150, align: 'left' })
+       .text(`-₹${order.productdiscount.toFixed(2)}`, 450, totalsStart + 20, { width: 100, align: 'right' })
+       .text('Coupon Discount', 300, totalsStart + 40, { width: 150, align: 'left' })
+       .text(`-₹${order.couponDiscount.toFixed(2)}`, 450, totalsStart + 40, { width: 100, align: 'right' });
+
+    // Grand Total
+    doc.font('Helvetica-Bold')
+       .text('Grand Total', 300, totalsStart + 70, { width: 150, align: 'left' })
+       .text(`₹${order.finalAmount.toFixed(2)}`, 450, totalsStart + 70, { width: 100, align: 'right' });
+
+    // Contact Section
+    doc.moveDown(4)
+       .font('Helvetica-Bold')
+       .fontSize(10)
+       .text('Contact', 50, doc.y)
+       .font('Helvetica')
+       .fontSize(9)
+       .text('Time Edge Inc., 123 Main Street')
+       .text('Email: support@timeedge.com')
+       .text('www.timeedge.com');
+
+    // Thank You Note
+    doc.moveDown(2)
+       .fontSize(9)
+       .text('Thank you for choosing us!', { align: 'left' })
+       .text('We appreciate your trust in us and hope you enjoy your purchase.', { align: 'left' })
+       .text('If you have any questions, feel free to reach out to our support team.', { align: 'left' });
+
+    doc.end();
+
+  } catch (error) {
+    console.error('Invoice Generation Error:', error);
+    res.status(500).send('Error generating invoice');
+  }
+};
 module.exports = {
   getCheckoutPage,
   getOrderConfirmationPage,
@@ -985,5 +1118,6 @@ module.exports = {
   posteditAddress,
   getAddress,
   initiateRepayment,
-  verifyRepaymentOrder
+  verifyRepaymentOrder,
+  downloadInvoice
 };
