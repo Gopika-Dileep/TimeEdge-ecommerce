@@ -296,6 +296,15 @@
                     <div class="info-label">Phone:</div>
                     <div class="info-value"><%= order.user.phone %></div>
                 </div>
+                <div class="info-item">
+                    <div class="info-label">Address:</div>
+                    <div class="info-value"> <h6 class="mb-2"><%= specificAddress.name %></h6><p class="mb-1 text-muted"><%= specificAddress.addressType %></p>
+                        <p class="mb-1 text-muted"><%= specificAddress.landMark %></p>
+                        <p class="mb-1 text-muted">
+                          <%= specificAddress.city %>, <%= specificAddress.state %> <%=
+                          specificAddress.pincode %>
+                        </p></div>
+                </div>
             </div>
 
             <div class="info-card">

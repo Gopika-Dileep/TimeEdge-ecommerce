@@ -173,20 +173,18 @@
                   <tr>
                     <th>Date</th>
                     <th>User</th>
-                    <th>Product</th>
-                    <th>Quantity</th>
+                    <th>OrderId</th>
                     <th>Price</th>
                     <th>productDiscount</th>
                     <th>couponDiscount</th>
                     <th>Total</th>
-                    <th>Status</th>
                     <th>Payment Method</th>
                   </tr>
                 </thead>
                 <tbody>
                   <% if (order.length> 0) { %>
                     <% order.forEach(order=> { %>
-                      <% order.orderedItems.forEach(item=> { %>
+                    
                         <tr>
                           <td>
                             <%= new Date(order.createdOn).toLocaleDateString() %>
@@ -195,38 +193,24 @@
                             data-tooltip="<%= order.user ? order.user.name : 'N/A' %>">
                             <%= order.user ? order.user.name : 'N/A' %>
                           </td>
-                          <td class="truncate truncate-tooltip" data-tooltip="<%= item.products.productName %>">
-                            <%= item.products.productName %>
+                          <td class="truncate truncate-tooltip" data-tooltip="<%= order.orderId %>">
+                            <%= order.orderId %>
                           </td>
-                          <td>
-                            <%= item.quantity %>
-                          </td>
-                          <td>₹ <%= item.price %>
+                          <td>₹ <%= order.subtotal%>
                           </td> 
-                          <% 
-                          const productOffer = item.products.productOffer || 0;
-                          const categoryOffer = item.products.category.categoryOffer || 0;
-                          const bestOffer = Math.max(productOffer, categoryOffer);
-                          const salePrice = item.price;
-                          const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
-                          const finaloffer = item.price - finalPrice
-                          const coupondiscount = order.couponDiscount || 0
-                          %>
-                          <td>₹ <%= finaloffer  || 0 %>
+                    
+                          <td>₹ <%= order.productdiscount  || 0 %>
                           </td>
-                          <td>₹ <%= coupondiscount || 0 %>
+                          <td>₹ <%= order.couponDiscount || 0 %>
                           </td>
-                          <td>₹ <%= ((item.price - (finaloffer || 0) ) * item.quantity)-coupondiscount %>
-                          </td>
-                          <td>
-                            <%= order.status || "Pending" %>
+                          <td>₹ <%= order.finalAmount %>
                           </td>
                           <td>
                             <%= order.paymentMethod %>
                           </td>
                         </tr>
                         <% }); %>
-                          <% }); %>
+                       
                             <% } else { %>
                               <tr>
                                 <td colspan="7" class="text-center">No orders found.
@@ -319,35 +303,24 @@
         const filterTable = document.querySelector("table tbody");
         filterTable.textContent = "";
         response.orders.forEach(order => {
-          if (order.orderedItems && Array.isArray(order.orderedItems)) {
-            order.orderedItems.forEach(item => {
-              const productOffer = item.products.productOffer || 0;
-                          const categoryOffer = item.products.category.categoryOffer || 0;
-                          const bestOffer = Math.max(productOffer, categoryOffer);
-                          const salePrice = item.price;
-                          const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
-                          const finaloffer = item.price - finalPrice
-                          const coupondiscount = order.couponDiscount || 0
               const row = `
             <tr>
               <td>${new Date(order.createdOn).toLocaleDateString()}</td>
               <td>${order.user ? order.user.name : 'N/A'}</td>
-              <td>${item.products.productName}</td>
-              <td>${item.quantity}</td>
-              <td>₹ ${item.price}</td>
-             <td>₹  ${finaloffer  || 0 }
+              <td>${order.orderId}</td>
+              <td>₹ ${order.subtotal}</td>
+             <td>₹  ${order.productdiscount  || 0 }
                           </td>
-                          <td>₹ ${coupondiscount || 0}
+                          <td>₹ ${order.couponDiscount || 0}
                           </td>
-                          <td>₹  ${((item.price - (finaloffer || 0) ) * item.quantity)-coupondiscount} 
+                          <td>₹  ${order.finalAmount} 
                           </td>
-              <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;
               filterTable.insertAdjacentHTML("beforeend", row);
             });
-          }
-        });
+          
+        
 
         document.querySelector('.text-primary').innerHTML = response.saleCount; 
         document.querySelector('.text-success').innerHTML = `₹ ${response.totalSalePrice}`; 
@@ -356,8 +329,8 @@
 
         updatePagination(response.totalPage, 1);
       }
+    
     }
-
     async function filterByDate() {
       const startDate = document.getElementById('start-date').value;
       const endDate = document.getElementById('end-date').value;
@@ -373,40 +346,29 @@
         const filterTable = document.querySelector("table tbody");
         filterTable.textContent = "";
         response.orders.forEach(order => {
-          if (order.orderedItems && Array.isArray(order.orderedItems)) {
-            order.orderedItems.forEach(item => {
-              const productOffer = item.products.productOffer || 0;
-                          const categoryOffer = item.products.category.categoryOffer || 0;
-                          const bestOffer = Math.max(productOffer, categoryOffer);
-                          const salePrice = item.price;
-                          const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
-                          const finaloffer = item.price - finalPrice
-                          const coupondiscount = order.couponDiscount || 0
               const row = `
             <tr>
               <td>${new Date(order.createdOn).toLocaleDateString()}</td>
               <td>${order.user ? order.user.name : 'N/A'}</td>
-              <td>${item.products.productName}</td>
-              <td>${item.quantity}</td>
-              <td>₹ ${item.price}</td>
-              <td>₹  ${finaloffer  || 0 }
+              <td>${order.orderId}</td>
+              <td>₹ ${order.subtotal}</td>
+              <td>₹  ${order.productdiscount  || 0 }
                           </td>
-                          <td>₹ ${coupondiscount || 0}
+                          <td>₹ ${order.couponDiscount || 0}
                           </td>
-                          <td>₹  ${((item.price - (finaloffer || 0) ) * item.quantity)-coupondiscount} 
+                          <td>₹  ${order.finalAmount} 
                           </td>
-              <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;
               filterTable.insertAdjacentHTML("beforeend", row);
             });
-          }
-        });
+          
+        
 
-        document.querySelector('.text-primary').innerHTML = response.saleCount; // Total Orders
-        document.querySelector('.text-success').innerHTML = `₹ ${response.totalSalePrice}`; // Total Sale Revenue
-        document.querySelector('.text-warning').innerHTML = `₹ ${response.totalDiscount}`; // Total Discount
-        document.querySelector('.text-danger').innerHTML = `₹ ${response.couponDiscount}`; // Coupon Discount
+        document.querySelector('.text-primary').innerHTML = response.saleCount; 
+        document.querySelector('.text-success').innerHTML = `₹ ${response.totalSalePrice}`; 
+        document.querySelector('.text-warning').innerHTML = `₹ ${response.totalDiscount}`; 
+        document.querySelector('.text-danger').innerHTML = `₹ ${response.couponDiscount}`; 
 
         updatePagination(response.totalPage, 1);
       }
@@ -459,34 +421,23 @@
         const filterTable = document.querySelector("table tbody");
         filterTable.textContent = "";
         response.orders.forEach(order => {
-          if (order.orderedItems && Array.isArray(order.orderedItems)) {
-            order.orderedItems.forEach(item => {
-              const productOffer = item.products.productOffer || 0;
-                          const categoryOffer = item.products.category.categoryOffer || 0;
-                          const bestOffer = Math.max(productOffer, categoryOffer);
-                          const salePrice = item.price;
-                          const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
-                          const finaloffer = item.price - finalPrice
-                          const coupondiscount = order.couponDiscount || 0
               const row = `
             <tr>
               <td>${new Date(order.createdOn).toLocaleDateString()}</td>
               <td>${order.user ? order.user.name : 'N/A'}</td>
-              <td>${item.products.productName}</td>
-              <td>${item.quantity}</td>
-              <td>₹ ${item.price}</td>
-             <td>₹  ${finaloffer  || 0 }
+              <td>${order.orderId}</td>
+              <td>₹ ${order.subtotal}</td>
+             <td>₹  ${order.productdiscount  || 0 }
                           </td>
-                          <td>₹ ${coupondiscount || 0}
+                          <td>₹ ${order.couponDiscount|| 0}
                           </td>
-                          <td>₹  ${((item.price - (finaloffer || 0) ) * item.quantity)-coupondiscount} 
+                          <td>₹  ${order.finalAmount} 
                           </td>
-              <td>${order.status || "Pending"}</td>
               <td>${order.paymentMethod}</td>
             </tr>`;
               filterTable.insertAdjacentHTML("beforeend", row);
-            });
-          }
+            ;
+          
         });
 
         document.querySelector('.text-primary').innerHTML = response.saleCount;
@@ -499,21 +450,25 @@
     }
 
     function getSalesDataFromTable() {
-      const tableRows = document.querySelectorAll('#salesTable tbody tr');
-      const salesData = [];
+  const tableRows = document.querySelectorAll('#salesTable tbody tr');
+  const salesData = [];
 
-      tableRows.forEach((row) => {
-        const cells = row.querySelectorAll('td');
-        salesData.push({
-          date: cells[0].innerText,
-          product: cells[2].innerText,
-          userId: { name: cells[1].innerText },
-          totalAmount: Number(cells[4].innerText.slice(2)),
-          status: cells[7].innerText,
-        });
-      });
+  tableRows.forEach((row) => {
+    const cells = row.querySelectorAll('td');
+    salesData.push({
+      date: cells[0].innerText,
+      userName: cells[1].innerText,
+      orderId: cells[2].innerText,
+      subtotal: parseFloat(cells[3].innerText.replace('₹', '').trim()),
+      productDiscount: parseFloat(cells[4].innerText.replace('₹', '').trim()),
+      couponDiscount: parseFloat(cells[5].innerText.replace('₹', '').trim()),
+      finalAmount: parseFloat(cells[6].innerText.replace('₹', '').trim()),
+      paymentMethod: cells[7].innerText
+    });
+  });
 
-      return salesData;
-    }
+  return salesData;
+}
+
   </script>
   <%- include("../../views/partials/admin/footer") %>

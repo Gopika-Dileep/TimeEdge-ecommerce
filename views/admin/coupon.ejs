@@ -340,20 +340,6 @@ body {
     background-color: #fee2e2;
 }
 
-@media (max-width: 1000px) {
-    .coupon-page {
-        position: absolute;
-        top: 50px;
-        left: 20px;
-        width: calc(100% - 30px);
-        padding: 1.5rem;
-    }
-    
-    .modal {
-        width: 95%;
-        margin: 0 auto;
-    }
-}
 </style>
 
 <div class="coupon-page">
@@ -448,8 +434,10 @@ body {
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="usage-limit">Usage Limit (Optional)</label>
+                <label class="form-label" for="usage-limit">Usage Limit</label>
                 <input class="form-control" type="number" id="usage-limit" name="UsageLimit" placeholder="Enter usage limit">
+                <div id="usage-limit-error" class="error-message"></div>
+            
             </div>
 
             <div class="form-group">
@@ -538,7 +526,13 @@ document.getElementById('add-coupon-form').addEventListener('submit', function(e
             errorElement: document.getElementById('min-amount-error'),
             validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
             errorMessage: 'Please enter a valid minimum amount.'
-        }
+        },
+        'usage-limit': {
+            element: document.getElementById('usage-limit'),
+            errorElement: document.getElementById('usage-limit-error'),
+            validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
+            errorMessage: 'Please enter usage limit.'
+        },
     };
 
     clearErrors();

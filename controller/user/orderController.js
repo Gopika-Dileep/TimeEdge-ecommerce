@@ -637,6 +637,30 @@ const returnOrder = async (req, res) => {
           order.couponId = null;
           isCouponRemoved = true;
         }
+
+        const itemStatuses = order.orderedItems.map((item) => item.status);
+        if (itemStatuses.every((s) => s === "Returned")) {
+          order.status = "Returned";
+        } else if (
+          itemStatuses.some((s) => s === "delivered" )
+        ) {
+          order.status = "delivered";
+        }
+        else if (
+          itemStatuses.some((s) => s === "Processing" || s === "Shipped")
+        ) {
+          order.status = "Processing";
+        } else if (itemStatuses.some((s) => s === "Pending")) {
+          order.status = "Pending";
+        } else if (
+          itemStatuses.some(
+            (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
+          )
+        ) {
+          order.status = "Cancelled";
+        } else {
+          order.status = "pending";
+        }
         await order.save();
       }
 
@@ -995,7 +1019,7 @@ const downloadInvoice = async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
     doc.pipe(res);
 
-    // Company Header
+    
     doc.font('Helvetica-Bold')
       .fontSize(24)
       .text('TIME EDGE', { align: 'left' })
@@ -1003,7 +1027,6 @@ const downloadInvoice = async (req, res) => {
       .fontSize(12)
       .text('Private Limited', { align: 'left' });
 
-    // Invoice Details
     doc.moveDown(1)
       .fontSize(18)
       .text('Invoice', { align: 'right' })
@@ -1011,7 +1034,7 @@ const downloadInvoice = async (req, res) => {
       .text(`Invoice#: ${order.orderId}`, { align: 'right' })
       .text(`Date: ${new Date(order.createdOn).toLocaleDateString()}`, { align: 'right' });
 
-    // Shipping Address
+   
     doc.moveDown(2)
       .fontSize(12)
       .text('Shipping Address:', { continued: false })
@@ -1025,19 +1048,19 @@ const downloadInvoice = async (req, res) => {
          .text(`${specificAddress.phone || ''}`);
     }
 
-    // Item Table Header
+    
     doc.moveDown(2)
       .font('Helvetica-Bold')
       .fontSize(10);
 
-    // Create table header
+   
     const tableTop = doc.y;
     doc.text('ITEM DESCRIPTION', 50, tableTop, { width: 250 })
        .text('PRICE', 300, tableTop, { width: 100, align: 'right' })
        .text('QTY', 400, tableTop, { width: 50, align: 'right' })
        .text('TOTAL', 450, tableTop, { width: 100, align: 'right' });
 
-    // Underline header
+ 
     doc.moveDown(0.5)
        .strokeColor('#000000')
        .lineWidth(1)
@@ -1045,7 +1068,7 @@ const downloadInvoice = async (req, res) => {
        .lineTo(550, doc.y)
        .stroke();
 
-    // Item Details
+ 
     doc.font('Helvetica');
     let yPosition = doc.y + 15;
 
@@ -1057,7 +1080,7 @@ const downloadInvoice = async (req, res) => {
       yPosition += 20;
     });
 
-    // Totals Section
+  
     doc.moveDown(2)
        .strokeColor('#000000')
        .lineWidth(1)
@@ -1074,12 +1097,12 @@ const downloadInvoice = async (req, res) => {
        .text('Coupon Discount', 300, totalsStart + 40, { width: 150, align: 'left' })
        .text(`-₹${order.couponDiscount.toFixed(2)}`, 450, totalsStart + 40, { width: 100, align: 'right' });
 
-    // Grand Total
+   
     doc.font('Helvetica-Bold')
        .text('Grand Total', 300, totalsStart + 70, { width: 150, align: 'left' })
        .text(`₹${order.finalAmount.toFixed(2)}`, 450, totalsStart + 70, { width: 100, align: 'right' });
 
-    // Contact Section
+   
     doc.moveDown(4)
        .font('Helvetica-Bold')
        .fontSize(10)
@@ -1090,7 +1113,7 @@ const downloadInvoice = async (req, res) => {
        .text('Email: support@timeedge.com')
        .text('www.timeedge.com');
 
-    // Thank You Note
+   
     doc.moveDown(2)
        .fontSize(9)
        .text('Thank you for choosing us!', { align: 'left' })
