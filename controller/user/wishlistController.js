@@ -5,17 +5,104 @@ const Brand = require('../../models/brandSchema')
 const Wishlist= require('../../models/wishlistSchema')
 
 
-const loadWishlist = async(req,res)=>{
+const loadWishlist = async (req, res) => {
     try {
-        const userId = req.session.user
-        const user = await User.findById({_id:userId})
-        const wishlist = await Wishlist.findOne({userId:userId}).populate('products.productId')
-        res.render ('wishlist',{path: '/wishlist', user:user,wishlist:wishlist})
+        const userId = req.session.user;
+        const itemsPerPage = 2; // Same as cart pagination
+        const page = parseInt(req.query.page) || 1;
+
+        // Find wishlist and populate with product, category, and brand details
+        const wishlist = await Wishlist.findOne({ userId: userId }).populate({
+            path: "products.productId",
+            populate: [
+                {
+                    path: "category",
+                    select: "name isListed categoryOffer"
+                },
+                {
+                    path: "brand",
+                    select: "name isListed"
+                }
+            ]
+        });
+
+        const user = await User.findById({ _id: userId });
+
+        if (wishlist && wishlist.products.length > 0) {
+            // Filter out products that are not listed or whose category/brand is not listed
+            const validProducts = wishlist.products.filter(item => {
+                const product = item.productId;
+                return product && 
+                       product.isListed && // Check if product is listed
+                       product.category && 
+                       product.category.isListed && // Check if category is listed
+                       product.brand &&
+                       product.brand.isListed; // Check if brand is listed
+            });
+
+            // Calculate prices with offers for each product
+            const productsWithPrices = validProducts.map(item => {
+                const product = item.productId;
+                let price = product.salePrice;
+
+                // Apply product offer if exists
+                if (product.productOffer > 0) {
+                    price -= product.offerAmount;
+                }
+
+                // Apply category offer if exists
+                if (product.category && product.category.categoryOffer > 0) {
+                    const categoryDiscount = (price * product.category.categoryOffer) / 100;
+                    price -= categoryDiscount;
+                }
+
+                return {
+                    ...item.toObject(),
+                    finalPrice: Math.floor(price)
+                };
+            });
+
+            // Pagination
+            const totalItems = productsWithPrices.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            const paginatedProducts = productsWithPrices.slice(startIndex, endIndex);
+            const paginatedWishlist = {
+                ...wishlist.toObject(),
+                products: paginatedProducts
+            };
+
+            // Update wishlist with only valid products
+            wishlist.products = validProducts;
+            await wishlist.save();
+
+            res.render('wishlist', {
+                path: '/wishlist',
+                user: user,
+                wishlist: paginatedWishlist,
+                currentPage: page,
+                totalPages: totalPages,
+                hasNextPage: endIndex < totalItems,
+                hasPrevPage: page > 1,
+                message: validProducts.length < wishlist.products.length ?
+                    "Some items were removed from your wishlist because they are no longer available." :
+                    null
+            });
+        } else {
+            res.render('wishlist', {
+                path: '/wishlist',
+                user: user,
+                wishlist: null,
+                message: "Wishlist is empty"
+            });
+        }
     } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"Server error"})
+        console.error("Wishlist loading error:", error);
+        res.status(500).json({ message: "Server error" });
     }
-}
+};
 
 // const addToWishlist = async(req,res)=>{
 //      try {

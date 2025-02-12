@@ -86,15 +86,14 @@ const loadSalesReport = async (req, res) => {
     }
 };
 
-const filterOrder = async (req, res) => {
-    try {
-        const { filtervalue, startDate, endDate } = req.query;
+async function getFilteredOrders(filtervalue, startDate, endDate) {
+    let query = {
+        status: "delivered"
+    };
+
+    if (filtervalue !== 'custom') {
         const today = new Date();
         let start, end;
-
-        let query = {
-            status: "delivered" 
-        };
 
         switch (filtervalue) {
             case "daily":
@@ -127,39 +126,112 @@ const filterOrder = async (req, res) => {
                 break;
         }
 
-        if (startDate && endDate) {
-            start = new Date(startDate);
-            end = new Date(endDate);
-            end.setUTCHours(23, 59, 59, 999);
+        query.createdOn = { $gte: start, $lte: end };
+    }
+
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setUTCHours(23, 59, 59, 999);
+        query.createdOn = { $gte: start, $lte: end };
+    }
+
+    return await Order.find(query)
+        .sort({ createdOn: -1 })
+        .populate('user')
+        .populate('orderedItems.products');
+}
+
+const filterOrder = async (req, res) => {
+    try {
+        const { filtervalue, startDate, endDate } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        
+        let query = {
+            status: "delivered"
+        };
+
+        // Date filtering logic
+        if (filtervalue !== 'custom') {
+            const today = new Date();
+            let start, end;
+
+            switch (filtervalue) {
+                case "daily":
+                    start = new Date(today);
+                    start.setHours(0, 0, 0, 0);
+                    end = new Date(today);
+                    end.setHours(23, 59, 59, 999);
+                    break;
+                case "weekly":
+                    const startOfWeek = new Date(today);
+                    const firstDayOfWeek = startOfWeek.getDate() - startOfWeek.getDay();
+                    start = new Date(today.setDate(firstDayOfWeek));
+                    start.setHours(0, 0, 0, 0);
+                    end = new Date(today.setDate(firstDayOfWeek + 6));
+                    end.setHours(23, 59, 59, 999);
+                    break;
+                case "monthly":
+                    start = new Date(today.getFullYear(), today.getMonth(), 1);
+                    end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    end.setHours(23, 59, 59, 999);
+                    break;
+                case "yearly":
+                    start = new Date(today.getFullYear(), 0, 1);
+                    end = new Date(today.getFullYear(), 11, 31);
+                    end.setHours(23, 59, 59, 999);
+                    break;
+                default:
+                    start = new Date(0);
+                    end = new Date();
+                    break;
+            }
+
+            query.createdOn = { $gte: start, $lte: end };
         }
 
-        query.createdOn = { $gte: start, $lte: end };
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            end.setUTCHours(23, 59, 59, 999);
+            query.createdOn = { $gte: start, $lte: end };
+        }
 
+// In your filterOrder controller
+const totalOrders = await Order.countDocuments(query);
+const totalPage = Math.ceil(totalOrders / limit);
+
+        // Get paginated orders
         const orders = await Order.find(query)
             .sort({ createdOn: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
             .populate('user')
             .populate('orderedItems.products');
 
-        const totalSalePrice = orders.reduce((sum, order) => sum + order.finalAmount, 0);
-        const saleCount = orders.length;
-        const couponDiscount = orders.reduce((sum, order) => sum + order.couponDiscount, 0);
-        const totalDiscount = orders.reduce((sum, order) => sum + order.productdiscount, 0);
-        const totalPage = Math.ceil(saleCount / 5);
+        // Calculate totals from all matching orders (not just paginated ones)
+        const allOrders = await Order.find(query);
+        const totalSalePrice = allOrders.reduce((sum, order) => sum + order.finalAmount, 0);
+        const saleCount = allOrders.length;
+        const couponDiscount = allOrders.reduce((sum, order) => sum + (order.couponDiscount || 0), 0);
+        const totalDiscount = allOrders.reduce((sum, order) => sum + (order.productdiscount || 0), 0);
+
 
         return res.status(200).json({
             orders,
             saleCount,
-            totalSalePrice,
-            totalDiscount,
-            couponDiscount,
-            totalPage
-        });
+            totalSalePrice: Math.round(totalSalePrice),
+            totalDiscount: Math.round(totalDiscount),
+            couponDiscount: Math.round(couponDiscount),
+            totalPage,
+            currentPage: page
+          });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server error" });
     }
 };
-
 const filterbyDate = async (req, res) => {
     try {
         let { startDate, endDate } = req.query;
@@ -206,7 +278,24 @@ const filterbyDate = async (req, res) => {
 
 const downloadpdf = async (req, res) => {
     try {
-      const salesData = req.body.salesData;
+        const { filtervalue, startDate, endDate } = req.body;
+        console.log(req.body,"tessttt")
+        
+        // Get all filtered orders
+        const orders = await getFilteredOrders(filtervalue, startDate, endDate);
+        
+        // Transform orders into the format needed for PDF
+        const salesData = orders.map(order => ({
+            date: order.createdOn,
+            orderId: order.orderId,
+            userName: order.user ? order.user.name : 'N/A',
+            subtotal: order.subtotal,
+            productDiscount: order.productdiscount || 0,
+            couponDiscount: order.couponDiscount || 0,
+            finalAmount: order.finalAmount,
+            paymentMethod: order.paymentMethod
+        }));
+
       const PDFDocument = require('pdfkit');
       const doc = new PDFDocument({
         margins: { top: 50, bottom: 50, left: 50, right: 50 },
@@ -323,7 +412,23 @@ const downloadpdf = async (req, res) => {
   };
   const downloadexcel = async (req, res) => {
     try {
-        const salesData = req.body.salesData;
+        const { filtervalue, startDate, endDate } = req.body;
+        
+        // Get all filtered orders
+        const orders = await getFilteredOrders(filtervalue, startDate, endDate);
+        
+        // Transform orders into the format needed for Excel
+        const salesData = orders.map(order => ({
+            date: order.createdOn,
+            orderId: order.orderId,
+            userName: order.user ? order.user.name : 'N/A',
+            subtotal: order.subtotal,
+            productDiscount: order.productdiscount || 0,
+            couponDiscount: order.couponDiscount || 0,
+            finalAmount: order.finalAmount,
+            paymentMethod: order.paymentMethod
+        }));
+
         const workbook = new excelJS.Workbook();
         
         // Add metadata to the workbook

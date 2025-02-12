@@ -5,7 +5,6 @@
         padding: 20px;
     }
     
-    /* Add Brand button styling */
     .add-brand-btn {
         background-color: #0d6efd;
         color: white;
@@ -13,9 +12,9 @@
         padding: 8px 16px;
         border-radius: 4px;
         font-size: 14px;
+        cursor: pointer;
     }
     
-    /* Table styling */
     .table {
         width: 100%;
         border-collapse: separate;
@@ -24,6 +23,7 @@
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
     }
     
     .table th {
@@ -38,150 +38,157 @@
     .table td {
         padding: 12px 15px;
         border-bottom: 1px solid #dee2e6;
-        text-align: left;
+        vertical-align: middle;
     }
     
-    /* Status badge styling */
+    /* Status Badge */
     .badge {
+        display: inline-block;
         padding: 4px 8px;
         border-radius: 4px;
+        font-size: 12px;
         font-weight: normal;
-        font-size: 14px;
     }
+    
     .badge-success {
-        background-color: #e8f5e9;
-        color: #2e7d32;
+        background-color: #dcfce7;
+        color: #15803d;
     }
+    
     .badge-danger {
-        background-color: #ffebee;
-        color: #c62828;
+        background-color: #fee2e2;
+        color: #b91c1c;
     }
     
-    /* Dropdown styling */
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
-    
-    .three-dots {
-        cursor: pointer;
-        background: none;
-        border: none;
-        font-size: 20px;
-        color: #333;
-        padding: 0;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        appearance: none !important;
-        -webkit-appearance: none !important;
-        -moz-appearance: none !important;
-    }
-    
-    .three-dots::after {
-        display: none !important;
-    }
-    
-    .dropdown-menu {
-        display: none;
-        position: absolute;
-        right: 0;
-        background-color: white;
-        min-width: 120px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        border-radius: 4px;
-        z-index: 1;
-        margin-top: 2px;
-    }
-    
-    .dropdown-menu form {
-        display: block;
-    }
-    
-    .dropdown-menu button {
-        width: 100%;
-        padding: 8px 16px;
-        border: none;
-        background: none;
-        text-align: left;
-        cursor: pointer;
-        color: #333;
-        font-size: 14px;
-    }
-    
-    .dropdown-menu button:hover {
-        background-color: #f8f9fa;
-    }
-    
-    .show {
-        display: block;
-    }
-    
-    /* Updated Pagination styling */
+/* Fixed Dropdown Styling */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.three-dots {
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 20px;
+    line-height: 24px;
+    color: #6b7280;
+    position: relative;
+    z-index: 1;
+}
+
+.three-dots:hover {
+    color: #374151;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    margin-top: 0.5rem;
+    min-width: 120px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    z-index: 1000;
+}
+
+/* Add this new code to check for viewport space */
+.dropdown:last-child .dropdown-menu,
+.dropdown:nth-last-child(2) .dropdown-menu {
+    bottom: 0;
+    top: auto;
+    margin-top: 0;
+    margin-bottom: 0rem;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-menu form {
+    margin: 0;
+    padding: 0;
+}
+
+.dropdown-menu button {
+    width: 100%;
+    padding: 8px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+    display: block;
+    white-space: nowrap;
+}
+
+.dropdown-menu button:hover {
+    background-color: #f3f4f6;
+}
+
+/* Update table cell positioning */
+.table td {
+    position: relative;
+}
+
+    /* Fixed Pagination */
     .pagination-container {
-        margin-top: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        padding: 16px;
-        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 2rem;
     }
     
     .pagination-container a,
     .pagination-container span {
-        min-width: 36px;
-        height: 36px;
-        padding: 0 8px;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 6px;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 6px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background: white;
+        color: #374151;
         font-size: 14px;
         text-decoration: none;
-        color: #1a1a1a;
-        background: transparent;
-        transition: all 0.2s ease;
-        border: 1px solid #dee2e6;
-        font-weight: 500;
+        transition: all 0.2s;
     }
-
+    
     .pagination-container a:hover {
-        background: #f8f9fa;
+        background-color: #f3f4f6;
         border-color: #0d6efd;
         color: #0d6efd;
     }
-
+    
     .pagination-container .current-page {
-        background: #0d6efd;
-        color: white;
+        background-color: #0d6efd;
         border-color: #0d6efd;
+        color: white;
     }
-
+    
     .pagination-container .disabled {
-        color: #9e9e9e;
+        background-color: #f3f4f6;
+        color: #9ca3af;
         cursor: not-allowed;
         pointer-events: none;
-        border-color: #e9ecef;
-        background: #f8f9fa;
     }
-
+    
     .pagination-container .previous,
     .pagination-container .next {
         padding: 0 12px;
         min-width: 80px;
     }
-
-    /* Page title styling */
-    .content-title {
-        font-size: 24px;
-        font-weight: 500;
-        margin-bottom: 20px;
-    }
-
-    /* Modal styling */
+    
+    /* Modal */
     .modal {
         display: none;
         position: fixed;
@@ -189,21 +196,22 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 1000;
     }
-
+    
     .modal-content {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         background: white;
-        padding: 20px;
+        padding: 24px;
         border-radius: 8px;
         width: 90%;
         max-width: 400px;
     }
+    
     .content-main {
         position: absolute;
         top: 70px;
@@ -211,6 +219,7 @@
         width: calc(100% - 240px);
         padding: 2rem;
     }
+    
     @media (max-width: 1000px) {
         .content-main {
             position: absolute;
@@ -224,7 +233,7 @@
 
 <div class="content-main">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="content-title">Brands</h2>
+        <h2 class="m-0">Brands</h2>
         <button class="add-brand-btn" onclick="document.getElementById('addBrandModal').style.display='block'">+ Add Brand</button>
     </div>
 
@@ -249,7 +258,7 @@
                     </td>
                     <td class="text-center">
                         <div class="dropdown">
-                            <button class="three-dots" onclick="toggleDropdown(event, '<%= brand._id %>')">⋮</button>
+                            <button type="button" class="three-dots" onclick="toggleDropdown(event, '<%= brand._id %>')">⋮</button>
                             <div id="dropdown-<%= brand._id %>" class="dropdown-menu">
                                 <% if (!brand.isListed) { %>
                                     <form method="POST" action="/admin/listBrand/<%= brand._id %>">
@@ -268,28 +277,13 @@
         </tbody>
     </table>
 
-    <div id="addBrandModal" class="modal">
-        <div class="modal-content">
-            <form method="POST" action="/admin/addBrand">
-                <div class="mb-4">
-                    <label for="brand_name" class="form-label">Brand Name</label>
-                    <input type="text" name="name" placeholder="Enter brand name" class="form-control" required />
-                </div>
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addBrandModal').style.display='none'">Cancel</button>
-                    <button class="btn btn-primary" type="submit">Add Brand</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div class="pagination-container">
         <% if (currentpage > 1) { %>
             <a href="?page=<%= currentpage - 1 %>" class="previous">Previous</a>
         <% } else { %>
             <span class="disabled previous">Previous</span>
         <% } %>
-    
+
         <% 
         let startPage = Math.max(1, currentpage - 2);
         let endPage = Math.min(totalpage, startPage + 4);
@@ -304,7 +298,7 @@
                 <span>...</span>
             <% } %>
         <% } %>
-    
+
         <% for (let i = startPage; i <= endPage; i++) { %>
             <% if (i === currentpage) { %>
                 <span class="current-page"><%= i %></span>
@@ -312,55 +306,68 @@
                 <a href="?page=<%= i %>"><%= i %></a>
             <% } %>
         <% } %>
-    
+
         <% if (endPage < totalpage) { %>
             <% if (endPage < totalpage - 1) { %>
                 <span>...</span>
             <% } %>
             <a href="?page=<%= totalpage %>"><%= totalpage %></a>
         <% } %>
-    
+
         <% if (currentpage < totalpage) { %>
             <a href="?page=<%= currentpage + 1 %>" class="next">Next</a>
         <% } else { %>
             <span class="disabled next">Next</span>
         <% } %>
     </div>
+
+    <div id="addBrandModal" class="modal">
+        <div class="modal-content">
+            <form method="POST" action="/admin/addBrand">
+                <div class="mb-4">
+                    <label for="brand_name" class="form-label">Brand Name</label>
+                    <input type="text" name="name" id="brand_name" placeholder="Enter brand name" class="form-control" required />
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addBrandModal').style.display='none'">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Add Brand</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script>
-    // Close all dropdowns when clicking outside
-    window.onclick = function(event) {
-        if (!event.target.matches('.three-dots')) {
-            var dropdowns = document.getElementsByClassName("dropdown-menu");
-            for (var i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                    openDropdown.classList.remove('show');
-                }
-            }
-        }
-        
-        if (event.target.className === 'modal') {
-            event.target.style.display = 'none';
+    function toggleDropdown(event, brandId) {
+    event.stopPropagation();
+    event.preventDefault();
+    var dropdown = document.getElementById('dropdown-' + brandId);
+    
+    // Close other open dropdowns first
+    var dropdowns = document.getElementsByClassName("dropdown-menu");
+    for (var i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown !== dropdown && openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
         }
     }
+    
+    // Toggle the clicked dropdown
+    dropdown.classList.toggle("show");
+}
 
-    // Toggle specific dropdown
-    function toggleDropdown(event, brandId) {
-        event.stopPropagation();
-        var dropdown = document.getElementById('dropdown-' + brandId);
-        
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.matches('.three-dots')) {
         var dropdowns = document.getElementsByClassName("dropdown-menu");
         for (var i = 0; i < dropdowns.length; i++) {
             var openDropdown = dropdowns[i];
-            if (openDropdown !== dropdown && openDropdown.classList.contains('show')) {
+            if (openDropdown.classList.contains('show')) {
                 openDropdown.classList.remove('show');
             }
         }
-        
-        dropdown.classList.toggle("show");
     }
+});
 </script>
 
 <%- include("../../views/partials/admin/footer") %>

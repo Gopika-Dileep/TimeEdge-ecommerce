@@ -4,34 +4,74 @@ const Brand = require("../../models/brandSchema")
 const User = require("../../models/userSchema")
 const Cart = require('../../models/cartSchema')
 
-
 const loadAddToCart = async (req, res) => {
     try {
         const userId = req.session.user;
-        const itemsPerPage = 2; // Number of items per page
-        const page = parseInt(req.query.page) || 1; // Get page from query params, default to 1
+        const itemsPerPage = 2;
+        const page = parseInt(req.query.page) || 1;
         
+        // Find cart and populate with product, category, and brand details
         const cart = await Cart.findOne({ user: userId }).populate({
             path: "items.product",
-            populate: { path: "category", select: "categoryOffer" }
+            populate: [
+                { 
+                    path: "category",
+                    select: "name isListed categoryOffer"
+                },
+                { 
+                    path: "brand",
+                    select: "name isListed" 
+                }
+            ]
         });
 
         if (cart) {
-            const totalPrice = cart.items.reduce((total, item) => total + item.price, 0);
+            // Filter out items where product, category, or brand is not listed
+            const validItems = cart.items.filter(item => {
+                const product = item.product;
+                return product && 
+                       product.isListed && // Check if product is listed
+                       product.category && 
+                       product.category.isListed && // Check if category is listed
+                       product.brand &&
+                       product.brand.isListed; // Check if brand is listed
+            });
+
+            // Calculate price with any applicable offers
+            const totalPrice = validItems.reduce((total, item) => {
+                const product = item.product;
+                let price = product.salePrice;
+                
+                // Apply product offer if exists
+                if (product.productOffer > 0) {
+                    price -= product.offerAmount;
+                }
+                
+                // Apply category offer if exists
+                if (product.category && product.category.categoryOffer > 0) {
+                    const categoryDiscount = (price * product.category.categoryOffer) / 100;
+                    price -= categoryDiscount;
+                }
+                
+                return total + (price * item.quantity);
+            }, 0);
+
             const user = await User.findById({ _id: userId });
             
-            // Implement pagination on cart items
-            const totalItems = cart.items.length;
+            // Pagination
+            const totalItems = validItems.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const startIndex = (page - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             
-            // Slice the items array for pagination
-            const paginatedItems = cart.items.slice(startIndex, endIndex);
+            const paginatedItems = validItems.slice(startIndex, endIndex);
             const paginatedCart = {
                 ...cart.toObject(),
                 items: paginatedItems
             };
+
+            cart.items = validItems;
+            await cart.save();
 
             res.render('cart', {
                 cart: paginatedCart,
@@ -40,16 +80,20 @@ const loadAddToCart = async (req, res) => {
                 currentPage: page,
                 totalPages: totalPages,
                 hasNextPage: endIndex < totalItems,
-                hasPrevPage: page > 1
+                hasPrevPage: page > 1,
+                message: validItems.length < cart.items.length ? 
+                    "Some items were removed from your cart because they are no longer available." : 
+                    null
             });
         } else {
-            res.render('cart', { message: "cart is empty" });
+            res.render('cart', { message: "Cart is empty" });
         }
     } catch (error) {
-        console.error(error);
+        console.error("Cart loading error:", error);
         res.status(500).json("server error");
     }
 };
+
 
 const addToCart = async (req, res) => {
     const userId = req.session.user
