@@ -18,10 +18,10 @@ router.get(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/signup" }),
     (req, res) => {
-      console.log("Google callback reached"); 
+      req.session.user = req.user._id
       res.redirect("/");
     }
-  );
+);
 
 
 
