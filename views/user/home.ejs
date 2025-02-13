@@ -208,6 +208,10 @@
     .bi-heart-fill {
         color: #ff0000; 
     }
+
+    h6:hover {
+        color: #333;
+    }
     
     </style>
     
@@ -252,6 +256,7 @@
                                     <a href="/cart" class="add-cart" data-id="<%= product[i]._id %>" data-quantity="1" data-price="<%= product[i].salePrice %>">+ Add To Cart</a>
                                 </div>
                             </div>
+                            <a href="/productDetails?id=<%= product[i]._id %>" style="text-decoration: none;">
                             <div class="product__item__text">
                                 <h6><%= product[i].productName %></h6>
                                 <% 
@@ -271,6 +276,7 @@
                                     <% } %>
                                 </div>
                             </div>
+                        </a>
                         </a>
                     </div>
                 </div>

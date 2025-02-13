@@ -41,7 +41,6 @@
         vertical-align: middle;
     }
     
-    /* Status Badge */
     .badge {
         display: inline-block;
         padding: 4px 8px;
@@ -60,7 +59,6 @@
         color: #b91c1c;
     }
     
-/* Fixed Dropdown Styling */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -97,7 +95,6 @@
     z-index: 1000;
 }
 
-/* Add this new code to check for viewport space */
 .dropdown:last-child .dropdown-menu,
 .dropdown:nth-last-child(2) .dropdown-menu {
     bottom: 0;
@@ -132,12 +129,10 @@
     background-color: #f3f4f6;
 }
 
-/* Update table cell positioning */
 .table td {
     position: relative;
 }
 
-    /* Fixed Pagination */
     .pagination-container {
         display: flex;
         align-items: center;
@@ -188,7 +183,6 @@
         min-width: 80px;
     }
     
-    /* Modal */
     .modal {
         display: none;
         position: fixed;
@@ -343,7 +337,6 @@
     event.preventDefault();
     var dropdown = document.getElementById('dropdown-' + brandId);
     
-    // Close other open dropdowns first
     var dropdowns = document.getElementsByClassName("dropdown-menu");
     for (var i = 0; i < dropdowns.length; i++) {
         var openDropdown = dropdowns[i];
@@ -352,7 +345,6 @@
         }
     }
     
-    // Toggle the clicked dropdown
     dropdown.classList.toggle("show");
 }
 

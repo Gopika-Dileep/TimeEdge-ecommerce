@@ -173,7 +173,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Animation for timer/resend transition */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -225,7 +224,6 @@
             clearInterval(countDownInterval);
             let timer = duration;
             
-            // Reset display
             document.getElementById('resendLink').style.display = 'none';
             display.classList.remove('hide', 'fade-out');
             display.classList.add('fade-in');
@@ -347,7 +345,6 @@
                 });
             });
 
-            // Allow only numbers in OTP input
             $('#otp').on('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });

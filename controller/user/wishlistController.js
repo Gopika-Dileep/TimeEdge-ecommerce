@@ -8,10 +8,10 @@ const Wishlist= require('../../models/wishlistSchema')
 const loadWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
-        const itemsPerPage = 2; // Same as cart pagination
+        const itemsPerPage = 2; 
         const page = parseInt(req.query.page) || 1;
 
-        // Find wishlist and populate with product, category, and brand details
+       
         const wishlist = await Wishlist.findOne({ userId: userId }).populate({
             path: "products.productId",
             populate: [
@@ -29,28 +29,24 @@ const loadWishlist = async (req, res) => {
         const user = await User.findById({ _id: userId });
 
         if (wishlist && wishlist.products.length > 0) {
-            // Filter out products that are not listed or whose category/brand is not listed
             const validProducts = wishlist.products.filter(item => {
                 const product = item.productId;
                 return product && 
-                       product.isListed && // Check if product is listed
+                       product.isListed && 
                        product.category && 
-                       product.category.isListed && // Check if category is listed
+                       product.category.isListed && 
                        product.brand &&
-                       product.brand.isListed; // Check if brand is listed
+                       product.brand.isListed;
             });
 
-            // Calculate prices with offers for each product
             const productsWithPrices = validProducts.map(item => {
                 const product = item.productId;
                 let price = product.salePrice;
 
-                // Apply product offer if exists
                 if (product.productOffer > 0) {
                     price -= product.offerAmount;
                 }
 
-                // Apply category offer if exists
                 if (product.category && product.category.categoryOffer > 0) {
                     const categoryDiscount = (price * product.category.categoryOffer) / 100;
                     price -= categoryDiscount;
@@ -62,7 +58,6 @@ const loadWishlist = async (req, res) => {
                 };
             });
 
-            // Pagination
             const totalItems = productsWithPrices.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const startIndex = (page - 1) * itemsPerPage;
@@ -74,7 +69,6 @@ const loadWishlist = async (req, res) => {
                 products: paginatedProducts
             };
 
-            // Update wishlist with only valid products
             wishlist.products = validProducts;
             await wishlist.save();
 

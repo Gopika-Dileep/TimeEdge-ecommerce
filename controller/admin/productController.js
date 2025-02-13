@@ -108,11 +108,10 @@ const addProducts = async (req, res) => {
                 productImage: images,
                 status: "Available",
             });
-       
             await newProduct.save();
-            return res.redirect("/admin/product");
+            return res.redirect("/admin/product"); 
         } else {
-            return res.status(400).json("Product already exists.");
+            return res.status(400).json({success:true,message:"Product already exists."});
         }
     } catch (error) {
         console.error(error);

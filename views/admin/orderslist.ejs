@@ -1,7 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
 
   <style>
-/* General Styling */
 body {
   font-family: 'Arial', sans-serif;
   margin: 0;
@@ -25,7 +24,6 @@ h1 {
   font-size: 24px;
 }
 
-/* Table Styling */
 .orders-table {
   width: 100%;
   border-collapse: collapse;
@@ -60,7 +58,6 @@ h1 {
   background-color: #e5e7eb;
 }
 
-/* Button Styling */
 .orders-table .btn {
   padding: 6px 10px;
   font-size: 12px;
@@ -76,43 +73,42 @@ h1 {
   color: #ffffff;
 }
 
-/* Badge for Status */
 .orders-table td.pending {
-  color: #f59e0b; /* Yellow for Pending */
+  color: #f59e0b; 
   font-weight: bold;
 }
 
 .orders-table td.processing {
-  color: #3b82f6; /* Blue for Processing */
+  color: #3b82f6; 
   font-weight: bold;
 }
 
 .orders-table td.shipped {
-  color: #6366f1; /* Purple for Shipped */
+  color: #6366f1; 
   font-weight: bold;
 }
 
 .orders-table td.delivered {
-  color: #10b981; /* Green for Delivered */
+  color: #10b981; 
   font-weight: bold;
 }
 
 .orders-table td.cancelled {
-  color: #ef4444; /* Red for Cancelled */
+  color: #ef4444;
   font-weight: bold;
 }
 
 .orders-table td.return-request {
-  color: #f97316; /* Orange for Return Request */
+  color: #f97316; 
   font-weight: bold;
 }
 
 .orders-table td.returned {
-  color: #6b7280; /* Gray for Returned */
+  color: #6b7280; 
   font-weight: bold;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .orders-table thead {
     display: none;

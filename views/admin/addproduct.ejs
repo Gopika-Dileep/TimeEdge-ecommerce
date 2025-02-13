@@ -322,41 +322,32 @@
     <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
     <script>
         function validateImageOnSelect(event, inputNumber) {
-            // Clear previous error message
             const errorElement = document.getElementById('images-error');
             errorElement.style.display = 'none';
             errorElement.innerText = '';
 
             const file = event.target.files[0];
             
-            // If no file is selected, just return
             if (!file) return;
 
-            // Check file type
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
                 errorElement.innerText = 'Please select only JPG, JPEG, or PNG image files.';
                 errorElement.style.display = 'block';
-                // Clear the file input
                 event.target.value = '';
-                // Clear the preview image
                 document.getElementById(`imgView${inputNumber}`).src = '';
                 return;
             }
 
-            // Check file size (5MB max)
-            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            const maxSize = 5 * 1024 * 1024; 
             if (file.size > maxSize) {
                 errorElement.innerText = 'Image size should be less than 5MB.';
                 errorElement.style.display = 'block';
-                // Clear the file input
                 event.target.value = '';
-                // Clear the preview image
                 document.getElementById(`imgView${inputNumber}`).src = '';
                 return;
             }
 
-            // If validation passes, show the image preview
             viewImage(event, inputNumber);
         }
 
@@ -480,15 +471,12 @@
         }
 
         function validateImageFile(file) {
-            // Check if file exists
             if (!file) return false;
             
-            // Check file type
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (!allowedTypes.includes(file.type)) return false;
             
-            // Check file size (max 5MB)
-            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            const maxSize = 5 * 1024 * 1024;
             if (file.size > maxSize) return false;
             
             return true;
@@ -539,7 +527,6 @@
                 isValid = false;
             }
 
-            // Validate first image (required)
             if (images.files.length === 0) {
                 displayErrorMessage("images-error", 'Please select at least one image.');
                 isValid = false;
@@ -548,7 +535,6 @@
                 isValid = false;
             }
 
-            // Validate additional images if present
             const additionalImages = [
                 document.getElementById('input2'),
                 document.getElementById('input3'),

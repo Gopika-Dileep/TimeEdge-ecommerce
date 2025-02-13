@@ -10,7 +10,6 @@ const loadAddToCart = async (req, res) => {
         const itemsPerPage = 2;
         const page = parseInt(req.query.page) || 1;
         
-        // Find cart and populate with product, category, and brand details
         const cart = await Cart.findOne({ user: userId }).populate({
             path: "items.product",
             populate: [
@@ -26,28 +25,26 @@ const loadAddToCart = async (req, res) => {
         });
 
         if (cart) {
-            // Filter out items where product, category, or brand is not listed
             const validItems = cart.items.filter(item => {
                 const product = item.product;
                 return product && 
-                       product.isListed && // Check if product is listed
+                       product.isListed && 
                        product.category && 
-                       product.category.isListed && // Check if category is listed
+                       product.category.isListed &&
                        product.brand &&
-                       product.brand.isListed; // Check if brand is listed
+                       product.brand.isListed;
             });
 
-            // Calculate price with any applicable offers
             const totalPrice = validItems.reduce((total, item) => {
                 const product = item.product;
                 let price = product.salePrice;
                 
-                // Apply product offer if exists
+                
                 if (product.productOffer > 0) {
                     price -= product.offerAmount;
                 }
                 
-                // Apply category offer if exists
+              
                 if (product.category && product.category.categoryOffer > 0) {
                     const categoryDiscount = (price * product.category.categoryOffer) / 100;
                     price -= categoryDiscount;
@@ -58,7 +55,7 @@ const loadAddToCart = async (req, res) => {
 
             const user = await User.findById({ _id: userId });
             
-            // Pagination
+            
             const totalItems = validItems.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const startIndex = (page - 1) * itemsPerPage;

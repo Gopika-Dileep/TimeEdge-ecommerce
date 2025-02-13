@@ -1,7 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
-    /* Main content styling */
     .content-header {
         background: #f9fafb;
         padding: 1.5rem 2rem;
@@ -9,7 +8,6 @@
         margin-bottom: 2rem;
     }
 
-    /* Search bar styling */
     .search-bar {
         width: 300px;
         margin: 0;
@@ -29,7 +27,6 @@
         display: none;
     }
 
-    /* Table styling */
     .table-responsive {
         background: white;
         border-radius: 0.5rem;
@@ -58,14 +55,12 @@
         font-size: 0.875rem;
     }
 
-    /* Status and action buttons */
     .btn-sm {
         padding: 0.25rem 0.75rem;
         font-size: 0.875rem;
         border-radius: 0.375rem;
     }
 
-    /* Pagination styling */
     .pagination {
         margin: 1.5rem 0;
     }
@@ -86,7 +81,6 @@
         background-color: #f9fafb;
     }
 
-    /* Header section with title and search */
     .content-title {
         color: #111827;
         font-size: 1.5rem;
@@ -94,7 +88,6 @@
         margin: 0;
     }
 
-    /* Responsive adjustments */
     @media (max-width: 768px) {
         .content-header {
             padding: 1rem;
@@ -127,9 +120,7 @@
         color: #9b1c1c;
     }
 
-/* Existing styles remain the same */
 
-/* Updated dropdown styles */
 .action-dropdown {
     position: relative;
     display: inline-block;
@@ -200,7 +191,6 @@
     background-color: #f9fafb;
 }
 
-/* Fix for table cell containing dropdown */
 .table tbody td:last-child {
     position: relative;
     min-width: 100px;
@@ -306,7 +296,7 @@
         <ul class="pagination justify-content-center">
             <% if (pagination && pagination.totalpage > 1) { %>
             
-                <li class="page-item <%= pagination.currentpage === 1 ? 'disabled' : '' %>">
+                <li class="page-item <%= pagination.currentpage == 1 ? 'disabled' : '' %>">
                     <a class="page-link" href="?page=<%= pagination.currentpage - 1 %>&search=<%= search %>" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
@@ -314,14 +304,14 @@
 
                
                 <% for (let i = 1; i <= pagination.totalpage; i++) { %>
-                    <li class="page-item <%= i === pagination.currentpage ? 'active' : '' %>">
+                    <li class="page-item <%= i == pagination.currentpage ? 'active' : '' %>">
                         <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
                     </li>
                 <% } %>
 
             
-                <li class="page-item <%= pagination.currentpage === pagination.totalpage ? 'disabled' : '' %>">
-                    <a class="page-link" href="?page=<%= pagination.currentpage + 1 %>&search=<%= search %>" aria-label="Next">
+                <li class="page-item <%= pagination.currentpage == pagination.totalpage ? 'disabled' : '' %>">
+                    <a class="page-link" href="?page=<%= parseInt(pagination.currentpage) + 1 %>&search=<%= search %>" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
@@ -401,10 +391,6 @@
         });
     });
 });
-    
-    
-    
-    
-  
+
 </script>
 <%- include("../../views/partials/admin/footer") %>

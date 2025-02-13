@@ -889,7 +889,6 @@ const initiateRepayment = async (req, res) => {
   try {
     const { orderId } = req.body;
    const orderCreatedId=orderId
-    // Find the existing order
     const order = await Order.findOne({orderId:orderId});
     
     if (!order) {
@@ -899,9 +898,8 @@ const initiateRepayment = async (req, res) => {
       });
     }
 
-    // Create Razorpay order
     const options = {       
-      amount: order.finalAmount * 100,  // Amount in paise
+      amount: order.finalAmount * 100,  
       currency: "INR",
       receipt: `repay_${orderId}`
     };
@@ -938,7 +936,6 @@ const verifyRepaymentOrder = async (req, res) => {
     } = req.body;
     console.log(orderId,"check1")
 
-    // Find the existing order
     const order = await Order.findOne({orderId:orderId});
     console.log(order,"check2")
 
@@ -950,7 +947,6 @@ const verifyRepaymentOrder = async (req, res) => {
       });
     }
 
-    // Verify payment signature
     const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY)
       .update(`${razorpayOrderId}|${paymentId}`)
@@ -969,7 +965,6 @@ const verifyRepaymentOrder = async (req, res) => {
     if (paymentVerificationStatus) {
     console.log("check333")
       
-      // Update order payment status
       order.paymentStatus = 'Paid';
       await order.save();
     console.log(order,"check333")

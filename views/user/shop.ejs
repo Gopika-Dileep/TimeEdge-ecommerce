@@ -7,11 +7,11 @@
 .bi-heart, .bi-heart-fill {
     font-size: 2rem;
     cursor: pointer;
-    color: #ff2a68; /* Red color */
+    color: #ff2a68; 
 }
 
 .bi-heart-fill {
-    color: #ff0000; /* Solid red for filled heart */
+    color: #ff0000; 
 }
 
 </style>
@@ -142,7 +142,6 @@
                                             data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>">
                                             <ul class="product__hover">
                                                 <li>
-                                                    <!-- Heart icon with dynamic class based on wishlist status -->
                                                     <i class="bi <%= product[i].inWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" id="wishlist-icon-<%= product[i]._id %>" data-id="<%= product[i]._id %>"></i>
                                                     <span>Wishlist</span>
                                                 </li>

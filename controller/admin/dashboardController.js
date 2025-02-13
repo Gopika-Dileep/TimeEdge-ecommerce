@@ -1,11 +1,9 @@
-// adminDashboard.js (Controller)
 const Product = require('../../models/productSchema');
 const Order = require('../../models/orderSchema');
 const User = require('../../models/userSchema'); 
 
 const loadDashboard = async (req, res) => {
     try {
-        // Get total revenue from delivered orders
         const revenueData = await Order.aggregate([
             { $unwind: "$orderedItems" },
             {
@@ -22,7 +20,6 @@ const loadDashboard = async (req, res) => {
         ]);
         const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
 
-        // Get cancelled products count
         const cancelledData = await Order.aggregate([
             { $unwind: "$orderedItems" },
             {
@@ -39,13 +36,10 @@ const loadDashboard = async (req, res) => {
         ]);
         const cancelledCount = cancelledData.length > 0 ? cancelledData[0].totalCancelled : 0;
 
-        // Get total orders count
         const salesData = await Order.countDocuments();
 
-        // Get new users count
         const newUsersCount = await User.countDocuments();
 
-        // Best selling product order
         const product = await Order.aggregate([
             { $unwind: "$orderedItems" },
             {
@@ -74,7 +68,6 @@ const loadDashboard = async (req, res) => {
             { $limit: 4},
         ]);
 
-        // Best selling category order
         const category = await Order.aggregate([
             { $unwind: "$orderedItems" },
             {
@@ -111,7 +104,6 @@ const loadDashboard = async (req, res) => {
             { $limit: 4 },
         ]);
 
-        // Best selling brands order
         const brand = await Order.aggregate([
             { $unwind: "$orderedItems" },
             {
@@ -148,7 +140,6 @@ const loadDashboard = async (req, res) => {
             { $limit: 4 },
         ]);
 
-        // Get user registrations
         const users = await User.aggregate([
             {
                 $group: {
@@ -162,7 +153,6 @@ const loadDashboard = async (req, res) => {
             { $limit: 4 }
         ]);
 
-        // Chart data preparation
         const productData = product.map((item) => ({
             productName: item.productName,
             totalOrder: item.totalOrder,
@@ -209,7 +199,6 @@ const filterData = async (req, res) => {
         let filterCondition = {};
         let userFilterCondition = {};
 
-        // Set up date filtering based on the selected option
         const now = new Date();
         switch (filterValue) {
             case 'daily':
@@ -249,7 +238,6 @@ const filterData = async (req, res) => {
                 userFilterCondition = {};
         }
 
-        // Get filtered revenue
         const revenueData = await Order.aggregate([
             { $match: filterCondition },
             { $unwind: "$orderedItems" },
@@ -267,7 +255,6 @@ const filterData = async (req, res) => {
         ]);
         const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
 
-        // Get filtered cancelled products
         const cancelledData = await Order.aggregate([
             { $match: filterCondition },
             { $unwind: "$orderedItems" },
@@ -285,13 +272,10 @@ const filterData = async (req, res) => {
         ]);
         const cancelledCount = cancelledData.length > 0 ? cancelledData[0].totalCancelled : 0;
 
-        // Get filtered orders count
         const salesData = await Order.countDocuments(filterCondition);
 
-        // Get filtered new users count
         const newUsersCount = await User.countDocuments(userFilterCondition);
 
-        // Best selling products
         const products = await Order.aggregate([
             { $match: filterCondition },
             { $unwind: "$orderedItems" },
@@ -321,7 +305,6 @@ const filterData = async (req, res) => {
             { $limit: 4 },
         ]);
 
-        // Best selling categories
         const categories = await Order.aggregate([
             { $match: filterCondition },
             { $unwind: "$orderedItems" },
@@ -359,7 +342,6 @@ const filterData = async (req, res) => {
             { $limit: 4 },
         ]);
 
-        // Best selling brands
         const brands = await Order.aggregate([
             { $match: filterCondition },
             { $unwind: "$orderedItems" },
@@ -397,7 +379,6 @@ const filterData = async (req, res) => {
             { $limit: 4 },
         ]);
 
-        // Get filtered users
         const users = await User.aggregate([
             { $match: userFilterCondition },
             {
@@ -412,7 +393,6 @@ const filterData = async (req, res) => {
             { $limit: 4 }
         ]);
 
-        // Prepare chart data
         const productData = products.map((item) => ({
             productName: item.productName,
             totalOrder: item.totalOrder,

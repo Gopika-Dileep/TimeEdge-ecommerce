@@ -152,7 +152,6 @@ const filterOrder = async (req, res) => {
             status: "delivered"
         };
 
-        // Date filtering logic
         if (filtervalue !== 'custom') {
             const today = new Date();
             let start, end;
@@ -198,11 +197,9 @@ const filterOrder = async (req, res) => {
             query.createdOn = { $gte: start, $lte: end };
         }
 
-// In your filterOrder controller
 const totalOrders = await Order.countDocuments(query);
 const totalPage = Math.ceil(totalOrders / limit);
 
-        // Get paginated orders
         const orders = await Order.find(query)
             .sort({ createdOn: -1 })
             .skip((page - 1) * limit)
@@ -210,7 +207,6 @@ const totalPage = Math.ceil(totalOrders / limit);
             .populate('user')
             .populate('orderedItems.products');
 
-        // Calculate totals from all matching orders (not just paginated ones)
         const allOrders = await Order.find(query);
         const totalSalePrice = allOrders.reduce((sum, order) => sum + order.finalAmount, 0);
         const saleCount = allOrders.length;
@@ -281,10 +277,8 @@ const downloadpdf = async (req, res) => {
         const { filtervalue, startDate, endDate } = req.body;
         console.log(req.body,"tessttt")
         
-        // Get all filtered orders
         const orders = await getFilteredOrders(filtervalue, startDate, endDate);
         
-        // Transform orders into the format needed for PDF
         const salesData = orders.map(order => ({
             date: order.createdOn,
             orderId: order.orderId,
@@ -306,10 +300,8 @@ const downloadpdf = async (req, res) => {
       res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
       doc.pipe(res);
   
-      // Helper function to format currency
       const formatCurrency = (amount) => `₹${amount.toFixed(2)}`;
   
-      // Add company header
       doc.fontSize(20)
          .font('Helvetica-Bold')
          .text('Sales Report', { align: 'center' });
@@ -319,7 +311,6 @@ const downloadpdf = async (req, res) => {
          .font('Helvetica')
          .text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'right' });
   
-      // Add summary section
       doc.moveDown();
       doc.fontSize(14)
          .font('Helvetica-Bold')
@@ -337,24 +328,20 @@ const downloadpdf = async (req, res) => {
          .text(`Total Product Discounts: ${formatCurrency(totalProductDiscount)}`)
          .text(`Total Coupon Discounts: ${formatCurrency(totalCouponDiscount)}`);
   
-      // Add sales details table
       doc.moveDown();
       doc.fontSize(14)
          .font('Helvetica-Bold')
          .text('Sales Details');
   
-      // Table headers
       const startX = 50;
       const columnWidths = [80, 90, 80, 80, 80, 80];
       let currentY = doc.y + 10;
   
       const headers = ['Date', 'Order ID', 'Subtotal', 'Product Disc.', 'Coupon Disc.', 'Final Amount'];
       
-      // Draw header background
       doc.rect(startX, currentY, doc.page.width - 100, 20)
          .fill('#f0f0f0');
   
-      // Draw header text
       let currentX = startX;
       doc.fontSize(8)
          .font('Helvetica-Bold')
@@ -368,12 +355,10 @@ const downloadpdf = async (req, res) => {
         currentX += columnWidths[i];
       });
   
-      // Draw table rows
       currentY += 20;
       doc.font('Helvetica').fontSize(8);
   
       salesData.forEach((sale, index) => {
-        // Add new page if needed
         if (currentY > doc.page.height - 100) {
           doc.addPage();
           currentY = 50;
@@ -397,7 +382,6 @@ const downloadpdf = async (req, res) => {
           currentX += columnWidths[i];
         });
   
-        // Draw row border
         doc.rect(startX, currentY, doc.page.width - 100, 20)
            .stroke('#dddddd');
   
@@ -414,10 +398,8 @@ const downloadpdf = async (req, res) => {
     try {
         const { filtervalue, startDate, endDate } = req.body;
         
-        // Get all filtered orders
         const orders = await getFilteredOrders(filtervalue, startDate, endDate);
         
-        // Transform orders into the format needed for Excel
         const salesData = orders.map(order => ({
             date: order.createdOn,
             orderId: order.orderId,
@@ -431,14 +413,11 @@ const downloadpdf = async (req, res) => {
 
         const workbook = new excelJS.Workbook();
         
-        // Add metadata to the workbook
         workbook.creator = 'Admin';
         workbook.created = new Date();
         
-        // Create main worksheet
         const worksheet = workbook.addWorksheet('Sales Report');
 
-        // Define columns
         worksheet.columns = [
             { header: 'Date', key: 'date', width: 15 },
             { header: 'Order ID', key: 'orderId', width: 20 },
@@ -450,7 +429,6 @@ const downloadpdf = async (req, res) => {
             { header: 'Payment Method', key: 'paymentMethod', width: 15 }
         ];
 
-        // Style the header row
         worksheet.getRow(1).font = {
             bold: true,
             size: 12
@@ -461,7 +439,6 @@ const downloadpdf = async (req, res) => {
             fgColor: { argb: 'FFE0E0E0' }
         };
 
-        // Add sales data
         salesData.forEach((sale) => {
             worksheet.addRow({
                 date: new Date(sale.date).toLocaleDateString(),
@@ -475,32 +452,27 @@ const downloadpdf = async (req, res) => {
             });
         });
 
-        // Add summary section with a gap
-        worksheet.addRow([]); // Empty row for spacing
-        worksheet.addRow([]); // Empty row for spacing
+        worksheet.addRow([]); 
+        worksheet.addRow([]); 
         
         const summaryStartRow = worksheet.rowCount + 1;
         
-        // Calculate totals
         const totalOrders = salesData.length;
         const totalRevenue = salesData.reduce((sum, sale) => sum + sale.finalAmount, 0);
         const totalProductDiscount = salesData.reduce((sum, sale) => sum + sale.productDiscount, 0);
         const totalCouponDiscount = salesData.reduce((sum, sale) => sum + sale.couponDiscount, 0);
 
-        // Add summary data
         worksheet.addRow(['Summary']).font = { bold: true, size: 14 };
         worksheet.addRow(['Total Orders:', totalOrders]);
         worksheet.addRow(['Total Revenue:', `₹${totalRevenue.toFixed(2)}`]);
         worksheet.addRow(['Total Product Discounts:', `₹${totalProductDiscount.toFixed(2)}`]);
         worksheet.addRow(['Total Coupon Discounts:', `₹${totalCouponDiscount.toFixed(2)}`]);
 
-        // Style the numbers columns to show 2 decimal places
         worksheet.getColumn('subtotal').numFmt = '₹#,##0.00';
         worksheet.getColumn('productDiscount').numFmt = '₹#,##0.00';
         worksheet.getColumn('couponDiscount').numFmt = '₹#,##0.00';
         worksheet.getColumn('finalAmount').numFmt = '₹#,##0.00';
 
-        // Add borders to the data cells
         const dataEndRow = salesData.length + 1;
         worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
             if (rowNumber <= dataEndRow) {
@@ -515,7 +487,6 @@ const downloadpdf = async (req, res) => {
             }
         });
 
-        // Set response headers
         res.setHeader(
             'Content-Type',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -525,7 +496,6 @@ const downloadpdf = async (req, res) => {
             `attachment; filename=sales_report_${new Date().toISOString().split('T')[0]}.xlsx`
         );
 
-        // Write to response
         await workbook.xlsx.write(res);
         res.status(200).end();
     } catch (error) {

@@ -245,12 +245,12 @@
             </thead>
             <tbody>
                 <% 
-                const itemsPerPage = 5; // Define the number of items per page
-                const startIndex = (currentpage - 1) * itemsPerPage; // Calculate the starting index
+                const itemsPerPage = 5; 
+                const startIndex = (currentpage - 1) * itemsPerPage; 
                 %>
                 <% for(let i = 0; i < product.length; i++) { %>
                 <tr data-product-id="<%= product[i]?._id %>">
-                    <td><%= startIndex + i + 1 %></td> <!-- Display the correct index -->
+                    <td><%= startIndex + i + 1 %></td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <% if (product[i]?.productImage && product[i]?.productImage.length > 0) { %>
