@@ -478,24 +478,21 @@ const changeStatus = async (req, res) => {
     await order.save();
 
     const itemStatuses = order.orderedItems.map((item) => item.status);
-    if (itemStatuses.every((s) => s === "delivered")) {
-      order.status = "delivered";
-    } else if (
-      itemStatuses.some((s) => s === "Processing" || s === "Shipped")
-    ) {
-      order.status = "Processing";
+
+    if (itemStatuses.every((s) => s === "Cancelled" || s === "Returned")) {
+      order.status = "Cancelled";
     } else if (itemStatuses.some((s) => s === "Pending")) {
       order.status = "Pending";
-    } else if (
-      itemStatuses.some(
-        (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
-      )
-    ) {
-      order.status = "Cancelled";
+    } else if (itemStatuses.some((s) => s === "Processing" || s === "Shipped")) {
+      order.status = "Processing";
+    } else if (itemStatuses.every((s) => s === "delivered")) {
+      order.status = "delivered";
     } else {
       order.status = "pending";
     }
+    
     await order.save();
+    
 
     res.setHeader("Content-Type", "application/json");
     return res.json({ success: true });

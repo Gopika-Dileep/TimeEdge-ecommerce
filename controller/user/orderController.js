@@ -86,8 +86,8 @@ const createOrder = async (req, res) => {
       subtotal,
     } = req.body;
     console.log(req.body,'dfdddddddd');
-    if(finalAmount<=2000){
-      return res.status(400).json({success:false,message:"item below 2000 cant be in COD "})
+    if(finalAmount>=2000){
+      return res.status(400).json({success:false,message:"item above 2000 cant be in COD "})
     }
 
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");
@@ -520,7 +520,7 @@ const cancelOrderItem = async (req, res) => {
     } else if (itemStatuses.some((s) => s === "Pending")) {
       order.status = "Pending";
     } else if (
-      itemStatuses.some(
+      itemStatuses.every(
         (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
       )
     ) {
@@ -1069,9 +1069,9 @@ const downloadInvoice = async (req, res) => {
 
     order.orderedItems.forEach((item) => {
       doc.text(item.products.productName, 50, yPosition, { width: 250 })
-         .text(`₹${item.price.toFixed(2)}`, 300, yPosition, { width: 100, align: 'right' })
+         .text(`${item.price.toFixed(2)}`, 300, yPosition, { width: 100, align: 'right' })
          .text(item.quantity.toString(), 400, yPosition, { width: 50, align: 'right' })
-         .text(`₹${(item.price * item.quantity).toFixed(2)}`, 450, yPosition, { width: 100, align: 'right' });
+         .text(`${(item.price * item.quantity).toFixed(2)}`, 450, yPosition, { width: 100, align: 'right' });
       yPosition += 20;
     });
 
@@ -1086,16 +1086,16 @@ const downloadInvoice = async (req, res) => {
     const totalsStart = doc.y + 15;
     doc.font('Helvetica')
        .text('SUB TOTAL', 300, totalsStart, { width: 150, align: 'left' })
-       .text(`₹${order.subtotal.toFixed(2)}`, 450, totalsStart, { width: 100, align: 'right' })
+       .text(`${order.subtotal.toFixed(2)}`, 450, totalsStart, { width: 100, align: 'right' })
        .text('Discount', 300, totalsStart + 20, { width: 150, align: 'left' })
-       .text(`-₹${order.productdiscount.toFixed(2)}`, 450, totalsStart + 20, { width: 100, align: 'right' })
+       .text(`-${order.productdiscount.toFixed(2)}`, 450, totalsStart + 20, { width: 100, align: 'right' })
        .text('Coupon Discount', 300, totalsStart + 40, { width: 150, align: 'left' })
-       .text(`-₹${order.couponDiscount.toFixed(2)}`, 450, totalsStart + 40, { width: 100, align: 'right' });
+       .text(`-${order.couponDiscount.toFixed(2)}`, 450, totalsStart + 40, { width: 100, align: 'right' });
 
    
     doc.font('Helvetica-Bold')
        .text('Grand Total', 300, totalsStart + 70, { width: 150, align: 'left' })
-       .text(`₹${order.finalAmount.toFixed(2)}`, 450, totalsStart + 70, { width: 100, align: 'right' });
+       .text(`${order.finalAmount.toFixed(2)}`, 450, totalsStart + 70, { width: 100, align: 'right' });
 
    
     doc.moveDown(4)
