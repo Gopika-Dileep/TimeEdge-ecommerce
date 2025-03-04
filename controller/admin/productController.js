@@ -58,64 +58,78 @@ const addProducts = async (req, res) => {
     try {
         const products = req.body;
 
-        const productExists = await Product.findOne({ productName: products.productName });
-        if (!productExists) {
-            const images = [];
-            console.log(req.files, "req.files");
+        // Case-insensitive product name check
+        const productExists = await Product.findOne({ 
+            productName: { $regex: new RegExp(`^${products.productName}$`, 'i') } 
+        });
 
-            if (req.files && req.files.length > 0) {
-                for (const file of req.files) {
-                    const originalImagePath = file.path;
-
-                    const uploadDir = path.join("public", "uploads", "productImages");
-                    const resizedFilename = `resized-${Date.now()}-${file.filename}`;
-                    const resizedImagePath = path.join(uploadDir, resizedFilename);
-
-                    await sharp(originalImagePath)
-                        .resize({ width: 1000, height: 1000 })
-                        .toFile(resizedImagePath);
-                    images.push(resizedFilename);
-                }
-            }
-
-            const categoryId = await Category.findOne({ name: products.category });
-            const newcat = categoryId._id
-            console.log(newcat,'newcat');
-            
-            const brandId = await Brand.findOne({ name: products.brand });
-           const newbrand=brandId._id
-            
-            console.log(newbrand,"brand")
-            // const brandName = brandId.name
-            // console.log(brandName,"brandName");
-            
-            
-
-            if (!categoryId) {
-                return res.status(400).json("Invalid category name");
-            }
-
-            const newProduct = new Product({
-                productName: products.productName,
-                description: products.description,
-                brand: newbrand,
-                category: newcat,
-                regularPrice: products.regularPrice,
-                salePrice: products.salePrice,
-                createdOn: new Date(),
-                quantity: products.quantity,
-                size: products.size,
-                productImage: images,
-                status: "Available",
+        if (productExists) {
+            return res.status(400).json({
+                productExists: true,
+                success: false,
+                message: "A product with this name already exists.",
+                showSweetAlert: true
             });
-            await newProduct.save();
-            return res.redirect("/admin/product"); 
-        } else {
-            return res.status(400).json({success:true,message:"Product already exists."});
         }
+
+        const images = [];
+        console.log(req.files, "req.files");
+
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const originalImagePath = file.path;
+
+                const uploadDir = path.join("public", "uploads", "productImages");
+                const resizedFilename = `resized-${Date.now()}-${file.filename}`;
+                const resizedImagePath = path.join(uploadDir, resizedFilename);
+
+                await sharp(originalImagePath)
+                    .resize({ width: 1000, height: 1000 })
+                    .toFile(resizedImagePath);
+                images.push(resizedFilename);
+            }
+        }
+
+        const categoryId = await Category.findOne({ name: products.category });
+        const newcat = categoryId._id;
+        
+        const brandId = await Brand.findOne({ name: products.brand });
+        const newbrand = brandId._id;
+
+        if (!categoryId) {
+            return res.status(400).json({
+                error: true,
+                message: "Invalid category name"
+            });
+        }
+
+        const newProduct = new Product({
+            productName: products.productName,
+            description: products.description,
+            brand: newbrand,
+            category: newcat,
+            regularPrice: products.regularPrice || 0,
+            salePrice: products.salePrice,
+            createdOn: new Date(),
+            quantity: products.quantity,
+            size: products.size,
+            productImage: images,
+            status: "Available",
+        });
+        
+        // Save the product
+        await newProduct.save();
+
+        // Redirect to product list page
+        return res.redirect('/admin/product');
     } catch (error) {
-        console.error(error);
-        res.status(400).json({ message: "Error while adding product" });
+        console.error('Product Add Error:', error);
+        
+        // Render error page or redirect with error message
+        return res.status(500).render('error', {
+            message: "Error while adding product",
+            error: error.message
+        });
     }
 };
 

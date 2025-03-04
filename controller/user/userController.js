@@ -14,6 +14,45 @@ const loadlogin = async (req,res)=>{
         res.redirect('/')
     }
 }
+
+const googleAuthCallback = async (req, res) => {
+    try {
+        // Check if req.user exists
+        if (!req.user || !req.user._id) {
+            return res.redirect("/signup?error=unauthorized");
+        }
+
+        // Fetch user from the database
+        const user = await User.findById(req.user._id);
+
+        // Check if user exists
+        if (!user) {
+            return res.render("login", { message: "User not found" });
+        }
+
+        // Check if the user is blocked
+        if (user.isBlocked === true) {
+            await req.logout(); // Use await if using Passport v0.6+
+            req.session.destroy((err) => {
+                if (err) {
+                    console.error("Error destroying session:", err);
+                    return res.render("signup", { message: "User is blocked by admin" });
+                }
+                res.render("login", { message: "User is blocked by admin" });
+            });
+            return;
+        }
+
+        // If user is not blocked, set session and proceed
+        req.session.user = user._id;
+        res.redirect("/");
+    } catch (error) {
+        console.error("Error during authentication:", error);
+        res.redirect("/signup?error=server");
+    }
+};
+
+
 const login = async (req,res)=>{
     try {
         const { email, password } = req.body;
@@ -221,5 +260,6 @@ module.exports={
     otpverify,
     login,
     logout,
-    resendOtp
+    resendOtp,
+    googleAuthCallback
 }
