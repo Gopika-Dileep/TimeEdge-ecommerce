@@ -483,10 +483,12 @@ const changeStatus = async (req, res) => {
       order.status = "Cancelled";
     } else if (itemStatuses.some((s) => s === "Pending")) {
       order.status = "Pending";
-    } else if (itemStatuses.some((s) => s === "Processing" || s === "Shipped")) {
+    } else if (itemStatuses.some((s) => s === "Processing")) {
       order.status = "Processing";
     } else if (itemStatuses.every((s) => s === "delivered")) {
       order.status = "delivered";
+    } else if (itemStatuses.every((s) => s === "Shipped")) {
+      order.status = "Shipped";
     } else {
       order.status = "pending";
     }
@@ -509,7 +511,7 @@ const logout = async (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         console.log("Error desroying session", err);
-        return res.status(400).json({ message: "error while logout" });
+        return res.status(400).json({ success:false, error: "error while logout" });
       } else {
         console.log("back to lgin");
         res.redirect("/admin");
@@ -517,7 +519,7 @@ const logout = async (req, res) => {
     });
   } catch (error) {
     console.log("unexpected error during logout", error);
-    res.status(500).json({ message: "server error" });
+    res.status(500).json({success:false, error: "server error" });
   }
 };
 module.exports = {

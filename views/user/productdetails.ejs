@@ -15,12 +15,34 @@
         border-radius: 8px;
         padding: 20px;
         background: #fff;
+
+        cursor: zoom-in;
+        overflow: hidden;
+        position: relative;
     }
 
     .main-image img {
         width: 100%;
         height: auto;
         object-fit: contain;
+        transition: transform 0.5s ease;
+    }
+
+    /* Add zoom effect styles */
+    .img-magnifier-container {
+        position: relative;
+    }
+
+    .img-magnifier-glass {
+        position: absolute;
+        border: 3px solid #000;
+        border-radius: 50%;
+        cursor: none;
+        /* Set the size of the magnifier glass */
+        width: 200px;
+        height: 200px;
+        display: none;
+        z-index: 1000;
     }
 
     .thumbnail-gallery {
@@ -45,7 +67,7 @@
     }
 
     .thumbnail:hover {
-        border-color: #86c32a;
+        border-color: #333;
     }
 
     .product-info {
@@ -77,7 +99,7 @@
     }
 
     .discount-badge {
-        background: #86c32a;
+        background:#86c32a;
         color: white;
         padding: 5px 10px;
         border-radius: 4px;
@@ -91,30 +113,6 @@
         line-height: 1.6;
     }
 
-    .quantity-selector {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin: 20px 0;
-    }
-
-    .quantity-btn {
-        background: #f5f5f5;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 18px;
-    }
-
-    .quantity-value {
-        font-size: 18px;
-        font-weight: 600;
-        min-width: 40px;
-        text-align: center;
-    }
-
     .action-buttons {
         display: flex;
         gap: 15px;
@@ -122,7 +120,7 @@
     }
 
     .add-to-cart {
-        background: #86c32a;
+        background:#343534;
         color: white;
         border: none;
         padding: 12px 30px;
@@ -133,7 +131,7 @@
     }
 
     .add-to-cart:hover {
-        background: #729e24;
+        background: grey;
     }
 
     .add-to-wishlist {
@@ -201,15 +199,67 @@
         background: #ffebee;
         color: #c62828;
     }
+
+    /* Breadcrumb styles */
+    .breadcrumbs {
+        padding: 10px 0;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .breadcrumbs ul {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .breadcrumbs li {
+        display: flex;
+        align-items: center;
+        color: #666;
+    }
+
+    .breadcrumbs li:not(:last-child)::after {
+        content: '/';
+        margin: 0 8px;
+        color: #ccc;
+    }
+
+    .breadcrumbs a {
+        color: #666;
+        text-decoration: none;
+    }
+
+    .breadcrumbs a:hover {
+        color: #86c32a;
+    }
+
+    .breadcrumbs li:last-child {
+        color: #86c32a;
+    }
 </style>
 
 <main class="main">
     <div class="container product-details-container">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/shop">Shop</a></li>
+                <% if (product.category) { %>
+                    <li><a href="/category/<%= product.category._id %>"><%= product.category.name %></a></li>
+                <% } %>
+                <li><%= product.productName %></li>
+            </ul>
+        </div>
+
         <div class="row">
             <div class="col-md-6">
                 <div class="product-gallery">
-                    <div class="main-image">
+                    <div class="main-image img-magnifier-container">
                         <img id="currentImage" src="/uploads/productImages/<%= product.productImage[0] %>" alt="<%= product.productName %>">
+                        <div class="img-magnifier-glass"></div>
                     </div>
                     <div class="thumbnail-gallery">
                         <% product.productImage.forEach((image, index) => { %>
@@ -226,20 +276,28 @@
                     <h1 class="product-title"><%= product.productName %></h1>
                     
                     <div class="price-container">
-                        <span class="sale-price">₹<%= product.salePrice %></span>
-                        <span class="regular-price">₹<%= product.regularPrice %></span>
-                        <span class="discount-badge"><%= Math.round((product.regularPrice - product.salePrice) / product.regularPrice * 100) %>%</span>
+                        <% 
+                        const productOffer = product.productOffer || 0;
+                        const categoryOffer = product.category.categoryOffer || 0;
+                        const bestOffer = Math.max(productOffer, categoryOffer);
+                        const salePrice = product.salePrice;
+                        const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
+                        %>
+                        <span class="price text-danger">₹<%= finalPrice %></span>
+                        <% if (finalPrice < salePrice) { %>
+                            <span class="price"><strike class="text-muted">₹<%= product.salePrice %></strike></span>
+
+                        <% } %>
+                      
+                        <span class="discount-badge"><%= Math.round(( product.salePrice - finalPrice) / product.salePrice * 100) %>%</span>
                     </div>
 
                     <div class="product-description">
                         <%= product.description %>
                     </div>
 
-                    <div class="quantity-selector">
-                        <button class="quantity-btn qty-down">-</button>
-                        <span class="quantity-value" id="quantity">1</span>
-                        <button class="quantity-btn qty-up">+</button>
-                    </div>
+                 
+                    <input type="hidden" id="quantity" value="1">
 
                     <div class="action-buttons">
                         <button class="add-to-cart button-add-to-cart" data-id="<%= product._id %>">Add to Cart</button>
@@ -272,13 +330,23 @@
                     <div class="col-md-3 mb-4">
                         <div class="related-product-card">
                             <a href="/productDetails/<%= related._id %>">
+                                <a href="/productDetails?id=<%= related._id %>">
                                 <img src="/uploads/productImages/<%= related.productImage[0] %>" 
                                      alt="<%= related.productName %>"
                                      class="img-fluid mb-3">
                                 <h4 class="h6 mb-2"><%= related.productName %></h4>
                                 <div class="price-container">
-                                    <span class="sale-price">₹<%= related.salePrice %></span>
-                                    <span class="regular-price">₹<%= related.regularPrice %></span>
+                                    <% 
+                                        const productOffer = related.productOffer || 0;
+                                        const categoryOffer = related.category.categoryOffer || 0;
+                                        const bestOffer = Math.max(productOffer, categoryOffer);
+                                        const salePrice = related.salePrice;
+                                        const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
+                                        %>
+                                     <span class="price text-danger">₹<%= finalPrice %></span>
+                                   
+                                         <span class="price"><strike class="text-muted">₹<%= related.salePrice %></strike></span>
+
                                 </div>
                             </a>
                         </div>
@@ -297,23 +365,96 @@
         document.getElementById('currentImage').src = '/uploads/productImages/' + imageSrc;
     }
 
-    document.querySelector('.qty-up').addEventListener('click', function() {
-        let qty = parseInt(document.getElementById('quantity').innerText);
-        document.getElementById('quantity').innerText = qty + 1;
-    });
-
-    document.querySelector('.qty-down').addEventListener('click', function() {
-        let qty = parseInt(document.getElementById('quantity').innerText);
-        if (qty > 1) {
-            document.getElementById('quantity').innerText = qty - 1;
+    // Image zoom functionality
+    function magnify(imgID, zoom) {
+        var img, glass, w, h, bw;
+        img = document.getElementById(imgID);
+        glass = document.querySelector(".img-magnifier-glass");
+        
+        /* Create magnifier glass: */
+        if (!glass) {
+            glass = document.createElement("DIV");
+            glass.setAttribute("class", "img-magnifier-glass");
+            img.parentElement.appendChild(glass);
         }
+
+        /* Set background properties for the magnifier glass: */
+        glass.style.backgroundImage = "url('" + img.src + "')";
+        glass.style.backgroundRepeat = "no-repeat";
+        glass.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
+        bw = 3;
+        w = glass.offsetWidth / 2;
+        h = glass.offsetHeight / 2;
+
+        /* Execute a function when someone moves the magnifier glass over the image: */
+        glass.addEventListener("mousemove", moveMagnifier);
+        img.addEventListener("mousemove", moveMagnifier);
+
+        /* Show the magnifier glass: */
+        img.addEventListener("mouseenter", function() {
+            glass.style.display = "block";
+        });
+
+        /* Hide the magnifier glass when mouse leaves the image: */
+        img.addEventListener("mouseleave", function() {
+            glass.style.display = "none";
+        });
+
+        function moveMagnifier(e) {
+            var pos, x, y;
+            /* Prevent any other actions that may occur when moving over the image */
+            e.preventDefault();
+            /* Get the cursor's x and y positions: */
+            pos = getCursorPos(e);
+            x = pos.x;
+            y = pos.y;
+
+            /* Prevent the magnifier glass from being positioned outside the image: */
+            if (x > img.width - (w / zoom)) {x = img.width - (w / zoom);}
+            if (x < w / zoom) {x = w / zoom;}
+            if (y > img.height - (h / zoom)) {y = img.height - (h / zoom);}
+            if (y < h / zoom) {y = h / zoom;}
+
+            /* Set the position of the magnifier glass: */
+            glass.style.left = (x - w) + "px";
+            glass.style.top = (y - h) + "px";
+            /* Display what the magnifier glass "sees": */
+            glass.style.backgroundPosition = "-" + ((x * zoom) - w) + "px -" + ((y * zoom) - h) + "px";
+        }
+
+        function getCursorPos(e) {
+            var a, x = 0, y = 0;
+            e = e || window.event;
+            /* Get the x and y positions of the image: */
+            a = img.getBoundingClientRect();
+            /* Calculate the cursor's x and y coordinates, relative to the image: */
+            x = e.pageX - a.left - window.pageXOffset;
+            y = e.pageY - a.top - window.pageYOffset;
+            /* Consider any page scrolling: */
+            return {x : x, y : y};
+        }
+    }
+
+    // Initialize magnifier when the page loads
+    window.addEventListener('load', function() {
+        magnify("currentImage", 2.5); // 2.5x zoom level
+        
+        // Reinitialize magnifier when switching images
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                // Short delay to allow image to load before initializing magnifier
+                setTimeout(() => magnify("currentImage", 2.5), 100);
+            });
+        });
     });
 
+    // Modified Add to Cart function to use the hidden quantity input (fixed at 1)
     const addToCartbtn = document.querySelectorAll('.button-add-to-cart');
     addToCartbtn.forEach(function(button) {
         button.addEventListener('click', function() {
             const productId = this.getAttribute('data-id');
-            const quantity = document.getElementById('quantity').innerText;
+            const quantity = document.getElementById('quantity').value; // Get value from hidden input
             
             $.ajax({
                 url: `/addToCart/${productId}`,

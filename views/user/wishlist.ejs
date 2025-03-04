@@ -244,10 +244,12 @@
         <% wishlist.products.forEach(product => { %>
           <div class="product-card">
             <div class="product-image">
+             <a href="/productDetails?id=<%= product.productId._id %>">
               <img
                 src="<%= product.productId.productImage && product.productId.productImage.length > 0 ? '/uploads/productImages/' + product.productId.productImage[0] : '/uploads/productImages/default.png' %>"
                 alt="<%= product.productId.productName %>"
               />
+            </a>
               <button class="remove-btn" onclick="removeItem('<%= product.productId._id %>')">
                 <i class="fas fa-times"></i>
               </button>

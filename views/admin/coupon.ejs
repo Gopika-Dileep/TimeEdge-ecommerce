@@ -408,7 +408,7 @@ body {
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="offer-price">Offer Price (₹)</label>
+                <label class="form-label" for="offer-price">Discount Amount (₹)</label>
                 <input class="form-control" type="number" id="offer-price" name="offerPrice" placeholder="Enter offer price">
                 <div id="offer-price-error" class="error-message"></div>
             </div>
@@ -435,7 +435,6 @@ body {
                 <label class="form-label" for="usage-limit">Usage Limit</label>
                 <input class="form-control" type="number" id="usage-limit" name="UsageLimit" placeholder="Enter usage limit">
                 <div id="usage-limit-error" class="error-message"></div>
-            
             </div>
 
             <div class="form-group">
@@ -453,102 +452,98 @@ body {
     </form>
 </div>
 
+
 <script>
-function openModal() {
-    document.getElementById('modalOverlay').style.display = 'block';
-    document.getElementById('couponModal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-    document.getElementById('modalOverlay').style.display = 'none';
-    document.getElementById('couponModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
-    document.getElementById('add-coupon-form').reset();
-    clearErrors();
-}
-
-document.getElementById('modalOverlay').addEventListener('click', closeModal);
-
-document.getElementById('couponModal').addEventListener('click', function(e) {
-    e.stopPropagation();
-});
-
-function clearErrors() {
-    const errorElements = document.getElementsByClassName('error-message');
-    const inputElements = document.getElementsByClassName('form-control');
-    
-    for (let element of errorElements) {
-        element.innerText = '';
-    }
-    
-    for (let input of inputElements) {
-        input.classList.remove('error');
-    }
-}
-
-document.getElementById('add-coupon-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const validations = {
-        'coupon-code': {
-            element: document.getElementById('coupon-code'),
-            errorElement: document.getElementById('code-error'),
-            validate: (value) => value.trim() !== '',
-            errorMessage: 'Please enter a coupon code.'
-        },
-        'offer-price': {
-            element: document.getElementById('offer-price'),
-            errorElement: document.getElementById('offer-price-error'),
-            validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
-            errorMessage: 'Please enter a valid offer price.'
-        },
-        'start-date': {
-            element: document.getElementById('start-date'),
-            errorElement: document.getElementById('start-date-error'),
-            validate: (value) => value.trim() !== '',
-            errorMessage: 'Please select a start date.'
-        },
-        'expiry-date': {
-            element: document.getElementById('expiry-date'),
-            errorElement: document.getElementById('expiry-date-error'),
-            validate: (value) => {
-                const startDate = new Date(document.getElementById('start-date').value);
-                const expiryDate = new Date(value);
-                return value.trim() !== '' && expiryDate > startDate;
-            },
-            errorMessage: 'Expiry date must be after start date.'
-        },
-        'min-amount': {
-            element: document.getElementById('min-amount'),
-            errorElement: document.getElementById('min-amount-error'),
-            validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
-            errorMessage: 'Please enter a valid minimum amount.'
-        },
-        'usage-limit': {
-            element: document.getElementById('usage-limit'),
-            errorElement: document.getElementById('usage-limit-error'),
-            validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
-            errorMessage: 'Please enter usage limit.'
-        },
-    };
-
-    clearErrors();
-    let isValid = true;
-
-    Object.values(validations).forEach(validation => {
-        const value = validation.element.value;
-        if (!validation.validate(value)) {
-            validation.element.classList.add('error');
-            validation.errorElement.innerText = validation.errorMessage;
-            isValid = false;
+        function openModal() {
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('couponModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
-    });
 
-    if (isValid) {
-        this.submit();
-    }
-});
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('couponModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('add-coupon-form').reset();
+            clearErrors();
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', closeModal);
+        document.getElementById('couponModal').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => el.innerText = '');
+            document.querySelectorAll('.form-control').forEach(input => input.classList.remove('error'));
+        }
+
+        document.getElementById('add-coupon-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const validations = {
+                'coupon-code': {
+                    element: document.getElementById('coupon-code'),
+                    errorElement: document.getElementById('code-error'),
+                    validate: (value) => value.trim() !== '',
+                    errorMessage: 'Please enter a coupon code.'
+                },
+                'offer-price': {
+                    element: document.getElementById('offer-price'),
+                    errorElement: document.getElementById('offer-price-error'),
+                    validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
+                    errorMessage: 'Please enter a valid offer price.'
+                },
+                'start-date': {
+                    element: document.getElementById('start-date'),
+                    errorElement: document.getElementById('start-date-error'),
+                    validate: (value) => {
+                        const today = new Date().toISOString().split('T')[0];
+                        return value.trim() !== '' && value >= today;
+                    },
+                    errorMessage: 'Start date cannot be in the past.'
+                },
+                'expiry-date': {
+                    element: document.getElementById('expiry-date'),
+                    errorElement: document.getElementById('expiry-date-error'),
+                    validate: (value) => {
+                        const startDate = new Date(document.getElementById('start-date').value);
+                        const expiryDate = new Date(value);
+                        return value.trim() !== '' && expiryDate > startDate;
+                    },
+                    errorMessage: 'Expiry date must be after the start date.'
+                },
+                'min-amount': {
+                    element: document.getElementById('min-amount'),
+                    errorElement: document.getElementById('min-amount-error'),
+                    validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
+                    errorMessage: 'Please enter a valid minimum amount.'
+                },
+                'usage-limit': {
+                    element: document.getElementById('usage-limit'),
+                    errorElement: document.getElementById('usage-limit-error'),
+                    validate: (value) => value.trim() !== '' && Number.isInteger(parseFloat(value)) && parseInt(value) > 0,
+                    errorMessage: 'Please enter a valid usage limit (whole number).'
+                },
+            };
+
+            clearErrors();
+            let isValid = true;
+
+            Object.values(validations).forEach(validation => {
+                const value = validation.element.value;
+                if (!validation.validate(value)) {
+                    validation.element.classList.add('error');
+                    validation.errorElement.innerText = validation.errorMessage;
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                this.submit();
+            }
+        });
+
 
 function toggleDropdown(event) {
     event.stopPropagation(); 

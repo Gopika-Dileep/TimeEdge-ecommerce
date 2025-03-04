@@ -31,13 +31,15 @@
       <% order.orderedItems.forEach((item, index) => { %>
       <div class="order-item <%= index !== 0 ? 'border-top mt-3 pt-3' : '' %>">
         <div class="d-flex align-items-center position-relative">
+          <a href="/productDetails?id=<%= product[i]._id %>">
           <img
+          
             src="/uploads/productImages/<%= item.products.productImage[0] %>"
             alt="<%= item.products.productName %>"
             class="me-3 rounded"
             style="width: 100px; height: 100px; object-fit: cover"
           />
-
+            </a>
           <div class="flex-grow-1">
             <h6 class="mb-1 product-name"><%= item.products.productName %></h6>
             <div class="product-details">
@@ -68,7 +70,7 @@
                 <i class="bi bi-arrow-return-left"></i> Return
               </button>
               <% } %> <% if (!item.cancelReason && !['cancelled', 'delivered',
-              'returned'].includes(item.status.toLowerCase())) { %>
+              'returned','shipped','return request'].includes(item.status.toLowerCase())) { %>
               <button
                 class="btn btn-outline-danger btn-sm ms-2"
                 onclick="showCancelModal('<%= item._id %>')"

@@ -210,7 +210,9 @@
                             <div class="cart-item">
                                 <div class="row align-items-center">
                                     <div class="col-md-2">
+                                        <a href="/productDetails?id=<%= item.product._id %>">
                                         <img class="product-image" src="<%= item.product.productImage && item.product.productImage.length > 0 ? '/uploads/productImages/' + item.product.productImage[0] : '/uploads/productImages/default.png' %>" alt="<%= item.product.productName %>">
+                                    </a>
                                     </div>
                                     <div class="col-md-4 product-info">
                                         <h4><%= item.product.productName %></h4>
@@ -312,38 +314,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         function increaseQuantity(itemId) {
-            $.ajax({
-                url: `/increment/${itemId}`,
-                type: 'PATCH',
-                contentType: 'application/json',
-                success: function(result) {
-                    if (result.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Quantity Updated',
-                            text: 'The quantity has been successfully incremented.',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: result.message,
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Something went wrong. Please try again later.',
-                    });
-                },
+    $.ajax({
+        url: `/increment/${itemId}`,
+        type: 'PATCH',
+        contentType: 'application/json',
+        success: function(result) {
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Quantity Updated',
+                    text: 'The quantity has been successfully incremented.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message,
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            let errorMessage = "Something went wrong. Please try again later.";
+
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: errorMessage,
             });
-        }
+        },
+    });
+}
 
         function decreaseQuantity(itemId) {
             $.ajax({

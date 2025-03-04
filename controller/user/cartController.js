@@ -162,7 +162,7 @@ const incrementQuantity = async (req, res) => {
         const currentQuantity = item.quantity
 
         if (currentQuantity >= product.quantity) {
-            return res.status(400).json({message:"Quantity exceeded"});
+            return res.status(400).json({message:"product is out of stock"});
         } else if (currentQuantity >= product.maxQtyPerPerson) {
             return res.status(400).json({message:"Maximum quantity for one product exceeded"});
         } else {

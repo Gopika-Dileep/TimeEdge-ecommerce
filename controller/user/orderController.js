@@ -990,31 +990,41 @@ const verifyRepaymentOrder = async (req, res) => {
   }
 };
 
+
+
 const downloadInvoice = async (req, res) => {
   try {
     const orderId = req.params.orderId;
-    const userId = req.session.user;
-    
+
+    // Fetch the order with populated products and user
     const order = await Order.findOne({ orderId: orderId })
       .populate('orderedItems.products')
       .populate('user');
-    
-    const address = await Address.findOne({userId: order.user});
-    const addressess = address.address;
-    const specificAddress = addressess.find(
-      (addr) => addr._id.toString() === order.address.toString()
-    );
 
     if (!order) {
       return res.status(404).send('Order not found');
     }
 
+    // **Filter only delivered products**
+    const deliveredItems = order.orderedItems.filter(item => item.status === 'delivered');
+
+    if (deliveredItems.length === 0) {
+      return res.status(400).send('No delivered items in this order');
+    }
+
+    const address = await Address.findOne({ userId: order.user });
+    const specificAddress = address?.address.find(
+      (addr) => addr._id.toString() === order.address.toString()
+    );
+
+    // Create a PDF document
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
-    doc.pipe(res);
 
-    
+    doc.pipe(res); // Stream directly to response
+
+    // **Header Section**
     doc.font('Helvetica-Bold')
       .fontSize(24)
       .text('TIME EDGE', { align: 'left' })
@@ -1029,75 +1039,73 @@ const downloadInvoice = async (req, res) => {
       .text(`Invoice#: ${order.orderId}`, { align: 'right' })
       .text(`Date: ${new Date(order.createdOn).toLocaleDateString()}`, { align: 'right' });
 
-   
-    doc.moveDown(2)
-      .fontSize(12)
-      .text('Shipping Address:', { continued: false })
-      .fontSize(10)
-      .font('Helvetica');
-    
+    // **Shipping Address**
+    doc.moveDown(2).fontSize(12).text('Shipping Address:', { continued: false });
+
     if (specificAddress) {
-      doc.text(`${order.user.name}`)
-         .text(`${specificAddress.addressLine || ''}`)
-         .text(`${specificAddress.city || ''}, ${specificAddress.state || ''}, ${specificAddress.pincode || ''}`)
-         .text(`${specificAddress.phone || ''}`);
+      doc.font('Helvetica')
+        .text(`${order.user.name}`)
+        .text(`${specificAddress.addressLine || ''}`)
+        .text(`${specificAddress.city || ''}, ${specificAddress.state || ''}, ${specificAddress.pincode || ''}`)
+        .text(`${specificAddress.phone || ''}`);
     }
 
-    
-    doc.moveDown(2)
-      .font('Helvetica-Bold')
-      .fontSize(10);
+    doc.moveDown(2).font('Helvetica-Bold').fontSize(10);
 
-   
+    // **Table Headers**
     const tableTop = doc.y;
     doc.text('ITEM DESCRIPTION', 50, tableTop, { width: 250 })
        .text('PRICE', 300, tableTop, { width: 100, align: 'right' })
        .text('QTY', 400, tableTop, { width: 50, align: 'right' })
        .text('TOTAL', 450, tableTop, { width: 100, align: 'right' });
 
- 
-    doc.moveDown(0.5)
-       .strokeColor('#000000')
-       .lineWidth(1)
-       .moveTo(50, doc.y)
-       .lineTo(550, doc.y)
-       .stroke();
+    doc.moveDown(0.5).strokeColor('#000000').lineWidth(1)
+      .moveTo(50, doc.y)
+      .lineTo(550, doc.y)
+      .stroke();
 
- 
     doc.font('Helvetica');
-    let yPosition = doc.y + 15;
 
-    order.orderedItems.forEach((item) => {
+    // **List Delivered Items**
+    let yPosition = doc.y + 15;
+    let subTotal = 0;
+
+    deliveredItems.forEach((item) => {
+      const totalItemPrice = item.price * item.quantity;
+      subTotal += totalItemPrice;
+
       doc.text(item.products.productName, 50, yPosition, { width: 250 })
          .text(`${item.price.toFixed(2)}`, 300, yPosition, { width: 100, align: 'right' })
          .text(item.quantity.toString(), 400, yPosition, { width: 50, align: 'right' })
-         .text(`${(item.price * item.quantity).toFixed(2)}`, 450, yPosition, { width: 100, align: 'right' });
+         .text(`${totalItemPrice.toFixed(2)}`, 450, yPosition, { width: 100, align: 'right' });
+
       yPosition += 20;
     });
 
-  
-    doc.moveDown(2)
-       .strokeColor('#000000')
-       .lineWidth(1)
-       .moveTo(300, doc.y)
-       .lineTo(550, doc.y)
-       .stroke();
+    // **Totals Section**
+    doc.moveDown(2).strokeColor('#000000').lineWidth(1)
+      .moveTo(300, doc.y)
+      .lineTo(550, doc.y)
+      .stroke();
 
     const totalsStart = doc.y + 15;
+    const discount = order.productdiscount || 0;
+    const couponDiscount = order.couponDiscount || 0;
+    const grandTotal = subTotal - discount - couponDiscount;
+
     doc.font('Helvetica')
        .text('SUB TOTAL', 300, totalsStart, { width: 150, align: 'left' })
-       .text(`${order.subtotal.toFixed(2)}`, 450, totalsStart, { width: 100, align: 'right' })
+       .text(`${subTotal.toFixed(2)}`, 450, totalsStart, { width: 100, align: 'right' })
        .text('Discount', 300, totalsStart + 20, { width: 150, align: 'left' })
-       .text(`-${order.productdiscount.toFixed(2)}`, 450, totalsStart + 20, { width: 100, align: 'right' })
+       .text(`-${discount.toFixed(2)}`, 450, totalsStart + 20, { width: 100, align: 'right' })
        .text('Coupon Discount', 300, totalsStart + 40, { width: 150, align: 'left' })
-       .text(`-${order.couponDiscount.toFixed(2)}`, 450, totalsStart + 40, { width: 100, align: 'right' });
+       .text(`-${couponDiscount.toFixed(2)}`, 450, totalsStart + 40, { width: 100, align: 'right' });
 
-   
     doc.font('Helvetica-Bold')
        .text('Grand Total', 300, totalsStart + 70, { width: 150, align: 'left' })
-       .text(`${order.finalAmount.toFixed(2)}`, 450, totalsStart + 70, { width: 100, align: 'right' });
+       .text(`${grandTotal.toFixed(2)}`, 450, totalsStart + 70, { width: 100, align: 'right' });
 
-   
+    // **Footer**
     doc.moveDown(4)
        .font('Helvetica-Bold')
        .fontSize(10)
@@ -1108,7 +1116,6 @@ const downloadInvoice = async (req, res) => {
        .text('Email: support@timeedge.com')
        .text('www.timeedge.com');
 
-   
     doc.moveDown(2)
        .fontSize(9)
        .text('Thank you for choosing us!', { align: 'left' })
@@ -1122,6 +1129,7 @@ const downloadInvoice = async (req, res) => {
     res.status(500).send('Error generating invoice');
   }
 };
+
 module.exports = {
   getCheckoutPage,
   getOrderConfirmationPage,

@@ -212,7 +212,23 @@
     h6:hover {
         color: #333;
     }
-    
+    .stock-status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .in-stock {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .out-stock {
+        background: #ffebee;
+        color: #c62828;
+    }
     </style>
     
     <section class="hero">
@@ -274,6 +290,9 @@
                                     <% for (let j = 0; j < 5; j++) { %>
                                     <i class="fa <%= j < product[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
                                     <% } %>
+                                </div>
+                                <div class="stock-status <%= product[i].quantity > 0 ? '' : 'out-stock' %>">
+                                    <%= product[i].quantity > 0 ? '' : 'Out of Stock' %>
                                 </div>
                             </div>
                         </a>

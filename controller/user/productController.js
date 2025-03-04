@@ -11,7 +11,7 @@ const loadhome = async (req, res) => {
         const userId = req.session.user
         const category = await Category.find({ isListed: true })
         const brand = await Brand.find({ isListed: true })
-        const product = await Product.find({ isListed: true, quantity: { $gt: 0 } }).sort({ createdAt: -1 }).limit(9).populate('category').populate('brand');
+        const product = await Product.find({ isListed: true }).sort({ createdAt: -1 }).limit(9).populate('category').populate('brand');
         if (userId) {
             const user = await User.findById({ _id: userId })
             res.render('home', { user: user, product: product })
@@ -36,7 +36,7 @@ const loadshop = async (req, res) => {
         const search = req.query.search || '';
         const query = search ? { productName: { $regex: search, $options: 'i' } } : {};
 
-        const product = await Product.find({ ...query, isListed: true, quantity: { $gt: 0 } })
+        const product = await Product.find({ ...query, isListed: true })
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
