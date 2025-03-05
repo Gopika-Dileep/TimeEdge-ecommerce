@@ -241,6 +241,98 @@ const searchProducts = async (req, res) => {
         res.status(500).json("server error");
     }
 }
+const shopProducts = async (req, res) => {
+    try {
+        const user = req.session.user;
+        const search = req.query.search || '';
+        const categoryId = req.query.category;
+        const brandId = req.query.brand;
+        const priceSort = req.query.sort;
+        const priceGt = req.query.gt ? parseInt(req.query.gt) : null;
+        const priceLt = req.query.lt ? parseInt(req.query.lt) : null;
+
+        // Fetch categories and brands for sidebar
+        const category = await Category.find({ isListed: true });
+        const brand = await Brand.find({ isListed: true });
+
+        // Build the base query
+        let query = { 
+            isListed: true, 
+            quantity: { $gt: 0 } 
+        };
+
+        // Add search condition if search term exists
+        if (search) {
+            query.$or = [
+                { productName: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        // Add category filter
+        if (categoryId) {
+            query.category = categoryId;
+        }
+
+        // Add brand filter
+        if (brandId) {
+            query.brand = brandId;
+        }
+
+        // Add price range filter
+        if (priceGt !== null && priceLt !== null) {
+            query.salePrice = { $gte: priceGt, $lte: priceLt };
+        } else if (priceGt !== null) {
+            query.salePrice = { $gte: priceGt };
+        }
+
+        // Fetch products based on query
+        let products = await Product.find(query)
+            .populate('category')
+            .populate('brand');
+
+        // Apply price sorting
+        if (priceSort === 'asc') {
+            products.sort((a, b) => a.salePrice - b.salePrice);
+        } else if (priceSort === 'desc') {
+            products.sort((a, b) => b.salePrice - a.salePrice);
+        }
+
+        // Pagination
+        const itemsPerPage = 6;
+        const currentPage = parseInt(req.query.page) || 1;
+        const totalProducts = products.length;
+        const totalPages = Math.ceil(totalProducts / itemsPerPage);
+        
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const currentProducts = products.slice(startIndex, endIndex);
+
+        // Prepare render options
+        const renderOptions = {
+            product: currentProducts,
+            category: category,
+            brand: brand,
+            search: search,
+            selectedCategory: categoryId,
+            selectedBrand: brandId,
+            currentpage: currentPage,
+            totalpage: totalPages
+        };
+
+        // If user is logged in, you might want to add user data
+        if (user) {
+            const userData = await User.findOne({ _id: user });
+            renderOptions.user = userData;
+        }
+
+        res.render("shop", renderOptions);
+
+    } catch (error) {
+        console.error('Shop Products Error:', error);
+        res.status(500).json({ error: "Server error occurred" });
+    }
+};
 
 module.exports = {
     loadhome,
@@ -248,5 +340,6 @@ module.exports = {
     filterProduct,
     filterProductByPrice,
     productDetails,
-    searchProducts
+    searchProducts,
+    shopProducts
 }

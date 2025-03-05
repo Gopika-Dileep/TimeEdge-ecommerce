@@ -29,7 +29,7 @@ router.get('/otpverify',userController.loadotp)
 router.post('/otpverify',userController.otpverify)
 router.post('/resend-otp',userController.resendOtp);
 router.get('/',productController.loadhome)
-router.get('/shop',productController.loadshop)
+router.get('/shop',productController.shopProducts)
 router.get('/shop/search', productController.searchProducts);
 router.get('/filter',productController.filterProduct)
 router.get('/filterPriceRange',productController.filterProductByPrice)

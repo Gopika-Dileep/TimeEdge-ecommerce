@@ -1,6 +1,7 @@
-<%-include("../../views/partials/user/header") %>
+```ejs
+<%- include("../../views/partials/user/header") %>
+
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
@@ -13,125 +14,177 @@
 .bi-heart-fill {
     color: #ff0000; 
 }
+
 .stock-status {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 4px;
-        font-size: 14px;
-        margin-top: 10px;
-    }
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-top: 10px;
+}
 
-    .in-stock {
-        background: #e8f5e9;
-        color: #2e7d32;
-    }
+.in-stock {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
 
-    .out-stock {
-        background: #ffebee;
-        color: #c62828;
-    }
+.out-stock {
+    background: #ffebee;
+    color: #c62828;
+}
 
+.product__pagination a.active {
+    background-color: #000;
+    color: #fff;
+}
 </style>
 
-    <section class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__text">
-                        <h4>Shop</h4>
-                        <div class="breadcrumb__links">
-                            <a href="/">Home</a>
-                            <span><a href="/shop">Shop</a></span>
-                        </div>
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shop</h4>
+                    <div class="breadcrumb__links">
+                        <a href="/">Home</a>
+                        <span>Shop</span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
+<section class="shop spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="shop__sidebar">
+                    <% 
+                    function buildQueryString(params) {
+                        const queryParams = new URLSearchParams();
+                        
+                        // Add existing parameters if they exist
+                        if (locals.search) queryParams.set('search', search);
+                        if (locals.selectedCategory) queryParams.set('category', selectedCategory);
+                        if (locals.selectedBrand) queryParams.set('brand', selectedBrand);
+                        if (locals.priceSort) queryParams.set('sort', priceSort);
+                        if (locals.minPrice) queryParams.set('gt', minPrice);
+                        if (locals.maxPrice) queryParams.set('lt', maxPrice);
+                        
+                        // Override or add new parameters
+                        Object.keys(params).forEach(key => {
+                            if (params[key] !== undefined && params[key] !== null) {
+                                queryParams.set(key, params[key]);
+                            }
+                        });
+                        
+                        return queryParams.toString() ? '?' + queryParams.toString() : '';
+                    }
+                    %>
 
+                    <!-- Search Form -->
+                    <div class="shop__sidebar__search">
+                        <form action="/shop" method="GET">
+                            <input type="text" name="search" placeholder="Search..." 
+                                   value="<%= locals.search ? search : '' %>">
+                            <button type="submit"><span class="icon_search"></span></button>
+                        </form>
+                    </div>
 
-    <section class="shop spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3">
-                    <div class="shop__sidebar">
-                        <div class="shop__sidebar__search">
-                            <form action="/shop/search" method="GET">
-                                <input type="text" name="search" placeholder="Search...">
-                                <button type="submit"><span class="icon_search"></span></button>
-                            </form>
-                        </div>
-                        <div class="shop__sidebar__accordion">
-                            <div class="accordion" id="accordionExample">
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
-                                    </div>
-                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__categories">
-                                                <ul class="nice-scroll">
-                                                    <% for (let i=0; i < category.length; i++) { %>
-                                                        <li><a href="/filter?category=<%=category[i]._id%>">
-                                                                <%= category[i].name %>
-                                                            </a></li>
-                                                        <% } %>
-                                                </ul>
-
-                                            </div>
+                    <!-- Categories Accordion -->
+                    <div class="shop__sidebar__accordion">
+                        <div class="accordion" id="accordionExample">
+                            <!-- Categories Section -->
+                            <div class="card">
+                                <div class="card-heading">
+                                    <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
+                                </div>
+                                <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                    <div class="card-body">
+                                        <div class="shop__sidebar__categories">
+                                            <ul class="nice-scroll">
+                                                <% for (let cat of category) { %>
+                                                    <li>
+                                                        <a href="/shop<%= buildQueryString({ category: cat._id }) %>">
+                                                            <%= cat.name %>
+                                                        </a>
+                                                    </li>
+                                                <% } %>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseTwo">Branding</a>
-                                    </div>
-                                    <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__brand">
-                                                <ul>
-                                                    <% for (let i=0; i < brand.length; i++) { %>
-                                                        <li><a href="/filter?brand=<%=brand[i]._id%>">
-                                                                <%= brand[i].name %>
-                                                            </a></li>
-                                                        <% } %>
-                                                </ul>
-                                            </div>
+                            <!-- Brands Section -->
+                            <div class="card">
+                                <div class="card-heading">
+                                    <a data-toggle="collapse" data-target="#collapseTwo">Brands</a>
+                                </div>
+                                <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                                    <div class="card-body">
+                                        <div class="shop__sidebar__brand">
+                                            <ul>
+                                                <% for (let brandItem of brand) { %>
+                                                    <li>
+                                                        <a href="/shop<%= buildQueryString({ brand: brandItem._id }) %>">
+                                                            <%= brandItem.name %>
+                                                        </a>
+                                                    </li>
+                                                <% } %>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseThree">Sort By Price</a>
-                                    </div>
-                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__price">
-                                                <ul>
-                                                    <li><a href="/filterPriceRange?sort=asc">Low to High</a></li>
-                                                    <li><a href="/filterPriceRange?sort=desc">High to Low</a></li>
-                                                </ul>
-                                            </div>
+                            </div>
+
+                            <!-- Price Sort Section -->
+                            <div class="card">
+                                <div class="card-heading">
+                                    <a data-toggle="collapse" data-target="#collapseThree">Sort By Price</a>
+                                </div>
+                                <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                                    <div class="card-body">
+                                        <div class="shop__sidebar__price">
+                                            <ul>
+                                                <li><a href="/shop<%= buildQueryString({ sort: 'asc' }) %>">Low to High</a></li>
+                                                <li><a href="/shop<%= buildQueryString({ sort: 'desc' }) %>">High to Low</a></li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
-                                    </div>
-                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__price">
-                                                <ul>
-                                                    <li><a href="/filterPrice?gt=1000&lt=3000">1000 - 3000</a></li>
-                                                    <li><a href="/filterPrice?gt=3000&lt=5000">3000 - 5000</a></li>
-                                                    <li><a href="/filterPrice?gt=5000&lt=10000">5000 - 10000</a></li>
-                                                    <li><a href="/filterPrice?gt=10000&lt=20000">10000 - 20000</a></li>
-                                                    <li><a href="/filterPrice?gt=20000">20000+</a></li>
-                                                </ul>
-                                            </div>
+                            </div>
+
+                            <!-- Price Range Section -->
+                            <div class="card">
+                                <div class="card-heading">
+                                    <a data-toggle="collapse" data-target="#collapseFour">Filter Price</a>
+                                </div>
+                                <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
+                                    <div class="card-body">
+                                        <div class="shop__sidebar__price">
+                                            <ul>
+                                                <% 
+                                                const priceRanges = [
+                                                    { min: 1000, max: 3000, label: '1000 - 3000' },
+                                                    { min: 3000, max: 5000, label: '3000 - 5000' },
+                                                    { min: 5000, max: 10000, label: '5000 - 10000' },
+                                                    { min: 10000, max: 20000, label: '10000 - 20000' },
+                                                    { min: 20000, max: null, label: '20000+' }
+                                                ];
+                                                %>
+                                                <% priceRanges.forEach(range => { %>
+                                                    <li>
+                                                        <a href="/shop<%= buildQueryString({ 
+                                                            gt: range.min, 
+                                                            lt: range.max 
+                                                        }) %>">
+                                                            <%= range.label %>
+                                                        </a>
+                                                    </li>
+                                                <% }); %>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -139,27 +192,49 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-9">
-                    <div class="shop__product__option">
-                        <div class="row">
-                            <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="shop__product__option__left">
+            </div>
 
-                                </div>
-                            </div>
-
-                        </div>
+            <div class="col-lg-9">
+                <!-- Search/Filter Info -->
+                <% if (locals.search || locals.selectedCategory || locals.selectedBrand || locals.minPrice || locals.maxPrice || locals.priceSort) { %>
+                    <div class="alert alert-info">
+                        Search Results 
+                        <% if (locals.search) { %>
+                            for "<%= search %>"
+                        <% } %>
+                        <% if (locals.selectedCategory) { %>
+                            in Category: <%= category.find(c => c._id.toString() === selectedCategory).name %>
+                        <% } %>
+                        <% if (locals.selectedBrand) { %>
+                            in Brand: <%= brand.find(b => b._id.toString() === selectedBrand).name %>
+                        <% } %>
+                        <% if (locals.minPrice || locals.maxPrice) { %>
+                            Price Range: 
+                            <%= locals.minPrice ? locals.minPrice : 'Min' %> - 
+                            <%= locals.maxPrice ? locals.maxPrice : 'Max' %>
+                        <% } %>
+                        <a href="/shop" class="btn btn-sm btn-secondary ml-2">Clear Filters</a>
                     </div>
-                    <div class="row">
-                        <% for (let i = 0; i < product.length; i++) { %>
+                <% } %>
+
+                <!-- Product Grid -->
+                <div class="row">
+                    <% if (product.length === 0) { %>
+                        <div class="col-12 text-center">
+                            <h4>No products found</h4>
+                        </div>
+                    <% } else { %>
+                        <% for (let item of product) { %>
                             <div class="col-lg-4 col-md-6 col-sm-6">
                                 <div class="product__item">
-                                    <a href="/productDetails?id=<%= product[i]._id %>">
+                                    <a href="/productDetails?id=<%= item._id %>">
                                         <div class="product__item__pic set-bg"
-                                            data-setbg="/uploads/productImages/<%= product[i].productImage[0] %>">
+                                            data-setbg="/uploads/productImages/<%= item.productImage[0] %>">
                                             <ul class="product__hover">
                                                 <li>
-                                                    <i class="bi <%= product[i].inWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" id="wishlist-icon-<%= product[i]._id %>" data-id="<%= product[i]._id %>"></i>
+                                                    <i class="bi <%= item.inWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" 
+                                                       id="wishlist-icon-<%= item._id %>" 
+                                                       data-id="<%= item._id %>"></i>
                                                     <span>Wishlist</span>
                                                 </li>
                                             </ul>
@@ -167,101 +242,124 @@
                                     </a>
                     
                                     <div class="product__item__text">
-                                        <h6>
-                                            <%= product[i].productName %>
-                                        </h6>
-                                        <a href="#" class="add-cart" data-id="<%= product[i]._id %>" data-quantity="1"
-                                            data-price="<%= product[i].salePrice %>">
+                                        <h6><%= item.productName %></h6>
+                                        <a href="#" class="add-cart" 
+                                           data-id="<%= item._id %>" 
+                                           data-quantity="1"
+                                           data-price="<%= item.salePrice %>">
                                             + Add To Cart
                                         </a>
                                         <div class="rating">
                                             <% for (let j = 0; j < 5; j++) { %>
-                                                <i class="fa <%= j < product[i].rating ? 'fa-star' : 'fa-star-o' %>"></i>
+                                                <i class="fa <%= j < item.rating ? 'fa-star' : 'fa-star-o' %>"></i>
                                             <% } %>
                                         </div>
                                         <% 
-                                        const productOffer = product[i].productOffer || 0;
-                                        const categoryOffer = product[i].category.categoryOffer || 0;
+                                        const productOffer = item.productOffer || 0;
+                                        const categoryOffer = item.category.categoryOffer || 0;
                                         const bestOffer = Math.max(productOffer, categoryOffer);
-                                        const salePrice = product[i].salePrice;
+                                        const salePrice = item.salePrice;
                                         const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
                                         %>
                                         <span class="price text-danger">₹<%= finalPrice %></span>
                                         <% if (finalPrice < salePrice) { %>
-                                            <span class="price"><strike class="text-muted">₹<%= product[i].salePrice %></strike></span>
-
+                                            <span class="price"><strike class="text-muted">₹<%= item.salePrice %></strike></span>
                                         <% } %>
-                                        <div class="stock-status <%= product[i].quantity > 0 ? '' : 'out-stock' %>">
-                                            <%= product[i].quantity > 0 ? '' : 'Out of Stock' %>
+                                        <div class="stock-status <%= item.quantity > 0 ? '' : 'out-stock' %>">
+                                            <%= item.quantity > 0 ? 'In Stock' : 'Out of Stock' %>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
                         <% } %>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="product__pagination">
+                    <% } %>
+                </div>
+
+                <!-- Pagination -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="product__pagination">
+                            <% 
+                            const basePageParams = {
+                                search: locals.search,
+                                category: locals.selectedCategory,
+                                brand: locals.selectedBrand,
+                                sort: locals.priceSort,
+                                gt: locals.minPrice,
+                                lt: locals.maxPrice
+                            };
+                            
+                            const prevPage = currentpage > 1 ? currentpage - 1 : 1;
+                            const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage;
+                            %>
+                            
+                            <% if (currentpage > 1) { %>
+                                <a href="/shop<%= buildQueryString({ 
+                                    ...basePageParams, 
+                                    page: prevPage 
+                                }) %>" class="btn">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </a>
+                            <% } %>
+
+                            <div class="page-numbers">
                                 <% 
-                                    const searchParam = typeof search !== 'undefined' && search ? `&search=${search}` : '';
-                                    const prevPage = currentpage > 1 ? currentpage - 1 : 1;
-                                    const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage;
-                                %>
+                                let startPage = Math.max(1, currentpage - 2);
+                                let endPage = Math.min(totalpage, startPage + 4);
                                 
-                                <% if (currentpage > 1) { %>
-                                    <a href="?page=<%= prevPage %><%= searchParam %>" class="btn">
-                                        <i class="bi bi-chevron-left"></i> Previous
+                                if (endPage - startPage < 4) {
+                                    startPage = Math.max(1, endPage - 4);
+                                }
+                                
+                                if (startPage > 1) { %>
+                                    <a href="/shop<%= buildQueryString({ 
+                                        ...basePageParams, 
+                                        page: 1 
+                                    }) %>">1</a>
+                                    <% if (startPage > 2) { %>
+                                        <span>...</span>
+                                    <% } %>
+                                <% } %>
+
+                                <% for(let i = startPage; i <= endPage; i++) { %>
+                                    <a href="/shop<%= buildQueryString({ 
+                                        ...basePageParams, 
+                                        page: i 
+                                    }) %>" 
+                                       class="<%= (i === currentpage) ? 'active' : '' %>">
+                                        <%= i %>
                                     </a>
                                 <% } %>
 
-                                <div class="page-numbers">
-                                    <% 
-                                    let startPage = Math.max(1, currentpage - 2);
-                                    let endPage = Math.min(totalpage, startPage + 4);
-                                    
-                                    if (endPage - startPage < 4) {
-                                        startPage = Math.max(1, endPage - 4);
-                                    }
-                                    
-                                    if (startPage > 1) { %>
-                                        <a href="?page=1<%= searchParam %>">1</a>
-                                        <% if (startPage > 2) { %>
-                                            <span>...</span>
-                                        <% } %>
+                                <% if (endPage < totalpage) { %>
+                                    <% if (endPage < totalpage - 1) { %>
+                                        <span>...</span>
                                     <% } %>
-
-                                    <% for(let i = startPage; i <= endPage; i++) { %>
-                                        <a href="?page=<%= i %><%= searchParam %>" 
-                                           class="<%= (i === currentpage) ? 'active' : '' %>">
-                                            <%= i %>
-                                        </a>
-                                    <% } %>
-
-                                    <% if (endPage < totalpage) { %>
-                                        <% if (endPage < totalpage - 1) { %>
-                                            <span>...</span>
-                                        <% } %>
-                                        <a href="?page=<%= totalpage %><%= searchParam %>">
-                                            <%= totalpage %>
-                                        </a>
-                                    <% } %>
-                                </div>
-
-                                <% if (currentpage < totalpage) { %>
-                                    <a href="?page=<%= nextPage %><%= searchParam %>" class="btn">
-                                        Next <i class="bi bi-chevron-right"></i>
+                                    <a href="/shop<%= buildQueryString({ 
+                                        ...basePageParams, 
+                                        page: totalpage 
+                                    }) %>">
+                                        <%= totalpage %>
                                     </a>
                                 <% } %>
                             </div>
+
+                            <% if (currentpage < totalpage) { %>
+                                <a href="/shop<%= buildQueryString({ 
+                                    ...basePageParams, 
+                                    page: nextPage 
+                                }) %>" class="btn">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </a>
+                            <% } %>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -371,7 +469,7 @@ addToWishbtn.forEach(function(button) {
                 });
             }
         });
-    });
+    }); 
 });
     </script>
     <%-include("../../views/partials/user/footer") %>
