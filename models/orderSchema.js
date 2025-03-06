@@ -21,6 +21,12 @@
                 type:String,
                 default:"pending",
                 enum:["pending","Processing","Shipped","delivered","Cancelled","Return request","Returned"]
+            },
+            returnReason:{
+                type:String
+            },
+            cancelReason :{
+                type:String
             }
             }],
             subtotal:{

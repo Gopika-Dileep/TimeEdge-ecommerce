@@ -552,8 +552,7 @@ const returnOrder = async (req, res) => {
     try {
       const { orderId } = req.params;
       const { productId, reason } = req.body;
-      const userId = req.session.user;
-  
+      
       const order = await Order.findById(orderId);
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
@@ -561,7 +560,7 @@ const returnOrder = async (req, res) => {
   
       const orderItems = order.orderedItems;
       const currentDate = new Date();
-      let updatedQuantity = 0;
+      
   
       const item = orderItems.find((item) => item.products.toString() === productId);
   
@@ -582,96 +581,15 @@ const returnOrder = async (req, res) => {
         });
       }
   
-      item.status = "Returned";
+      item.status = "Return request";
       item.returnReason = reason;
-      updatedQuantity = item.quantity;
   
       const product = await Product.findById(productId).populate("category");
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
   
-      const getSalePrice = (product) => {
-        const productOffer = product.productOffer || 0;
-        const categoryOffer = product.category?.categoryOffer || 0;
-        const bestOffer = Math.max(productOffer, categoryOffer);
-        return bestOffer > 0 ? Math.floor(product.salePrice - (product.salePrice * bestOffer) / 100) : product.salePrice;
-      };
-  
-      const itemSalePrice = getSalePrice(product);
-      await order.save();
-  
-      let couponRefundAmount = 0;
-      let isCouponRemoved = false;
-
-      console.log(order)
-  
-      if (order.couponId) {
-        const remainingItems = order.orderedItems.filter(
-            item => item.status !== "Returned" && item.status !== "Cancelled"
-          );          
-  
-          let newtotal = 0;
-          if (remainingItems.length >= 0) {
-            for (let i = 0; i < remainingItems.length; i++) {
-              const items = await Product.findById({
-                _id: remainingItems[i].products,
-              }).populate("category");
-              const productOffer = items.productOffer || 0;
-              const categoryOffer = items.category.categoryOffer || 0;
-              const bestOffer = Math.max(productOffer, categoryOffer);
-              const salePrice = items.salePrice;
-              newtotal +=
-                bestOffer > 0
-                  ? Math.floor(salePrice - (salePrice * bestOffer) / 100) * remainingItems[i].quantity
-                  : salePrice * remainingItems[i].quantity;
-            }
-          }
-  
-        const coupon = await Coupon.findById(order.couponId);
-
-        if (newtotal < coupon.minimumPrice) {
-
-          couponRefundAmount = order.couponDiscount;
-          order.couponDiscount = 0;
-          order.couponId = null;
-          isCouponRemoved = true;
-        }
-
-        const itemStatuses = order.orderedItems.map((item) => item.status);
-        if (itemStatuses.every((s) => s === "Returned")) {
-          order.status = "Returned";
-        } else if (
-          itemStatuses.some((s) => s === "delivered" )
-        ) {
-          order.status = "delivered";
-        }
-        else if (
-          itemStatuses.some((s) => s === "Processing" || s === "Shipped")
-        ) {
-          order.status = "Processing";
-        } else if (itemStatuses.some((s) => s === "Pending")) {
-          order.status = "Pending";
-        } else if (
-          itemStatuses.some(
-            (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
-          )
-        ) {
-          order.status = "Cancelled";
-        } else {
-          order.status = "pending";
-        }
-        await order.save();
-      }
-
-        const refundAmount = isCouponRemoved ? (itemSalePrice * updatedQuantity) - couponRefundAmount : itemSalePrice * updatedQuantity;
-        order.finalAmount -= refundAmount
-        await order.save()
-        await walletHelper.updateWalletBalance(userId, refundAmount, "credit");
-  
-      product.quantity += updatedQuantity;
-      await product.save();
-  
+     order.save()
       res.status(200).json({ success: true, message: "Order returned successfully" });
   
     } catch (error) {

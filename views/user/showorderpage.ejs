@@ -31,7 +31,7 @@
       <% order.orderedItems.forEach((item, index) => { %>
       <div class="order-item <%= index !== 0 ? 'border-top mt-3 pt-3' : '' %>">
         <div class="d-flex align-items-center position-relative">
-          <a href="/productDetails?id=<%= product[i]._id %>">
+          <a href="/productDetails?id=<%= item.products._id %>">
           <img
           
             src="/uploads/productImages/<%= item.products.productImage[0] %>"
@@ -178,7 +178,7 @@
   <div class="text-center mt-4">
     <% 
 const allReturnedOrCancelled = order.orderedItems.every(item => 
-    item.status === "Returned" || item.status === "Cancelled"
+    item.status === "Returned" || item.status === "Cancelled" || item.status!=="delivered"
 ); 
 %>
 

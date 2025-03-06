@@ -181,6 +181,14 @@
             color: #7f1d1d;
             font-weight: 500;
         }
+        .returned-section {
+            background-color: #fefbe2;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            margin: 1rem;
+            color: #cad80b;
+            font-weight: 500;
+        }
 
         .total-amount {
             text-align: right;
@@ -361,16 +369,29 @@
                     </tbody>
                 </table>
 
-                <% if (order.cancelledItems && order.cancelledItems.length> 0) { %>
+                <% if (order.orderedItems.some((s) => s.cancelReason)) { %>
                     <div class="cancelled-section">
                         <div class="info-label">Cancelled Items:</div>
-                        <% order.cancelledItems.forEach(item=> { %>
+                        <% order.orderedItems.forEach(item=> { %>
                             <div>
-                                <%= item.product.name %>: <%= item.reason %>
+                                <%= item.products.productName %>: <%= item.cancelReason %>
                             </div>
                             <% }); %>
                     </div>
                     <% } %>
+                    <% if (order.orderedItems.some((s) => s.returnReason )) { %>
+                    
+                        <div class="returned-section">
+                            <div class="info-label">Retruned Items:</div>
+
+                            <% order.orderedItems.forEach(item=> { %>
+                                <div>
+                                    <%= item.products.productName %>: <%= item.returnReason %>
+                                </div>
+                                <% }); %>
+                        </div>
+                        <% } %>
+    
 
                         <div class="total-amount">
                             Total: ₹<%= order.finalAmount.toFixed(2) %>
