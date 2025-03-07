@@ -36,7 +36,7 @@ async function updateWalletBalance(userId, amount, transactionType) {
     wallet.transactions.push(newTransaction);
 
     const walletcreated = await wallet.save();
-    console.log(walletcreated,'create waller')
+ 
     return { success: true, message: 'Wallet updated successfully' };
   } catch (error) {
     console.error(error);

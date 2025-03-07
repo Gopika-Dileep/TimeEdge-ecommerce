@@ -48,6 +48,8 @@ router.get('/orders',adminAuth,adminController.getOrders)
 router.get("/orders/:orderId",  adminController.getOrderDetails)
 
 router.post("/orders/update-status/:itemId", adminAuth, adminController.changeStatus);
+router.post("/orders/approve-return/:itemId", adminAuth, adminController.approveReturn);
+router.post("/orders/decline-return/:itemId", adminAuth, adminController.declineReturn);
 
 router.get('/coupon',adminAuth,couponController.loadCouponPage)
 router.post('/addCoupon',adminAuth,couponController.addCoupon)

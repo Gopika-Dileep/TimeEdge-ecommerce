@@ -6,7 +6,8 @@ const Address = require("../../models/addressSchema");
 const Brand = require("../../models/brandSchema");
 const Product = require("../../models/productSchema");
 const Order = require("../../models/orderSchema");
-
+const walletHelper = require("../../helpers/walletHelper");
+const Coupon = require("../../models/couponSchema");
 const loadAdminLogin = async (req, res) => {
   try {
     res.render("adminlogin");
@@ -478,7 +479,7 @@ const changeStatus = async (req, res) => {
     await order.save();
 
     const itemStatuses = order.orderedItems.map((item) => item.status);
-
+    console.log(itemStatuses, "itemStatuses");
     if (itemStatuses.every((s) => s === "Cancelled" || s === "Returned")) {
       order.status = "Cancelled";
     } else if (itemStatuses.some((s) => s === "Pending")) {
@@ -506,6 +507,202 @@ const changeStatus = async (req, res) => {
       .json({ success: false, error: "Failed to update order status" });
   }
 };
+const approveReturn = async (req, res) => {
+  try {
+  
+    const { itemId } = req.params;
+    const order = await Order.findOne({ "orderedItems._id": itemId });
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
+    const currentDate = new Date();
+    const item = order.orderedItems.id(itemId);
+    if (!item) {
+      return res.status(404).json({ success: false, error: "Item not found" });
+    }
+    console.log(order,"order1")
+
+    if (item.status !== "Return request") {
+      return res.status(400).json({ 
+        success: false, 
+        error: "This item is not in return request status" 
+      });
+    }
+    
+    const deliveryDate = new Date(item.deliveryDate);
+    const diffDays = (currentDate - deliveryDate) / (1000 * 60 * 60 * 24);
+    console.log(order,"order2")
+
+    if (diffDays > 10) {
+      return res.status(400).json({
+        message: "You cannot return an item after 10 days of delivery",
+      });
+    }
+    console.log(order,"order3")
+    try {
+ 
+      console.log(order,"order4")
+     
+      const product = await Product.findById(item.products).populate("category");
+      if (!product) {
+        return res.status(404).json({ success: false, error: "Product not found" });
+      }
+
+      console.log(order,"order5")
+
+
+      const getSalePrice = (product) => {
+        const productOffer = product.productOffer || 0;
+        const categoryOffer = product.category?.categoryOffer || 0;
+        const bestOffer = Math.max(productOffer, categoryOffer);
+        return bestOffer > 0 ? Math.floor(product.salePrice - (product.salePrice * bestOffer) / 100) : product.salePrice;
+      };
+
+      console.log(order,"order6")
+
+      const itemSalePrice = getSalePrice(product);
+      const updatedQuantity = item.quantity;
+     
+      let couponRefundAmount = 0;
+      let isCouponRemoved = false;
+      console.log(order,"order7")
+      if (order.couponId) {
+        const remainingItems = order.orderedItems.filter(
+          item => item.status !== "Returned" && item.status !== "Cancelled"
+        );
+        
+        let newtotal = 0;
+        if (remainingItems.length >= 0) {
+          for (let i = 0; i < remainingItems.length; i++) {
+            const items = await Product.findById({
+              _id: remainingItems[i].products,
+            }).populate("category");
+            const productOffer = items.productOffer || 0;
+            const categoryOffer = items.category.categoryOffer || 0;
+            const bestOffer = Math.max(productOffer, categoryOffer);
+            const salePrice = items.salePrice;
+            newtotal +=
+              bestOffer > 0
+                ? Math.floor(salePrice - (salePrice * bestOffer) / 100) * remainingItems[i].quantity
+                : salePrice * remainingItems[i].quantity;
+          }
+        }
+        console.log(order,"order8")
+        const coupon = await Coupon.findById(order.couponId);
+
+        if (coupon && newtotal < coupon.minimumPrice) {
+          couponRefundAmount = order.couponDiscount;
+          order.couponDiscount = 0;
+          order.couponId = null;
+          isCouponRemoved = true;
+        }
+      }
+      item.status = "Returned";
+        console.log(order.orderedItems,"order9.orderedItems")
+        const itemStatuses = order.orderedItems.map((item) => item.status);
+     
+        console.log(itemStatuses, "itemStatuses");
+        if (itemStatuses.every((s) => s === "Returned")) {
+          order.status = "Returned";
+        } else if (
+          itemStatuses.some((s) => s === "delivered")
+        ) {
+          order.status = "delivered";
+        } else if (
+          itemStatuses.some((s) => s === "Processing" || s === "Shipped")
+        ) {
+          order.status = "Processing";
+        } else if (itemStatuses.some((s) => s === "Pending")) {
+          order.status = "Pending";
+        } else if (
+          itemStatuses.some(
+            (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
+          )
+        ) {
+          order.status = "Cancelled";
+        } else {
+          order.status = "pending";
+        }
+      
+     
+       console.log(order,"orderfinal")
+      const refundAmount = isCouponRemoved 
+        ? (itemSalePrice * updatedQuantity) - couponRefundAmount 
+        : itemSalePrice * updatedQuantity;
+      
+     
+      product.quantity += updatedQuantity;
+      await product.save();
+
+      
+      
+      
+      
+      order.finalAmount -= refundAmount;
+      await order.save();
+
+      if (order.user) {
+        await walletHelper.updateWalletBalance(order.user, refundAmount, "credit");
+      }
+
+      return res.status(200).json({ 
+        success: true, 
+        message: "Return request approved successfully" 
+      });
+    } catch (innerError) {
+      console.error("Error in processing return:", innerError);
+      return res.status(500).json({ 
+        success: false, 
+        error: "Error processing return request" 
+      });
+    }
+  } catch (error) {
+    console.error("Error in approveReturn:", error);
+    return res.status(500).json({ 
+      success: false, 
+      error: "Failed to approve return" 
+    });
+  }
+};
+
+const declineReturn = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const order = await Order.findOne({ "orderedItems._id": itemId });
+    
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
+
+    const item = order.orderedItems.id(itemId);
+    if (!item) {
+      return res.status(404).json({ success: false, error: "Item not found" });
+    }
+
+    if (item.status !== "Return request") {
+      return res.status(400).json({ 
+        success: false, 
+        error: "This item is not in return request status" 
+      });
+    }
+
+    item.status = "delivered";
+    item.returnReason = null;
+    await order.save();
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Return request declined successfully" 
+    });
+  } catch (error) {
+    console.error("Error in declineReturn:", error);
+    return res.status(500).json({ 
+      success: false, 
+      error: "Failed to decline return" 
+    });
+  }
+};
+
 const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
@@ -544,5 +741,7 @@ module.exports = {
   getOrderDetails,
   changeStatus,
   removeOffer,
+  approveReturn,
+  declineReturn,
   logout,
 };

@@ -249,6 +249,15 @@
                 padding: 2rem;
             }
         }
+        .approve-btn {
+        background-color: #bbf7d0;
+        color: #064e3b;
+        margin-right: 5px;
+    }
+    .decline-btn {
+        background-color: #fecaca;
+        color: #7f1d1d;
+    }
     </style>
 
 <div class="content-header">
@@ -360,9 +369,18 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <button class="edit-status-btn" onclick="status('<%= item._id %>')">
-                                        Edit Status
-                                    </button>
+                                    <% if (item.status === 'Return request') { %>
+                                        <button class="edit-status-btn approve-btn" onclick="approveReturn('<%= item._id %>')">
+                                            Approve Return
+                                        </button>
+                                        <button class="edit-status-btn decline-btn" onclick="declineReturn('<%= item._id %>')">
+                                            Decline Return
+                                        </button>
+                                    <% } else if (!['Cancelled', 'Returned', 'Return request'].includes(item.status)) { %>
+                                        <button class="edit-status-btn" onclick="status('<%= item._id %>')">
+                                            Edit Status
+                                        </button>
+                                    <% } %>
                                 </td>
                             </tr>
                             <% }); %>
@@ -481,6 +499,104 @@
                 changeStatus();
             }
         };
+
+        function approveReturn(itemId) {
+        Swal.fire({
+            title: 'Confirm Return Approval',
+            text: 'Are you sure you want to approve this return request?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, approve it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/orders/approve-return/${itemId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message || 'Return request approved successfully',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        throw new Error(data.error || 'Error processing return');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.error || 'Something went wrong. Please try again.',
+                    });
+                });
+            }
+        });
+    }
+
+    function declineReturn(itemId) {
+        Swal.fire({
+            title: 'Confirm Return Decline',
+            text: 'Are you sure you want to decline this return request?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, decline it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/orders/decline-return/${itemId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message || 'Return request declined successfully',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        throw new Error(data.error || 'Error declining return');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.error || 'Something went wrong. Please try again.',
+                    });
+                });
+            }
+        });
+    }
     </script>
 
     <%- include("../../views/partials/admin/footer") %>
