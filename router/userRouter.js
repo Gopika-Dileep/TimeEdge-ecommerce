@@ -7,6 +7,9 @@ const profileController = require("../controller/user/profileController")
 const orderController = require("../controller/user/orderController")
 const wishlistController = require("../controller/user/wishlistController")
 const couponController = require("../controller/user/couponController")
+const referralController = require("../controller/user/referralController")
+
+
 const passport = require('passport')
 
 
@@ -114,6 +117,8 @@ router.post('/verifyRepaymentOrder',userAuth,orderController.verifyRepaymentOrde
 router.get('/download-invoice/:orderId',userAuth, orderController.downloadInvoice);
 
 
+router.get('/refer', userAuth, referralController.getReferAndEarnPage);
+router.post('/apply-referral', userAuth, referralController.applyReferralCode);
 
 
 

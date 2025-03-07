@@ -40,7 +40,19 @@ const userSchema = mongoose.Schema({
     isBlocked:{
         type:Boolean,
         default:false
-    }
+    },
+    referralCode: {
+        type: String,
+        unique: true,
+    },
+    referredBy: {
+        type: String, 
+        default: null,
+    },
+    referralBonusApplied: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 
