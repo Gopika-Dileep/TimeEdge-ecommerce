@@ -28,7 +28,8 @@ const getReferAndEarnPage = async (req, res) => {
         path: '/refer',
         user,
         referralCode: user.referralCode,
-        referralCount
+        referralCount,
+        appliedCode: user.referredBy
       });
       
     } catch (error) {
@@ -39,7 +40,7 @@ const getReferAndEarnPage = async (req, res) => {
   
   const applyReferralCode = async (req, res) => {
     try {
-      console.log("fghjkjhgfds")
+      
       const userId = req.session.user;
       
       if (!userId) {

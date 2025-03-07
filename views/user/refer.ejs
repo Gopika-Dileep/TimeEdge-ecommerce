@@ -102,13 +102,16 @@
                     </div>
                     
                     <!-- Apply Referral Code -->
+                     <% if(!user.referredBy) { %>
                     <div class="mt-4">
+
                         <label for="applyCode" class="form-label">Apply a Referral Code</label>
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" id="applyCode" placeholder="Enter code">
                             <button class="btn apply-button text-white" type="button">Apply</button>
                         </div>
                     </div>
+                    <% } %>
                     
                     <!-- Terms and conditions -->
                     <div class="terms-text">
@@ -152,6 +155,73 @@
                     console.error('Failed to copy: ', err);
                 });
         });
+        document.querySelector('.apply-button').addEventListener('click', function() {
+     
+        const referralCode = document.getElementById('applyCode').value.trim();
+        
+
+        if (!referralCode) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Empty Code',
+                text: 'Please enter a referral code',
+                confirmButtonColor: '#7cb342'
+            });
+            return;
+        }
+        
+   
+        Swal.fire({
+            title: 'Applying code...',
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false
+        });
+        
+ 
+        fetch('/apply-referral', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code: referralCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+               
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message || 'Referral code applied successfully',
+                    confirmButtonColor: '#7cb342'
+                }).then(() => {
+                  
+                    window.location.reload();
+                });
+            } else {
+               
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: data.message || 'Failed to apply referral code',
+                    confirmButtonColor: '#7cb342'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong. Please try again later.',
+                confirmButtonColor: '#7cb342'
+            });
+        });
+    });
     </script>
 </body>
 <%-include("../../views/partials/user/footer") %>

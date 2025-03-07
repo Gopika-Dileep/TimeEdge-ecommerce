@@ -475,6 +475,9 @@ const changeStatus = async (req, res) => {
         });
     }
 
+  
+    const previousStatus = item.status;
+    
     item.status = status;
     await order.save();
 
@@ -496,6 +499,38 @@ const changeStatus = async (req, res) => {
     
     await order.save();
     
+   
+    if (previousStatus !== "delivered" && status === "delivered") {
+      try {
+       
+        const user = await User.findById(order.user);
+        
+        if (user) {
+          
+          if (user.referredBy && !user.referralBonusApplied) {
+           
+            
+            
+            await walletHelper.updateWalletBalance(user._id, 25, 'credit');
+            
+            
+            const referrer = await User.findOne({ referralCode: user.referredBy });
+            
+            if (referrer) {
+              
+              await walletHelper.updateWalletBalance(referrer._id, 50, 'credit');
+            }
+            user.referralBonusApplied = true;
+            await user.save();
+            
+            console.log(`Referral bonus applied: User ${user._id} received 25 rupees, Referrer received 50 rupees`);
+          }
+        }
+      } catch (error) {
+        console.error("Error processing referral bonus:", error);
+       
+      }
+    }
 
     res.setHeader("Content-Type", "application/json");
     return res.json({ success: true });
@@ -507,6 +542,8 @@ const changeStatus = async (req, res) => {
       .json({ success: false, error: "Failed to update order status" });
   }
 };
+
+
 const approveReturn = async (req, res) => {
   try {
   
