@@ -250,16 +250,15 @@ const shopProducts = async (req, res) => {
         const priceSort = req.query.sort;
         const priceGt = req.query.gt ? parseInt(req.query.gt) : null;
         const priceLt = req.query.lt ? parseInt(req.query.lt) : null;
+        const page = parseInt(req.query.page) || 1;
+        const itemsPerPage = 6;
 
         // Fetch categories and brands for sidebar
         const category = await Category.find({ isListed: true });
         const brand = await Brand.find({ isListed: true });
 
         // Build the base query
-        let query = { 
-            isListed: true, 
-            quantity: { $gt: 0 } 
-        };
+        let query = { isListed: true };
 
         // Add search condition if search term exists
         if (search) {
@@ -284,43 +283,59 @@ const shopProducts = async (req, res) => {
             query.salePrice = { $gte: priceGt, $lte: priceLt };
         } else if (priceGt !== null) {
             query.salePrice = { $gte: priceGt };
+        } else if (priceLt !== null) {
+            query.salePrice = { $lte: priceLt };
         }
 
-        // Fetch products based on query
-        let products = await Product.find(query)
-            .populate('category')
-            .populate('brand');
-
-        // Apply price sorting
+        // Determine sort order
+        let sortOption = {};
         if (priceSort === 'asc') {
-            products.sort((a, b) => a.salePrice - b.salePrice);
+            sortOption = { salePrice: 1 };
         } else if (priceSort === 'desc') {
-            products.sort((a, b) => b.salePrice - a.salePrice);
+            sortOption = { salePrice: -1 };
         }
 
-        // Pagination
-        const itemsPerPage = 6;
-        const currentPage = parseInt(req.query.page) || 1;
-        const totalProducts = products.length;
+        // Count total matching products (for pagination)
+        const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / itemsPerPage);
-        
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const currentProducts = products.slice(startIndex, endIndex);
+
+        // Fetch products with pagination, sorting, and populate
+        const products = await Product.find(query)
+            .populate('category')
+            .populate('brand')
+            .sort(sortOption)
+            .skip((page - 1) * itemsPerPage)
+            .limit(itemsPerPage);
+
+        // Check wishlist status for products if user is logged in
+        let productsWithWishlist = [...products];
+        if (user) {
+            const userData = await User.findOne({ _id: user });
+            const wishlist = userData.wishlist || [];
+            
+            productsWithWishlist = products.map(product => {
+                const productObj = product.toObject();
+                productObj.inWishlist = wishlist.includes(product._id.toString());
+                return productObj;
+            });
+        }
 
         // Prepare render options
         const renderOptions = {
-            product: currentProducts,
+            product: productsWithWishlist,
             category: category,
             brand: brand,
             search: search,
             selectedCategory: categoryId,
             selectedBrand: brandId,
-            currentpage: currentPage,
+            priceSort: priceSort,
+            minPrice: priceGt,
+            maxPrice: priceLt,
+            currentpage: page,
             totalpage: totalPages
         };
 
-        // If user is logged in, you might want to add user data
+        // If user is logged in, add user data
         if (user) {
             const userData = await User.findOne({ _id: user });
             renderOptions.user = userData;
