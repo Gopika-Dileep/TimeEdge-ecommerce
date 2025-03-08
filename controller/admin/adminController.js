@@ -437,7 +437,7 @@ const getOrderDetails = async (req, res) => {
 const changeStatus = async (req, res) => {
   try {
     const { itemId } = req.params;
-    const { status } = req.body;
+    const { status, cancelReason } = req.body;
 
     const order = await Order.findOne({ "orderedItems._id": itemId });
     if (!order) {
@@ -450,39 +450,124 @@ const changeStatus = async (req, res) => {
     }
 
     if (item.status === "Returned") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Cannot change status of a returned item",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Cannot change status of a returned item",
+      });
     }
 
     if (item.status === "Cancelled") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Cannot change status of a cancelled item",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Cannot change status of a cancelled item",
+      });
     }
     if (item.status === "delivered") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Cannot change status of a cancelled item",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Cannot change status of a delivered item",
+      });
     }
 
-  
     const previousStatus = item.status;
     
-    item.status = status;
+    // Handle cancellation
+    if (status === 'Cancelled') {
+      if (!cancelReason) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Cancellation reason is required" 
+        });
+      }
+      
+      const itemQuantity = item.quantity;
+      let itemSalePrice = 0;
+      
+      // Calculate item sale price with best offer
+      if (item) {
+        const product = await Product.findById({
+          _id: item.products,
+        }).populate("category");
+        
+        if (product) {
+          // Update product quantity when cancelling
+          product.quantity += item.quantity;
+          await product.save();
+          
+          const productOffer = product.productOffer || 0;
+          const categoryOffer = product.category.categoryOffer || 0;
+          const bestOffer = Math.max(productOffer, categoryOffer);
+          const salePrice = product.salePrice;
+          itemSalePrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer) / 100) : salePrice;
+        }
+      }
+      
+      // Handle coupon logic when cancelling
+      let couponRefundAmount = 0;
+      let isCouponRemoved = false;
+      
+      if (order.couponId) {
+        const remainingItems = order.orderedItems.filter(
+          item => item.status !== "Returned" && item.status !== "Cancelled" && item._id.toString() !== itemId
+        );
+        
+        let newTotal = 0;
+        if (remainingItems.length >= 0) {
+          for (let i = 0; i < remainingItems.length; i++) {
+            const items = await Product.findById({
+              _id: remainingItems[i].products,
+            }).populate("category");
+            
+            const productOffer = items.productOffer || 0;
+            const categoryOffer = items.category.categoryOffer || 0;
+            const bestOffer = Math.max(productOffer, categoryOffer);
+            const salePrice = items.salePrice;
+            newTotal +=
+              bestOffer > 0
+                ? Math.floor(salePrice - (salePrice * bestOffer) / 100) * remainingItems[i].quantity
+                : salePrice * remainingItems[i].quantity;
+          }
+        }
+        
+        const coupon = await Coupon.findById({ _id: order.couponId });
+        if (coupon && newTotal < coupon.minimumPrice) {
+          couponRefundAmount = order.couponDiscount;
+          order.couponDiscount = 0;
+          order.couponId = null;
+          isCouponRemoved = true;
+        }
+      }
+      
+      // Refund to wallet if not COD
+      if (order.paymentMethod !== "COD") {
+        const cancelAmount = isCouponRemoved 
+          ? (itemSalePrice * itemQuantity) - couponRefundAmount 
+          : itemSalePrice * itemQuantity;
+          
+        order.finalAmount -= cancelAmount;
+        
+        // Get user ID from the order
+        const userId = order.user;
+        const transactionType = "credit";
+        
+        await walletHelper.updateWalletBalance(
+          userId,
+          cancelAmount,
+          transactionType
+        );
+      }
+      
+      item.status = status;
+      item.cancelReason = cancelReason;
+    } else {
+      // For non-cancellation status updates
+      item.status = status;
+    }
+    
     await order.save();
 
+    // Update overall order status
     const itemStatuses = order.orderedItems.map((item) => item.status);
-    console.log(itemStatuses, "itemStatuses");
     if (itemStatuses.every((s) => s === "Cancelled" || s === "Returned")) {
       order.status = "Cancelled";
     } else if (itemStatuses.some((s) => s === "Pending")) {
@@ -499,25 +584,18 @@ const changeStatus = async (req, res) => {
     
     await order.save();
     
-   
+    // Process referral bonus if applicable
     if (previousStatus !== "delivered" && status === "delivered") {
       try {
-       
         const user = await User.findById(order.user);
         
         if (user) {
-          
           if (user.referredBy && !user.referralBonusApplied) {
-           
-            
-            
             await walletHelper.updateWalletBalance(user._id, 25, 'credit');
-            
             
             const referrer = await User.findOne({ referralCode: user.referredBy });
             
             if (referrer) {
-              
               await walletHelper.updateWalletBalance(referrer._id, 50, 'credit');
             }
             user.referralBonusApplied = true;
@@ -528,7 +606,6 @@ const changeStatus = async (req, res) => {
         }
       } catch (error) {
         console.error("Error processing referral bonus:", error);
-       
       }
     }
 
@@ -542,7 +619,6 @@ const changeStatus = async (req, res) => {
       .json({ success: false, error: "Failed to update order status" });
   }
 };
-
 
 const approveReturn = async (req, res) => {
   try {

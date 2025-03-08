@@ -54,6 +54,9 @@
                 <% if (item.cancelReason) { %>
                 <small class="text-danger"><%= item.cancelReason %></small>
                 <% } %>
+                <% if (item.returnReason) { %>
+                  <small class="text-danger"><%= item.returnReason %></small>
+                  <% } %>
               </div>
             </div>
           </div>
