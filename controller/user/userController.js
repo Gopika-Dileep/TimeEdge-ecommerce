@@ -4,7 +4,8 @@ const bcrypt = require("bcrypt")
 
 
 const loadlogin = async (req,res)=>{
-   if(!req.session.user) {try {
+   if(!req.session.user) {
+    try {
      
         res.render("login", { message: null });
     } catch (error) {

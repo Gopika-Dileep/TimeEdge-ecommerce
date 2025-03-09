@@ -4,6 +4,19 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
+  ::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Hide scrollbar for Firefox */
+html {
+  scrollbar-width: none;
+}
+
+body {
+  overflow: auto; /* Allow scrolling */
+}
   /* General Styling */
   .shop-container {
     padding: 40px 0;
@@ -152,6 +165,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    padding-bottom: 0px;
   }
   
   .product-name {
@@ -171,6 +185,7 @@
     font-weight: 600;
     color: #ff2a68;
     margin-bottom: 10px;
+    display: flex;
   }
   
   .original-price {
@@ -181,7 +196,7 @@
   }
   
   .add-to-cart {
-    margin-top: auto;
+    margin-top: 10px;
     background: #000;
     color: #fff;
     border: none;
@@ -197,23 +212,15 @@
     background: #333;
   }
   
-  .stock-badge {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    margin-top: 10px;
-    font-weight: 500;
-  }
-  
-  .in-stock {
-    background: #e8f5e9;
-    color: #2e7d32;
-  }
-  
   .out-stock {
     background: #ffebee;
     color: #c62828;
+    
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    margin-left: 15px;
+    font-weight: 500;
   }
   
   .rating {
@@ -544,11 +551,7 @@
                       </a>
                     </h3>
                     
-                    <div class="rating">
-                      <% for (let j = 0; j < 5; j++) { %>
-                        <i class="fa <%= j < item.rating ? 'fa-star' : 'fa-star-o' %>"></i>
-                      <% } %>
-                    </div>
+                 
                     
                     <% 
                     const productOffer = item.productOffer || 0;
@@ -563,11 +566,12 @@
                       <% if (finalPrice < salePrice) { %>
                         <span class="original-price">₹<%= salePrice.toLocaleString() %></span>
                       <% } %>
-                    </div>
-                    
-                    <div class="stock-status <%= item.quantity > 0 ? '' : 'out-stock' %>">
+                      <div class="stock-status <%= item.quantity > 0 ? '' : 'out-stock' %>">
                         <%= item.quantity > 0 ? '' : 'Out of Stock' %>
                     </div>
+                    </div>
+                    
+                  
                     
                     <button class="add-to-cart" 
                             data-id="<%= item._id %>" 
