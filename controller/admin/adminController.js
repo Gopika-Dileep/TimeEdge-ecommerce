@@ -434,6 +434,8 @@ const getOrderDetails = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch order details" });
   }
 };
+
+
 const changeStatus = async (req, res) => {
   try {
     const { itemId } = req.params;
@@ -501,8 +503,9 @@ const changeStatus = async (req, res) => {
           itemSalePrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer) / 100) : salePrice;
         }
       }
-      
-      // Handle coupon logic when cancelling
+        
+
+      const price = item.price - itemSalePrice;
       let couponRefundAmount = 0;
       let isCouponRemoved = false;
       
@@ -545,6 +548,8 @@ const changeStatus = async (req, res) => {
           : itemSalePrice * itemQuantity;
           
         order.finalAmount -= cancelAmount;
+        order.subtotal -= item.price;
+        order.productdiscount -= price;
         
         // Get user ID from the order
         const userId = order.user;
@@ -625,11 +630,14 @@ const approveReturn = async (req, res) => {
   
     const { itemId } = req.params;
     const order = await Order.findOne({ "orderedItems._id": itemId });
+    console.log(order,"orderrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
     if (!order) {
       return res.status(404).json({ success: false, error: "Order not found" });
     }
     const currentDate = new Date();
-    const item = order.orderedItems.id(itemId);
+    const item = order.orderedItems.find(
+      (item) => item._id.toString() === itemId
+    );
     if (!item) {
       return res.status(404).json({ success: false, error: "Item not found" });
     }
@@ -671,19 +679,27 @@ const approveReturn = async (req, res) => {
         return bestOffer > 0 ? Math.floor(product.salePrice - (product.salePrice * bestOffer) / 100) : product.salePrice;
       };
 
-      console.log(order,"order6")
+    
 
+      console.log(order,"order6")
+      item.status = "Returned";
       const itemSalePrice = getSalePrice(product);
+
       const updatedQuantity = item.quantity;
+      console.log(item.price,itemSalePrice,"order6.1")
      
+      const price = item.price - itemSalePrice;
+      console.log(price,"price")
+
+
       let couponRefundAmount = 0;
       let isCouponRemoved = false;
       console.log(order,"order7")
       if (order.couponId) {
         const remainingItems = order.orderedItems.filter(
           item => item.status !== "Returned" && item.status !== "Cancelled"
-        );
-        
+        );   
+        console.log(remainingItems,"remainingItems")
         let newtotal = 0;
         if (remainingItems.length >= 0) {
           for (let i = 0; i < remainingItems.length; i++) {
@@ -701,16 +717,17 @@ const approveReturn = async (req, res) => {
           }
         }
         console.log(order,"order8")
-        const coupon = await Coupon.findById(order.couponId);
-
-        if (coupon && newtotal < coupon.minimumPrice) {
+        const coupon = await Coupon.findById({_id:order.couponId});
+        console.log(coupon,"coupon")
+        console.log(newtotal,coupon.minimumPrice,"newtotal")
+        if ( newtotal < coupon.minimumPrice) {
           couponRefundAmount = order.couponDiscount;
           order.couponDiscount = 0;
           order.couponId = null;
           isCouponRemoved = true;
         }
       }
-      item.status = "Returned";
+     
         console.log(order.orderedItems,"order9.orderedItems")
         const itemStatuses = order.orderedItems.map((item) => item.status);
      
@@ -752,6 +769,8 @@ const approveReturn = async (req, res) => {
       
       
       order.finalAmount -= refundAmount;
+      order.subtotal -= item.price;
+      order.productdiscount -= price;
       await order.save();
 
       if (order.user) {

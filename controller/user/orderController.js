@@ -400,6 +400,8 @@ const showOrder = async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 };
+
+
 const cancelOrderItem = async (req, res) => {
   try {
     const orderId = req.params.itemId;
@@ -412,7 +414,8 @@ const cancelOrderItem = async (req, res) => {
     }
 
     const order = await Order.findById(orderId);
-
+    console.log(order,'order for checking coupon id ')
+    console.log(order.couponId,'coupon id')
     if (order.couponId)
       if (!order) {
         return res
@@ -423,7 +426,7 @@ const cancelOrderItem = async (req, res) => {
     const orderItem = order.orderedItems.find(
       (item) => item._id.toString() === itemId
     );
-
+console.log(orderItem,'orderItem')
     if (!orderItem) {
       return res
         .status(404)
@@ -442,11 +445,13 @@ const cancelOrderItem = async (req, res) => {
 
     orderItem.status = "Cancelled";
     orderItem.cancelReason = reason;
+    console.log(orderItem,'orderItem')
 
     const itemQuantity = orderItem.quantity
+    console.log(itemQuantity,'itemQuantity')
 
     let itemSaleprice = 0
-    
+    console.log(orderItem,'orderItem')
     if(orderItem) {
         const item = await Product.findById({
             _id: orderItem.products,
@@ -460,15 +465,19 @@ const cancelOrderItem = async (req, res) => {
     }
 
     await order.save();
+  
+const price = orderItem.price-itemSaleprice
 
     let couponRefudAmount = 0 ;
     let isCouponRemoved = false ;
-
+console.log(order,'order')
+console.log(order.couponId,'coupon id')
     if (order.couponId) {
         const remainingItems = order.orderedItems.filter(
             item => item.status !== "Returned" && item.status !== "Cancelled"
           );          
       
+          console.log(remainingItems,'remainingItems')
           let newtotal = 0;
           if (remainingItems.length >= 0) {
             for (let i = 0; i < remainingItems.length; i++) {
@@ -487,6 +496,9 @@ const cancelOrderItem = async (req, res) => {
           }
 
           const coupon = await Coupon.findById({_id:order.couponId})
+          console.log(coupon,'coupon')
+          console.log(newtotal,coupon.minimumPrice,'newtotal')
+
           if(newtotal<coupon.minimumPrice){
             couponRefudAmount = order.couponDiscount;
             order.couponDiscount =  0 ;
@@ -499,6 +511,8 @@ const cancelOrderItem = async (req, res) => {
     if (order.paymentMethod !== "COD") {
       const cancelAmount = isCouponRemoved ? (itemSaleprice * itemQuantity) - couponRefudAmount : itemSaleprice * itemQuantity
       order.finalAmount -= cancelAmount
+      order.subtotal -= orderItem.price
+      order.productdiscount -= price
       await order.save()
       const transactionType = "credit";
       const userId = req.session.user;
@@ -510,7 +524,9 @@ const cancelOrderItem = async (req, res) => {
     }
 
     await order.save();
+    console.log(order, "order");
     const itemStatuses = order.orderedItems.map((item) => item.status);
+    console.log(itemStatuses, "itemStatuses");
     if (itemStatuses.every((s) => s === "delivered")) {
       order.status = "delivered";
     } else if (
@@ -529,7 +545,8 @@ const cancelOrderItem = async (req, res) => {
       order.status = "pending";
     }
     await order.save();
-    console.log(order, "order");
+    console.log(order, "order2");
+    console.log(orderItem, "orderItem2");
 
     const product = await Product.findById(orderItem.products);
     console.log(product, "product");
@@ -552,6 +569,12 @@ const returnOrder = async (req, res) => {
     try {
       const { orderId } = req.params;
       const { productId, reason } = req.body;
+
+      if (!reason.trim()) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Return reason is required reason is required" });
+      }
       
       const order = await Order.findById(orderId);
       if (!order) {
