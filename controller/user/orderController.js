@@ -107,9 +107,9 @@ const createOrder = async (req, res) => {
 
       if (product.quantity < quantity) {
         return res
-          .status(400)
-          .send(`Not enough stock for product ${product.name}`);
+          .status(400).json({success:false,message:`Not enough stock for product ${product.productName}`});
       }
+     
       product.quantity -= quantity;
       await product.save();
     }
@@ -155,8 +155,24 @@ const razorpayInstance = new Razorpay({
 
 const orderRazorpay = async (req, res) => {   
   try {     
-    const { totalAmount } = req.body;
+    const { totalAmount, cartId } = req.body;
     console.log(totalAmount, "totalAmount");
+    console.log(cartId, "cartId");
+    // Check product availability before creating payment order
+    const cart = await Cart.findById({ _id: cartId }).populate("items.product");
+    
+    // Validate product availability
+    for (let item of cart.items) {
+      const product = item.product;
+      const quantity = item.quantity;
+      
+      if (product.quantity < quantity) {
+        return res.status(400).json({
+          success: false,
+          message: `Not enough stock for product ${product.productName}`
+        });
+      }
+    }
     
     const options = {       
       amount: totalAmount * 100,       
@@ -197,6 +213,7 @@ const verifyRazorPayOrder = async (req, res) => {
       subtotal,
       paymentStatus 
     } = req.body;
+    console.log(req.body,'req.body')
     
     console.log('Verifying RazorPay Order')
 
@@ -225,16 +242,14 @@ const verifyRazorPayOrder = async (req, res) => {
     const user = cart.user;
     let discountTotalPrice = 0;
 
+    // No need to check stock here as we already validated in orderRazorpay
     for (let item of cart.items) {
       const product = item.product;
       const quantity = item.quantity;
 
       discountTotalPrice += (item.product.salePrice * quantity) - item.price
-      if (product.quantity < quantity) {
-        return res
-          .status(400)
-          .send(`Not enough stock for product ${product.name}`);
-      }
+      
+      // Update product quantities
       product.quantity -= quantity;
       await product.save();
     }
@@ -282,7 +297,6 @@ const verifyRazorPayOrder = async (req, res) => {
     });
   }
 };
-
 const walletPayment = async (req, res) => {
   try {
     const {
@@ -320,8 +334,7 @@ const walletPayment = async (req, res) => {
 
       if (product.quantity < quantity) {
         return res
-          .status(400)
-          .send("Not enough stock for product ${product.name}");
+          .status(400).json({success:false,message:`Not enough stock for product ${product.productName}`});
       }
       product.quantity -= quantity;
       await product.save();
