@@ -305,27 +305,30 @@
     const userData = JSON.parse(document.getElementById('userData').dataset.value);
 
     const ctx = document.getElementById('productChart').getContext('2d');
-    const productChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: productData.map(item => item.productName),
-            datasets: [{
-                label: 'Sales',
-                data: productData.map(item => item.totalOrder),
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+const productChart = new Chart(ctx, {
+    type: 'line',  
+    data: {
+        labels: productData.map(item => item.productName.split(' ')[0]+" "+item.productName.split(' ')[1]),
+        datasets: [{
+            label: 'Sales',
+            data: productData.map(item => item.totalOrder),
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+            tension: 0.1,  
+            fill: false    
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
             }
         }
-    });
-
+    }
+});
     const categoryCtx = document.getElementById('categoryChart').getContext('2d');
     const categoryChart = new Chart(categoryCtx, {
         type: 'doughnut',
@@ -459,7 +462,7 @@
                 </tr>
             `).join('');
 
-            productChart.data.labels = data.productData.map(item => item.productName);
+            productChart.data.labels = data.productData.map(item => item.productName.split(' ')[0]);
             productChart.data.datasets[0].data = data.productData.map(item => item.totalOrder);
             productChart.update();
 
