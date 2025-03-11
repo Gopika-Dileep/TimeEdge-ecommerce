@@ -685,52 +685,99 @@ body {
   });
   
   // Add to cart functionality
-  const addToCartButtons = document.querySelectorAll('.add-to-cart');
-  addToCartButtons.forEach(function (button) {
+  // Add to cart functionality
+const addToCartbtn = document.querySelectorAll('.add-to-cart');
+addToCartbtn.forEach(function (button) {
     button.addEventListener('click', function (event) {
-      event.preventDefault();
-      const productId = this.getAttribute('data-id');
-      const quantity = this.getAttribute('data-quantity');
-      $.ajax({
+        event.preventDefault();
+        const productId = this.getAttribute('data-id');
+        const quantity = this.getAttribute('data-quantity');
+        
+        // Check if user is logged in
+        $.ajax({
+            url: '/check-auth',
+            method: 'GET',
+            success: function(response) {
+                if (response.isLoggedIn) {
+                    // User is logged in, proceed with adding to cart
+                    addProductToCart(productId, quantity);
+                } else {
+                    // User is not logged in, show login prompt
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Login Required',
+                        text: 'Please login to add items to your cart',
+                        showCancelButton: true,
+                        confirmButtonText: 'Go to Login',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/login';
+                        }
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error checking authentication status:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong. Please try again later.',
+                });
+            }
+        });
+    });
+});
+
+function addProductToCart(productId, quantity) {
+    $.ajax({
         url: `/addToCart/${productId}`,
         method: 'POST',
         data: JSON.stringify({ quantity: quantity }),
         contentType: 'application/json',
         success: function (response) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Added to Cart',
-            text: response.message,
-            confirmButtonText: 'OK',
-          }).then(()=>{
             Swal.fire({
-              title:'Go to cart?',
-              text:'Do you want to go to cart?',
-              showCancelButton:true,
-              confirmButtonText:"YES",
-              cancelButtonText:"NO",
-            })
-            .then((confirmation) => {
-              if (confirmation.isConfirmed) {
-                window.location.href = '/cart';
-              }else{
-                console.log('stay on the current page')
-              }
+                icon: 'success',
+                title: 'Added to Cart',
+                text: response.message,
+                confirmButtonText: 'OK',
+            }).then(() => {
+                Swal.fire({
+                    title: 'Go to cart?',
+                    text: 'Do you Want to go to cart?',
+                    showCancelButton: true,
+                    confirmButtonText: "YES",
+                    cancelButtonText: "NO",
+                })
+                .then((confirmation) => {
+                    if (confirmation.isConfirmed) {
+                        window.location.href = '/cart';
+                    }
+                });
             });
-          });
         },
         error: function (xhr, status, error) {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Error while adding to cart. Please try again!",
-            confirmButtonText: 'OK',
-          });
-          console.error('Error while adding to Cart', error);
+            // Parse the response to get the error message
+            let errorMessage = "Error while adding to cart. Please try again!";
+            try {
+                const response = JSON.parse(xhr.responseText);
+                if (response && response.message) {
+                    errorMessage = response.message;
+                }
+            } catch (e) {
+                console.error('Error parsing error response', e);
+            }
+            
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage,
+                confirmButtonText: 'OK',
+            });
+            console.error('Error while adding to Cart', error);
         }
-      });
     });
-  });
+}
 
   // Wishlist functionality
   const wishlistIcons = document.querySelectorAll('.bi-heart, .bi-heart-fill');

@@ -93,48 +93,101 @@ const loadAddToCart = async (req, res) => {
 
 
 const addToCart = async (req, res) => {
-    const userId = req.session.user
-    const productId = req.params.productId;
-    const quantity = parseInt(req.body.quantity, 10);
+    try {
+        const userId = req.session.user
+        const productId = req.params.productId;
+        const quantity = parseInt(req.body.quantity, 10);
 
-
-    if (!userId) {
-        return res.status(400).send('User ID is required');
-    }
-
-    const product = await Product.findById(productId).populate('category')
-    const productOffer = product.productOffer || 0
-    const categoryOffer = product.category.categoryOffer || 0
-
-    const bestOffer = Math.max(productOffer, categoryOffer)
-    const finalPrice = bestOffer > 0 ? product.salePrice - (product.salePrice * bestOffer / 100) : product.salePrice
-    if (!product) {
-        return res.status(404).send('Product not found');
-    }
-    let cart = await Cart.findOne({ user: userId });
-
-
-    if (!cart) {
-        cart = new Cart({
-            user: userId,
-            items: [{ product: productId, quantity, price: Math.floor(finalPrice * quantity) }]
-        });
-    } else {
-        const existingItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-
-
-        if (existingItemIndex !== -1) {
-            cart.items[existingItemIndex].quantity += quantity;
-            cart.items[existingItemIndex].price += finalPrice * quantity;
-        } else {
-            cart.items.push({ product: productId, quantity, price:Math.floor(finalPrice * quantity) });
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'User ID is required' });
         }
+
+        const product = await Product.findById(productId).populate('category')
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        // Check if product is in stock
+        if (product.quantity <= 0) {
+            return res.status(400).json({ success: false, message: 'Product is out of stock' });
+        }
+
+        let cart = await Cart.findOne({ user: userId });
+        
+        // Calculate price with best offer
+        const productOffer = product.productOffer || 0
+        const categoryOffer = product.category.categoryOffer || 0
+        const bestOffer = Math.max(productOffer, categoryOffer)
+        const finalPrice = bestOffer > 0 ? product.salePrice - (product.salePrice * bestOffer / 100) : product.salePrice
+
+        // If cart doesn't exist, create a new one
+        if (!cart) {
+            // Check if requested quantity exceeds max quantity per person
+            if (quantity > product.maxQtyPerPerson) {
+                return res.status(400).json({ success: false, message: 'Maximum quantity for one product exceeded' });
+            }
+            
+            // Check if requested quantity exceeds available stock
+            if (quantity > product.quantity) {
+                return res.status(400).json({ success: false, message: 'Requested quantity exceeds available stock' });
+            }
+            
+            cart = new Cart({
+                user: userId,
+                items: [{ product: productId, quantity, price: Math.floor(finalPrice * quantity) }]
+            });
+        } else {
+            const existingItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
+
+            // If item already exists in cart
+            if (existingItemIndex !== -1) {
+                const newQuantity = cart.items[existingItemIndex].quantity + quantity;
+                
+                // Check if new quantity exceeds max quantity per person
+                if (newQuantity > product.maxQtyPerPerson) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: 'Maximum quantity for one product exceeded' 
+                    });
+                }
+                
+                // Check if new quantity exceeds available stock
+                if (newQuantity > product.quantity) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: 'Requested quantity exceeds available stock' 
+                    });
+                }
+                
+                cart.items[existingItemIndex].quantity = newQuantity;
+                cart.items[existingItemIndex].price = Math.floor(finalPrice * newQuantity);
+            } else {
+                // Check if requested quantity exceeds max quantity per person
+                if (quantity > product.maxQtyPerPerson) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: 'Maximum quantity for one product exceeded' 
+                    });
+                }
+                
+                // Check if requested quantity exceeds available stock
+                if (quantity > product.quantity) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: 'Requested quantity exceeds available stock' 
+                    });
+                }
+                
+                cart.items.push({ product: productId, quantity, price: Math.floor(finalPrice * quantity) });
+            }
+        }
+
+        await cart.save();
+        return res.json({ success: true, message: "Added to cart" });
+    } catch (error) {
+        console.error("Add to cart error:", error);
+        return res.status(500).json({ success: false, message: "Server error" });
     }
-
-
-    await cart.save();
-    res.json({ success: true, message: "added to cart" })
-
 };
 
 const incrementQuantity = async (req, res) => {

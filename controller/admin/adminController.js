@@ -8,9 +8,16 @@ const Product = require("../../models/productSchema");
 const Order = require("../../models/orderSchema");
 const walletHelper = require("../../helpers/walletHelper");
 const Coupon = require("../../models/couponSchema");
+
+
+
+
 const loadAdminLogin = async (req, res) => {
   try {
-    res.render("adminlogin");
+    res.render("adminlogin", {
+      error: null,
+      email: null // Add this line to pass email variable
+    });
   } catch (error) {
     console.error(error);
     res.status(200).json({ message: "Error while load adminlogin page" });
@@ -19,19 +26,31 @@ const loadAdminLogin = async (req, res) => {
 const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const admin = await User.findOne({ email, isAdmin: true });
-    if (admin) {
-      const passwordmatch = await bcrypt.compare(password, admin.password);
-      if (passwordmatch) {
-        req.session.admin = admin._id;
-        res.redirect("admin/dashboard");
-      }
+
+    if (!email || !password) {
+      return res.render("adminlogin", { error: "Email and password are required", email });
     }
+
+    const admin = await User.findOne({ email, isAdmin: true });
+
+    if (!admin) {
+      return res.render("adminlogin", { error: "Invalid email or you are not an admin", email });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, admin.password);
+    if (!passwordMatch) {
+      return res.render("adminlogin", { error: "Incorrect password", email });
+    }
+
+    req.session.admin = admin._id;
+    res.redirect("/admin/dashboard");
+
   } catch (error) {
     console.error(error);
-    res.status(200).json({ message: "Error while login" });
+    res.render("adminlogin", { error: "Error while logging in", email });
   }
 };
+
 const loadDashboard = async (req, res) => {
   try {
     res.render("dashboard");

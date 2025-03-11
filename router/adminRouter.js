@@ -45,7 +45,7 @@ router.get('/addProductOffer',adminAuth,productController.addOffer)
 router.get('/removeProductOffer',adminAuth,productController.removeOffer)
 
 router.get('/orders',adminAuth,adminController.getOrders)
-router.get("/orders/:orderId",  adminController.getOrderDetails)
+router.get("/orders/:orderId", adminAuth, adminController.getOrderDetails)
 
 router.post("/orders/update-status/:itemId", adminAuth, adminController.changeStatus);
 router.post("/orders/approve-return/:itemId", adminAuth, adminController.approveReturn);

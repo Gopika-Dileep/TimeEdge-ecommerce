@@ -450,47 +450,110 @@
     });
 
     // Modified Add to Cart function to use the hidden quantity input (fixed at 1)
-    const addToCartbtn = document.querySelectorAll('.button-add-to-cart');
-    addToCartbtn.forEach(function(button) {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            const quantity = document.getElementById('quantity').value; // Get value from hidden input
-            
-            $.ajax({
-                url: `/addToCart/${productId}`,
-                method: 'POST',
-                data: JSON.stringify({ quantity: parseInt(quantity) }),
-                contentType: 'application/json',
-                success: function(response) {
+    // Modified Add to Cart function to use the hidden quantity input (fixed at 1)
+const addToCartbtn = document.querySelectorAll('.button-add-to-cart');
+addToCartbtn.forEach(function(button) {
+    button.addEventListener('click', function() {
+        const productId = this.getAttribute('data-id');
+        const quantity = document.getElementById('quantity').value;
+        
+        $.ajax({
+            url: '/check-auth',
+            method: 'GET',
+            success: function(response) {
+                if (response.isLoggedIn) {
+                    // User is logged in, proceed with adding to cart
+                    addProductToCart(productId, quantity);
+                } else {
+                    // User is not logged in, show login prompt
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Added to Cart',
-                        text: response.message,
-                        confirmButtonText: 'OK',
-                    }).then(() => {
-                        Swal.fire({
-                            title: 'Go to cart?',
-                            showCancelButton: true,
-                            confirmButtonText: "YES",
-                            cancelButtonText: "NO",
-                        }).then((confirmation) => {
-                            if (confirmation.isConfirmed) {
-                                window.location.href = '/cart';
-                            }
-                        });
-                    });
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "Error while adding to cart. Please try again!",
-                        confirmButtonText: 'OK',
+                        icon: 'info',
+                        title: 'Login Required',
+                        text: 'Please login to add items to your cart',
+                        showCancelButton: true,
+                        confirmButtonText: 'Go to Login',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/login';
+                        }
                     });
                 }
+            },
+            error: function (xhr, status, error) {
+            // Parse the response to get the error message
+            let errorMessage = "Error while adding to cart. Please try again!";
+            try {
+                const response = JSON.parse(xhr.responseText);
+                if (response && response.message) {
+                    errorMessage = response.message;
+                }
+            } catch (e) {
+                console.error('Error parsing error response', e);
+            }
+            
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage,
+                confirmButtonText: 'OK',
             });
+            console.error('Error while adding to Cart', error);
+        }
         });
     });
+});
+
+// Function to add product to cart
+function addProductToCart(productId, quantity) {
+    $.ajax({
+        url: `/addToCart/${productId}`,
+        method: 'POST',
+        data: JSON.stringify({ quantity: quantity }),
+        contentType: 'application/json',
+        success: function (response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart',
+                text: response.message,
+                confirmButtonText: 'OK',
+            }).then(() => {
+                Swal.fire({
+                    title: 'Go to cart?',
+                    text: 'Do you Want to go to cart?',
+                    showCancelButton: true,
+                    confirmButtonText: "YES",
+                    cancelButtonText: "NO",
+                })
+                .then((confirmation) => {
+                    if (confirmation.isConfirmed) {
+                        window.location.href = '/cart';
+                    }
+                });
+            });
+        },
+        error: function (xhr, status, error) {
+            // Parse the response to get the error message
+            let errorMessage = "Error while adding to cart. Please try again!";
+            try {
+                const response = JSON.parse(xhr.responseText);
+                if (response && response.message) {
+                    errorMessage = response.message;
+                }
+            } catch (e) {
+                console.error('Error parsing error response', e);
+            }
+            
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage,
+                confirmButtonText: 'OK',
+            });
+            console.error('Error while adding to Cart', error);
+        }
+    });
+}
 
     const addToWishbtn = document.querySelectorAll('.add-to-wishlist');
     addToWishbtn.forEach(function(button) {

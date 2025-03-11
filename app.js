@@ -37,6 +37,11 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/",userRouter)
 app.use("/admin",adminRouter)
 
+
+app.get('/check-auth', (req, res) => {
+    res.json({ isLoggedIn: !!req.session.user });
+});
+
 app.listen(PORT,()=>{
     console.log(`server is running ${PORT}` );
 })
