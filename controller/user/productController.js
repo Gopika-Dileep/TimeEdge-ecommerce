@@ -7,18 +7,26 @@ const User = require("../../models/userSchema")
 
 const loadhome = async (req, res) => {
     try {
-
         const userId = req.session.user
-        const category = await Category.find({ isListed: true })
-        const brand = await Brand.find({ isListed: true })
-        const product = await Product.find({ isListed: true }).sort({ createdAt: -1 }).limit(9).populate('category').populate('brand');
+        const categories = await Category.find({ isListed: true })
+        const brands = await Brand.find({ isListed: true })
+        
+        const products = await Product.find({ 
+            isListed: true,
+            category: { $in: categories.map(cat => cat._id) },
+            brand: { $in: brands.map(brand => brand._id) }
+        })
+        .sort({ createdAt: -1 })
+        .limit(9)
+        .populate('category')
+        .populate('brand');
+        
         if (userId) {
             const user = await User.findById({ _id: userId })
-            res.render('home', { user: user, product: product })
+            res.render('home', { user: user, product: products })
         } else {
-            res.render("home", { product: product })
+            res.render("home", { product: products })
         }
-
     } catch (error) {
         console.error(error)
         res.status(500).json("server error")
@@ -36,7 +44,8 @@ const loadshop = async (req, res) => {
         const search = req.query.search || '';
         const query = search ? { productName: { $regex: search, $options: 'i' } } : {};
 
-        const product = await Product.find({ ...query, isListed: true })
+        const product = await Product.find({ ...query, isListed: true ,    category: { $in: category.map(cat => cat._id) },
+        brand: { $in: brand.map(brand => brand._id) } })
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
@@ -190,33 +199,46 @@ const productDetails = async (req, res) => {
         const userId = req.session.user
         const productId = req.query.id
 
-        const product = await Product.findOne({ _id: productId,isListed:true }).populate('category').populate('brand')
+       
+        const product = await Product.findOne({ 
+            _id: productId,
+            isListed: true 
+        })
+        .populate({
+            path: 'category',
+            match: { isListed: true }
+        })
+        .populate({
+            path: 'brand',
+            match: { isListed: true } 
+        })
+
         console.log(product, 'product')
 
-        if (!product) {
+        if (!product || !product.category || !product.brand) {
             return res.status(404).render('product-not-found');
         }
 
         const findCategory = product.category
-
         const findBrand = product.brand
 
-
-        const relatedProducts = await Product.find({ category: findCategory._id, _id: { $ne: productId } }).limit(3)
+       
+        const relatedProducts = await Product.find({ 
+            category: findCategory._id, 
+            _id: { $ne: productId },
+            isListed: true 
+        }).limit(3)
 
         if (userId) {
-            if (product && product.isListed===true) {
-
-                const user = await User.findById({ _id: userId })
-                res.render('productdetails', {
-                    user: user,
-                    product: product,
-                    quantity: product.quantity,
-                    category: findCategory,
-                    brand: findBrand,
-                    relatedProducts: relatedProducts
-                })
-            }
+            const user = await User.findById({ _id: userId })
+            res.render('productdetails', {
+                user: user,
+                product: product,
+                quantity: product.quantity,
+                category: findCategory,
+                brand: findBrand,
+                relatedProducts: relatedProducts
+            })
         } else {
             res.render('productdetails', {
                 product: product,
@@ -228,7 +250,7 @@ const productDetails = async (req, res) => {
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json("sercer error")
+        res.status(500).json("server error") 
     }
 }
 
@@ -253,14 +275,21 @@ const shopProducts = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const itemsPerPage = 6;
 
-       
-        const category = await Category.find({ isListed: true });
-        const brand = await Brand.find({ isListed: true });
+        const categories = await Category.find({ isListed: true });
+        const brands = await Brand.find({ isListed: true });
 
-     
-        let query = { isListed: true };
+    
+        const listedCategoryIds = categories.map(cat => cat._id);
+        const listedBrandIds = brands.map(brand => brand._id);
 
-       
+      
+        let query = { 
+            isListed: true,
+            category: { $in: listedCategoryIds },
+            brand: { $in: listedBrandIds }
+        };
+
+        
         if (search) {
             query.$or = [
                 { productName: { $regex: search, $options: 'i' } },
@@ -268,16 +297,17 @@ const shopProducts = async (req, res) => {
             ];
         }
 
-        if (categoryId) {
+        
+        if (categoryId && listedCategoryIds.some(id => id.toString() === categoryId)) {
             query.category = categoryId;
         }
 
-      
-        if (brandId) {
+        
+        if (brandId && listedBrandIds.some(id => id.toString() === brandId)) {
             query.brand = brandId;
         }
 
-       
+      
         if (priceGt !== null && priceLt !== null) {
             query.salePrice = { $gte: priceGt, $lte: priceLt };
         } else if (priceGt !== null) {
@@ -286,7 +316,7 @@ const shopProducts = async (req, res) => {
             query.salePrice = { $lte: priceLt };
         }
 
-       
+      
         let sortOption = {};
         if (priceSort === 'asc') {
             sortOption = { salePrice: 1 };
@@ -304,7 +334,7 @@ const shopProducts = async (req, res) => {
             .skip((page - 1) * itemsPerPage)
             .limit(itemsPerPage);
 
-      
+        
         let productsWithWishlist = [...products];
         if (user) {
             const userData = await User.findOne({ _id: user });
@@ -317,11 +347,11 @@ const shopProducts = async (req, res) => {
             });
         }
 
-       
+     
         const renderOptions = {
             product: productsWithWishlist,
-            category: category,
-            brand: brand,
+            category: categories,
+            brand: brands,
             search: search,
             selectedCategory: categoryId,
             selectedBrand: brandId,
