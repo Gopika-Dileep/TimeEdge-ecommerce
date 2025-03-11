@@ -259,7 +259,7 @@
         color: #7f1d1d;
     }
     
-    /* Added styles for cancel reason container */
+   
     #cancelReasonContainer {
         margin-top: 15px;
         margin-bottom: 15px;
@@ -459,7 +459,7 @@
                     <option value="Returned">Returned</option>
                 </select>
                 <br>
-                <!-- Add this container for cancel reason -->
+              
                 <div id="cancelReasonContainer" style="display: none;">
                     <label for="cancelReason" class="cancel-reason-label">Cancellation Reason:</label>
                     <textarea id="cancelReason" rows="3" placeholder="Please provide a reason for cancellation"></textarea>
@@ -479,20 +479,20 @@
             currentItemId = itemId;
             document.getElementById('status').style.display = 'block';
             
-            // Reset reason field visibility and value
+            
             const cancelReasonContainer = document.getElementById('cancelReasonContainer');
             cancelReasonContainer.style.display = 'none';
             document.getElementById('cancelReason').value = '';
             
-            // Set default selected status
+           
             const statusSelect = document.getElementById('statusSelect');
             statusSelect.value = "pending";
             
-            // Clear previous event listeners
+            
             const newStatusSelect = statusSelect.cloneNode(true);
             statusSelect.parentNode.replaceChild(newStatusSelect, statusSelect);
             
-            // Add event listener for status change
+           
             newStatusSelect.addEventListener('change', function() {
                 if (this.value === 'Cancelled') {
                     cancelReasonContainer.style.display = 'block';

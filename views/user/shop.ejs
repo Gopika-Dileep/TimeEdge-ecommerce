@@ -9,21 +9,21 @@
   background: transparent;
 }
 
-/* Hide scrollbar for Firefox */
+
 html {
   scrollbar-width: none;
 }
 
 body {
-  overflow: auto; /* Allow scrolling */
+  overflow: auto; 
 }
-  /* General Styling */
+
   .shop-container {
     padding: 40px 0;
     background-color: #f8f9fa;
   }
   
-  /* Sidebar Styling */
+
   .shop-sidebar {
     background: #fff;
     border-radius: 8px;
@@ -102,7 +102,7 @@ body {
     transform: translateX(5px);
   }
   
-  /* Product Card Styling */
+ 
   .product-card {
     background: #fff;
     border-radius: 8px;
@@ -228,7 +228,6 @@ body {
     color: #ffc107;
   }
   
-  /* Pagination */
   .pagination-container {
     margin-top: 30px;
     display: flex;
@@ -283,7 +282,7 @@ body {
     background: #f0f0f0;
   }
   
-  /* Filter Tags */
+ 
   .filter-tags {
     margin-bottom: 20px;
   }
@@ -314,7 +313,7 @@ body {
     background: #555;
   }
   
-  /* Breadcrumb */
+
   .shop-breadcrumb {
     background: #fff;
     padding: 15px 0;
@@ -333,7 +332,6 @@ body {
   }
 </style>
 
-<!-- Breadcrumb Section -->
 <div class="shop-breadcrumb">
   <div class="container">
     <div class="row">
@@ -349,17 +347,17 @@ body {
   </div>
 </div>
 
-<!-- Shop Section -->
+
 <div class="shop-container">
   <div class="container">
     <div class="row">
-      <!-- Sidebar -->
+     
       <div class="col-lg-3">
         <% 
         function buildQueryString(params) {
           const queryParams = new URLSearchParams();
           
-          // Add existing parameters if they exist
+         
           if (locals.search) queryParams.set('search', search);
           if (locals.selectedCategory) queryParams.set('category', selectedCategory);
           if (locals.selectedBrand) queryParams.set('brand', selectedBrand);
@@ -367,7 +365,7 @@ body {
           if (locals.minPrice) queryParams.set('gt', minPrice);
           if (locals.maxPrice) queryParams.set('lt', maxPrice);
           
-          // Override or add new parameters
+        
           Object.keys(params).forEach(key => {
             if (params[key] !== undefined && params[key] !== null) {
               queryParams.set(key, params[key]);
@@ -378,7 +376,7 @@ body {
         }
         %>
 
-        <!-- Search Form -->
+      
         <div class="shop-sidebar">
           <div class="sidebar-search">
             <form action="/shop" method="GET">
@@ -389,7 +387,7 @@ body {
           </div>
         </div>
 
-        <!-- Categories -->
+       
         <div class="shop-sidebar">
           <div class="sidebar-heading" data-toggle="collapse" data-target="#categoriesCollapse" aria-expanded="true">
             Categories <i class="bi bi-chevron-down"></i>
@@ -408,7 +406,7 @@ body {
           </div>
         </div>
 
-        <!-- Brands -->
+       
         <div class="shop-sidebar">
           <div class="sidebar-heading" data-toggle="collapse" data-target="#brandsCollapse" aria-expanded="true">
             Brands <i class="bi bi-chevron-down"></i>
@@ -427,7 +425,7 @@ body {
           </div>
         </div>
 
-        <!-- Price Sort -->
+      
         <div class="shop-sidebar">
           <div class="sidebar-heading" data-toggle="collapse" data-target="#sortCollapse" aria-expanded="true">
             Sort By Price <i class="bi bi-chevron-down"></i>
@@ -450,7 +448,7 @@ body {
           </div>
         </div>
 
-        <!-- Price Range -->
+       
         <div class="shop-sidebar">
           <div class="sidebar-heading" data-toggle="collapse" data-target="#priceCollapse" aria-expanded="true">
             Filter By Price <i class="bi bi-chevron-down"></i>
@@ -482,9 +480,9 @@ body {
         </div>
       </div>
 
-      <!-- Product Listing -->
+     
       <div class="col-lg-9">
-        <!-- Applied Filters -->
+      
         <% if (locals.search || locals.selectedCategory || locals.selectedBrand || locals.minPrice || locals.maxPrice || locals.priceSort) { %>
           <div class="filter-tags">
             <h5 class="mb-3">Applied Filters:</h5>
@@ -521,7 +519,7 @@ body {
           </div>
         <% } %>
         
-        <!-- Product Grid -->
+      
         <div class="row">
           <% if (product.length === 0) { %>
             <div class="col-12 text-center py-5">
@@ -586,7 +584,7 @@ body {
           <% } %>
         </div>
         
-        <!-- Pagination -->
+      
         <% if (product.length > 0 && totalpage > 1) { %>
           <div class="pagination-container">
             <% 
@@ -676,7 +674,7 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  // Set background images
+
   document.querySelectorAll('.set-bg').forEach(function (element) {
     const bg = element.getAttribute('data-setbg');
     if (bg) {
@@ -684,8 +682,7 @@ body {
     }
   });
   
-  // Add to cart functionality
-  // Add to cart functionality
+
 const addToCartbtn = document.querySelectorAll('.add-to-cart');
 addToCartbtn.forEach(function (button) {
     button.addEventListener('click', function (event) {
@@ -693,16 +690,16 @@ addToCartbtn.forEach(function (button) {
         const productId = this.getAttribute('data-id');
         const quantity = this.getAttribute('data-quantity');
         
-        // Check if user is logged in
+        
         $.ajax({
             url: '/check-auth',
             method: 'GET',
             success: function(response) {
                 if (response.isLoggedIn) {
-                    // User is logged in, proceed with adding to cart
+                  
                     addProductToCart(productId, quantity);
                 } else {
-                    // User is not logged in, show login prompt
+                  
                     Swal.fire({
                         icon: 'info',
                         title: 'Login Required',
@@ -757,7 +754,7 @@ function addProductToCart(productId, quantity) {
             });
         },
         error: function (xhr, status, error) {
-            // Parse the response to get the error message
+            
             let errorMessage = "Error while adding to cart. Please try again!";
             try {
                 const response = JSON.parse(xhr.responseText);
@@ -779,7 +776,7 @@ function addProductToCart(productId, quantity) {
     });
 }
 
-  // Wishlist functionality
+ 
   const wishlistIcons = document.querySelectorAll('.bi-heart, .bi-heart-fill');
   wishlistIcons.forEach(function(icon) {
     icon.addEventListener('click', function(event) {

@@ -107,27 +107,27 @@ const addToCart = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        // Check if product is in stock
+       
         if (product.quantity <= 0) {
             return res.status(400).json({ success: false, message: 'Product is out of stock' });
         }
 
         let cart = await Cart.findOne({ user: userId });
         
-        // Calculate price with best offer
+      
         const productOffer = product.productOffer || 0
         const categoryOffer = product.category.categoryOffer || 0
         const bestOffer = Math.max(productOffer, categoryOffer)
         const finalPrice = bestOffer > 0 ? product.salePrice - (product.salePrice * bestOffer / 100) : product.salePrice
 
-        // If cart doesn't exist, create a new one
+        
         if (!cart) {
-            // Check if requested quantity exceeds max quantity per person
+            
             if (quantity > product.maxQtyPerPerson) {
                 return res.status(400).json({ success: false, message: 'Maximum quantity for one product exceeded' });
             }
             
-            // Check if requested quantity exceeds available stock
+          
             if (quantity > product.quantity) {
                 return res.status(400).json({ success: false, message: 'Requested quantity exceeds available stock' });
             }
@@ -139,11 +139,11 @@ const addToCart = async (req, res) => {
         } else {
             const existingItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
 
-            // If item already exists in cart
+            
             if (existingItemIndex !== -1) {
                 const newQuantity = cart.items[existingItemIndex].quantity + quantity;
                 
-                // Check if new quantity exceeds max quantity per person
+                
                 if (newQuantity > product.maxQtyPerPerson) {
                     return res.status(400).json({ 
                         success: false, 
@@ -151,7 +151,7 @@ const addToCart = async (req, res) => {
                     });
                 }
                 
-                // Check if new quantity exceeds available stock
+                
                 if (newQuantity > product.quantity) {
                     return res.status(400).json({ 
                         success: false, 
@@ -162,7 +162,7 @@ const addToCart = async (req, res) => {
                 cart.items[existingItemIndex].quantity = newQuantity;
                 cart.items[existingItemIndex].price = Math.floor(finalPrice * newQuantity);
             } else {
-                // Check if requested quantity exceeds max quantity per person
+                
                 if (quantity > product.maxQtyPerPerson) {
                     return res.status(400).json({ 
                         success: false, 
@@ -170,7 +170,6 @@ const addToCart = async (req, res) => {
                     });
                 }
                 
-                // Check if requested quantity exceeds available stock
                 if (quantity > product.quantity) {
                     return res.status(400).json({ 
                         success: false, 

@@ -179,10 +179,9 @@
     } 
 });
 
-
 function resendOtp(){
     clearInterval(otpTimerInterval);
-    timer = 60;
+    timeRemaining = 60; // Changed from timer = 60 to timeRemaining = 60
     startOtpTimer();
     const emailInput = document.getElementById('email').value.trim(); 
 
@@ -193,18 +192,18 @@ function resendOtp(){
         data: JSON.stringify({ email: emailInput }),
         success: function (response){
             if(response.success){
-                Swall.fire({
+                // Fixed typo: Swall should be Swal
+                Swal.fire({
                     icon:"success",
                     title:"Resend OTP Success",
-                    showCOnfirmButton:false,
+                    showConfirmButton:false, // Fixed typo: showCOnfirmButton to showConfirmButton
                     timer:1500,
                 })
             }else{
                 Swal.fire({
                     icon:"error",
                     title:"Error",
-                    text:"Failed to resend OTP.please try again",
-
+                    text:"Failed to resend OTP. Please try again", // Fixed capitalization
                 })
             }
         },
@@ -212,12 +211,11 @@ function resendOtp(){
             Swal.fire({
                 icon:"error",
                 title:"Error",
-                text:"Failed to resend OTP. please try again"
+                text:"Failed to resend OTP. Please try again" // Fixed capitalization
             })
         }
     })
 }
-
 
 
     </script>

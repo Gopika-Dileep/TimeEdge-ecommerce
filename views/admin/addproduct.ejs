@@ -169,7 +169,7 @@
                 margin-bottom: 10px;
             }
 
-            /* Make sure cropper is visible */
+            
             .cropper-container {
                 max-width: 100%;
                 height: 400px !important;
@@ -177,7 +177,7 @@
                 display: block !important;
             }
 
-            /* Fix for cropper view */
+           
             .cropper-view-box,
             .cropper-face {
                 display: block !important;
@@ -187,7 +187,7 @@
                 display: block !important;
             }
 
-            /* Fix for cropper modal */
+          
             .cropper-modal {
                 opacity: 0.5;
                 display: block !important;
@@ -312,7 +312,7 @@
                                 </div>
                                 <div id="images-error" class="error-message mx-3"></div>
                                 
-                                <!-- Image 1 -->
+                               
                                 <div class="card-body">
                                     <div class="image-container">
                                         <label class="form-label">Product Image 1 (Required)</label>
@@ -337,7 +337,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Image 2 -->
+                              
                                 <div class="card-body">
                                     <div class="image-container">
                                         <label class="form-label">Product Image 2 (Optional)</label>
@@ -362,7 +362,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Image 3 -->
+                              
                                 <div class="card-body">
                                     <div class="image-container">
                                         <label class="form-label">Product Image 3 (Optional)</label>
@@ -387,7 +387,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Image 4 -->
+                               
                                 <div class="card-body">
                                     <div class="image-container">
                                         <label class="form-label">Product Image 4 (Optional)</label>
@@ -426,7 +426,7 @@
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Global array to store selected images
+      
         const selectedImages = [];
         const croppers = {};
     
@@ -469,19 +469,19 @@
                     const image = document.getElementById(`imgView${index}`);
                     image.src = dataURL;
                     
-                    // Show the cropper container
+                
                     document.getElementById(`cropper-container-${index}`).style.display = 'block';
                     
-                    // Destroy previous cropper instance if exists
+                   
                     if (croppers[index]) {
                         croppers[index].destroy();
                     }
                     
-                    // Important: Make sure the image is loaded before initializing cropper
+               
                     image.onload = function() {
-                        // Initialize Cropper.js with correct options
+                       
                         croppers[index] = new Cropper(image, {
-                            aspectRatio: NaN, // Free aspect ratio
+                            aspectRatio: NaN, 
                             viewMode: 1,
                             dragMode: 'move',
                             guides: true,
@@ -495,13 +495,13 @@
                             minContainerHeight: 300,
                             ready: function() {
                                 console.log(`Cropper ${index} initialized`);
-                                // Force redraw
+                              
                                 this.cropper.crop();
                             }
                         });
                     };
                     
-                    // Set up save button event handler
+                    
                     document.getElementById(`saveButton${index}`).onclick = function() {
                         saveCroppedImage(index);
                     };
@@ -517,7 +517,7 @@
             }
             
             try {
-                // Get cropped canvas
+             
                 const croppedCanvas = croppers[index].getCroppedCanvas({
                     minWidth: 256,
                     minHeight: 256,
@@ -530,35 +530,35 @@
                     return;
                 }
                 
-                // Convert to data URL and set preview
+                
                 const croppedImageDataURL = croppedCanvas.toDataURL('image/png');
                 const croppedImg = document.getElementById(`croppedImg${index}`);
                 croppedImg.src = croppedImageDataURL;
                 
-                // Show preview container
+               
                 document.getElementById(`preview-container-${index}`).style.display = 'block';
                 
-                // Create file from blob
+                
                 croppedCanvas.toBlob((blob) => {
                     if (!blob) {
                         console.error('Failed to create blob');
                         return;
                     }
                     
-                    // Create file object
+                   
                     const timestamp = new Date().getTime();
                     const fileName = `cropped-image-${timestamp}-${index}.png`;
                     const file = new File([blob], fileName, { type: 'image/png' });
                     
-                    // Update file input
+                 
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
                     document.getElementById(`input${index}`).files = dataTransfer.files;
                     
-                    // Hide cropper container
+                   
                     document.getElementById(`cropper-container-${index}`).style.display = 'none';
                     
-                    // Add to thumbnails
+                  
                     addThumbnail(croppedImageDataURL, index);
                     
                     console.log(`Image ${index} cropped and saved as ${fileName}`);
@@ -570,16 +570,16 @@
         }
     
         function cancelCrop(index) {
-            // Destroy cropper
+            
             if (croppers[index]) {
                 croppers[index].destroy();
                 croppers[index] = null;
             }
             
-            // Clear file input
+           
             document.getElementById(`input${index}`).value = '';
             
-            // Hide cropper and preview
+            
             document.getElementById(`cropper-container-${index}`).style.display = 'none';
             document.getElementById(`preview-container-${index}`).style.display = 'none';
         }
@@ -587,44 +587,44 @@
         function addThumbnail(imageSrc, index) {
             const container = document.getElementById('addedImagesContainer');
             
-            // Check if thumbnail already exists
+           
             const existingThumbnail = container.querySelector(`.thumbnail[data-index="${index}"]`);
             if (existingThumbnail) {
-                // Update existing thumbnail
+               
                 existingThumbnail.querySelector('img').src = imageSrc;
                 return;
             }
             
-            // Create thumbnail element
+           
             const thumbnailDiv = document.createElement('div');
             thumbnailDiv.className = 'thumbnail';
             thumbnailDiv.dataset.index = index;
             
-            // Create image element
+            
             const img = document.createElement('img');
             img.src = imageSrc;
             img.alt = `Product image ${index}`;
             
-            // Create remove button
+          
             const removeBtn = document.createElement('span');
             removeBtn.className = 'remove-icon';
             removeBtn.innerHTML = '&times;';
             removeBtn.onclick = function() {
-                // Remove thumbnail
+                
                 thumbnailDiv.remove();
                 
-                // Clear file input and preview
+                
                 document.getElementById(`input${index}`).value = '';
                 document.getElementById(`preview-container-${index}`).style.display = 'none';
                 
-                // Destroy cropper if exists
+               
                 if (croppers[index]) {
                     croppers[index].destroy();
                     croppers[index] = null;
                 }
             };
             
-            // Append elements
+            
             thumbnailDiv.appendChild(img);
             thumbnailDiv.appendChild(removeBtn);
             container.appendChild(thumbnailDiv);
@@ -712,35 +712,34 @@
             return false;
         }
 
-        // Create FormData to submit the form
         const form = document.querySelector('form');
         const formData = new FormData(form);
 
-        // Submit form via AJAX to handle product existence and validation
+        
         fetch('/admin/addProducts', {
             method: 'POST',
             body: formData
         })
         .then(response => {
-            // Log the entire response for debugging
+            
             console.log('Full response:', response);
             
-            // Check response type
+          
             const contentType = response.headers.get('content-type');
             console.log('Content Type:', contentType);
 
-            // If it's a redirect, handle it
+           
             if (response.redirected) {
                 window.location.href = response.url;
                 return null;
             }
 
-            // If it's JSON, parse it
+           
             if (contentType && contentType.includes('application/json')) {
                 return response.json();
             }
 
-            // If unexpected response, try to get text for more info
+           
             return response.text().then(text => {
                 console.error('Unexpected response text:', text);
                 throw new Error('Unexpected server response');
@@ -748,9 +747,9 @@
         })
         .then(data => {
             if (data) {
-                // Handle different scenarios from server response
+
                 if (data.productExists) {
-                    // Product with same name exists
+                    
                     Swal.fire({
                         icon: 'warning',
                         title: 'Product Already Exists',
@@ -759,7 +758,7 @@
                         confirmButtonColor: '#3085d6'
                     });
                 } else if (data.error) {
-                    // Server-side validation or other error
+                    
                     Swal.fire({
                         icon: 'error',
                         title: 'Submission Error',
@@ -779,7 +778,7 @@
             });
         });
 
-        return false; // Prevent default form submission
+        return false; 
     }
 
     function validateImageFile(file) {

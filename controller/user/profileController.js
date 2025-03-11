@@ -224,6 +224,7 @@ const forgotEmailValid = async(req,res)=>{
 const verifyForgotPassOtp = async(req,res)=>{
     try {
         const {otp,email} = req.body
+        console.log(req.body,'req.body')
   
         const user = await User.findOne({email:email})
         const userOtp=user.otp
@@ -243,9 +244,12 @@ const verifyForgotPassOtp = async(req,res)=>{
 const resendOtp = async(req,res)=>{
     try {
         const {email} = req.body
+        console.log(req.body,'req.body')
         const findUser = await User.findOne({email:email})
+        console.log(findUser,'findUser')
         if(findUser){
             const otp = generateOtp()
+            console.log(otp,'otp')
             const emailsend = await sendVerificationMail(email,otp);
             if(emailsend){
                 await User.updateOne({email:email},{$set:{otp:otp}})

@@ -28,7 +28,7 @@
         transition: transform 0.5s ease;
     }
 
-    /* Add zoom effect styles */
+    
     .img-magnifier-container {
         position: relative;
     }
@@ -38,7 +38,6 @@
         border: 3px solid #000;
         border-radius: 50%;
         cursor: none;
-        /* Set the size of the magnifier glass */
         width: 200px;
         height: 200px;
         display: none;
@@ -200,7 +199,7 @@
         color: #c62828;
     }
 
-    /* Breadcrumb styles */
+   
     .breadcrumbs {
         padding: 10px 0;
         margin-bottom: 20px;
@@ -242,7 +241,6 @@
 
 <main class="main">
     <div class="container product-details-container">
-        <!-- Breadcrumbs -->
         <div class="breadcrumbs">
             <ul>
                 <li><a href="/">Home</a></li>
@@ -365,20 +363,20 @@
         document.getElementById('currentImage').src = '/uploads/productImages/' + imageSrc;
     }
 
-    // Image zoom functionality
+   
     function magnify(imgID, zoom) {
         var img, glass, w, h, bw;
         img = document.getElementById(imgID);
         glass = document.querySelector(".img-magnifier-glass");
         
-        /* Create magnifier glass: */
+       
         if (!glass) {
             glass = document.createElement("DIV");
             glass.setAttribute("class", "img-magnifier-glass");
             img.parentElement.appendChild(glass);
         }
 
-        /* Set background properties for the magnifier glass: */
+      
         glass.style.backgroundImage = "url('" + img.src + "')";
         glass.style.backgroundRepeat = "no-repeat";
         glass.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
@@ -386,71 +384,70 @@
         w = glass.offsetWidth / 2;
         h = glass.offsetHeight / 2;
 
-        /* Execute a function when someone moves the magnifier glass over the image: */
+       
         glass.addEventListener("mousemove", moveMagnifier);
         img.addEventListener("mousemove", moveMagnifier);
 
-        /* Show the magnifier glass: */
+        
         img.addEventListener("mouseenter", function() {
             glass.style.display = "block";
         });
 
-        /* Hide the magnifier glass when mouse leaves the image: */
+       
         img.addEventListener("mouseleave", function() {
             glass.style.display = "none";
         });
 
         function moveMagnifier(e) {
             var pos, x, y;
-            /* Prevent any other actions that may occur when moving over the image */
+           
             e.preventDefault();
-            /* Get the cursor's x and y positions: */
+          
             pos = getCursorPos(e);
             x = pos.x;
             y = pos.y;
 
-            /* Prevent the magnifier glass from being positioned outside the image: */
+           
             if (x > img.width - (w / zoom)) {x = img.width - (w / zoom);}
             if (x < w / zoom) {x = w / zoom;}
             if (y > img.height - (h / zoom)) {y = img.height - (h / zoom);}
             if (y < h / zoom) {y = h / zoom;}
 
-            /* Set the position of the magnifier glass: */
+            
             glass.style.left = (x - w) + "px";
             glass.style.top = (y - h) + "px";
-            /* Display what the magnifier glass "sees": */
+          
             glass.style.backgroundPosition = "-" + ((x * zoom) - w) + "px -" + ((y * zoom) - h) + "px";
         }
 
         function getCursorPos(e) {
             var a, x = 0, y = 0;
             e = e || window.event;
-            /* Get the x and y positions of the image: */
+            
             a = img.getBoundingClientRect();
-            /* Calculate the cursor's x and y coordinates, relative to the image: */
+          
             x = e.pageX - a.left - window.pageXOffset;
             y = e.pageY - a.top - window.pageYOffset;
-            /* Consider any page scrolling: */
+          
             return {x : x, y : y};
         }
     }
 
-    // Initialize magnifier when the page loads
+   
     window.addEventListener('load', function() {
-        magnify("currentImage", 2.5); // 2.5x zoom level
+        magnify("currentImage", 2.5);
         
-        // Reinitialize magnifier when switching images
+      
         const thumbnails = document.querySelectorAll('.thumbnail');
         thumbnails.forEach(thumbnail => {
             thumbnail.addEventListener('click', function() {
-                // Short delay to allow image to load before initializing magnifier
+               
                 setTimeout(() => magnify("currentImage", 2.5), 100);
             });
         });
     });
 
-    // Modified Add to Cart function to use the hidden quantity input (fixed at 1)
-    // Modified Add to Cart function to use the hidden quantity input (fixed at 1)
+    
 const addToCartbtn = document.querySelectorAll('.button-add-to-cart');
 addToCartbtn.forEach(function(button) {
     button.addEventListener('click', function() {
@@ -462,10 +459,10 @@ addToCartbtn.forEach(function(button) {
             method: 'GET',
             success: function(response) {
                 if (response.isLoggedIn) {
-                    // User is logged in, proceed with adding to cart
+                  
                     addProductToCart(productId, quantity);
                 } else {
-                    // User is not logged in, show login prompt
+                  
                     Swal.fire({
                         icon: 'info',
                         title: 'Login Required',
@@ -481,7 +478,7 @@ addToCartbtn.forEach(function(button) {
                 }
             },
             error: function (xhr, status, error) {
-            // Parse the response to get the error message
+           
             let errorMessage = "Error while adding to cart. Please try again!";
             try {
                 const response = JSON.parse(xhr.responseText);
@@ -504,7 +501,7 @@ addToCartbtn.forEach(function(button) {
     });
 });
 
-// Function to add product to cart
+
 function addProductToCart(productId, quantity) {
     $.ajax({
         url: `/addToCart/${productId}`,
@@ -533,7 +530,7 @@ function addProductToCart(productId, quantity) {
             });
         },
         error: function (xhr, status, error) {
-            // Parse the response to get the error message
+           
             let errorMessage = "Error while adding to cart. Please try again!";
             try {
                 const response = JSON.parse(xhr.responseText);

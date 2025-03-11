@@ -12,14 +12,26 @@
         <form id="signupform" class="space-y-6">
             <h2 class="text-2xl font-bold text-center text-white">Sign up</h2>
             <div class="space-y-4">
-                <input type="text" name="name" placeholder="User name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <input type="email" name="email" placeholder="Email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <input type="number" name="phone" placeholder="Phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <div class="relative">
-                    <input type="password" id="password" name="password" placeholder="Password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" onclick="togglePassword()">
-                        <i class="fas fa-eye" id="password-icon"></i>
-                    </span>
+                <div>
+                    <input type="text" name="name" placeholder="User name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-red-500 text-sm mt-1 hidden" id="name-error"></p>
+                </div>
+                <div>
+                    <input type="email" name="email" placeholder="Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-red-500 text-sm mt-1 hidden" id="email-error"></p>
+                </div>
+                <div>
+                    <input type="number" name="phone" placeholder="Phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-red-500 text-sm mt-1 hidden" id="phone-error"></p>
+                </div>
+                <div>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="password-icon"></i>
+                        </span>
+                    </div>
+                    <p class="text-red-500 text-sm mt-1 hidden" id="password-error"></p>
                 </div>
             </div>
             <button type="submit" class="w-full py-2 text-white bg-[#6d44b8] rounded-lg hover:bg-[#573b8a] focus:outline-none focus:ring-2 focus:ring-indigo-500">Sign up</button>
@@ -52,9 +64,98 @@
             }
         }
 
+        function showError(field, message) {
+            const errorElement = document.getElementById(`${field}-error`);
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+
+        function hideError(field) {
+            const errorElement = document.getElementById(`${field}-error`);
+            errorElement.classList.add('hidden');
+        }
+
+        function validateForm() {
+            let isValid = true;
+            
+            
+            const name = $('input[name="name"]').val().trim();
+            if (!name) {
+                showError('name', 'Username is required');
+                isValid = false;
+            } else if (name.length < 3) {
+                showError('name', 'Username must be at least 3 characters');
+                isValid = false;
+            } else {
+                hideError('name');
+            }
+            
+         
+            const email = $('input[name="email"]').val().trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                showError('email', 'Email is required');
+                isValid = false;
+            } else if (!emailRegex.test(email)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideError('email');
+            }
+            
+            const phone = $('input[name="phone"]').val().trim();
+            if (!phone) {
+                showError('phone', 'Phone number is required');
+                isValid = false;
+            } else if (phone.length < 10) {
+                showError('phone', 'Please enter a valid phone number');
+                isValid = false;
+            } else {
+                hideError('phone');
+            }
+            
+           
+            const password = $('input[name="password"]').val();
+            if (!password) {
+                showError('password', 'Password is required');
+                isValid = false;
+            } else if (password.length < 8) {
+                showError('password', 'Password must be at least 8 characters');
+                isValid = false;
+            } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/.test(password)) {
+                showError('password', 'Password must include uppercase, lowercase, number and special character');
+                isValid = false;
+            } else {
+                hideError('password');
+            }
+            
+            return isValid;
+        }
+
         $(document).ready(function() {
+            
+            $('input[name="name"]').on('input', function() {
+                hideError('name');
+            });
+            
+            $('input[name="email"]').on('input', function() {
+                hideError('email');
+            });
+            
+            $('input[name="phone"]').on('input', function() {
+                hideError('phone');
+            });
+            
+            $('input[name="password"]').on('input', function() {
+                hideError('password');
+            });
+
             $('#signupform').on('submit', function(e) {
                 e.preventDefault();
+                
+                if (!validateForm()) {
+                    return false;
+                }
                 
                 const formData = {
                     name: $('input[name="name"]').val(),

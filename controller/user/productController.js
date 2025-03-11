@@ -193,8 +193,8 @@ const productDetails = async (req, res) => {
         const product = await Product.findOne({ _id: productId,isListed:true }).populate('category').populate('brand')
         console.log(product, 'product')
 
-        if(!product){
-            return res.status(400).json({success:false , message :"Product not found "})
+        if (!product) {
+            return res.status(404).render('product-not-found');
         }
 
         const findCategory = product.category
@@ -253,14 +253,14 @@ const shopProducts = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const itemsPerPage = 6;
 
-        // Fetch categories and brands for sidebar
+       
         const category = await Category.find({ isListed: true });
         const brand = await Brand.find({ isListed: true });
 
-        // Build the base query
+     
         let query = { isListed: true };
 
-        // Add search condition if search term exists
+       
         if (search) {
             query.$or = [
                 { productName: { $regex: search, $options: 'i' } },
@@ -268,17 +268,16 @@ const shopProducts = async (req, res) => {
             ];
         }
 
-        // Add category filter
         if (categoryId) {
             query.category = categoryId;
         }
 
-        // Add brand filter
+      
         if (brandId) {
             query.brand = brandId;
         }
 
-        // Add price range filter
+       
         if (priceGt !== null && priceLt !== null) {
             query.salePrice = { $gte: priceGt, $lte: priceLt };
         } else if (priceGt !== null) {
@@ -287,7 +286,7 @@ const shopProducts = async (req, res) => {
             query.salePrice = { $lte: priceLt };
         }
 
-        // Determine sort order
+       
         let sortOption = {};
         if (priceSort === 'asc') {
             sortOption = { salePrice: 1 };
@@ -295,11 +294,9 @@ const shopProducts = async (req, res) => {
             sortOption = { salePrice: -1 };
         }
 
-        // Count total matching products (for pagination)
         const totalProducts = await Product.countDocuments(query);
         const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
-        // Fetch products with pagination, sorting, and populate
         const products = await Product.find(query)
             .populate('category')
             .populate('brand')
@@ -307,7 +304,7 @@ const shopProducts = async (req, res) => {
             .skip((page - 1) * itemsPerPage)
             .limit(itemsPerPage);
 
-        // Check wishlist status for products if user is logged in
+      
         let productsWithWishlist = [...products];
         if (user) {
             const userData = await User.findOne({ _id: user });
@@ -320,7 +317,7 @@ const shopProducts = async (req, res) => {
             });
         }
 
-        // Prepare render options
+       
         const renderOptions = {
             product: productsWithWishlist,
             category: category,
@@ -335,7 +332,7 @@ const shopProducts = async (req, res) => {
             totalpage: totalPages
         };
 
-        // If user is logged in, add user data
+       
         if (user) {
             const userData = await User.findOne({ _id: user });
             renderOptions.user = userData;

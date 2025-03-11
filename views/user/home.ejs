@@ -19,7 +19,6 @@
         background-color: #f8f9fa;
     }
     
-    /* Keep original banner styles */
     .hero {
         padding: 0;
         width: 100%;
@@ -106,7 +105,7 @@
         transform: translateY(-2px);
     }
     
-    /* New Card-Based Product Design */
+    
     .product-section {
         padding: 40px 0;
         background-color: #f8f9fa;
@@ -161,7 +160,7 @@
         border-bottom: 2px solid #000;
     }
     
-    /* Product Card Styles */
+    
     .product-card {
         background: #fff;
         border-radius: 8px;
@@ -328,7 +327,7 @@
         font-weight: 500;
     }
     
-    /* Responsive styles */
+   
     @media (max-width: 768px) {
         .banner-area .single-banner {
             height: 350px;
@@ -398,7 +397,7 @@
                         <div class="banner-content">
                             <h2>Welcome to Our Platform</h2>
                             <p>Discover amazing products and services tailored just for you.</p>
-                            <a href="#" class="banner-button">Explore Now</a>
+                            <a href="/shop" class="banner-button">Explore Now</a>
                         </div>
                     </div>
                 </div>
@@ -407,7 +406,6 @@
     </div>
 </section>
 
-<!-- New Card-Based Product Section -->
 <section class="product-section">
     <div class="container">
         <div class="section-title">
@@ -426,18 +424,18 @@
             <% for (let i = 0; i < product.length; i++) { %>
             <div class="col-lg-4 col-md-6 col-sm-6 mb-4">
                 <div class="product-card">
-                    <!-- Product Image with Wishlist Button -->
+                   
                     <div class="product-image">
                         <a href="/productDetails?id=<%= product[i]._id %>">
                             <img src="/uploads/productImages/<%= product[i].productImage[0] %>" alt="<%= product[i].productName %>">
                         </a>
-                        <!-- Wishlist Button -->
+                        
                         <div class="wishlist-button">
                             <i class="bi <%= product[i].inWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" 
                                id="wishlist-icon-<%= product[i]._id %>" 
                                data-id="<%= product[i]._id %>"></i>
                         </div>
-                        <!-- Add to Cart Button -->
+                      
                         <div class="add-to-cart">
                             <a href="/cart" class="add-cart" 
                                data-id="<%= product[i]._id %>" 
@@ -446,7 +444,7 @@
                         </div>
                     </div>
                     
-                    <!-- Product Details -->
+                  
                     <div class="product-details">
                         <h5 class="product-name">
                             <a href="/productDetails?id=<%= product[i]._id %>"><%= product[i].productName %></a>
@@ -482,7 +480,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Active filter class
+  
     document.addEventListener('DOMContentLoaded', function() {
         const filterControls = document.querySelectorAll('.filter__controls li');
         filterControls.forEach(function(control) {
@@ -493,8 +491,8 @@
         });
     });
     
-    // Add to cart functionality
-// Add to cart functionality
+    
+
 const addToCartbtn = document.querySelectorAll('.add-cart');
 addToCartbtn.forEach(function (button) {
     button.addEventListener('click', function (event) {
@@ -502,16 +500,16 @@ addToCartbtn.forEach(function (button) {
         const productId = this.getAttribute('data-id');
         const quantity = this.getAttribute('data-quantity');
         
-        // Check if user is logged in
+        
         $.ajax({
             url: '/check-auth',
             method: 'GET',
             success: function(response) {
                 if (response.isLoggedIn) {
-                    // User is logged in, proceed with adding to cart
+                    
                     addProductToCart(productId, quantity);
                 } else {
-                    // User is not logged in, show login prompt
+                    
                     Swal.fire({
                         icon: 'info',
                         title: 'Login Required',
@@ -538,7 +536,7 @@ addToCartbtn.forEach(function (button) {
     });
 });
 
-// Function to add product to cart
+
 function addProductToCart(productId, quantity) {
     $.ajax({
         url: `/addToCart/${productId}`,
@@ -567,7 +565,7 @@ function addProductToCart(productId, quantity) {
             });
         },
         error: function (xhr, status, error) {
-            // Parse the response to get the error message
+            
             let errorMessage = "Error while adding to cart. Please try again!";
             try {
                 const response = JSON.parse(xhr.responseText);
@@ -588,7 +586,7 @@ function addProductToCart(productId, quantity) {
         }
     });
 }
-    // Wishlist functionality
+    
     const addToWishbtn = document.querySelectorAll('.bi-heart, .bi-heart-fill');
     addToWishbtn.forEach(function(button) {
         button.addEventListener('click', function(event) {
@@ -636,7 +634,7 @@ function addProductToCart(productId, quantity) {
         });
     });
 
-    // Ensure heart icons have proper styling on page load
+
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.bi-heart-fill').forEach(function(icon) {
             icon.classList.add('text-danger');

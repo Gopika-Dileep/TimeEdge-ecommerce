@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
     form.addEventListener("submit", function (event) {
         let isValid = true;
 
-        // Function to check if a field is empty
+       
         function validateField(input, errorElement, errorMessage) {
             if (input.value.trim() === "") {
                 errorElement.textContent = errorMessage;
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Coupon Code Validation
+        
         const couponCode = document.getElementById("coupon-code");
         const codeError = document.getElementById("code-error");
         validateField(couponCode, codeError, "Coupon code is required.");
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isValid = false;
         }
 
-        // Offer Price Validation
+      
         const offerPrice = document.getElementById("offer-price");
         const offerError = document.getElementById("offer-error");
         validateField(offerPrice, offerError, "Offer price is required.");
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isValid = false;
         }
 
-        // Start Date Validation
+       
         const startDate = document.getElementById("start-date");
         const startError = document.getElementById("start-error");
         validateField(startDate, startError, "Start date is required.");
@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isValid = false;
         }
 
-        // Expiry Date Validation
+      
         const expiryDate = document.getElementById("expiry-date");
         const expiryError = document.getElementById("expiry-error");
         validateField(expiryDate, expiryError, "Expiry date is required.");
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isValid = false;
         }
 
-        // Minimum Amount Validation
+      
         const minAmount = document.getElementById("min-amount");
         const minError = document.getElementById("min-error");
         validateField(minAmount, minError, "Minimum amount is required.");
@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isValid = false;
         }
 
-        // Usage Limit Validation
+       
         const usageLimit = document.getElementById("usage-limit");
         const usageError = document.getElementById("usage-error");
         validateField(usageLimit, usageError, "Usage limit is required.");
@@ -197,13 +197,13 @@ document.addEventListener("DOMContentLoaded", function () {
             isValid = false;
         }
 
-        // Prevent form submission if any validation fails
+        
         if (!isValid) {
             event.preventDefault();
         }
     });
 
-    // Live Validation: Clear errors as the user types
+    
     document.querySelectorAll("input").forEach((input) => {
         input.addEventListener("input", function () {
             document.getElementById(`${input.id}-error`).textContent = "";

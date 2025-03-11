@@ -86,7 +86,7 @@
             let password = document.getElementById("password").value.trim();
             let isValid = true;
   
-            // Reset previous error messages
+            
             document.querySelectorAll(".error-message").forEach(e => e.remove());
   
             if (email === "") {
@@ -106,7 +106,7 @@
             }
   
             if (!isValid) {
-                event.preventDefault(); // Prevent form submission if validation fails
+                event.preventDefault(); 
             }
         });
   

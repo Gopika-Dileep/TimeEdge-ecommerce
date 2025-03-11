@@ -58,7 +58,7 @@ const addProducts = async (req, res) => {
     try {
         const products = req.body;
 
-        // Case-insensitive product name check
+    
         const productExists = await Product.findOne({ 
             productName: { $regex: new RegExp(`^${products.productName}$`, 'i') } 
         });
@@ -117,15 +117,14 @@ const addProducts = async (req, res) => {
             status: "Available",
         });
         
-        // Save the product
+       
         await newProduct.save();
 
-        // Redirect to product list page
         return res.redirect('/admin/product');
     } catch (error) {
         console.error('Product Add Error:', error);
         
-        // Render error page or redirect with error message
+      
         return res.status(500).render('error', {
             message: "Error while adding product",
             error: error.message

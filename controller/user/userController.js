@@ -18,22 +18,21 @@ const loadlogin = async (req,res)=>{
 
 const googleAuthCallback = async (req, res) => {
     try {
-        // Check if req.user exists
+        
         if (!req.user || !req.user._id) {
             return res.redirect("/signup?error=unauthorized");
         }
 
-        // Fetch user from the database
+        
         const user = await User.findById(req.user._id);
 
-        // Check if user exists
         if (!user) {
             return res.render("login", { message: "User not found" });
         }
 
-        // Check if the user is blocked
+       
         if (user.isBlocked === true) {
-            await req.logout(); // Use await if using Passport v0.6+
+            await req.logout(); 
             req.session.destroy((err) => {
                 if (err) {
                     console.error("Error destroying session:", err);
@@ -44,7 +43,7 @@ const googleAuthCallback = async (req, res) => {
             return;
         }
 
-        // If user is not blocked, set session and proceed
+        
         req.session.user = user._id;
         res.redirect("/");
     } catch (error) {

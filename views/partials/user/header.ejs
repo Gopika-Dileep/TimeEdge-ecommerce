@@ -9,11 +9,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Time Edge </title>
 
-    <!-- Google Font -->
+  
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
     rel="stylesheet">
 
-    <!-- Css Styles -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
@@ -64,7 +63,7 @@
     color: #333;
 }
 
-/* New Search Styles */
+
 .search-container {
     position: relative;
     display: inline-block;
@@ -100,7 +99,7 @@
     border-color: #666;
 }
 
-/* Hide the original input */
+
 .tranpartnt {
     display: none;
 }
@@ -108,12 +107,12 @@
 </head>
 
 <body>
-    <!-- Page Preloder -->
+    
     <div id="preloder">
         <div class="loader"></div>
     </div>
 
-    <!-- Offcanvas Menu Begin -->
+  
     <div class="offcanvas-menu-overlay"></div>
     <div class="offcanvas-menu-wrapper">
         <div class="offcanvas__option">
@@ -144,9 +143,9 @@
             <p>Free shipping, 30-day return or refund guarantee.</p>
         </div>
     </div>
-    <!-- Offcanvas Menu End -->
+    
 
-    <!-- Header Section Begin -->
+  
     <header class="header">
         <div class="header__top">
             <div class="container">
@@ -187,15 +186,15 @@
                 <div class="col-lg-6 col-md-6">
                     <nav class="header__menu mobile-menu">
                         <ul>
-                            <li class="active"><a href="/">Home</a></li>
+                            <li class=""><a href="/">Home</a></li>
                             <li><a href="/shop">Shop</a></li>
                             <li><a href="#">Pages</a>
                                 <ul class="dropdown">
-                                    <li><a href="./about.html">About Us</a></li>
-                                    <li><a href="./shop-details.html">Shop Details</a></li>
-                                    <li><a href="./shopping-cart.html">Shopping Cart</a></li>
-                                    <li><a href="./checkout.html">Check Out</a></li>
-                                    <li><a href="./blog-details.html">Blog Details</a></li>
+                                    <li><a href="./wishlist">Wishlist</a></li>
+                                    <li><a href="./shop">Shop</a></li>
+                                    <li><a href="./cart">Shopping Cart</a></li>
+                                    <li><a href="./orders">Orders</a></li>
+                                    <li><a href="./accountdetails">Account Details</a></li>
                                 </ul>
                             </li>
                             <li><a href="./blog.html">Blog</a></li>
@@ -228,22 +227,22 @@
             <div class="canvas__open"><i class="fa fa-bars"></i></div>
         </div>
     </header>
-    <!-- Header Section End -->
+  
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Desktop search
+      
         const searchIcon = document.getElementById('searchIcon');
         const searchDropdown = document.getElementById('searchDropdown');
         const searchInput = document.getElementById('searchInput');
 
-        // Mobile search
+     
         const mobileSearchIcon = document.getElementById('mobileSearchIcon');
         const mobileSearchDropdown = document.getElementById('mobileSearchDropdown');
         const mobileSearchInput = document.getElementById('mobileSearchInput');
 
         function setupSearch(icon, dropdown, input) {
-            // Toggle dropdown when clicking search icon
+            
             icon.addEventListener('click', function(e) {
                 e.preventDefault();
                 dropdown.classList.toggle('active');
@@ -252,7 +251,7 @@
                 }
             });
 
-            // Handle search submission
+            
             input.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     const searchTerm = input.value.trim();
@@ -263,11 +262,11 @@
             });
         }
 
-        // Setup both desktop and mobile search
+       
         setupSearch(searchIcon, searchDropdown, searchInput);
         setupSearch(mobileSearchIcon, mobileSearchDropdown, mobileSearchInput);
 
-        // Close dropdowns when clicking outside
+       
         document.addEventListener('click', function(e) {
             if (!searchIcon.contains(e.target) && !searchDropdown.contains(e.target)) {
                 searchDropdown.classList.remove('active');

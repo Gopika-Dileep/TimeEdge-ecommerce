@@ -45,8 +45,7 @@
             padding: 0.25rem;
         }
         
-        .add-product-btn {
-            background: #79b928;
+        .add-product {
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 4px;
@@ -55,9 +54,7 @@
             cursor: pointer;
         }
         
-        .add-product-btn:hover {
-            background: #689f1f;
-        }
+       
         
         table {
             width: 100%;
@@ -165,9 +162,9 @@
         }
         
         .page-numbers a.active {
-            background: #79b928;
+            background: #0863dab9;
             color: white;
-            border-color: #79b928;
+            border-color:  #0863dab9;
         }
         
         .page-numbers a:hover:not(.active) {
@@ -206,14 +203,14 @@
 </head>
 
 <div class="content-main">
-    <!-- Breadcrumb -->
+   
     <div class="breadcrumb">
         <span>Admin</span>
         <span>></span>
         <span>Products</span>
     </div>
 
-    <!-- Page Header -->
+   
     <div class="page-header">
         <h1>Products</h1>
         <div class="search-container">
@@ -223,7 +220,7 @@
                     <i class="bi bi-search"></i>
                 </button>
             </form>
-            <a href="/admin/addProducts" class="add-product-btn">
+            <a href="/admin/addProducts" class="add-product btn btn-primary">
                 <i class="bi bi-plus-lg"></i> Add Product
             </a>
         </div>
@@ -451,7 +448,7 @@ function removeOffer(productId) {
     });
 }
 
-// Handle search form submission
+
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
     const searchValue = document.querySelector('input[name="search"]').value;

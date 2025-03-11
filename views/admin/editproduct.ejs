@@ -637,7 +637,7 @@
           const quantityInput = document.getElementsByName('quantity')[0];
           const quantity = quantityInput ? quantityInput.value : "";
           
-          // Check if image input exists or if we already have images
+          
           const image1 = document.getElementById('input1');
           const hasExistingImages = document.getElementById("imageDatas")?.value;
   
@@ -651,31 +651,31 @@
   
           let isValid = true;
           
-          // Validate product name
+         
           if (name.trim() === "") {
               displayErrorMessage('productName-error', 'Please enter a product name.');
               isValid = false;
           }
   
-          // Validate description
+          
           if (description.trim() === '') {
               displayErrorMessage('description-error', 'Please enter a product description.');
               isValid = false;
           }
   
-          // Validate quantity
+         
           if (quantity !== "" && (isNaN(parseInt(quantity)) || parseInt(quantity) < 0)) {
               displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
               isValid = false;
           }
   
-          // Validate sale price
+         
           if (!/^\d+(\.\d{1,2})?$/.test(salePrice) || parseFloat(salePrice) < 0) {
               displayErrorMessage('salePrice-error', 'Please enter a valid non-negative price.');
               isValid = false;
           }
   
-          // Validate image (only if no existing images and input1 exists)
+          
           if (!hasExistingImages && image1 && image1.files.length === 0) {
               displayErrorMessage("images-error", 'Please select at least one image.');
               isValid = false;

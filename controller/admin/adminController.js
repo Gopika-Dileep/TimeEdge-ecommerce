@@ -16,7 +16,7 @@ const loadAdminLogin = async (req, res) => {
   try {
     res.render("adminlogin", {
       error: null,
-      email: null // Add this line to pass email variable
+      email: null 
     });
   } catch (error) {
     console.error(error);
@@ -492,7 +492,7 @@ const changeStatus = async (req, res) => {
 
     const previousStatus = item.status;
     
-    // Handle cancellation
+    
     if (status === 'Cancelled') {
       if (!cancelReason) {
         return res.status(400).json({ 
@@ -504,14 +504,14 @@ const changeStatus = async (req, res) => {
       const itemQuantity = item.quantity;
       let itemSalePrice = 0;
       
-      // Calculate item sale price with best offer
+      
       if (item) {
         const product = await Product.findById({
           _id: item.products,
         }).populate("category");
         
         if (product) {
-          // Update product quantity when cancelling
+          
           product.quantity += item.quantity;
           await product.save();
           
@@ -560,7 +560,7 @@ const changeStatus = async (req, res) => {
         }
       }
       
-      // Refund to wallet if not COD
+      
       if (order.paymentMethod !== "COD") {
         const cancelAmount = isCouponRemoved 
           ? (itemSalePrice * itemQuantity) - couponRefundAmount 
@@ -570,7 +570,7 @@ const changeStatus = async (req, res) => {
         order.subtotal -= item.price;
         order.productdiscount -= price;
         
-        // Get user ID from the order
+      
         const userId = order.user;
         const transactionType = "credit";
         
@@ -584,13 +584,12 @@ const changeStatus = async (req, res) => {
       item.status = status;
       item.cancelReason = cancelReason;
     } else {
-      // For non-cancellation status updates
+     
       item.status = status;
     }
     
     await order.save();
 
-    // Update overall order status
     const itemStatuses = order.orderedItems.map((item) => item.status);
     if (itemStatuses.every((s) => s === "Cancelled" || s === "Returned")) {
       order.status = "Cancelled";
@@ -608,7 +607,7 @@ const changeStatus = async (req, res) => {
     
     await order.save();
     
-    // Process referral bonus if applicable
+   
     if (previousStatus !== "delivered" && status === "delivered") {
       try {
         const user = await User.findById(order.user);

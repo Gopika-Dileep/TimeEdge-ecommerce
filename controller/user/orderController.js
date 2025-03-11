@@ -158,10 +158,10 @@ const orderRazorpay = async (req, res) => {
     const { totalAmount, cartId } = req.body;
     console.log(totalAmount, "totalAmount");
     console.log(cartId, "cartId");
-    // Check product availability before creating payment order
+   
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");
     
-    // Validate product availability
+    
     for (let item of cart.items) {
       const product = item.product;
       const quantity = item.quantity;
@@ -242,14 +242,14 @@ const verifyRazorPayOrder = async (req, res) => {
     const user = cart.user;
     let discountTotalPrice = 0;
 
-    // No need to check stock here as we already validated in orderRazorpay
+   
     for (let item of cart.items) {
       const product = item.product;
       const quantity = item.quantity;
 
       discountTotalPrice += (item.product.salePrice * quantity) - item.price
       
-      // Update product quantities
+     
       product.quantity -= quantity;
       await product.save();
     }
@@ -950,7 +950,7 @@ const downloadInvoice = async (req, res) => {
   try {
     const orderId = req.params.orderId;
 
-    // Fetch the order with populated products and user
+   
     const order = await Order.findOne({ orderId: orderId })
       .populate('orderedItems.products')
       .populate('user');
@@ -959,7 +959,7 @@ const downloadInvoice = async (req, res) => {
       return res.status(404).send('Order not found');
     }
 
-    // **Filter only delivered products**
+   
     const deliveredItems = order.orderedItems.filter(item => item.status === 'delivered');
 
     if (deliveredItems.length === 0) {
@@ -971,14 +971,14 @@ const downloadInvoice = async (req, res) => {
       (addr) => addr._id.toString() === order.address.toString()
     );
 
-    // Create a PDF document
+    
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
 
-    doc.pipe(res); // Stream directly to response
+    doc.pipe(res); 
 
-    // **Header Section**
+   
     doc.font('Helvetica-Bold')
       .fontSize(24)
       .text('TIME EDGE', { align: 'left' })
@@ -993,7 +993,6 @@ const downloadInvoice = async (req, res) => {
       .text(`Invoice#: ${order.orderId}`, { align: 'right' })
       .text(`Date: ${new Date(order.createdOn).toLocaleDateString()}`, { align: 'right' });
 
-    // **Shipping Address**
     doc.moveDown(2).fontSize(12).text('Shipping Address:', { continued: false });
 
     if (specificAddress) {
@@ -1006,7 +1005,7 @@ const downloadInvoice = async (req, res) => {
 
     doc.moveDown(2).font('Helvetica-Bold').fontSize(10);
 
-    // **Table Headers**
+   
     const tableTop = doc.y;
     doc.text('ITEM DESCRIPTION', 50, tableTop, { width: 250 })
        .text('PRICE', 300, tableTop, { width: 100, align: 'right' })
@@ -1020,7 +1019,7 @@ const downloadInvoice = async (req, res) => {
 
     doc.font('Helvetica');
 
-    // **List Delivered Items**
+   
     let yPosition = doc.y + 15;
     let subTotal = 0;
 
@@ -1036,7 +1035,7 @@ const downloadInvoice = async (req, res) => {
       yPosition += 20;
     });
 
-    // **Totals Section**
+  
     doc.moveDown(2).strokeColor('#000000').lineWidth(1)
       .moveTo(300, doc.y)
       .lineTo(550, doc.y)
@@ -1059,7 +1058,7 @@ const downloadInvoice = async (req, res) => {
        .text('Grand Total', 300, totalsStart + 70, { width: 150, align: 'left' })
        .text(`${grandTotal.toFixed(2)}`, 450, totalsStart + 70, { width: 100, align: 'right' });
 
-    // **Footer**
+    
     doc.moveDown(4)
        .font('Helvetica-Bold')
        .fontSize(10)
