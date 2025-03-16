@@ -401,6 +401,7 @@ body {
     </div>
     <form id="add-coupon-form" method="POST" action="/admin/addCoupon">
         <div class="modal-body">
+            <div id="form-global-error" class="error-message" style="margin-bottom: 1rem; color: var(--danger);"></div>
             <div class="form-group">
                 <label class="form-label" for="coupon-code">Coupon Code</label>
                 <input class="form-control" type="text" id="coupon-code" name="code" placeholder="Enter coupon code">
@@ -478,72 +479,131 @@ body {
             document.querySelectorAll('.form-control').forEach(input => input.classList.remove('error'));
         }
 
-        document.getElementById('add-coupon-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const validations = {
-                'coupon-code': {
-                    element: document.getElementById('coupon-code'),
-                    errorElement: document.getElementById('code-error'),
-                    validate: (value) => value.trim() !== '',
-                    errorMessage: 'Please enter a coupon code.'
-                },
-                'offer-price': {
-                    element: document.getElementById('offer-price'),
-                    errorElement: document.getElementById('offer-price-error'),
-                    validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
-                    errorMessage: 'Please enter a valid offer price.'
-                },
-                'start-date': {
-                    element: document.getElementById('start-date'),
-                    errorElement: document.getElementById('start-date-error'),
-                    validate: (value) => {
-                        const today = new Date().toISOString().split('T')[0];
-                        return value.trim() !== '' && value >= today;
-                    },
-                    errorMessage: 'Start date cannot be in the past.'
-                },
-                'expiry-date': {
-                    element: document.getElementById('expiry-date'),
-                    errorElement: document.getElementById('expiry-date-error'),
-                    validate: (value) => {
-                        const startDate = new Date(document.getElementById('start-date').value);
-                        const expiryDate = new Date(value);
-                        return value.trim() !== '' && expiryDate > startDate;
-                    },
-                    errorMessage: 'Expiry date must be after the start date.'
-                },
-                'min-amount': {
-                    element: document.getElementById('min-amount'),
-                    errorElement: document.getElementById('min-amount-error'),
-                    validate: (value) => value.trim() !== '' && parseFloat(value) > 0,
-                    errorMessage: 'Please enter a valid minimum amount.'
-                },
-                'usage-limit': {
-                    element: document.getElementById('usage-limit'),
-                    errorElement: document.getElementById('usage-limit-error'),
-                    validate: (value) => value.trim() !== '' && Number.isInteger(parseFloat(value)) && parseInt(value) > 0,
-                    errorMessage: 'Please enter a valid usage limit (whole number).'
-                },
-            };
+       // Replace the form submit event handler in your script section
 
-            clearErrors();
-            let isValid = true;
+// Replace the form submit event handler in your script section
 
-            Object.values(validations).forEach(validation => {
-                const value = validation.element.value;
-                if (!validation.validate(value)) {
-                    validation.element.classList.add('error');
-                    validation.errorElement.innerText = validation.errorMessage;
-                    isValid = false;
-                }
-            });
+document.getElementById('add-coupon-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const validations = {
+        'coupon-code': {
+            element: document.getElementById('coupon-code'),
+            errorElement: document.getElementById('code-error'),
+            validate: (value) => value.trim() !== '',
+            errorMessage: 'Please enter a coupon code.'
+        },
+        'offer-price': {
+            element: document.getElementById('offer-price'),
+            errorElement: document.getElementById('offer-price-error'),
+            validate: (value) => {
+                const minAmount = parseFloat(document.getElementById('min-amount').value);
+                const offerPrice = parseFloat(value);
+                return value.trim() !== '' && offerPrice > 0 && offerPrice < minAmount;
+            },
+            errorMessage: 'Discount amount must be greater than 0 and less than minimum amount.'
+        },
+        'start-date': {
+            element: document.getElementById('start-date'),
+            errorElement: document.getElementById('start-date-error'),
+            validate: (value) => {
+                const today = new Date().toISOString().split('T')[0];
+                return value.trim() !== '' && value >= today;
+            },
+            errorMessage: 'Start date cannot be in the past.'
+        },
+        'expiry-date': {
+            element: document.getElementById('expiry-date'),
+            errorElement: document.getElementById('expiry-date-error'),
+            validate: (value) => {
+                const startDate = new Date(document.getElementById('start-date').value);
+                const expiryDate = new Date(value);
+                return value.trim() !== '' && expiryDate > startDate;
+            },
+            errorMessage: 'Expiry date must be after the start date.'
+        },
+        'min-amount': {
+            element: document.getElementById('min-amount'),
+            errorElement: document.getElementById('min-amount-error'),
+            validate: (value) => {
+                const offerPrice = parseFloat(document.getElementById('offer-price').value);
+                const minAmount = parseFloat(value);
+                return value.trim() !== '' && minAmount > 0 && minAmount > offerPrice;
+            },
+            errorMessage: 'Minimum amount must be greater than discount amount.'
+        },
+        'usage-limit': {
+            element: document.getElementById('usage-limit'),
+            errorElement: document.getElementById('usage-limit-error'),
+            validate: (value) => value.trim() !== '' && Number.isInteger(parseFloat(value)) && parseInt(value) > 0,
+            errorMessage: 'Please enter a valid usage limit (whole number).'
+        },
+    };
 
-            if (isValid) {
-                this.submit();
-            }
+    clearErrors();
+    let isValid = true;
+
+    // First check min-amount and offer-price relationship
+    const minAmount = parseFloat(document.getElementById('min-amount').value);
+    const offerPrice = parseFloat(document.getElementById('offer-price').value);
+    
+    if (offerPrice >= minAmount) {
+        document.getElementById('offer-price').classList.add('error');
+        document.getElementById('offer-price-error').innerText = 'Discount amount must be less than minimum amount.';
+        isValid = false;
+    }
+
+    // Then validate each field
+    Object.values(validations).forEach(validation => {
+        const value = validation.element.value;
+        if (!validation.validate(value)) {
+            validation.element.classList.add('error');
+            validation.errorElement.innerText = validation.errorMessage;
+            isValid = false;
+        }
+    });
+
+    if (isValid) {
+        const formData = new FormData(this);
+        const formObject = {};
+        formData.forEach((value, key) => {
+            formObject[key] = value;
         });
 
+        // Send AJAX request to check if coupon exists before submitting
+        fetch('/admin/addCoupon', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formObject)
+        })
+        .then(response => {
+            if (response.ok) {
+                // Coupon added successfully, redirect
+                window.location.href = '/admin/coupon';
+            } else if (response.status === 409) {
+                // Coupon code already exists
+                return response.json();
+            } else {
+                throw new Error('Server error');
+            }
+        })
+        .then(data => {
+            if (data && data.error) {
+                // Show error message about duplicate coupon
+                const codeInput = document.getElementById('coupon-code');
+                const codeError = document.getElementById('code-error');
+                codeInput.classList.add('error');
+                codeError.innerText = data.error;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while adding the coupon.');
+        });
+    }
+});
 
 function toggleDropdown(event) {
     event.stopPropagation(); 

@@ -240,6 +240,43 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script>
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('start-date').setAttribute('max', today);
+  document.getElementById('end-date').setAttribute('max', today);
+
+  document.getElementById('start-date').addEventListener('change', function() {
+    const startDate = this.value;
+    const endDateInput = document.getElementById('end-date');
+    
+   
+    if (startDate) {
+      endDateInput.setAttribute('min', startDate);
+      
+      if (endDateInput.value && endDateInput.value < startDate) {
+        endDateInput.value = startDate;
+      }
+    }
+  });
+
+
+  function validateDates() {
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    
+    if (startDate && new Date(startDate) > new Date()) {
+      alert('Start date cannot be in the future');
+      return false;
+    }
+    
+    if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+      alert('End date cannot be earlier than start date');
+      return false;
+    }
+    
+    return true;
+  }
+
   function getFilterValues() {
     return {
       filtervalue: document.getElementById("filter-order").value,
@@ -247,24 +284,26 @@
       endDate: document.getElementById("end-date").value,
     };
   }
-  document.getElementById("downloadPdf").addEventListener("click", async () => {
-    const filterParams = getFilterValues();
-    const response = await fetch("/admin/sales-report/pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(filterParams),
-    });
 
-    const blob = await response.blob();
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.download = "sales_report.pdf";
-    link.click();
+  document.getElementById("downloadPdf").addEventListener("click", async () => {
+    if (validateDates()) {
+      const filterParams = getFilterValues();
+      const response = await fetch("/admin/sales-report/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(filterParams),
+      });
+
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = "sales_report.pdf";
+      link.click();
+    }
   });
 
-  document
-    .getElementById("downloadExcel")
-    .addEventListener("click", async () => {
+  document.getElementById("downloadExcel").addEventListener("click", async () => {
+    if (validateDates()) {
       const filterParams = getFilterValues();
       const response = await fetch("/admin/sales-report/excel", {
         method: "POST",
@@ -277,99 +316,105 @@
       link.href = window.URL.createObjectURL(blob);
       link.download = "sales_report.xlsx";
       link.click();
-    });
+    }
+  });
 
   async function filterOrder() {
-    const filtervalue = document.getElementById("filter-order").value;
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
-    const response = await $.ajax({
-      url: `/admin/filterOrder?filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.orders) {
-      const filterTable = document.querySelector("table tbody");
-      filterTable.textContent = "";
-      response.orders.forEach((order) => {
-        const row = `
-            <tr>
-              <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-              <td>${order.user ? order.user.name : "N/A"}</td>
-              <td>${order.orderId}</td>
-              <td>₹ ${order.subtotal}</td>
-             <td>₹  ${order.productdiscount || 0}
-                          </td>
-                          <td>₹ ${order.couponDiscount || 0}
-                          </td>
-                          <td>₹  ${order.finalAmount} 
-                          </td>
-              <td>${order.paymentMethod}</td>
-            </tr>`;
-        filterTable.insertAdjacentHTML("beforeend", row);
+    if (validateDates()) {
+      const filtervalue = document.getElementById("filter-order").value;
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
+      const response = await $.ajax({
+        url: `/admin/filterOrder?filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      document.querySelector(".text-primary").innerHTML = response.saleCount;
-      document.querySelector(
-        ".text-success"
-      ).innerHTML = `₹ ${response.totalSalePrice}`;
-      document.querySelector(
-        ".text-warning"
-      ).innerHTML = `₹ ${response.totalDiscount}`;
-      document.querySelector(
-        ".text-danger"
-      ).innerHTML = `₹ ${response.couponDiscount}`;
+      if (response.orders) {
+        const filterTable = document.querySelector("table tbody");
+        filterTable.textContent = "";
+        response.orders.forEach((order) => {
+          const row = `
+              <tr>
+                <td>${new Date(order.createdOn).toLocaleDateString()}</td>
+                <td>${order.user ? order.user.name : "N/A"}</td>
+                <td>${order.orderId}</td>
+                <td>₹ ${order.subtotal}</td>
+               <td>₹  ${order.productdiscount || 0}
+                            </td>
+                            <td>₹ ${order.couponDiscount || 0}
+                            </td>
+                            <td>₹  ${order.finalAmount} 
+                            </td>
+                <td>${order.paymentMethod}</td>
+              </tr>`;
+          filterTable.insertAdjacentHTML("beforeend", row);
+        });
 
-      updatePagination(response.totalPage, 1);
+        document.querySelector(".text-primary").innerHTML = response.saleCount;
+        document.querySelector(
+          ".text-success"
+        ).innerHTML = `₹ ${response.totalSalePrice}`;
+        document.querySelector(
+          ".text-warning"
+        ).innerHTML = `₹ ${response.totalDiscount}`;
+        document.querySelector(
+          ".text-danger"
+        ).innerHTML = `₹ ${response.couponDiscount}`;
+
+        updatePagination(response.totalPage, 1);
+      }
     }
   }
-  async function filterByDate() {
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
-    const response = await $.ajax({
-      url: `/admin/filterbyDate?startDate=${startDate}&endDate=${endDate}`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
 
-    if (response.orders) {
-      const filterTable = document.querySelector("table tbody");
-      filterTable.textContent = "";
-      response.orders.forEach((order) => {
-        const row = `
-            <tr>
-              <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-              <td>${order.user ? order.user.name : "N/A"}</td>
-              <td>${order.orderId}</td>
-              <td>₹ ${order.subtotal}</td>
-              <td>₹  ${order.productdiscount || 0}
-                          </td>
-                          <td>₹ ${order.couponDiscount || 0}
-                          </td>
-                          <td>₹  ${order.finalAmount} 
-                          </td>
-              <td>${order.paymentMethod}</td>
-            </tr>`;
-        filterTable.insertAdjacentHTML("beforeend", row);
+  async function filterByDate() {
+    if (validateDates()) {
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
+      const response = await $.ajax({
+        url: `/admin/filterbyDate?startDate=${startDate}&endDate=${endDate}`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      document.querySelector(".text-primary").innerHTML = response.saleCount;
-      document.querySelector(
-        ".text-success"
-      ).innerHTML = `₹ ${response.totalSalePrice}`;
-      document.querySelector(
-        ".text-warning"
-      ).innerHTML = `₹ ${response.totalDiscount}`;
-      document.querySelector(
-        ".text-danger"
-      ).innerHTML = `₹ ${response.couponDiscount}`;
+      if (response.orders) {
+        const filterTable = document.querySelector("table tbody");
+        filterTable.textContent = "";
+        response.orders.forEach((order) => {
+          const row = `
+              <tr>
+                <td>${new Date(order.createdOn).toLocaleDateString()}</td>
+                <td>${order.user ? order.user.name : "N/A"}</td>
+                <td>${order.orderId}</td>
+                <td>₹ ${order.subtotal}</td>
+                <td>₹  ${order.productdiscount || 0}
+                            </td>
+                            <td>₹ ${order.couponDiscount || 0}
+                            </td>
+                            <td>₹  ${order.finalAmount} 
+                            </td>
+                <td>${order.paymentMethod}</td>
+              </tr>`;
+          filterTable.insertAdjacentHTML("beforeend", row);
+        });
 
-      updatePagination(response.totalPage, 1);
+        document.querySelector(".text-primary").innerHTML = response.saleCount;
+        document.querySelector(
+          ".text-success"
+        ).innerHTML = `₹ ${response.totalSalePrice}`;
+        document.querySelector(
+          ".text-warning"
+        ).innerHTML = `₹ ${response.totalDiscount}`;
+        document.querySelector(
+          ".text-danger"
+        ).innerHTML = `₹ ${response.couponDiscount}`;
+
+        updatePagination(response.totalPage, 1);
+      }
     }
   }
 
@@ -408,51 +453,53 @@
   }
 
   async function goToPage(page) {
-    const filtervalue = document.getElementById("filter-order").value;
-    const startDate = document.getElementById("start-date").value;
-    const endDate = document.getElementById("end-date").value;
+    if (validateDates()) {
+      const filtervalue = document.getElementById("filter-order").value;
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
 
-    const response = await $.ajax({
-      url: `/admin/salesreport?page=${page}&filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.orders) {
-      const filterTable = document.querySelector("table tbody");
-      filterTable.textContent = "";
-      response.orders.forEach((order) => {
-        const row = `
-            <tr>
-              <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-              <td>${order.user ? order.user.name : "N/A"}</td>
-              <td>${order.orderId}</td>
-              <td>₹ ${order.subtotal}</td>
-             <td>₹  ${order.productdiscount || 0}
-                          </td>
-                          <td>₹ ${order.couponDiscount || 0}
-                          </td>
-                          <td>₹  ${order.finalAmount} 
-                          </td>
-              <td>${order.paymentMethod}</td>
-            </tr>`;
-        filterTable.insertAdjacentHTML("beforeend", row);
+      const response = await $.ajax({
+        url: `/admin/salesreport?page=${page}&filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      document.querySelector(".text-primary").innerHTML = response.saleCount;
-      document.querySelector(
-        ".text-success"
-      ).innerHTML = `₹ ${response.totalSalePrice}`;
-      document.querySelector(
-        ".text-warning"
-      ).innerHTML = `₹ ${response.totalDiscount}`;
-      document.querySelector(
-        ".text-danger"
-      ).innerHTML = `₹ ${response.couponDiscount}`;
+      if (response.orders) {
+        const filterTable = document.querySelector("table tbody");
+        filterTable.textContent = "";
+        response.orders.forEach((order) => {
+          const row = `
+              <tr>
+                <td>${new Date(order.createdOn).toLocaleDateString()}</td>
+                <td>${order.user ? order.user.name : "N/A"}</td>
+                <td>${order.orderId}</td>
+                <td>₹ ${order.subtotal}</td>
+               <td>₹  ${order.productdiscount || 0}
+                            </td>
+                            <td>₹ ${order.couponDiscount || 0}
+                            </td>
+                            <td>₹  ${order.finalAmount} 
+                            </td>
+                <td>${order.paymentMethod}</td>
+              </tr>`;
+          filterTable.insertAdjacentHTML("beforeend", row);
+        });
 
-      updatePagination(response.totalPage, page);
+        document.querySelector(".text-primary").innerHTML = response.saleCount;
+        document.querySelector(
+          ".text-success"
+        ).innerHTML = `₹ ${response.totalSalePrice}`;
+        document.querySelector(
+          ".text-warning"
+        ).innerHTML = `₹ ${response.totalDiscount}`;
+        document.querySelector(
+          ".text-danger"
+        ).innerHTML = `₹ ${response.couponDiscount}`;
+
+        updatePagination(response.totalPage, page);
+      }
     }
   }
 

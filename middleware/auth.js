@@ -41,10 +41,38 @@ const adminAuth = (req,res,next)=>{
     }
 }
 
+const isLogin = async(req,res,next)=>{
+    try {                  
+       if(req.session.user){
+        res.setHeader('Cache-Control', 'no-store')
+          return next();
+       }else{
+          return res.redirect('/')
+       }
+    } catch (error) {
+       console.log(error.message);
+    }
+}
+
+const isLogout = async(req,res,next)=>{
+   try {
+      if(req.session.user){
+        res.setHeader('Cache-Control', 'no-store')
+       return res.redirect('/home');
+      } else {
+         return next();
+      }
+
+   } catch (error) {
+      console.log(error.message);
+   }
+}
 
 module.exports ={
     userAuth,
     adminAuth,
     checkUser,
-    checkAdmin
+    checkAdmin,
+    isLogin,
+    isLogout
 }

@@ -210,8 +210,29 @@ const removeItem = async(req,res)=>{
     }
 }
 
+const loadAboutus = async(req,res)=>{
+    try{
+        res.render('aboutus')
+    }catch{
+        console.error(error)
+        res.status(500).json({message:"server error"})
+    }
+    
+}
+
+const loadContact = async(req,res)=>{
+    try {
+        res.render('contact')
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"server error"})
+    }
+}
+
 module.exports ={
     loadWishlist,
     addToWishlist,
-    removeItem
+    removeItem,
+    loadAboutus,
+    loadContact
 }

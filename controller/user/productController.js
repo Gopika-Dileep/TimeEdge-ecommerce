@@ -23,6 +23,9 @@ const loadhome = async (req, res) => {
         
         if (userId) {
             const user = await User.findById({ _id: userId })
+            if(user.isBlocked===true){
+              return  res.render('login', { message: "User is blocked by admin" });
+            }
             res.render('home', { user: user, product: products })
         } else {
             res.render("home", { product: products })
@@ -231,6 +234,9 @@ const productDetails = async (req, res) => {
 
         if (userId) {
             const user = await User.findById({ _id: userId })
+            if(user.isBlocked===true){
+                return  res.render('login', { message: "User is blocked by admin" });
+              }
             res.render('productdetails', {
                 user: user,
                 product: product,
@@ -274,7 +280,8 @@ const shopProducts = async (req, res) => {
         const priceLt = req.query.lt ? parseInt(req.query.lt) : null;
         const page = parseInt(req.query.page) || 1;
         const itemsPerPage = 6;
-
+        
+       
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isListed: true });
 
@@ -289,14 +296,14 @@ const shopProducts = async (req, res) => {
             brand: { $in: listedBrandIds }
         };
 
-        
         if (search) {
+            const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            
             query.$or = [
-                { productName: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } }
+                { productName: { $regex: escapedSearch, $options: 'i' } },
+                { description: { $regex: escapedSearch, $options: 'i' } }
             ];
         }
-
         
         if (categoryId && listedCategoryIds.some(id => id.toString() === categoryId)) {
             query.category = categoryId;
@@ -365,6 +372,10 @@ const shopProducts = async (req, res) => {
        
         if (user) {
             const userData = await User.findOne({ _id: user });
+            if(userData.isBlocked===true){
+                return  res.render('login', { message: "User is blocked by admin" });
+              }
+      
             renderOptions.user = userData;
         }
 

@@ -777,53 +777,89 @@ function addProductToCart(productId, quantity) {
 }
 
  
-  const wishlistIcons = document.querySelectorAll('.bi-heart, .bi-heart-fill');
-  wishlistIcons.forEach(function(icon) {
-    icon.addEventListener('click', function(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      const productId = this.getAttribute('data-id');
-      const iconElement = document.getElementById(`wishlist-icon-${productId}`);
+const addToWishbtn = document.querySelectorAll('.bi-heart, .bi-heart-fill');
+addToWishbtn.forEach(function(button) {
+    button.addEventListener('click', function(event) {
+        event.preventDefault();
+        const productId = this.getAttribute('data-id');
+        const icon = document.getElementById(`wishlist-icon-${productId}`);
 
-      $.ajax({
+        // Check if user is logged in first
+        $.ajax({
+            url: '/check-auth',
+            method: 'GET',
+            success: function(response) {
+                if (response.isLoggedIn) {
+                    // User is logged in, proceed with wishlist action
+                    updateWishlist(productId, icon);
+                } else {
+                    // User is not logged in, show login prompt
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Login Required',
+                        text: 'Please login to add items to your wishlist',
+                        showCancelButton: true,
+                        confirmButtonText: 'Go to Login',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/login';
+                        }
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error checking authentication status:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong. Please try again later.',
+                });
+            }
+        });
+    });
+});
+
+// Move the actual wishlist update functionality to a separate function
+function updateWishlist(productId, icon) {
+    $.ajax({
         url: `/addToWishlist/${productId}`,
         method: 'POST',
         data: JSON.stringify({ productId: productId }),
         contentType: "application/json",
         success: function(response) {
-          if (response.success) {
-            if (response.action === 'added') {
-              iconElement.classList.remove('bi-heart');
-              iconElement.classList.add('bi-heart-fill');
-              Swal.fire({
-                icon: 'success',
-                title: "Added to Wishlist",
-                text: response.message,
-                confirmButtonText: 'OK',
-              });
-            } else if (response.action === 'removed') {
-              iconElement.classList.remove('bi-heart-fill');
-              iconElement.classList.add('bi-heart');
-              Swal.fire({
-                icon: 'success',
-                title: "Removed from Wishlist",
-                text: response.message,
-                confirmButtonText: 'OK',
-              });
+            if (response.success) {
+                if (response.action === 'added') {
+                    icon.classList.remove('bi-heart');
+                    icon.classList.add('bi-heart-fill', 'text-danger');
+                    Swal.fire({
+                        icon: 'success',
+                        title: "Added to Wishlist",
+                        text: response.message,
+                        confirmButtonText: 'OK',
+                    });
+                } else if (response.action === 'removed') {
+                    icon.classList.remove('bi-heart-fill', 'text-danger');
+                    icon.classList.add('bi-heart');
+                    Swal.fire({
+                        icon: 'success',
+                        title: "Removed from Wishlist",
+                        text: response.message,
+                        confirmButtonText: 'OK',
+                    });
+                }
             }
-          }
         },
         error: function(xhr, status, error) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Error while updating the wishlist.',
-            confirmButtonText: "Ok",
-          });
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error while updating the wishlist.',
+                confirmButtonText: "Ok",
+            });
         }
-      });
     });
-  });
+}
 </script>
 
 <%- include("../../views/partials/user/footer") %>

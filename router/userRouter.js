@@ -119,7 +119,8 @@ router.get('/download-invoice/:orderId',userAuth, orderController.downloadInvoic
 
 router.get('/refer', userAuth, referralController.getReferAndEarnPage);
 router.post('/apply-referral', userAuth, referralController.applyReferralCode);
-
+router.get('/aboutus',wishlistController.loadAboutus)
+router.get('/contact',wishlistController.loadContact)
 
 
 
