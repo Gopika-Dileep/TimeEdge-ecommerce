@@ -9,7 +9,7 @@ const loadAddToCart = async (req, res) => {
         const userId = req.session.user;
         const itemsPerPage = 2;
         const page = parseInt(req.query.page) || 1;
-        
+        const user = await User.findById({ _id: userId });
         const cart = await Cart.findOne({ user: userId }).populate({
             path: "items.product",
             populate: [
@@ -38,12 +38,12 @@ const loadAddToCart = async (req, res) => {
             const totalPrice = validItems.reduce((total, item) => {
                 const product = item.product;
                 
-                // Calculate best offer similar to addToCart function
+               
                 const productOffer = product.productOffer || 0;
                 const categoryOffer = product.category.categoryOffer || 0;
                 const bestOffer = Math.max(productOffer, categoryOffer);
                 
-                // Apply the best offer to calculate final price
+               
                 const finalPrice = bestOffer > 0 ? 
                     product.salePrice - (product.salePrice * bestOffer / 100) : 
                     product.salePrice;
@@ -51,7 +51,7 @@ const loadAddToCart = async (req, res) => {
                 return total + ((finalPrice) * item.quantity);
             }, 0);
 
-            const user = await User.findById({ _id: userId });
+           
             
             const totalItems = validItems.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -68,6 +68,7 @@ const loadAddToCart = async (req, res) => {
             await cart.save();
 
             res.render('cart', {
+                user:user,
                 cart: paginatedCart,
                 totalPrice: Math.floor(totalPrice),
                 user: user,
@@ -80,7 +81,7 @@ const loadAddToCart = async (req, res) => {
                     null
             });
         } else {
-            res.render('cart', { message: "Cart is empty" });
+            res.render('cart',{ user:user, message: "Cart is empty" });
         }
     } catch (error) {
         console.error("Cart loading error:", error);

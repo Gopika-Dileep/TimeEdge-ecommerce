@@ -212,7 +212,12 @@ const removeItem = async(req,res)=>{
 
 const loadAboutus = async(req,res)=>{
     try{
-        res.render('aboutus')
+        const userId = req.session.user
+        if(userId){
+            const user = await User.findById({_id:userId})
+            return res.render('aboutus',{user:user})
+        }
+       return  res.render('aboutus')
     }catch{
         console.error(error)
         res.status(500).json({message:"server error"})
@@ -222,7 +227,12 @@ const loadAboutus = async(req,res)=>{
 
 const loadContact = async(req,res)=>{
     try {
-        res.render('contact')
+        const userId = req.session.user
+        if(userId){
+            const user = await User.findById({_id:userId})
+           return  res.render('contact',{user:user})
+        }
+       return res.render('contact')
     } catch (error) {
         console.log(error)
         res.status(500).json({message:"server error"})

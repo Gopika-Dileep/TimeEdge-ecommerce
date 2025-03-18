@@ -117,7 +117,6 @@ const sendVerificationMail = async (email, otp) => {
                 pass: process.env.NODEMAILER_PASSWORD
             }
         });
-
         const mailOptions = {
             from: process.env.NODEMAILER_EMAIL,
             to: email,
@@ -125,7 +124,6 @@ const sendVerificationMail = async (email, otp) => {
             text: `Your OTP is ${otp}`,
             html: `<b>Your OTP: ${otp}</b>`
         };
-
         const info = await transporter.sendMail(mailOptions);
         return info.accepted.length > 0;
     } catch (error) {
