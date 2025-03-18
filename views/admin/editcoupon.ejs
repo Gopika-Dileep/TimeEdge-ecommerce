@@ -1,106 +1,112 @@
 <%- include("../../views/partials/admin/header") %>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    padding: 20px;
-    color: #333;
-}
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+            color: #333;
+        }
 
-.coupon-page {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
+        .coupon-page {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
 
-.coupon-form {
-    flex: 1;
-    max-width: 400px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.coupon-form h2 {
-    margin-bottom: 15px;
-    font-size: 1.5rem;
-}
-
-.coupon-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.coupon-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.coupon-form .btn {
-    background-color: #28a745;
-    color: #fff;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.coupon-form .btn:hover {
-    background-color: #218838;
-}
-.error {
-    color: red;
-    font-size: 14px;
-    margin-top: 5px;
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .coupon-form {
-        flex-direction: column;
-    }
-}
-.coupon-form {
-        position: absolute;
-        top: 70px;
-        left: 240px;
-        width: calc(100% - 240px);
-        padding: 2rem;
-    }
-    @media (max-width: 1000px) {
         .coupon-form {
-        position: absolute;
-        top: 50px;
-        left: 20px;
-        width: calc(100% - 30px);
-        padding: 2rem;
-    }
-    }
-</style>
-<body>
-    
+            flex: 1;
+            max-width: 400px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .coupon-form h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .coupon-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .coupon-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .coupon-form .btn {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .coupon-form .btn:hover {
+            background-color: #218838;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .coupon-form {
+                flex-direction: column;
+            }
+        }
+
+        .coupon-form {
+            position: absolute;
+            top: 70px;
+            left: 240px;
+            width: calc(100% - 240px);
+            padding: 2rem;
+        }
+
+        @media (max-width: 1000px) {
+            .coupon-form {
+                position: absolute;
+                top: 50px;
+                left: 20px;
+                width: calc(100% - 30px);
+                padding: 2rem;
+            }
+        }
+    </style>
+
+    <body>
+
         <div class="coupon-form">
             <h2>Add a Coupon</h2>
             <form id="add-coupon-form" method="post" action="/admin/editCoupon?id=<%= coupon._id%>">
                 <label for="coupon-code">Coupon Code:</label>
-                <input type="text" id="coupon-code" name="code" value="<%= coupon.name%>" placeholder="Enter coupon code">
+                <input type="text" id="coupon-code" name="code" value="<%= coupon.name%>"
+                    placeholder="Enter coupon code">
                 <span class="error" id="code-error"></span>
 
                 <label for="offer-price">Discount Amount (₹):</label>
-                <input type="number" id="offer-price" name="offerPrice" value="<%= coupon.offerPrice%>" placeholder="Enter offer price" >
+                <input type="number" id="offer-price" name="offerPrice" value="<%= coupon.offerPrice%>"
+                    placeholder="Enter offer price">
                 <span class="error" id="offer-error"></span>
 
                 <label for="start-date">Start Date:</label>
@@ -108,108 +114,110 @@ body {
                 <span class="error" id="start-error"></span>
 
                 <label for="expiry-date">Expiry Date:</label>
-                <input type="date" id="expiry-date" name="expireOn" value="<%= coupon.expireOn%>" >
+                <input type="date" id="expiry-date" name="expireOn" value="<%= coupon.expireOn%>">
                 <span class="error" id="expiry-error"></span>
 
                 <label for="min-amount">Minimum Amount (₹):</label>
-                <input type="number" id="min-amount" name="minimumPrice" value="<%= coupon.minimumPrice%>" placeholder="Enter minimum order amount" >
+                <input type="number" id="min-amount" name="minimumPrice" value="<%= coupon.minimumPrice%>"
+                    placeholder="Enter minimum order amount">
                 <span class="error" id="min-error"></span>
 
                 <label for="usage-limit">Usage Limit:</label>
-                <input type="number" id="usage-limit" name="UsageLimit" value="<%= coupon.UsageLimit%>"  placeholder="Enter usage limit">
+                <input type="number" id="usage-limit" name="UsageLimit" value="<%= coupon.UsageLimit%>"
+                    placeholder="Enter usage limit">
                 <span class="error" id="usage-error"></span>
 
-                
+
                 </select>
-    
+
                 <button type="submit" class="btn">Add Coupon</button>
             </form>
         </div>
         <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("add-coupon-form");
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById("add-coupon-form");
 
-    form.addEventListener("submit", function (event) {
-        let isValid = true;
+                form.addEventListener("submit", function (event) {
+                    let isValid = true;
 
-       
-        function validateField(input, errorElement, errorMessage) {
-            if (input.value.trim() === "") {
-                errorElement.textContent = errorMessage;
-                isValid = false;
-            } else {
-                errorElement.textContent = "";
-            }
-        }
 
-        
-        const couponCode = document.getElementById("coupon-code");
-        const codeError = document.getElementById("code-error");
-        validateField(couponCode, codeError, "Coupon code is required.");
-        if (couponCode.value.trim().length < 3) {
-            codeError.textContent = "Coupon code must be at least 3 characters.";
-            isValid = false;
-        }
+                    function validateField(input, errorElement, errorMessage) {
+                        if (input.value.trim() === "") {
+                            errorElement.textContent = errorMessage;
+                            isValid = false;
+                        } else {
+                            errorElement.textContent = "";
+                        }
+                    }
 
-      
-        const offerPrice = document.getElementById("offer-price");
-        const offerError = document.getElementById("offer-error");
-        validateField(offerPrice, offerError, "Offer price is required.");
-        if (offerPrice.value <= 0 || isNaN(offerPrice.value)) {
-            offerError.textContent = "Offer price must be a positive number.";
-            isValid = false;
-        }
 
-       
-        const startDate = document.getElementById("start-date");
-        const startError = document.getElementById("start-error");
-        validateField(startDate, startError, "Start date is required.");
-        const today = new Date().toISOString().split("T")[0];
-        if (startDate.value && startDate.value < today) {
-            startError.textContent = "Start date cannot be in the past.";
-            isValid = false;
-        }
+                    const couponCode = document.getElementById("coupon-code");
+                    const codeError = document.getElementById("code-error");
+                    validateField(couponCode, codeError, "Coupon code is required.");
+                    if (couponCode.value.trim().length < 3) {
+                        codeError.textContent = "Coupon code must be at least 3 characters.";
+                        isValid = false;
+                    }
 
-      
-        const expiryDate = document.getElementById("expiry-date");
-        const expiryError = document.getElementById("expiry-error");
-        validateField(expiryDate, expiryError, "Expiry date is required.");
-        if (expiryDate.value && expiryDate.value <= startDate.value) {
-            expiryError.textContent = "Expiry date must be after the start date.";
-            isValid = false;
-        }
 
-      
-        const minAmount = document.getElementById("min-amount");
-        const minError = document.getElementById("min-error");
-        validateField(minAmount, minError, "Minimum amount is required.");
-        if (minAmount.value <= 0 || isNaN(minAmount.value)) {
-            minError.textContent = "Minimum amount must be a positive number.";
-            isValid = false;
-        }
+                    const offerPrice = document.getElementById("offer-price");
+                    const offerError = document.getElementById("offer-error");
+                    validateField(offerPrice, offerError, "Offer price is required.");
+                    if (offerPrice.value <= 0 || isNaN(offerPrice.value)) {
+                        offerError.textContent = "Offer price must be a positive number.";
+                        isValid = false;
+                    }
 
-       
-        const usageLimit = document.getElementById("usage-limit");
-        const usageError = document.getElementById("usage-error");
-        validateField(usageLimit, usageError, "Usage limit is required.");
-        if (usageLimit.value <= 0 || isNaN(usageLimit.value)) {
-            usageError.textContent = "Usage limit must be a positive number.";
-            isValid = false;
-        }
 
-        
-        if (!isValid) {
-            event.preventDefault();
-        }
-    });
+                    const startDate = document.getElementById("start-date");
+                    const startError = document.getElementById("start-error");
+                    validateField(startDate, startError, "Start date is required.");
+                    const today = new Date().toISOString().split("T")[0];
+                    if (startDate.value && startDate.value < today) {
+                        startError.textContent = "Start date cannot be in the past.";
+                        isValid = false;
+                    }
 
-    
-    document.querySelectorAll("input").forEach((input) => {
-        input.addEventListener("input", function () {
-            document.getElementById(`${input.id}-error`).textContent = "";
-        });
-    });
-});
+
+                    const expiryDate = document.getElementById("expiry-date");
+                    const expiryError = document.getElementById("expiry-error");
+                    validateField(expiryDate, expiryError, "Expiry date is required.");
+                    if (expiryDate.value && expiryDate.value <= startDate.value) {
+                        expiryError.textContent = "Expiry date must be after the start date.";
+                        isValid = false;
+                    }
+
+
+                    const minAmount = document.getElementById("min-amount");
+                    const minError = document.getElementById("min-error");
+                    validateField(minAmount, minError, "Minimum amount is required.");
+                    if (minAmount.value <= 0 || isNaN(minAmount.value)) {
+                        minError.textContent = "Minimum amount must be a positive number.";
+                        isValid = false;
+                    }
+
+
+                    const usageLimit = document.getElementById("usage-limit");
+                    const usageError = document.getElementById("usage-error");
+                    validateField(usageLimit, usageError, "Usage limit is required.");
+                    if (usageLimit.value <= 0 || isNaN(usageLimit.value)) {
+                        usageError.textContent = "Usage limit must be a positive number.";
+                        isValid = false;
+                    }
+
+
+                    if (!isValid) {
+                        event.preventDefault();
+                    }
+                });
+
+
+                document.querySelectorAll("input").forEach((input) => {
+                    input.addEventListener("input", function () {
+                        document.getElementById(`${input.id}-error`).textContent = "";
+                    });
+                });
+            });
 
         </script>
     </body>

@@ -56,9 +56,12 @@ const isLogin = async(req,res,next)=>{
 
 const isLogout = async(req,res,next)=>{
    try {
+    console.log("first")
+    console.log(req.session,'fg')
       if(req.session.user){
+        console.log("sec")
         res.setHeader('Cache-Control', 'no-store')
-       return res.redirect('/home');
+       return res.redirect('/');
       } else {
          return next();
       }

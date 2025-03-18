@@ -186,7 +186,7 @@ const newChangePassword = async(req,res)=>{
 
 const getForgotPassPage = async (req,res)=>{
     try {
-        res.render("forgot-password");
+        res.render("forgot-password",{message:""});
     } catch (error) {
         res.redirect("/pageNotFound")
     }
@@ -213,7 +213,7 @@ const forgotEmailValid = async(req,res)=>{
                 res.render('forgot-password',{message:"error while sending mail"})
             }
         }else{
-            res.render('change-email',{message:'user not found'})
+            res.render('forgot-password',{message:'user not found'})
         }
      } catch (error) {
         console.error(error)

@@ -1,31 +1,31 @@
-<%-include("../../views/partials/user/header") %>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-<style>
-  table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
+<%-include(".. /../views/partials/user/header") %>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+  <style>
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
 
-  th {
-    text-align: left;
-    padding: 12px;
-    color: #64748b;
-    font-weight: 500;
-    font-size: 14px;
-    border-bottom: 1px solid #e2e8f0;
-  }
+    th {
+      text-align: left;
+      padding: 12px;
+      color: #64748b;
+      font-weight: 500;
+      font-size: 14px;
+      border-bottom: 1px solid #e2e8f0;
+    }
 
-  td {
-    padding: 16px 12px;
-    font-size: 14px;
-    border-bottom: 1px solid #e2e8f0;
-  }
+    td {
+      padding: 16px 12px;
+      font-size: 14px;
+      border-bottom: 1px solid #e2e8f0;
+    }
 
-  /* .status {
+    /* .status {
     padding: 4px 12px;
     border-radius: 4px;
     font-size: 12px;
@@ -42,197 +42,196 @@
     background: #dcfce7;
     color: #166534;
   } */
-  .status {
-    display: inline-block;
-    min-width: 100px; 
-    text-align: center; 
-    padding: 6px 15px;
-    border-radius: 20px; 
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: capitalize;
-    white-space: nowrap; 
-}
+    .status {
+      display: inline-block;
+      min-width: 100px;
+      text-align: center;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
 
-.status.pending {
-    background: #fef9c3;
-    color: #a16207;
-}
+    .status.pending {
+      background: #fef9c3;
+      color: #a16207;
+    }
 
-.status.processing {
-    background: #dbeafe;
-    color: #1e40af;
-}
+    .status.processing {
+      background: #dbeafe;
+      color: #1e40af;
+    }
 
-.status.shipped {
-    background: #ede9fe;
-    color: #6d28d9;
-}
+    .status.shipped {
+      background: #ede9fe;
+      color: #6d28d9;
+    }
 
-.status.delivered {
-    background: #dcfce7;
-    color: #166534;
-}
+    .status.delivered {
+      background: #dcfce7;
+      color: #166534;
+    }
 
-.status.cancelled {
-    background: #fee2e2;
-    color: #991b1b;
-}
+    .status.cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
 
-.status.return-request {
-    background: #ffedd5;
-    color: #9a3412;
-}
+    .status.return-request {
+      background: #ffedd5;
+      color: #9a3412;
+    }
 
-.status.returned {
-    background: #e5e7eb;
-    color: #374151;
-}
+    .status.returned {
+      background: #e5e7eb;
+      color: #374151;
+    }
 
 
-  .view-btn {
-    display: inline-block;
-    padding: 6px 12px;
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    color: #1e293b;
-    text-decoration: none;
-    font-size: 14px;
-    transition: all 0.2s;
-  }
+    .view-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      color: #1e293b;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
 
-  .view-btn:hover {
-    background-color: #f1f5f9;
-  }
-</style>
+    .view-btn:hover {
+      background-color: #f1f5f9;
+    }
+  </style>
 
-<div style="display: flex; background-color: #f8fafc;">
-  <%-include("../../views/partials/user/profile-sidebar") %>
-<div style="width: 100%; padding-right: 40px; margin-top: 40px;">
-<table>
-  <thead>
-    <tr>
-      <th>Order ID</th>
-      <th>Order Date</th>
-      <th>Status</th>
-      <th>Total Amount</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% orders.forEach(item=> { %>
-    <tr>
-      <td><%=item.orderId %></td>
-      <td><%= item.createdOn.toLocaleDateString()%></td>
-      <td><span class="status <%= item.status.toLowerCase().replace(' ', '-') %>"><%= item.status %></span></td>
-      <td><%= item.finalAmount%></td>
-      <td><a href="/orders-details?id=<%= item._id%>" class="view-btn">View Details</a></td>
-    </tr>
-    <% }); %>
-  </tbody>
-</table>
+  <div style="display: flex; background-color: #f8fafc;">
+    <%-include(".. /../views/partials/user/profile-sidebar") %>
+      <div style="width: 100%; padding-right: 40px; margin-top: 40px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Order Date</th>
+              <th>Status</th>
+              <th>Total Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orders.forEach(item=> { %>
+              <tr>
+                <td>
+                  <%=item.orderId %>
+                </td>
+                <td>
+                  <%= item.createdOn.toLocaleDateString()%>
+                </td>
+                <td><span class="status <%= item.status.toLowerCase().replace(' ', '-') %>">
+                    <%= item.status %>
+                  </span></td>
+                <td>
+                  <%= item.finalAmount%>
+                </td>
+                <td><a href="/orders-details?id=<%= item._id%>" class="view-btn">View Details</a></td>
+              </tr>
+              <% }); %>
+          </tbody>
+        </table>
 
-<div class="pagination">
-  <% 
-    const searchParam = typeof search !== 'undefined' && search ? `&search=${search}` : '';
-    const prevPage = currentpage > 1 ? currentpage - 1 : 1;
-    const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage;
-  %>
-  
-  <% if (currentpage > 1) { %>
-    <a href="?page=<%= prevPage %><%= searchParam %>" class="btn">
-      <i class="bi bi-chevron-left"></i> Previous
-    </a>
-  <% } %>
+        <div class="pagination">
+          <% const searchParam=typeof search !=='undefined' && search ? `&search=${search}` : '' ; const
+            prevPage=currentpage> 1 ? currentpage - 1 : 1;
+            const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage; %>
 
-  <div class="page-numbers">
-    <% 
-      let startPage = Math.max(1, currentpage - 2);
-      let endPage = Math.min(totalpage, startPage + 4);
-      
-      if (endPage - startPage < 4) {
-        startPage = Math.max(1, endPage - 4);
-      }
-      
-      if (startPage > 1) { %>
-        <a href="?page=1<%= searchParam %>">1</a>
-        <% if (startPage > 2) { %>
-          <span>...</span>
-        <% } %>
-    <% } %>
+              <% if (currentpage> 1) { %>
+                <a href="?page=<%= prevPage %><%= searchParam %>" class="btn">
+                  <i class="bi bi-chevron-left"></i> Previous
+                </a>
+                <% } %>
 
-    <% for(let i = startPage; i <= endPage; i++) { %>
-      <a href="?page=<%= i %><%= searchParam %>" 
-         class="<%= (i === currentpage) ? 'active' : '' %>">
-        <%= i %>
-      </a>
-    <% } %>
+                  <div class="page-numbers">
+                    <% let startPage=Math.max(1, currentpage - 2); let endPage=Math.min(totalpage, startPage + 4); if
+                      (endPage - startPage < 4) { startPage=Math.max(1, endPage - 4); } if (startPage> 1) { %>
+                      <a href="?page=1<%= searchParam %>">1</a>
+                      <% if (startPage> 2) { %>
+                        <span>...</span>
+                        <% } %>
+                          <% } %>
 
-    <% if (endPage < totalpage) { %>
-      <% if (endPage < totalpage - 1) { %>
-        <span>...</span>
-      <% } %>
-      <a href="?page=<%= totalpage %><%= searchParam %>">
-        <%= totalpage %>
-      </a>
-    <% } %>
+                            <% for(let i=startPage; i <=endPage; i++) { %>
+                              <a href="?page=<%= i %><%= searchParam %>"
+                                class="<%= (i === currentpage) ? 'active' : '' %>">
+                                <%= i %>
+                              </a>
+                              <% } %>
+
+                                <% if (endPage < totalpage) { %>
+                                  <% if (endPage < totalpage - 1) { %>
+                                    <span>...</span>
+                                    <% } %>
+                                      <a href="?page=<%= totalpage %><%= searchParam %>">
+                                        <%= totalpage %>
+                                      </a>
+                                      <% } %>
+                  </div>
+
+                  <% if (currentpage < totalpage) { %>
+                    <a href="?page=<%= nextPage %><%= searchParam %>" class="btn">
+                      Next <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <% } %>
+        </div>
+
+        <style>
+          .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+          }
+
+          .page-numbers {
+            display: flex;
+            gap: 0.5rem;
+          }
+
+          .page-numbers a {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: inherit;
+          }
+
+          .page-numbers a.active {
+            background: rgb(73, 72, 72);
+            color: white;
+            border-color: rgb(73, 72, 72);
+          }
+
+          .page-numbers a:hover:not(.active) {
+            background: #f5f5f5;
+          }
+
+          .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+          }
+
+          .pagination button:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+          }
+        </style>
+
+      </div>
   </div>
 
-  <% if (currentpage < totalpage) { %>
-    <a href="?page=<%= nextPage %><%= searchParam %>" class="btn">
-      Next <i class="bi bi-chevron-right"></i>
-    </a>
-  <% } %>
-</div>
-
-<style>
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2rem;
-  gap: 1rem;
-}
-
-.page-numbers {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.page-numbers a {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  text-decoration: none;
-  color: inherit;
-}
-
-.page-numbers a.active {
-  background: rgb(73, 72, 72);
-  color: white;
-  border-color: rgb(73, 72, 72);
-}
-
-.page-numbers a:hover:not(.active) {
-  background: #f5f5f5;
-}
-
-.pagination button {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.pagination button:disabled {
-  background: #f5f5f5;
-  cursor: not-allowed;
-}
-</style>
-
-</div>
-</div>
-
-<%-include("../../views/partials/user/footer") %>
+  <%-include(".. /../views/partials/user/footer") %>

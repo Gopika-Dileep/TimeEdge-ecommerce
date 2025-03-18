@@ -1,12 +1,13 @@
 <%- include("../../views/partials/admin/header") %>
 
     <style>
-      .content-header {
-        padding: 2rem;
-        background: #f4f4f4;
-        border-radius: 0.5rem;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
+        .content-header {
+            padding: 2rem;
+            background: #f4f4f4;
+            border-radius: 0.5rem;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
         .status-select {
             height: 50px;
             border-radius: 6px;
@@ -181,6 +182,7 @@
             color: #7f1d1d;
             font-weight: 500;
         }
+
         .returned-section {
             background-color: #fefbe2;
             border-radius: 0.5rem;
@@ -236,9 +238,10 @@
             width: calc(100% - 240px);
             padding: 2rem;
         }
+
         .negative-value {
-        color: #16a34a;
-    }
+            color: #16a34a;
+        }
 
         @media (max-width: 1000px) {
             .content-header {
@@ -249,121 +252,147 @@
                 padding: 2rem;
             }
         }
+
         .approve-btn {
-        background-color: #bbf7d0;
-        color: #064e3b;
-        margin-right: 5px;
-    }
-    .decline-btn {
-        background-color: #fecaca;
-        color: #7f1d1d;
-    }
-    
-   
-    #cancelReasonContainer {
-        margin-top: 15px;
-        margin-bottom: 15px;
-    }
-    
-    #cancelReason {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        resize: vertical;
-        min-height: 80px;
-        margin-top: 8px;
-    }
-    
-    .cancel-reason-label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 500;
-        color: #4b5563;
-    }
+            background-color: #bbf7d0;
+            color: #064e3b;
+            margin-right: 5px;
+        }
+
+        .decline-btn {
+            background-color: #fecaca;
+            color: #7f1d1d;
+        }
+
+
+        #cancelReasonContainer {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        #cancelReason {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            resize: vertical;
+            min-height: 80px;
+            margin-top: 8px;
+        }
+
+        .cancel-reason-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #4b5563;
+        }
     </style>
 
-<div class="content-header">
-    <div style="width: 100%;">
-        <div class="breadcrumb">
-            <span>Admin</span> &gt; <span>Orders</span>
-        </div>
+    <div class="content-header">
+        <div style="width: 100%;">
+            <div class="breadcrumb">
+                <span>Admin</span> &gt; <span>Orders</span>
+            </div>
 
-        <a href="/admin/orders" class="btn btn-outline-primary" style="margin-bottom: 30px;">
-            <i class="fas fa-arrow-left"></i> Back to Orders
-        </a>
+            <a href="/admin/orders" class="btn btn-outline-primary" style="margin-bottom: 30px;">
+                <i class="fas fa-arrow-left"></i> Back to Orders
+            </a>
 
-        <h1 class="page-title">Order Details</h1>
+            <h1 class="page-title">Order Details</h1>
 
-        <div class="cards-container">
-            <div class="info-card">
-                <h2 class="card-title">Order Information</h2>
-                <div class="info-item">
-                    <div class="info-label">Order ID:</div>
-                    <div class="info-value"><%= order.orderId %></div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Date:</div>
-                    <div class="info-value"><%= new Date(order.date).toLocaleDateString() %></div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Payment Method:</div>
-                    <div class="info-value"><%= order.paymentMethod %></div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Overall Status:</div>
-                    <div class="info-value">
-                        <span class="status-badge status-<%= order.status.toLowerCase() %>">
-                            <%= order.status %>
-                        </span>
+            <div class="cards-container">
+                <div class="info-card">
+                    <h2 class="card-title">Order Information</h2>
+                    <div class="info-item">
+                        <div class="info-label">Order ID:</div>
+                        <div class="info-value">
+                            <%= order.orderId %>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Date:</div>
+                        <div class="info-value">
+                            <%= new Date(order.date).toLocaleDateString() %>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Payment Method:</div>
+                        <div class="info-value">
+                            <%= order.paymentMethod %>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Overall Status:</div>
+                        <div class="info-value">
+                            <span class="status-badge status-<%= order.status.toLowerCase() %>">
+                                <%= order.status %>
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="info-card">
-                <h2 class="card-title">Customer Details</h2>
-                <div class="info-item">
-                    <div class="info-label">Name:</div>
-                    <div class="info-value"><%= order.user.name %></div>
+                <div class="info-card">
+                    <h2 class="card-title">Customer Details</h2>
+                    <div class="info-item">
+                        <div class="info-label">Name:</div>
+                        <div class="info-value">
+                            <%= order.user.name %>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Phone:</div>
+                        <div class="info-value">
+                            <%= order.user.phone %>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Address:</div>
+                        <div class="info-value">
+                            <h6 class="mb-2">
+                                <%= specificAddress.name %>
+                            </h6>
+                            <p class="mb-1 text-muted">
+                                <%= specificAddress.addressType %>
+                            </p>
+                            <p class="mb-1 text-muted">
+                                <%= specificAddress.landMark %>
+                            </p>
+                            <p class="mb-1 text-muted">
+                                <%= specificAddress.city %>, <%= specificAddress.state %>
+                                        <%= specificAddress.pincode %>
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Phone:</div>
-                    <div class="info-value"><%= order.user.phone %></div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Address:</div>
-                    <div class="info-value"> <h6 class="mb-2"><%= specificAddress.name %></h6><p class="mb-1 text-muted"><%= specificAddress.addressType %></p>
-                        <p class="mb-1 text-muted"><%= specificAddress.landMark %></p>
-                        <p class="mb-1 text-muted">
-                          <%= specificAddress.city %>, <%= specificAddress.state %> <%=
-                          specificAddress.pincode %>
-                        </p></div>
-                </div>
-            </div>
 
-            <div class="info-card">
-                <h2 class="card-title">Order Summary</h2>
-                <div class="info-item">
-                    <div class="info-label">Subtotal:</div>
-                    <div class="info-value">₹<%= order.subtotal.toFixed(2)  %></div>
-                </div>
-                <% if (order.productdiscount>0) { %>
-                <div class="info-item">
-                    <div class="info-label">Product Discount:</div>
-                    <div class="info-value negative-value">-₹<%= order.productdiscount.toFixed(2) %></div>
-                </div>
-                <% } %> <% if (order.couponDiscount > 0) { %>
-                <div class="info-item">
-                    <div class="info-label">Coupon Discount:</div>
-                    <div class="info-value">-₹<%= order.couponDiscount.toFixed(2) %></div>
-                </div>
-                <% } %>
-                <div class="info-item">
-                    <div class="info-label">Total:</div>
-                    <div class="info-value">₹<%= order.finalAmount.toFixed(2) %></div>
+                <div class="info-card">
+                    <h2 class="card-title">Order Summary</h2>
+                    <div class="info-item">
+                        <div class="info-label">Subtotal:</div>
+                        <div class="info-value">₹<%= order.subtotal.toFixed(2) %>
+                        </div>
+                    </div>
+                    <% if (order.productdiscount>0) { %>
+                        <div class="info-item">
+                            <div class="info-label">Product Discount:</div>
+                            <div class="info-value negative-value">-₹<%= order.productdiscount.toFixed(2) %>
+                            </div>
+                        </div>
+                        <% } %>
+                            <% if (order.couponDiscount> 0) { %>
+                                <div class="info-item">
+                                    <div class="info-label">Coupon Discount:</div>
+                                    <div class="info-value">-₹<%= order.couponDiscount.toFixed(2) %>
+                                    </div>
+                                </div>
+                                <% } %>
+                                    <div class="info-item">
+                                        <div class="info-label">Total:</div>
+                                        <div class="info-value">₹<%= order.finalAmount.toFixed(2) %>
+                                        </div>
+                                    </div>
                 </div>
             </div>
-        </div>
             <div class="items-card">
                 <table class="items-table">
                     <thead>
@@ -392,55 +421,58 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <% if (item.status === 'Return request') { %>
-                                        <button class="edit-status-btn approve-btn" onclick="approveReturn('<%= item._id %>')">
+                                    <% if (item.status==='Return request' ) { %>
+                                        <button class="edit-status-btn approve-btn"
+                                            onclick="approveReturn('<%= item._id %>')">
                                             Approve Return
                                         </button>
-                                        <button class="edit-status-btn decline-btn" onclick="declineReturn('<%= item._id %>')">
+                                        <button class="edit-status-btn decline-btn"
+                                            onclick="declineReturn('<%= item._id %>')">
                                             Decline Return
                                         </button>
-                                    <% } else if (!['Cancelled', 'Returned', 'Return request'].includes(item.status)) { %>
-                                        <button class="edit-status-btn" onclick="status('<%= item._id %>')">
-                                            Edit Status
-                                        </button>
-                                    <% } %>
+                                        <% } else if (!['Cancelled', 'Returned' , 'Return request'
+                                            ].includes(item.status)) { %>
+                                            <button class="edit-status-btn" onclick="status('<%= item._id %>')">
+                                                Edit Status
+                                            </button>
+                                            <% } %>
                                 </td>
                             </tr>
                             <% }); %>
                     </tbody>
                 </table>
 
-                <% if (order.orderedItems.some((s) => s.cancelReason)) { %>
+                <% if (order.orderedItems.some((s)=> s.cancelReason)) { %>
                     <div class="cancelled-section">
                         <div class="info-label">Cancelled Items:</div>
                         <% order.orderedItems.forEach(item=> { %>
                             <% if (item.cancelReason) { %>
-                            <div>
-                                <%= item.products.productName %>: <%= item.cancelReason %>
-                            </div>
-                            <% } %>
-                            <% }); %>
-                    </div>
-                    <% } %>
-                    <% if (order.orderedItems.some((s) => s.returnReason )) { %>
-                    
-                        <div class="returned-section">
-                            <div class="info-label">Returned Items:</div>
-
-                            <% order.orderedItems.forEach(item=> { %>
-                                <% if (item.returnReason) { %>
                                 <div>
-                                    <%= item.products.productName %>: <%= item.returnReason %>
+                                    <%= item.products.productName %>: <%= item.cancelReason %>
                                 </div>
                                 <% } %>
-                                <% }); %>
-                        </div>
-                        <% } %>
-    
+                                    <% }); %>
+                    </div>
+                    <% } %>
+                        <% if (order.orderedItems.some((s)=> s.returnReason )) { %>
 
-                        <div class="total-amount">
-                            Total: ₹<%= order.finalAmount.toFixed(2) %>
-                        </div>
+                            <div class="returned-section">
+                                <div class="info-label">Returned Items:</div>
+
+                                <% order.orderedItems.forEach(item=> { %>
+                                    <% if (item.returnReason) { %>
+                                        <div>
+                                            <%= item.products.productName %>: <%= item.returnReason %>
+                                        </div>
+                                        <% } %>
+                                            <% }); %>
+                            </div>
+                            <% } %>
+
+
+                                <div class="total-amount">
+                                    Total: ₹<%= order.finalAmount.toFixed(2) %>
+                                </div>
             </div>
         </div>
 
@@ -459,10 +491,11 @@
                     <option value="Returned">Returned</option>
                 </select>
                 <br>
-              
+
                 <div id="cancelReasonContainer" style="display: none;">
                     <label for="cancelReason" class="cancel-reason-label">Cancellation Reason:</label>
-                    <textarea id="cancelReason" rows="3" placeholder="Please provide a reason for cancellation"></textarea>
+                    <textarea id="cancelReason" rows="3"
+                        placeholder="Please provide a reason for cancellation"></textarea>
                 </div>
                 <button class="save-status-btn" onclick="updateStatus()">Save Changes</button>
             </div>
@@ -478,22 +511,22 @@
         function status(itemId) {
             currentItemId = itemId;
             document.getElementById('status').style.display = 'block';
-            
-            
+
+
             const cancelReasonContainer = document.getElementById('cancelReasonContainer');
             cancelReasonContainer.style.display = 'none';
             document.getElementById('cancelReason').value = '';
-            
-           
+
+
             const statusSelect = document.getElementById('statusSelect');
             statusSelect.value = "pending";
-            
-            
+
+
             const newStatusSelect = statusSelect.cloneNode(true);
             statusSelect.parentNode.replaceChild(newStatusSelect, statusSelect);
-            
-           
-            newStatusSelect.addEventListener('change', function() {
+
+
+            newStatusSelect.addEventListener('change', function () {
                 if (this.value === 'Cancelled') {
                     cancelReasonContainer.style.display = 'block';
                 } else {
@@ -509,7 +542,7 @@
         function updateStatus() {
             const newStatus = document.getElementById('statusSelect').value;
             let cancelReason = '';
-            
+
             if (newStatus === 'Cancelled') {
                 cancelReason = document.getElementById('cancelReason').value;
                 if (!cancelReason.trim()) {
@@ -527,41 +560,41 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     status: newStatus,
                     cancelReason: cancelReason
                 })
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => Promise.reject(err));
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Status Updated',
+                            text: 'The order status has been successfully updated.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            changeStatus();
+                            location.reload();
+                        });
+                    } else {
+                        throw new Error(data.error || 'Error updating status');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Status Updated',
-                        text: 'The order status has been successfully updated.',
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        changeStatus();
-                        location.reload();
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.error || error.message || 'Something went wrong. Please try again.',
                     });
-                } else {
-                    throw new Error(data.error || 'Error updating status');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.error || error.message || 'Something went wrong. Please try again.',
                 });
-            });
         }
 
         window.onclick = function (event) {
@@ -571,102 +604,102 @@
         };
 
         function approveReturn(itemId) {
-        Swal.fire({
-            title: 'Confirm Return Approval',
-            text: 'Are you sure you want to approve this return request?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, approve it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/admin/orders/approve-return/${itemId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => Promise.reject(err));
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: data.message || 'Return request approved successfully',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            location.reload();
+            Swal.fire({
+                title: 'Confirm Return Approval',
+                text: 'Are you sure you want to approve this return request?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, approve it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/orders/approve-return/${itemId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => Promise.reject(err));
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: data.message || 'Return request approved successfully',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                throw new Error(data.error || 'Error processing return');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: error.error || 'Something went wrong. Please try again.',
+                            });
                         });
-                    } else {
-                        throw new Error(data.error || 'Error processing return');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.error || 'Something went wrong. Please try again.',
-                    });
-                });
-            }
-        });
-    }
+                }
+            });
+        }
 
-    function declineReturn(itemId) {
-        Swal.fire({
-            title: 'Confirm Return Decline',
-            text: 'Are you sure you want to decline this return request?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, decline it'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/admin/orders/decline-return/${itemId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => Promise.reject(err));
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: data.message || 'Return request declined successfully',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            location.reload();
+        function declineReturn(itemId) {
+            Swal.fire({
+                title: 'Confirm Return Decline',
+                text: 'Are you sure you want to decline this return request?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, decline it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/orders/decline-return/${itemId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => Promise.reject(err));
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: data.message || 'Return request declined successfully',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                throw new Error(data.error || 'Error declining return');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: error.error || 'Something went wrong. Please try again.',
+                            });
                         });
-                    } else {
-                        throw new Error(data.error || 'Error declining return');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.error || 'Something went wrong. Please try again.',
-                    });
-                });
-            }
-        });
-    }
+                }
+            });
+        }
     </script>
 
     <%- include("../../views/partials/admin/footer") %>

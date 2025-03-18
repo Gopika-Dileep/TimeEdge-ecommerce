@@ -1,621 +1,619 @@
 <%- include("../../views/partials/user/header") %>
 
-<div class="container mt-4 mb-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h5 class="mb-1">
-        Order #<span class="text-success"><%= order.orderId %></span>
-      </h5>
-      <p class="text-muted mb-0">
-        Placed on <%= new Date(order.createdOn).toLocaleDateString() %> at <%=
-        new Date(order.createdOn).toLocaleTimeString() %>
-      </p>
-    </div>
-    <% if (order.paymentStatus === 'Failed') { %>
-      <div class="d-flex align-items-center">
-        <button 
-          class="btn btn-outline-primary btn-sm" 
-          onclick="initiateRepayment('<%= order.orderId %>')">
-                  Repay
-        </button>
+  <div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h5 class="mb-1">
+          Order #<span class="text-success">
+            <%= order.orderId %>
+          </span>
+        </h5>
+        <p class="text-muted mb-0">
+          Placed on <%= new Date(order.createdOn).toLocaleDateString() %> at <%= new
+              Date(order.createdOn).toLocaleTimeString() %>
+        </p>
       </div>
-    <% } else { %>
-      <span class="badge bg-secondary px-3 py-2 text-uppercase"
-        ><%= order.status %></span
-    >
-    <% } %>
-  </div>
+      <% if (order.paymentStatus==='Failed' ) { %>
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-primary btn-sm" onclick="initiateRepayment('<%= order.orderId %>')">
+            Repay
+          </button>
+        </div>
+        <% } else { %>
+          <span class="badge bg-secondary px-3 py-2 text-uppercase">
+            <%= order.status %>
+          </span>
+          <% } %>
+    </div>
 
-  <div class="card mb-4">
-    <div class="card-body">
-      <% order.orderedItems.forEach((item, index) => { %>
-      <div class="order-item <%= index !== 0 ? 'border-top mt-3 pt-3' : '' %>">
-        <div class="d-flex align-items-center position-relative">
-          <a href="/productDetails?id=<%= item.products._id %>">
-          <img
-          
-            src="/uploads/productImages/<%= item.products.productImage[0] %>"
-            alt="<%= item.products.productName %>"
-            class="me-3 rounded"
-            style="width: 100px; height: 100px; object-fit: cover"
-          />
-            </a>
-          <div class="flex-grow-1">
-            <h6 class="mb-1 product-name"><%= item.products.productName %></h6>
-            <div class="product-details">
-             
-              <p class="mb-1 text-muted">Quantity: <%= item.quantity %></p>
-              <div class="d-flex align-items-center gap-2">
-                <span
-                  class="badge bg-<%= item.status.toLowerCase() === 'delivered' ? 'success' : item.status.toLowerCase() === 'cancelled' ? 'danger' : 'secondary' %>"
-                >
-                  <%= item.status %>
-                </span>
-                <% if (item.cancelReason) { %>
-                <small class="text-danger"><%= item.cancelReason %></small>
-                <% } %>
-                <% if (item.returnReason) { %>
-                  <small class="text-danger"><%= item.returnReason %></small>
-                  <% } %>
+    <div class="card mb-4">
+      <div class="card-body">
+        <% order.orderedItems.forEach((item, index)=> { %>
+          <div class="order-item <%= index !== 0 ? 'border-top mt-3 pt-3' : '' %>">
+            <div class="d-flex align-items-center position-relative">
+              <a href="/productDetails?id=<%= item.products._id %>">
+                <img src="/uploads/productImages/<%= item.products.productImage[0] %>"
+                  alt="<%= item.products.productName %>" class="me-3 rounded"
+                  style="width: 100px; height: 100px; object-fit: cover" />
+              </a>
+              <div class="flex-grow-1">
+                <h6 class="mb-1 product-name">
+                  <%= item.products.productName %>
+                </h6>
+                <div class="product-details">
+
+                  <p class="mb-1 text-muted">Quantity: <%= item.quantity %>
+                  </p>
+                  <div class="d-flex align-items-center gap-2">
+                    <span
+                      class="badge bg-<%= item.status.toLowerCase() === 'delivered' ? 'success' : item.status.toLowerCase() === 'cancelled' ? 'danger' : 'secondary' %>">
+                      <%= item.status %>
+                    </span>
+                    <% if (item.cancelReason) { %>
+                      <small class="text-danger">
+                        <%= item.cancelReason %>
+                      </small>
+                      <% } %>
+                        <% if (item.returnReason) { %>
+                          <small class="text-danger">
+                            <%= item.returnReason %>
+                          </small>
+                          <% } %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-end ms-3">
+                <h6 class="mb-1 price">₹<%= item.price.toFixed(2) %>
+                </h6>
+                <div class="mt-2 action-buttons">
+                  <% if (!item.cancelReason && item.status==='delivered' && item.status.toLowerCase() !=='returned' ) {
+                    %>
+                    <button class="btn btn-outline-primary btn-sm"
+                      onclick="showReturnModal('<%= item.products._id %>', '<%= order._id %>')">
+                      <i class="bi bi-arrow-return-left"></i> Return
+                    </button>
+                    <% } %>
+                      <% if (!item.cancelReason && !['cancelled', 'delivered' , 'returned' ,'shipped','return
+                        request'].includes(item.status.toLowerCase())) { %>
+                        <button class="btn btn-outline-danger btn-sm ms-2" onclick="showCancelModal('<%= item._id %>')">
+                          <i class="bi bi-x-circle"></i> Cancel
+                        </button>
+                        <% } %>
+                </div>
               </div>
             </div>
           </div>
+          <% }); %>
+      </div>
+    </div>
 
-          <div class="text-end ms-3">
-            <h6 class="mb-1 price">₹<%= item.price.toFixed(2) %></h6>
-            <div class="mt-2 action-buttons">
-              <% if (!item.cancelReason && item.status === 'delivered' &&
-              item.status.toLowerCase() !== 'returned') { %>
-              <button
-                class="btn btn-outline-primary btn-sm"
-                onclick="showReturnModal('<%= item.products._id %>', '<%= order._id %>')"
-              >
-                <i class="bi bi-arrow-return-left"></i> Return
-              </button>
-              <% } %> <% if (!item.cancelReason && !['cancelled', 'delivered',
-              'returned','shipped','return request'].includes(item.status.toLowerCase())) { %>
-              <button
-                class="btn btn-outline-danger btn-sm ms-2"
-                onclick="showCancelModal('<%= item._id %>')"
-              >
-                <i class="bi bi-x-circle"></i> Cancel
-              </button>
-              <% } %>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-credit-card me-2"></i>Payment Information
+            </h6>
+            <p class="mb-2">
+              <i class="bi bi-wallet2 me-2"></i>
+              <%= order.paymentMethod %>
+            </p>
+            <p class="mb-0">Status:<span class="text-success">
+                <%=order.paymentStatus%>
+              </span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-truck me-2"></i>Shipping Details
+            </h6>
+            <h6 class="mb-2">
+              <%= specificAddress.name %>
+            </h6>
+            <p class="mb-1 text-muted">
+              <%= specificAddress.addressType %>
+            </p>
+            <p class="mb-1 text-muted">
+              <%= specificAddress.landMark %>
+            </p>
+            <p class="mb-1 text-muted">
+              <%= specificAddress.city %>, <%= specificAddress.state %>
+                  <%= specificAddress.pincode %>
+            </p>
+            <p class="mb-0">
+              <i class="bi bi-telephone me-2"></i>
+              <%= specificAddress.phone %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-receipt me-2"></i>Order Summary
+            </h6>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Subtotal</span>
+              <span>₹<%= order.subtotal.toFixed(2) %></span>
             </div>
+            <% if (order.productdiscount> 0) { %>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Product Discount</span>
+                <span class="text-success">-₹<%= order.productdiscount.toFixed(2) %></span>
+              </div>
+              <% } %>
+                <% if (order.couponDiscount> 0) { %>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Coupon Discount</span>
+                    <span class="text-success">-₹<%= order.couponDiscount.toFixed(2) %></span>
+                  </div>
+                  <% } %>
+                    <hr />
+                    <div class="d-flex justify-content-between fw-bold">
+                      <span>Total</span>
+                      <span>₹<%= order.finalAmount.toFixed(2) %></span>
+                    </div>
           </div>
-        </div>
-      </div>
-      <% }); %>
-    </div>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h6 class="card-title mb-3">
-            <i class="bi bi-credit-card me-2"></i>Payment Information
-          </h6>
-          <p class="mb-2">
-            <i class="bi bi-wallet2 me-2"></i>
-            <%= order.paymentMethod %>
-          </p>
-          <p class="mb-0">Status:<span class="text-success"><%=order.paymentStatus%> </span></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h6 class="card-title mb-3">
-            <i class="bi bi-truck me-2"></i>Shipping Details
-          </h6>
-          <h6 class="mb-2"><%= specificAddress.name %></h6>
-          <p class="mb-1 text-muted"><%= specificAddress.addressType %></p>
-          <p class="mb-1 text-muted"><%= specificAddress.landMark %></p>
-          <p class="mb-1 text-muted">
-            <%= specificAddress.city %>, <%= specificAddress.state %> <%=
-            specificAddress.pincode %>
-          </p>
-          <p class="mb-0">
-            <i class="bi bi-telephone me-2"></i><%= specificAddress.phone %>
-          </p>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-body">
-          <h6 class="card-title mb-3">
-            <i class="bi bi-receipt me-2"></i>Order Summary
-          </h6>
-          <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted">Subtotal</span>
-            <span>₹<%= order.subtotal.toFixed(2) %></span>
-          </div>
-          <% if (order.productdiscount > 0) { %>
-          <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted">Product Discount</span>
-            <span class="text-success"
-              >-₹<%= order.productdiscount.toFixed(2) %></span
-            >
-          </div>
-          <% } %> <% if (order.couponDiscount > 0) { %>
-          <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted">Coupon Discount</span>
-            <span class="text-success"
-              >-₹<%= order.couponDiscount.toFixed(2) %></span
-            >
-          </div>
+    <div class="card mt-4">
+      <div class="card-body">
+        <h6 class="card-title mb-3">
+          <i class="bi bi-question-circle me-2"></i>Need Help?
+        </h6>
+        <p class="mb-0">
+          If you have any questions about your order, please contact our customer
+          support at
+          <a href="tel:+918714479949" class="text-decoration-none">
+            <i class="bi bi-telephone me-1"></i>+91 87144 79949
+          </a>
+          or
+          <a href="mailto:timeedge@support.com" class="text-decoration-none">
+            <i class="bi bi-envelope me-1"></i>timeedge@support.com
+          </a>
+        </p>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <% const allReturnedOrCancelled=order.orderedItems.every(item=>
+        item.status === "Returned" || item.status === "Cancelled" || item.status!=="delivered"
+        );
+        %>
+
+        <% if (!allReturnedOrCancelled) { %>
+          <button onclick="downloadInvoice('<%= order.orderId %>')" class="btn btn-primary">
+            <i class="bi bi-download me-2"></i>Download Invoice
+          </button>
           <% } %>
-          <hr />
-          <div class="d-flex justify-content-between fw-bold">
-            <span>Total</span>
-            <span>₹<%= order.finalAmount.toFixed(2) %></span>
-          </div>
-        </div>
+    </div>
+  </div>
+
+  <div id="cancelModal" class="modal">
+    <div class="modal-content">
+      <h3>Cancellation Reason</h3>
+      <textarea id="cancelReason" placeholder="Please provide a reason for cancellation"></textarea>
+      <div class="modal-buttons">
+        <button id="confirmCancel" class="confirm-btn">Confirm</button>
+        <button id="closeModal" class="close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+  <div id="returnModal" class="modal">
+    <div class="modal-content">
+      <h3>Return Reason</h3>
+      <textarea id="returnReason" placeholder="Please provide a reason for returning"></textarea>
+      <div class="modal-buttons">
+        <button id="confirmReturn" class="confirm-btn">Confirm</button>
+        <button id="closeReturnModal" class="close-btn">Close</button>
       </div>
     </div>
   </div>
 
-  <div class="card mt-4">
-    <div class="card-body">
-      <h6 class="card-title mb-3">
-        <i class="bi bi-question-circle me-2"></i>Need Help?
-      </h6>
-      <p class="mb-0">
-        If you have any questions about your order, please contact our customer
-        support at
-        <a href="tel:+918714479949" class="text-decoration-none">
-          <i class="bi bi-telephone me-1"></i>+91 87144 79949
-        </a>
-        or
-        <a href="mailto:timeedge@support.com" class="text-decoration-none">
-          <i class="bi bi-envelope me-1"></i>timeedge@support.com
-        </a>
-      </p>
-    </div>
-  </div>
-  <div class="text-center mt-4">
-    <% 
-const allReturnedOrCancelled = order.orderedItems.every(item => 
-    item.status === "Returned" || item.status === "Cancelled" || item.status!=="delivered"
-); 
-%>
-
-<% if (!allReturnedOrCancelled) { %>
-  <button onclick="downloadInvoice('<%= order.orderId %>')" class="btn btn-primary">
-    <i class="bi bi-download me-2"></i>Download Invoice
-  </button>
-<% } %>
-</div>
-</div>
-
-<div id="cancelModal" class="modal">
-  <div class="modal-content">
-    <h3>Cancellation Reason</h3>
-    <textarea
-      id="cancelReason"
-      placeholder="Please provide a reason for cancellation"
-    ></textarea>
-    <div class="modal-buttons">
-      <button id="confirmCancel" class="confirm-btn">Confirm</button>
-      <button id="closeModal" class="close-btn">Close</button>
-    </div>
-  </div>
-</div>
-<div id="returnModal" class="modal">
-  <div class="modal-content">
-    <h3>Return Reason</h3>
-    <textarea
-      id="returnReason"
-      placeholder="Please provide a reason for returning"
-    ></textarea>
-    <div class="modal-buttons">
-      <button id="confirmReturn" class="confirm-btn">Confirm</button>
-      <button id="closeReturnModal" class="close-btn">Close</button>
-    </div>
-  </div>
-</div>
-
-<style>
-  .container {
-    max-width: 1000px;
-  }
-
-  .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-  }
-
-  .modal-content {
-    background: white;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    margin: 10vh auto;
-    padding: 1.5rem;
-  }
-
-  .modal-content h3 {
-    margin-bottom: 1rem;
-    color: #1a1a1a;
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
-
-  .modal-content textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    min-height: 100px;
-    font-size: 0.95rem;
-  }
-
-  .modal-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-  }
-
-  .modal-buttons button {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-  }
-
-  .confirm-btn {
-    background-color: #2563eb;
-    color: white;
-  }
-
-  .close-btn {
-    background-color: #e5e7eb;
-    color: #4b5563;
-  }
-
-  .card {
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s ease;
-  }
-
-  .card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .badge {
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    padding: 0.5em 0.75em;
-  }
-
-  .btn-outline-primary,
-  .btn-outline-danger {
-    border-width: 1px;
-    font-size: 0.875rem;
-    padding: 0.25rem 0.75rem;
-  }
-
-  .text-success {
-    color: #2e7d32 !important;
-  }
-
-  .card-title {
-    color: #333;
-    font-weight: 600;
-    font-size: 1rem;
-  }
-
-  .product-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #2c3e50;
-  }
-
-  .product-details {
-    font-size: 0.9rem;
-  }
-
-  .price {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #2c3e50;
-  }
-
-  .action-buttons {
-    white-space: nowrap;
-  }
-
-  hr {
-    margin: 1rem 0;
-    opacity: 0.15;
-  }
-
-  .text-muted {
-    color: #6c757d !important;
-  }
-
-  .order-item:not(:first-child) {
-    border-top: 1px solid #e0e0e0;
-    margin-top: 1rem;
-    padding-top: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    .action-buttons {
-      margin-top: 1rem;
-      display: flex;
-      justify-content: flex-start;
+  <style>
+    .container {
+      max-width: 1000px;
     }
 
-    .order-item {
-      flex-direction: column;
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
     }
 
-    .product-image {
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      margin: 10vh auto;
+      padding: 1.5rem;
+    }
+
+    .modal-content h3 {
       margin-bottom: 1rem;
+      color: #1a1a1a;
+      font-size: 1.1rem;
+      font-weight: 500;
     }
-  }
-</style>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-  let currentItemId = null;
-  let currentOrderId = null;
+    .modal-content textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      min-height: 100px;
+      font-size: 0.95rem;
+    }
 
-  function showCancelModal(itemId) {
-    currentItemId = itemId;
-    document.getElementById("cancelModal").style.display = "block";
-    document.getElementById("cancelReason").value = "";
-  }
+    .modal-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
 
-  function showReturnModal(itemId, orderId) {
-    currentItemId = itemId;
-    currentOrderId = orderId;
-    document.getElementById("returnModal").style.display = "block";
-    document.getElementById("returnReason").value = "";
-  }
+    .modal-buttons button {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+    }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const cancelModal = document.getElementById("cancelModal");
-    const closeBtn = document.getElementById("closeModal");
-    const confirmBtn = document.getElementById("confirmCancel");
-    const cancelReasonText = document.getElementById("cancelReason");
+    .confirm-btn {
+      background-color: #2563eb;
+      color: white;
+    }
 
-    const returnModal = document.getElementById("returnModal");
-    const closeReturnBtn = document.getElementById("closeReturnModal");
-    const confirmReturnBtn = document.getElementById("confirmReturn");
-    const returnReasonText = document.getElementById("returnReason");
+    .close-btn {
+      background-color: #e5e7eb;
+      color: #4b5563;
+    }
 
-    closeBtn.onclick = () => (cancelModal.style.display = "none");
-    closeReturnBtn.onclick = () => (returnModal.style.display = "none");
+    .card {
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.3s ease;
+    }
 
-    window.onclick = function (event) {
-      if (event.target == cancelModal) cancelModal.style.display = "none";
-      if (event.target == returnModal) returnModal.style.display = "none";
-    };
+    .card:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-    confirmBtn.onclick = function () {
-      const reason = cancelReasonText.value;
-      if (!reason.trim()) {
-        Swal.fire({
-          icon: "warning",
-          title: "Missing Reason",
-          text: "Please provide a reason for cancellation.",
-          confirmButtonText: "OK",
-        });
-        return;
+    .badge {
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      padding: 0.5em 0.75em;
+    }
+
+    .btn-outline-primary,
+    .btn-outline-danger {
+      border-width: 1px;
+      font-size: 0.875rem;
+      padding: 0.25rem 0.75rem;
+    }
+
+    .text-success {
+      color: #2e7d32 !important;
+    }
+
+    .card-title {
+      color: #333;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .product-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .product-details {
+      font-size: 0.9rem;
+    }
+
+    .price {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .action-buttons {
+      white-space: nowrap;
+    }
+
+    hr {
+      margin: 1rem 0;
+      opacity: 0.15;
+    }
+
+    .text-muted {
+      color: #6c757d !important;
+    }
+
+    .order-item:not(:first-child) {
+      border-top: 1px solid #e0e0e0;
+      margin-top: 1rem;
+      padding-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .action-buttons {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: flex-start;
       }
 
-      const orderId = window.location.search.split('id=')[1];
-
-      fetch(`/orders/${orderId}/cancel-item`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          itemId: currentItemId,
-          reason: reason,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            cancelModal.style.display = "none";
-            Swal.fire({
-              icon: "success",
-              title: "Product Cancelled",
-              text: "The product has been cancelled successfully.",
-              confirmButtonText: "OK",
-            }).then(() => {
-              window.location.reload();
-            });
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: data.message || "Failed to cancel item",
-              confirmButtonText: "OK",
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Failed to cancel item. Please try again.",
-            confirmButtonText: "OK",
-          });
-        });
-    };
-
-    confirmReturnBtn.onclick = function () {
-      const reason = returnReasonText.value;
-      if (!reason.trim()) {
-        Swal.fire({
-          icon: "warning",
-          title: "Missing Reason",
-          text: "Please provide a reason for returning the item",
-          confirmButtonText: "OK",
-        });
-        return;
+      .order-item {
+        flex-direction: column;
       }
 
-      fetch(`/returnorder/${currentOrderId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          productId: currentItemId,
-          reason: reason,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            returnModal.style.display = "none";
-            Swal.fire({
-              icon: "success",
-              title: "Return Initiated",
-              text: "Your return request has been submitted successfully.",
-              confirmButtonText: "OK",
-            }).then(() => {
-              window.location.reload();
-            });
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: data.message || "Failed to process return request",
-              confirmButtonText: "OK",
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Failed to process return request. Please try again.",
-            confirmButtonText: "OK",
-          });
-        });
-    };
-  });
+      .product-image {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
 
-  function initiateRepayment(orderId) {
-  fetch('/initiateRepayment', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ orderId })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      const { orderId,orderCreatedId, amount, currency, key } = data;
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    let currentItemId = null;
+    let currentOrderId = null;
 
-      const options = {
-        key,
-        amount: amount,
-        currency,
-        name: "Time Edge",
-        description: "Order Repayment",
-        order_id: orderId,
-        handler: async function (response) {
-          const paymentId = response.razorpay_payment_id;
-          const razorpaySignature = response.razorpay_signature;
+    function showCancelModal(itemId) {
+      currentItemId = itemId;
+      document.getElementById("cancelModal").style.display = "block";
+      document.getElementById("cancelReason").value = "";
+    }
 
-          const verifyResponse = await fetch("/verifyRepaymentOrder", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              orderId:orderCreatedId,
-              razorpayOrderId:orderId,
-              paymentId,
-              razorpaySignature
-            }),
-          });
+    function showReturnModal(itemId, orderId) {
+      currentItemId = itemId;
+      currentOrderId = orderId;
+      document.getElementById("returnModal").style.display = "block";
+      document.getElementById("returnReason").value = "";
+    }
 
-          const verifyData = await verifyResponse.json();
-          if (verifyData.success) {
-            Swal.fire({
-              title: "Payment Success",
-              text: "Order Repayment Successful.",
-              icon: "success",
-              confirmButtonText: "OK",
-            }).then(() => window.location.reload());
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Payment Failed",
-              text: "Payment verification failed. Please try again.",
-              confirmButtonText: "OK",
-            });
-          }
-        },
-        modal: {
-          ondismiss: async function () {
-            Swal.fire({
-              icon: "error",
-              title: "Payment Cancelled",
-              text: "Repayment was cancelled.",
-              confirmButtonText: "OK",
-            });
-          }
-        },
-        theme: { color: "#3399cc" },
+    document.addEventListener("DOMContentLoaded", function () {
+      const cancelModal = document.getElementById("cancelModal");
+      const closeBtn = document.getElementById("closeModal");
+      const confirmBtn = document.getElementById("confirmCancel");
+      const cancelReasonText = document.getElementById("cancelReason");
+
+      const returnModal = document.getElementById("returnModal");
+      const closeReturnBtn = document.getElementById("closeReturnModal");
+      const confirmReturnBtn = document.getElementById("confirmReturn");
+      const returnReasonText = document.getElementById("returnReason");
+
+      closeBtn.onclick = () => (cancelModal.style.display = "none");
+      closeReturnBtn.onclick = () => (returnModal.style.display = "none");
+
+      window.onclick = function (event) {
+        if (event.target == cancelModal) cancelModal.style.display = "none";
+        if (event.target == returnModal) returnModal.style.display = "none";
       };
 
-      const rzp = new Razorpay(options);
-      rzp.open();
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: data.message,
-        confirmButtonText: "OK",
-      });
-    }
-  })
-  .catch(error => {
-    console.error("Error initiating repayment:", error);
-    Swal.fire({
-      title: "Error",
-      text: "An error occurred while processing the repayment.",
-      icon: "error",
-      confirmButtonText: "OK",
+      confirmBtn.onclick = function () {
+        const reason = cancelReasonText.value;
+        if (!reason.trim()) {
+          Swal.fire({
+            icon: "warning",
+            title: "Missing Reason",
+            text: "Please provide a reason for cancellation.",
+            confirmButtonText: "OK",
+          });
+          return;
+        }
+
+        const orderId = window.location.search.split('id=')[1];
+
+        fetch(`/orders/${orderId}/cancel-item`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            itemId: currentItemId,
+            reason: reason,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              cancelModal.style.display = "none";
+              Swal.fire({
+                icon: "success",
+                title: "Product Cancelled",
+                text: "The product has been cancelled successfully.",
+                confirmButtonText: "OK",
+              }).then(() => {
+                window.location.reload();
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message || "Failed to cancel item",
+                confirmButtonText: "OK",
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Failed to cancel item. Please try again.",
+              confirmButtonText: "OK",
+            });
+          });
+      };
+
+      confirmReturnBtn.onclick = function () {
+        const reason = returnReasonText.value;
+        if (!reason.trim()) {
+          Swal.fire({
+            icon: "warning",
+            title: "Missing Reason",
+            text: "Please provide a reason for returning the item",
+            confirmButtonText: "OK",
+          });
+          return;
+        }
+
+        fetch(`/returnorder/${currentOrderId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productId: currentItemId,
+            reason: reason,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              returnModal.style.display = "none";
+              Swal.fire({
+                icon: "success",
+                title: "Return Initiated",
+                text: "Your return request has been submitted successfully.",
+                confirmButtonText: "OK",
+              }).then(() => {
+                window.location.reload();
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message || "Failed to process return request",
+                confirmButtonText: "OK",
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Failed to process return request. Please try again.",
+              confirmButtonText: "OK",
+            });
+          });
+      };
     });
-  });
-}
 
-function downloadInvoice(orderId) {
-  window.location.href = `/download-invoice/${orderId}`;
-}
+    function initiateRepayment(orderId) {
+      fetch('/initiateRepayment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const { orderId, orderCreatedId, amount, currency, key } = data;
+
+            const options = {
+              key,
+              amount: amount,
+              currency,
+              name: "Time Edge",
+              description: "Order Repayment",
+              order_id: orderId,
+              handler: async function (response) {
+                const paymentId = response.razorpay_payment_id;
+                const razorpaySignature = response.razorpay_signature;
+
+                const verifyResponse = await fetch("/verifyRepaymentOrder", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    orderId: orderCreatedId,
+                    razorpayOrderId: orderId,
+                    paymentId,
+                    razorpaySignature
+                  }),
+                });
+
+                const verifyData = await verifyResponse.json();
+                if (verifyData.success) {
+                  Swal.fire({
+                    title: "Payment Success",
+                    text: "Order Repayment Successful.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                  }).then(() => window.location.reload());
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Payment Failed",
+                    text: "Payment verification failed. Please try again.",
+                    confirmButtonText: "OK",
+                  });
+                }
+              },
+              modal: {
+                ondismiss: async function () {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Payment Cancelled",
+                    text: "Repayment was cancelled.",
+                    confirmButtonText: "OK",
+                  });
+                }
+              },
+              theme: { color: "#3399cc" },
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: data.message,
+              confirmButtonText: "OK",
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error initiating repayment:", error);
+          Swal.fire({
+            title: "Error",
+            text: "An error occurred while processing the repayment.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        });
+    }
+
+    function downloadInvoice(orderId) {
+      window.location.href = `/download-invoice/${orderId}`;
+    }
 
 
-</script>
+  </script>
 
-<%- include("../../views/partials/user/footer") %>
+  <%- include("../../views/partials/user/footer") %>

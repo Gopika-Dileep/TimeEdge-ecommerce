@@ -1,342 +1,352 @@
 <%- include("../../views/partials/admin/header") %>
-<style>
-  .content-main {
-    position: absolute;
-    top: 70px;
-    left: 240px;
-    width: calc(100% - 240px);
-    padding: 2rem;
-  }
-
-  @media (max-width: 1000px) {
+  <style>
     .content-main {
       position: absolute;
-      top: 50px;
-      left: 20px;
-      width: calc(100% - 30px);
+      top: 70px;
+      left: 240px;
+      width: calc(100% - 240px);
       padding: 2rem;
     }
-  }
 
-  .truncate {
-    max-width: 150px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    @media (max-width: 1000px) {
+      .content-main {
+        position: absolute;
+        top: 50px;
+        left: 20px;
+        width: calc(100% - 30px);
+        padding: 2rem;
+      }
+    }
 
-  .truncate-tooltip {
-    position: relative;
-  }
+    .truncate {
+      max-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  .truncate-tooltip:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    background: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: normal;
-    z-index: 100;
-  }
+    .truncate-tooltip {
+      position: relative;
+    }
 
-  .pagination-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
+    .truncate-tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      background: #333;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: normal;
+      z-index: 100;
+    }
 
-  .pagination {
-    display: flex;
-    list-style: none;
-    padding: 0;
-  }
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
 
-  .page-item {
-    margin: 0 5px;
-  }
+    .pagination {
+      display: flex;
+      list-style: none;
+      padding: 0;
+    }
 
-  .page-link {
-    display: block;
-    padding: 8px 12px;
-    color: #007bff;
-    text-decoration: none;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-  }
+    .page-item {
+      margin: 0 5px;
+    }
 
-  .page-item.active .page-link {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-  }
-</style>
-<section class="content-main">
-  <div class="content-header">
-    <div>
-      <h2 class="content-title card-title">Admin Sales Report</h2>
+    .page-link {
+      display: block;
+      padding: 8px 12px;
+      color: #007bff;
+      text-decoration: none;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+    }
+
+    .page-item.active .page-link {
+      background-color: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+  </style>
+  <section class="content-main">
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Admin Sales Report</h2>
+      </div>
+      <div class="download-buttons">
+        <button class="btn btn-primary" id="downloadPdf">Download PDF</button>
+        <button class="btn btn-primary" id="downloadExcel">Download Excel</button>
+      </div>
     </div>
-    <div class="download-buttons">
-      <button class="btn btn-primary" id="downloadPdf">Download PDF</button>
-      <button class="btn btn-primary" id="downloadExcel">Download Excel</button>
-    </div>
-  </div>
 
-  <div class="content-body">
-    <div class="row mb-4">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Sales Report Filters</h5>
-            <div class="row">
-              <div class="col-md-3">
-                <label for="report-type" class="form-label">Report Type</label>
-                <select
-                  id="filter-order"
-                  class="form-select"
-                  onchange="filterOrder()"
-                >
-                  <option value="custom">Default</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="yearly">Yearly</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <label for="start-date" class="form-label">Start Date</label>
-                <input type="date" id="start-date" class="form-control" />
-              </div>
-              <div class="col-md-3">
-                <label for="end-date" class="form-label">End Date</label>
-                <input type="date" id="end-date" class="form-control" />
-              </div>
-              <div class="col-md-3 d-flex align-items-end">
-                <button class="btn btn-primary w-100" onClick="filterByDate()">
-                  Filter
-                </button>
+    <div class="content-body">
+      <div class="row mb-4">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Sales Report Filters</h5>
+              <div class="row">
+                <div class="col-md-3">
+                  <label for="report-type" class="form-label">Report Type</label>
+                  <select id="filter-order" class="form-select" onchange="filterOrder()">
+                    <option value="custom">Default</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="start-date" class="form-label">Start Date</label>
+                  <input type="date" id="start-date" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label for="end-date" class="form-label">End Date</label>
+                  <input type="date" id="end-date" class="form-control" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                  <button class="btn btn-primary w-100" onClick="filterByDate()">
+                    Filter
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <div class="row">
+        <div class="col-md-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Total Orders</h5>
+              <h3 class="text-primary">
+                <%= saleCount %>
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Total Revenue</h5>
+              <h3 class="text-success">₹ <%= totalSalePrice %>
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Total Discounts</h5>
+              <h3 class="text-warning">₹ <%= Math.round(totalDiscount) %>
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Coupon Discount</h5>
+              <h3 class="text-danger">
+                <%= couponDiscount %>
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title">Sales Report</h5>
+            </div>
+            <div class="card-body">
+              <table id="salesTable" class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>User</th>
+                    <th>OrderId</th>
+                    <th>Price</th>
+                    <th>productDiscount</th>
+                    <th>couponDiscount</th>
+                    <th>Total</th>
+                    <th>Payment Method</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (order.length> 0) { %> <% order.forEach(order=> { %>
+
+                      <tr>
+                        <td>
+                          <%= new Date(order.createdOn).toLocaleDateString() %>
+                        </td>
+                        <td class="truncate truncate-tooltip"
+                          data-tooltip="<%= order.user ? order.user.name : 'N/A' %>">
+                          <%= order.user ? order.user.name : 'N/A' %>
+                        </td>
+                        <td class="truncate truncate-tooltip" data-tooltip="<%= order.orderId %>">
+                          <%= order.orderId %>
+                        </td>
+                        <td>₹ <%= order.subtotal%>
+                        </td>
+
+                        <td>₹ <%= order.productdiscount || 0 %>
+                        </td>
+                        <td>₹ <%= order.couponDiscount || 0 %>
+                        </td>
+                        <td>₹ <%= order.finalAmount %>
+                        </td>
+                        <td>
+                          <%= order.paymentMethod %>
+                        </td>
+                      </tr>
+                      <% }); %>
+                        <% } else { %>
+                          <tr>
+                            <td colspan="7" class="text-center">No orders found.</td>
+                          </tr>
+                          <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div class="row">
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Total Orders</h5>
-            <h3 class="text-primary"><%= saleCount %></h3>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Total Revenue</h5>
-            <h3 class="text-success">₹ <%= totalSalePrice %></h3>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Total Discounts</h5>
-            <h3 class="text-warning">₹ <%= Math.round(totalDiscount) %></h3>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Coupon Discount</h5>
-            <h3 class="text-danger"><%= couponDiscount %></h3>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mt-4">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title">Sales Report</h5>
-          </div>
-          <div class="card-body">
-            <table id="salesTable" class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>User</th>
-                  <th>OrderId</th>
-                  <th>Price</th>
-                  <th>productDiscount</th>
-                  <th>couponDiscount</th>
-                  <th>Total</th>
-                  <th>Payment Method</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% if (order.length> 0) { %> <% order.forEach(order=> { %>
-
-                <tr>
-                  <td><%= new Date(order.createdOn).toLocaleDateString() %></td>
-                  <td
-                    class="truncate truncate-tooltip"
-                    data-tooltip="<%= order.user ? order.user.name : 'N/A' %>"
-                  >
-                    <%= order.user ? order.user.name : 'N/A' %>
-                  </td>
-                  <td
-                    class="truncate truncate-tooltip"
-                    data-tooltip="<%= order.orderId %>"
-                  >
-                    <%= order.orderId %>
-                  </td>
-                  <td>₹ <%= order.subtotal%></td>
-
-                  <td>₹ <%= order.productdiscount || 0 %></td>
-                  <td>₹ <%= order.couponDiscount || 0 %></td>
-                  <td>₹ <%= order.finalAmount %></td>
-                  <td><%= order.paymentMethod %></td>
-                </tr>
-                <% }); %> <% } else { %>
-                <tr>
-                  <td colspan="7" class="text-center">No orders found.</td>
-                </tr>
+    <div class="pagination-container">
+      <% if (totalPage> 1) { %>
+        <ul class="pagination">
+          <% if (page> 1) { %>
+            <li class="page-item">
+              <a class="page-link" href="?page=<%= page - 1 %>">&laquo; Previous</a>
+            </li>
+            <% } %>
+              <% for (let i=1; i <=totalPage; i++) { %>
+                <li class="page-item <%= i === page ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>">
+                    <%= i %>
+                  </a>
+                </li>
                 <% } %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+                  <% if (page < totalPage) { %>
+                    <li class="page-item">
+                      <a class="page-link" href="?page=<%= page + 1 %>">Next &raquo;</a>
+                    </li>
+                    <% } %>
+        </ul>
+        <% } %>
     </div>
-  </div>
-  <div class="pagination-container">
-    <% if (totalPage> 1) { %>
-    <ul class="pagination">
-      <% if (page> 1) { %>
-      <li class="page-item">
-        <a class="page-link" href="?page=<%= page - 1 %>">&laquo; Previous</a>
-      </li>
-      <% } %> <% for (let i=1; i <=totalPage; i++) { %>
-      <li class="page-item <%= i === page ? 'active' : '' %>">
-        <a class="page-link" href="?page=<%= i %>"> <%= i %> </a>
-      </li>
-      <% } %> <% if (page < totalPage) { %>
-      <li class="page-item">
-        <a class="page-link" href="?page=<%= page + 1 %>">Next &raquo;</a>
-      </li>
-      <% } %>
-    </ul>
-    <% } %>
-  </div>
-</section>
+  </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-<script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script>
 
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('start-date').setAttribute('max', today);
-  document.getElementById('end-date').setAttribute('max', today);
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start-date').setAttribute('max', today);
+    document.getElementById('end-date').setAttribute('max', today);
 
-  document.getElementById('start-date').addEventListener('change', function() {
-    const startDate = this.value;
-    const endDateInput = document.getElementById('end-date');
-    
-   
-    if (startDate) {
-      endDateInput.setAttribute('min', startDate);
-      
-      if (endDateInput.value && endDateInput.value < startDate) {
-        endDateInput.value = startDate;
+    document.getElementById('start-date').addEventListener('change', function () {
+      const startDate = this.value;
+      const endDateInput = document.getElementById('end-date');
+
+
+      if (startDate) {
+        endDateInput.setAttribute('min', startDate);
+
+        if (endDateInput.value && endDateInput.value < startDate) {
+          endDateInput.value = startDate;
+        }
       }
+    });
+
+
+    function validateDates() {
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+
+      if (startDate && new Date(startDate) > new Date()) {
+        alert('Start date cannot be in the future');
+        return false;
+      }
+
+      if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+        alert('End date cannot be earlier than start date');
+        return false;
+      }
+
+      return true;
     }
-  });
 
-
-  function validateDates() {
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
-    
-    if (startDate && new Date(startDate) > new Date()) {
-      alert('Start date cannot be in the future');
-      return false;
+    function getFilterValues() {
+      return {
+        filtervalue: document.getElementById("filter-order").value,
+        startDate: document.getElementById("start-date").value,
+        endDate: document.getElementById("end-date").value,
+      };
     }
-    
-    if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
-      alert('End date cannot be earlier than start date');
-      return false;
-    }
-    
-    return true;
-  }
 
-  function getFilterValues() {
-    return {
-      filtervalue: document.getElementById("filter-order").value,
-      startDate: document.getElementById("start-date").value,
-      endDate: document.getElementById("end-date").value,
-    };
-  }
+    document.getElementById("downloadPdf").addEventListener("click", async () => {
+      if (validateDates()) {
+        const filterParams = getFilterValues();
+        const response = await fetch("/admin/sales-report/pdf", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(filterParams),
+        });
 
-  document.getElementById("downloadPdf").addEventListener("click", async () => {
-    if (validateDates()) {
-      const filterParams = getFilterValues();
-      const response = await fetch("/admin/sales-report/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(filterParams),
-      });
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "sales_report.pdf";
+        link.click();
+      }
+    });
 
-      const blob = await response.blob();
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = "sales_report.pdf";
-      link.click();
-    }
-  });
+    document.getElementById("downloadExcel").addEventListener("click", async () => {
+      if (validateDates()) {
+        const filterParams = getFilterValues();
+        const response = await fetch("/admin/sales-report/excel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(filterParams),
+        });
 
-  document.getElementById("downloadExcel").addEventListener("click", async () => {
-    if (validateDates()) {
-      const filterParams = getFilterValues();
-      const response = await fetch("/admin/sales-report/excel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(filterParams),
-      });
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "sales_report.xlsx";
+        link.click();
+      }
+    });
 
-      const blob = await response.blob();
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = "sales_report.xlsx";
-      link.click();
-    }
-  });
+    async function filterOrder() {
+      if (validateDates()) {
+        const filtervalue = document.getElementById("filter-order").value;
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+        const response = await $.ajax({
+          url: `/admin/filterOrder?filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-  async function filterOrder() {
-    if (validateDates()) {
-      const filtervalue = document.getElementById("filter-order").value;
-      const startDate = document.getElementById("start-date").value;
-      const endDate = document.getElementById("end-date").value;
-      const response = await $.ajax({
-        url: `/admin/filterOrder?filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.orders) {
-        const filterTable = document.querySelector("table tbody");
-        filterTable.textContent = "";
-        response.orders.forEach((order) => {
-          const row = `
+        if (response.orders) {
+          const filterTable = document.querySelector("table tbody");
+          filterTable.textContent = "";
+          response.orders.forEach((order) => {
+            const row = `
               <tr>
                 <td>${new Date(order.createdOn).toLocaleDateString()}</td>
                 <td>${order.user ? order.user.name : "N/A"}</td>
@@ -350,42 +360,42 @@
                             </td>
                 <td>${order.paymentMethod}</td>
               </tr>`;
-          filterTable.insertAdjacentHTML("beforeend", row);
-        });
+            filterTable.insertAdjacentHTML("beforeend", row);
+          });
 
-        document.querySelector(".text-primary").innerHTML = response.saleCount;
-        document.querySelector(
-          ".text-success"
-        ).innerHTML = `₹ ${response.totalSalePrice}`;
-        document.querySelector(
-          ".text-warning"
-        ).innerHTML = `₹ ${response.totalDiscount}`;
-        document.querySelector(
-          ".text-danger"
-        ).innerHTML = `₹ ${response.couponDiscount}`;
+          document.querySelector(".text-primary").innerHTML = response.saleCount;
+          document.querySelector(
+            ".text-success"
+          ).innerHTML = `₹ ${response.totalSalePrice}`;
+          document.querySelector(
+            ".text-warning"
+          ).innerHTML = `₹ ${response.totalDiscount}`;
+          document.querySelector(
+            ".text-danger"
+          ).innerHTML = `₹ ${response.couponDiscount}`;
 
-        updatePagination(response.totalPage, 1);
+          updatePagination(response.totalPage, 1);
+        }
       }
     }
-  }
 
-  async function filterByDate() {
-    if (validateDates()) {
-      const startDate = document.getElementById("start-date").value;
-      const endDate = document.getElementById("end-date").value;
-      const response = await $.ajax({
-        url: `/admin/filterbyDate?startDate=${startDate}&endDate=${endDate}`,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    async function filterByDate() {
+      if (validateDates()) {
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+        const response = await $.ajax({
+          url: `/admin/filterbyDate?startDate=${startDate}&endDate=${endDate}`,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      if (response.orders) {
-        const filterTable = document.querySelector("table tbody");
-        filterTable.textContent = "";
-        response.orders.forEach((order) => {
-          const row = `
+        if (response.orders) {
+          const filterTable = document.querySelector("table tbody");
+          filterTable.textContent = "";
+          response.orders.forEach((order) => {
+            const row = `
               <tr>
                 <td>${new Date(order.createdOn).toLocaleDateString()}</td>
                 <td>${order.user ? order.user.name : "N/A"}</td>
@@ -399,78 +409,76 @@
                             </td>
                 <td>${order.paymentMethod}</td>
               </tr>`;
-          filterTable.insertAdjacentHTML("beforeend", row);
-        });
+            filterTable.insertAdjacentHTML("beforeend", row);
+          });
 
-        document.querySelector(".text-primary").innerHTML = response.saleCount;
-        document.querySelector(
-          ".text-success"
-        ).innerHTML = `₹ ${response.totalSalePrice}`;
-        document.querySelector(
-          ".text-warning"
-        ).innerHTML = `₹ ${response.totalDiscount}`;
-        document.querySelector(
-          ".text-danger"
-        ).innerHTML = `₹ ${response.couponDiscount}`;
+          document.querySelector(".text-primary").innerHTML = response.saleCount;
+          document.querySelector(
+            ".text-success"
+          ).innerHTML = `₹ ${response.totalSalePrice}`;
+          document.querySelector(
+            ".text-warning"
+          ).innerHTML = `₹ ${response.totalDiscount}`;
+          document.querySelector(
+            ".text-danger"
+          ).innerHTML = `₹ ${response.couponDiscount}`;
 
-        updatePagination(response.totalPage, 1);
+          updatePagination(response.totalPage, 1);
+        }
       }
     }
-  }
 
-  function updatePagination(totalPage, currentPage) {
-    const paginationContainer = document.querySelector(".pagination-container");
-    const pagination = document.createElement("ul");
-    pagination.className = "pagination";
+    function updatePagination(totalPage, currentPage) {
+      const paginationContainer = document.querySelector(".pagination-container");
+      const pagination = document.createElement("ul");
+      pagination.className = "pagination";
 
-    if (currentPage > 1) {
-      const prevPage = document.createElement("li");
-      prevPage.className = "page-item";
-      prevPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${
-        currentPage - 1
-      })">&laquo; Previous</a>`;
-      pagination.appendChild(prevPage);
+      if (currentPage > 1) {
+        const prevPage = document.createElement("li");
+        prevPage.className = "page-item";
+        prevPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage - 1
+          })">&laquo; Previous</a>`;
+        pagination.appendChild(prevPage);
+      }
+
+      for (let i = 1; i <= totalPage; i++) {
+        const pageItem = document.createElement("li");
+        pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+        pageItem.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i})">${i}</a>`;
+        pagination.appendChild(pageItem);
+      }
+
+      if (currentPage < totalPage) {
+        const nextPage = document.createElement("li");
+        nextPage.className = "page-item";
+        nextPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage + 1
+          })">Next &raquo;</a>`;
+        pagination.appendChild(nextPage);
+      }
+
+      paginationContainer.innerHTML = "";
+      paginationContainer.appendChild(pagination);
     }
 
-    for (let i = 1; i <= totalPage; i++) {
-      const pageItem = document.createElement("li");
-      pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
-      pageItem.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i})">${i}</a>`;
-      pagination.appendChild(pageItem);
-    }
+    async function goToPage(page) {
+      if (validateDates()) {
+        const filtervalue = document.getElementById("filter-order").value;
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
 
-    if (currentPage < totalPage) {
-      const nextPage = document.createElement("li");
-      nextPage.className = "page-item";
-      nextPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${
-        currentPage + 1
-      })">Next &raquo;</a>`;
-      pagination.appendChild(nextPage);
-    }
+        const response = await $.ajax({
+          url: `/admin/salesreport?page=${page}&filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-    paginationContainer.innerHTML = "";
-    paginationContainer.appendChild(pagination);
-  }
-
-  async function goToPage(page) {
-    if (validateDates()) {
-      const filtervalue = document.getElementById("filter-order").value;
-      const startDate = document.getElementById("start-date").value;
-      const endDate = document.getElementById("end-date").value;
-
-      const response = await $.ajax({
-        url: `/admin/salesreport?page=${page}&filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.orders) {
-        const filterTable = document.querySelector("table tbody");
-        filterTable.textContent = "";
-        response.orders.forEach((order) => {
-          const row = `
+        if (response.orders) {
+          const filterTable = document.querySelector("table tbody");
+          filterTable.textContent = "";
+          response.orders.forEach((order) => {
+            const row = `
               <tr>
                 <td>${new Date(order.createdOn).toLocaleDateString()}</td>
                 <td>${order.user ? order.user.name : "N/A"}</td>
@@ -484,44 +492,44 @@
                             </td>
                 <td>${order.paymentMethod}</td>
               </tr>`;
-          filterTable.insertAdjacentHTML("beforeend", row);
-        });
+            filterTable.insertAdjacentHTML("beforeend", row);
+          });
 
-        document.querySelector(".text-primary").innerHTML = response.saleCount;
-        document.querySelector(
-          ".text-success"
-        ).innerHTML = `₹ ${response.totalSalePrice}`;
-        document.querySelector(
-          ".text-warning"
-        ).innerHTML = `₹ ${response.totalDiscount}`;
-        document.querySelector(
-          ".text-danger"
-        ).innerHTML = `₹ ${response.couponDiscount}`;
+          document.querySelector(".text-primary").innerHTML = response.saleCount;
+          document.querySelector(
+            ".text-success"
+          ).innerHTML = `₹ ${response.totalSalePrice}`;
+          document.querySelector(
+            ".text-warning"
+          ).innerHTML = `₹ ${response.totalDiscount}`;
+          document.querySelector(
+            ".text-danger"
+          ).innerHTML = `₹ ${response.couponDiscount}`;
 
-        updatePagination(response.totalPage, page);
+          updatePagination(response.totalPage, page);
+        }
       }
     }
-  }
 
-  function getSalesDataFromTable() {
-    const tableRows = document.querySelectorAll("#salesTable tbody tr");
-    const salesData = [];
+    function getSalesDataFromTable() {
+      const tableRows = document.querySelectorAll("#salesTable tbody tr");
+      const salesData = [];
 
-    tableRows.forEach((row) => {
-      const cells = row.querySelectorAll("td");
-      salesData.push({
-        date: cells[0].innerText,
-        userName: cells[1].innerText,
-        orderId: cells[2].innerText,
-        subtotal: parseFloat(cells[3].innerText.replace("₹", "").trim()),
-        productDiscount: parseFloat(cells[4].innerText.replace("₹", "").trim()),
-        couponDiscount: parseFloat(cells[5].innerText.replace("₹", "").trim()),
-        finalAmount: parseFloat(cells[6].innerText.replace("₹", "").trim()),
-        paymentMethod: cells[7].innerText,
+      tableRows.forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        salesData.push({
+          date: cells[0].innerText,
+          userName: cells[1].innerText,
+          orderId: cells[2].innerText,
+          subtotal: parseFloat(cells[3].innerText.replace("₹", "").trim()),
+          productDiscount: parseFloat(cells[4].innerText.replace("₹", "").trim()),
+          couponDiscount: parseFloat(cells[5].innerText.replace("₹", "").trim()),
+          finalAmount: parseFloat(cells[6].innerText.replace("₹", "").trim()),
+          paymentMethod: cells[7].innerText,
+        });
       });
-    });
 
-    return salesData;
-  }
-</script>
-<%- include("../../views/partials/admin/footer") %>
+      return salesData;
+    }
+  </script>
+  <%- include("../../views/partials/admin/footer") %>

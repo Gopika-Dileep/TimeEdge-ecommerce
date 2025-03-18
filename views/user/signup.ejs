@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Sign Up Page</title>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
@@ -7,34 +8,42 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 font-jost">
     <div class="w-full max-w-md p-8 space-y-6 bg-[#27303F] rounded-lg shadow-lg">
         <form id="signupform" class="space-y-6">
             <h2 class="text-2xl font-bold text-center text-white">Sign up</h2>
             <div class="space-y-4">
                 <div>
-                    <input type="text" name="name" placeholder="User name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" name="name" placeholder="User name"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <p class="text-red-500 text-sm mt-1 hidden" id="name-error"></p>
                 </div>
                 <div>
-                    <input type="email" name="email" placeholder="Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="email" name="email" placeholder="Email"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <p class="text-red-500 text-sm mt-1 hidden" id="email-error"></p>
                 </div>
                 <div>
-                    <input type="number" name="phone" placeholder="Phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="number" name="phone" placeholder="Phone"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <p class="text-red-500 text-sm mt-1 hidden" id="phone-error"></p>
                 </div>
                 <div>
                     <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="Password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" onclick="togglePassword()">
+                        <input type="password" id="password" name="password" placeholder="Password"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                            onclick="togglePassword()">
                             <i class="fas fa-eye" id="password-icon"></i>
                         </span>
                     </div>
                     <p class="text-red-500 text-sm mt-1 hidden" id="password-error"></p>
                 </div>
             </div>
-            <button type="submit" class="w-full py-2 text-white bg-[#6d44b8] rounded-lg hover:bg-[#573b8a] focus:outline-none focus:ring-2 focus:ring-indigo-500">Sign up</button>
+            <button type="submit"
+                class="w-full py-2 text-white bg-[#6d44b8] rounded-lg hover:bg-[#573b8a] focus:outline-none focus:ring-2 focus:ring-indigo-500">Sign
+                up</button>
             <div class="flex items-center justify-center w-full py-2 mt-4 bg-white border border-gray-300 rounded-lg">
                 <a href="/auth/google" class="flex items-center space-x-2">
                     <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google Icon">
@@ -75,100 +84,100 @@
             errorElement.classList.add('hidden');
         }
         function validateForm() {
-    let isValid = true;
-    
-    // Username validation
-    const name = $('input[name="name"]').val().trim();
-    if (!name) {
-        showError('name', 'Username is required');
-        isValid = false;
-    } else if (name.length < 3) {
-        showError('name', 'Username must be at least 3 characters');
-        isValid = false;
-    } else {
-        hideError('name');
-    }
-    
-    // Email validation
-    const email = $('input[name="email"]').val().trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-        showError('email', 'Email is required');
-        isValid = false;
-    } else if (!emailRegex.test(email)) {
-        showError('email', 'Please enter a valid email address');
-        isValid = false;
-    } else {
-        hideError('email');
-    }
-    
-    // Enhanced phone number validation
-    const phone = $('input[name="phone"]').val().trim();
-    if (!phone) {
-        showError('phone', 'Phone number is required');
-        isValid = false;
-    } else if (phone.length < 10) {
-        showError('phone', 'Phone number must be at least 10 digits');
-        isValid = false;
-    } else if (phone.charAt(0) === '0') {
-        showError('phone', 'Phone number should not start with 0');
-        isValid = false;
-    } else if (parseInt(phone.charAt(0)) < 6) {
-        showError('phone', 'Phone number should start with 6 or higher');
-        isValid = false;
-    } else if (/000/.test(phone)) {
-        showError('phone', 'Phone number should not contain more than two zeros in a row');
-        isValid = false;
-    } else if (/^0+$/.test(phone)) {
-        showError('phone', 'Phone number cannot consist only of zeros');
-        isValid = false;
-    } else {
-        hideError('phone');
-    }
-    
-    // Password validation
-    const password = $('input[name="password"]').val();
-    if (!password) {
-        showError('password', 'Password is required');
-        isValid = false;
-    } else if (password.length < 8) {
-        showError('password', 'Password must be at least 8 characters');
-        isValid = false;
-    } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/.test(password)) {
-        showError('password', 'Password must include uppercase, lowercase, number and special character');
-        isValid = false;
-    } else {
-        hideError('password');
-    }
-    
-    return isValid;
-}
+            let isValid = true;
 
-        $(document).ready(function() {
-            
-            $('input[name="name"]').on('input', function() {
+            // Username validation
+            const name = $('input[name="name"]').val().trim();
+            if (!name) {
+                showError('name', 'Username is required');
+                isValid = false;
+            } else if (name.length < 3) {
+                showError('name', 'Username must be at least 3 characters');
+                isValid = false;
+            } else {
+                hideError('name');
+            }
+
+            // Email validation
+            const email = $('input[name="email"]').val().trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                showError('email', 'Email is required');
+                isValid = false;
+            } else if (!emailRegex.test(email)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                hideError('email');
+            }
+
+            // Enhanced phone number validation
+            const phone = $('input[name="phone"]').val().trim();
+            if (!phone) {
+                showError('phone', 'Phone number is required');
+                isValid = false;
+            } else if (phone.length < 10) {
+                showError('phone', 'Phone number must be at least 10 digits');
+                isValid = false;
+            } else if (phone.charAt(0) === '0') {
+                showError('phone', 'Phone number should not start with 0');
+                isValid = false;
+            } else if (parseInt(phone.charAt(0)) < 6) {
+                showError('phone', 'Phone number should start with 6 or higher');
+                isValid = false;
+            } else if (/000/.test(phone)) {
+                showError('phone', 'Phone number should not contain more than two zeros in a row');
+                isValid = false;
+            } else if (/^0+$/.test(phone)) {
+                showError('phone', 'Phone number cannot consist only of zeros');
+                isValid = false;
+            } else {
+                hideError('phone');
+            }
+
+            // Password validation
+            const password = $('input[name="password"]').val();
+            if (!password) {
+                showError('password', 'Password is required');
+                isValid = false;
+            } else if (password.length < 8) {
+                showError('password', 'Password must be at least 8 characters');
+                isValid = false;
+            } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/.test(password)) {
+                showError('password', 'Password must include uppercase, lowercase, number and special character');
+                isValid = false;
+            } else {
+                hideError('password');
+            }
+
+            return isValid;
+        }
+
+        $(document).ready(function () {
+
+            $('input[name="name"]').on('input', function () {
                 hideError('name');
             });
-            
-            $('input[name="email"]').on('input', function() {
+
+            $('input[name="email"]').on('input', function () {
                 hideError('email');
             });
-            
-            $('input[name="phone"]').on('input', function() {
+
+            $('input[name="phone"]').on('input', function () {
                 hideError('phone');
             });
-            
-            $('input[name="password"]').on('input', function() {
+
+            $('input[name="password"]').on('input', function () {
                 hideError('password');
             });
 
-            $('#signupform').on('submit', function(e) {
+            $('#signupform').on('submit', function (e) {
                 e.preventDefault();
-                
+
                 if (!validateForm()) {
                     return false;
                 }
-                
+
                 const formData = {
                     name: $('input[name="name"]').val(),
                     email: $('input[name="email"]').val(),
@@ -181,12 +190,12 @@
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
-                    success: function(result) {
+                    success: function (result) {
                         if (result.userId) {
                             window.location.href = `/otpverify?id=${result.userId}`;
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again later.';
                         Swal.fire({
                             icon: 'error',
@@ -200,4 +209,5 @@
         });
     </script>
 </body>
+
 </html>

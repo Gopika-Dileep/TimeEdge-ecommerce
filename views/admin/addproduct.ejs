@@ -164,12 +164,12 @@
 
             .cropper-preview {
                 width: 100%;
-                height: 300px; 
+                height: 300px;
                 overflow: hidden;
                 margin-bottom: 10px;
             }
 
-            
+
             .cropper-container {
                 max-width: 100%;
                 height: 400px !important;
@@ -177,7 +177,7 @@
                 display: block !important;
             }
 
-           
+
             .cropper-view-box,
             .cropper-face {
                 display: block !important;
@@ -187,7 +187,7 @@
                 display: block !important;
             }
 
-          
+
             .cropper-modal {
                 opacity: 0.5;
                 display: block !important;
@@ -260,7 +260,7 @@
                                         <option value="<%= brand[i].name %>">
                                             <%= brand[i].name %>
                                         </option>
-                                    <% } %>
+                                        <% } %>
                                 </select>
                                 <div id="brand-error" class="error-message"></div>
                             </div>
@@ -296,7 +296,7 @@
                                                     <option value="<%= cat[i].name %>">
                                                         <%= cat[i].name %>
                                                     </option>
-                                                <% } %>
+                                                    <% } %>
                                             </select>
                                             <div id="category-error" class="error-message"></div>
                                         </div>
@@ -311,103 +311,115 @@
                                     <div id="addedImagesContainer" class="thumbnails-container"></div>
                                 </div>
                                 <div id="images-error" class="error-message mx-3"></div>
-                                
-                               
+
+
                                 <div class="card-body">
                                     <div class="image-container">
                                         <label class="form-label">Product Image 1 (Required)</label>
-                                        <input class="form-control" type="file" name="images" id="input1" 
-                                            accept="image/png, image/jpeg, image/jpg" 
+                                        <input class="form-control" type="file" name="images" id="input1"
+                                            accept="image/png, image/jpeg, image/jpg"
                                             onchange="validateImageOnSelect(event, 1)">
-                                        
+
                                         <div class="image-cropper" id="cropper-container-1">
                                             <div class="cropper-preview">
                                                 <img src="" alt="" id="imgView1" style="max-width: 100%;">
                                             </div>
                                             <div class="btn-crop-actions">
-                                                <button type="button" class="btn btn-secondary" onclick="cancelCrop(1)">Cancel</button>
-                                                <button type="button" class="btn btn-primary" id="saveButton1">Save Crop</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    onclick="cancelCrop(1)">Cancel</button>
+                                                <button type="button" class="btn btn-primary" id="saveButton1">Save
+                                                    Crop</button>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="mt-3" id="preview-container-1" style="display:none;">
                                             <p>Cropped Image:</p>
-                                            <img src="" id="croppedImg1" alt="Cropped preview" style="max-width: 100%; max-height: 200px;">
+                                            <img src="" id="croppedImg1" alt="Cropped preview"
+                                                style="max-width: 100%; max-height: 200px;">
                                         </div>
                                     </div>
                                 </div>
-                                
-                              
+
+
                                 <div class="card-body">
                                     <div class="image-container">
                                         <label class="form-label">Product Image 2</label>
-                                        <input class="form-control" type="file" name="images" id="input2" 
-                                            accept="image/png, image/jpeg, image/jpg" 
+                                        <input class="form-control" type="file" name="images" id="input2"
+                                            accept="image/png, image/jpeg, image/jpg"
                                             onchange="validateImageOnSelect(event, 2)">
-                                        
+
                                         <div class="image-cropper" id="cropper-container-2">
                                             <div class="cropper-preview">
                                                 <img src="" alt="" id="imgView2" style="max-width: 100%;">
                                             </div>
                                             <div class="btn-crop-actions">
-                                                <button type="button" class="btn btn-secondary" onclick="cancelCrop(2)">Cancel</button>
-                                                <button type="button" class="btn btn-primary" id="saveButton2">Save Crop</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    onclick="cancelCrop(2)">Cancel</button>
+                                                <button type="button" class="btn btn-primary" id="saveButton2">Save
+                                                    Crop</button>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="mt-3" id="preview-container-2" style="display:none;">
                                             <p>Cropped Image:</p>
-                                            <img src="" id="croppedImg2" alt="Cropped preview" style="max-width: 100%; max-height: 200px;">
+                                            <img src="" id="croppedImg2" alt="Cropped preview"
+                                                style="max-width: 100%; max-height: 200px;">
                                         </div>
                                     </div>
                                 </div>
-                                
-                              
+
+
                                 <div class="card-body">
                                     <div class="image-container">
                                         <label class="form-label">Product Image 3 </label>
-                                        <input class="form-control" type="file" name="images" id="input3" 
-                                            accept="image/png, image/jpeg, image/jpg" 
+                                        <input class="form-control" type="file" name="images" id="input3"
+                                            accept="image/png, image/jpeg, image/jpg"
                                             onchange="validateImageOnSelect(event, 3)">
-                                        
+
                                         <div class="image-cropper" id="cropper-container-3">
                                             <div class="cropper-preview">
                                                 <img src="" alt="" id="imgView3" style="max-width: 100%;">
                                             </div>
                                             <div class="btn-crop-actions">
-                                                <button type="button" class="btn btn-secondary" onclick="cancelCrop(3)">Cancel</button>
-                                                <button type="button" class="btn btn-primary" id="saveButton3">Save Crop</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    onclick="cancelCrop(3)">Cancel</button>
+                                                <button type="button" class="btn btn-primary" id="saveButton3">Save
+                                                    Crop</button>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="mt-3" id="preview-container-3" style="display:none;">
                                             <p>Cropped Image:</p>
-                                            <img src="" id="croppedImg3" alt="Cropped preview" style="max-width: 100%; max-height: 200px;">
+                                            <img src="" id="croppedImg3" alt="Cropped preview"
+                                                style="max-width: 100%; max-height: 200px;">
                                         </div>
                                     </div>
                                 </div>
-                                
-                               
+
+
                                 <div class="card-body">
                                     <div class="image-container">
                                         <label class="form-label">Product Image 4 </label>
-                                        <input class="form-control" type="file" name="images" id="input4" 
-                                            accept="image/png, image/jpeg, image/jpg" 
+                                        <input class="form-control" type="file" name="images" id="input4"
+                                            accept="image/png, image/jpeg, image/jpg"
                                             onchange="validateImageOnSelect(event, 4)">
-                                        
+
                                         <div class="image-cropper" id="cropper-container-4">
                                             <div class="cropper-preview">
                                                 <img src="" alt="" id="imgView4" style="max-width: 100%;">
                                             </div>
                                             <div class="btn-crop-actions">
-                                                <button type="button" class="btn btn-secondary" onclick="cancelCrop(4)">Cancel</button>
-                                                <button type="button" class="btn btn-primary" id="saveButton4">Save Crop</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    onclick="cancelCrop(4)">Cancel</button>
+                                                <button type="button" class="btn btn-primary" id="saveButton4">Save
+                                                    Crop</button>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="mt-3" id="preview-container-4" style="display:none;">
                                             <p>Cropped Image:</p>
-                                            <img src="" id="croppedImg4" alt="Cropped preview" style="max-width: 100%; max-height: 200px;">
+                                            <img src="" id="croppedImg4" alt="Cropped preview"
+                                                style="max-width: 100%; max-height: 200px;">
                                         </div>
                                     </div>
                                 </div>
@@ -426,19 +438,19 @@
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      
+
         const selectedImages = [];
         const croppers = {};
-    
+
         function validateImageOnSelect(event, inputNumber) {
             const errorElement = document.getElementById('images-error');
             errorElement.style.display = 'none';
             errorElement.innerText = '';
-    
+
             const file = event.target.files[0];
-            
+
             if (!file) return;
-    
+
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
                 errorElement.innerText = 'Please select only JPG, JPEG, or PNG image files.';
@@ -447,8 +459,8 @@
                 document.getElementById(`imgView${inputNumber}`).src = '';
                 return;
             }
-    
-            const maxSize = 5 * 1024 * 1024; 
+
+            const maxSize = 5 * 1024 * 1024;
             if (file.size > maxSize) {
                 errorElement.innerText = 'Image size should be less than 5MB.';
                 errorElement.style.display = 'block';
@@ -456,10 +468,10 @@
                 document.getElementById(`imgView${inputNumber}`).src = '';
                 return;
             }
-    
+
             viewImage(event, inputNumber);
         }
-    
+
         function viewImage(event, index) {
             const input = event.target;
             if (input.files && input.files[0]) {
@@ -468,20 +480,20 @@
                     const dataURL = e.target.result;
                     const image = document.getElementById(`imgView${index}`);
                     image.src = dataURL;
-                    
-                
+
+
                     document.getElementById(`cropper-container-${index}`).style.display = 'block';
-                    
-                   
+
+
                     if (croppers[index]) {
                         croppers[index].destroy();
                     }
-                    
-               
-                    image.onload = function() {
-                       
+
+
+                    image.onload = function () {
+
                         croppers[index] = new Cropper(image, {
-                            aspectRatio: NaN, 
+                            aspectRatio: NaN,
                             viewMode: 1,
                             dragMode: 'move',
                             guides: true,
@@ -493,319 +505,319 @@
                             rotatable: true,
                             minContainerWidth: 300,
                             minContainerHeight: 300,
-                            ready: function() {
+                            ready: function () {
                                 console.log(`Cropper ${index} initialized`);
-                              
+
                                 this.cropper.crop();
                             }
                         });
                     };
-                    
-                    
-                    document.getElementById(`saveButton${index}`).onclick = function() {
+
+
+                    document.getElementById(`saveButton${index}`).onclick = function () {
                         saveCroppedImage(index);
                     };
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
-    
+
         function saveCroppedImage(index) {
             if (!croppers[index]) {
                 console.error(`Cropper ${index} not initialized`);
                 return;
             }
-            
+
             try {
-             
+
                 const croppedCanvas = croppers[index].getCroppedCanvas({
                     minWidth: 256,
                     minHeight: 256,
                     maxWidth: 4096,
                     maxHeight: 4096
                 });
-                
+
                 if (!croppedCanvas) {
                     console.error('Could not get cropped canvas');
                     return;
                 }
-                
-                
+
+
                 const croppedImageDataURL = croppedCanvas.toDataURL('image/png');
                 const croppedImg = document.getElementById(`croppedImg${index}`);
                 croppedImg.src = croppedImageDataURL;
-                
-               
+
+
                 document.getElementById(`preview-container-${index}`).style.display = 'block';
-                
-                
+
+
                 croppedCanvas.toBlob((blob) => {
                     if (!blob) {
                         console.error('Failed to create blob');
                         return;
                     }
-                    
-                   
+
+
                     const timestamp = new Date().getTime();
                     const fileName = `cropped-image-${timestamp}-${index}.png`;
                     const file = new File([blob], fileName, { type: 'image/png' });
-                    
-                 
+
+
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
                     document.getElementById(`input${index}`).files = dataTransfer.files;
-                    
-                   
+
+
                     document.getElementById(`cropper-container-${index}`).style.display = 'none';
-                    
-                  
+
+
                     addThumbnail(croppedImageDataURL, index);
-                    
+
                     console.log(`Image ${index} cropped and saved as ${fileName}`);
                 }, 'image/png', 0.9);
-                
+
             } catch (error) {
                 console.error('Error cropping image:', error);
             }
         }
-    
+
         function cancelCrop(index) {
-            
+
             if (croppers[index]) {
                 croppers[index].destroy();
                 croppers[index] = null;
             }
-            
-           
+
+
             document.getElementById(`input${index}`).value = '';
-            
-            
+
+
             document.getElementById(`cropper-container-${index}`).style.display = 'none';
             document.getElementById(`preview-container-${index}`).style.display = 'none';
         }
-    
+
         function addThumbnail(imageSrc, index) {
             const container = document.getElementById('addedImagesContainer');
-            
-           
+
+
             const existingThumbnail = container.querySelector(`.thumbnail[data-index="${index}"]`);
             if (existingThumbnail) {
-               
+
                 existingThumbnail.querySelector('img').src = imageSrc;
                 return;
             }
-            
-           
+
+
             const thumbnailDiv = document.createElement('div');
             thumbnailDiv.className = 'thumbnail';
             thumbnailDiv.dataset.index = index;
-            
-            
+
+
             const img = document.createElement('img');
             img.src = imageSrc;
             img.alt = `Product image ${index}`;
-            
-          
+
+
             const removeBtn = document.createElement('span');
             removeBtn.className = 'remove-icon';
             removeBtn.innerHTML = '&times;';
-            removeBtn.onclick = function() {
-                
+            removeBtn.onclick = function () {
+
                 thumbnailDiv.remove();
-                
-                
+
+
                 document.getElementById(`input${index}`).value = '';
                 document.getElementById(`preview-container-${index}`).style.display = 'none';
-                
-               
+
+
                 if (croppers[index]) {
                     croppers[index].destroy();
                     croppers[index] = null;
                 }
             };
-            
-            
+
+
             thumbnailDiv.appendChild(img);
             thumbnailDiv.appendChild(removeBtn);
             container.appendChild(thumbnailDiv);
         }
         function validateImageFile(file) {
-        if (!file) return false;
-        
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!allowedTypes.includes(file.type)) return false;
-        
-        const maxSize = 5 * 1024 * 1024;
-        if (file.size > maxSize) return false;
-        
-        return true;
-    }
+            if (!file) return false;
 
-    function validateForm() {
-        clearErrorMessages();
-        const name = document.getElementsByName('productName')[0].value;
-        const description = document.getElementById('descriptionid').value;
-        const brand = document.getElementsByName('brand')[0].value;
-        const saleprice = document.getElementsByName('salePrice')[0].value;
-        const category = document.getElementsByName('category')[0].value;
-        const images = document.getElementById('input1');
-        const quantity = document.getElementsByName('quantity')[0].value;
-        let isValid = true;
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) return false;
 
-        if (name.trim() === "") {
-            displayErrorMessage('productName-error', 'Please enter a product name.');
-            isValid = false;
-        } else if (!/^[a-zA-Z\s;,.]+$/.test(name.trim())) {
-            displayErrorMessage('productName-error', 'Product name can only contain letters, spaces, and the following characters: ; , .');
-            isValid = false;
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) return false;
+
+            return true;
         }
 
-        if (description.trim() === "") {
-            displayErrorMessage('description-error', 'Please enter a product description.');
-            isValid = false;
-        } else if (!/^[a-zA-Z0-9\s;:"._-]+$/.test(description.trim())) {
-            displayErrorMessage('description-error', 'Product description can only contain letters, numbers, spaces, and the following characters: ; : " . _ -');
-            isValid = false;
-        }
+        function validateForm() {
+            clearErrorMessages();
+            const name = document.getElementsByName('productName')[0].value;
+            const description = document.getElementById('descriptionid').value;
+            const brand = document.getElementsByName('brand')[0].value;
+            const saleprice = document.getElementsByName('salePrice')[0].value;
+            const category = document.getElementsByName('category')[0].value;
+            const images = document.getElementById('input1');
+            const quantity = document.getElementsByName('quantity')[0].value;
+            let isValid = true;
 
-        if (parseInt(quantity) < 0) {
-            displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
-            isValid = false;
-        }
-
-        const sanitizedSalePrice = saleprice.trim().replace(/,/g, '');
-        if (
-            !/^\d{4,6}(\.\d{1,2})?$/.test(sanitizedSalePrice) ||
-            parseFloat(sanitizedSalePrice) < 1000 ||
-            parseFloat(sanitizedSalePrice) > 100000
-        ) {
-            displayErrorMessage(
-                'salePrice-error',
-                'Please enter a valid sale price'
-            );
-            isValid = false;
-        }
-
-        if (images.files.length === 0) {
-            displayErrorMessage("images-error", 'Please select at least one image.');
-            isValid = false;
-        } else if (!validateImageFile(images.files[0])) {
-            displayErrorMessage("images-error", 'Please select a valid image file (JPG, JPEG, or PNG) under 5MB.');
-            isValid = false;
-        }
-
-        const additionalImages = [
-            document.getElementById('input2'),
-            document.getElementById('input3'),
-            document.getElementById('input4')
-        ];
-
-        for (let i = 0; i < additionalImages.length; i++) {
-            if (additionalImages[i].files.length > 0 && !validateImageFile(additionalImages[i].files[0])) {
-                displayErrorMessage(`images-error`, 'All images must be valid image files (JPG, JPEG, or PNG) under 5MB.');
+            if (name.trim() === "") {
+                displayErrorMessage('productName-error', 'Please enter a product name.');
                 isValid = false;
-                break;
-            }
-        }
-
-        if (!isValid) {
-            return false;
-        }
-
-        const form = document.querySelector('form');
-        const formData = new FormData(form);
-
-        
-        fetch('/admin/addProducts', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            
-            console.log('Full response:', response);
-            
-          
-            const contentType = response.headers.get('content-type');
-            console.log('Content Type:', contentType);
-
-           
-            if (response.redirected) {
-                window.location.href = response.url;
-                return null;
+            } else if (!/^[a-zA-Z\s;,.]+$/.test(name.trim())) {
+                displayErrorMessage('productName-error', 'Product name can only contain letters, spaces, and the following characters: ; , .');
+                isValid = false;
             }
 
-           
-            if (contentType && contentType.includes('application/json')) {
-                return response.json();
+            if (description.trim() === "") {
+                displayErrorMessage('description-error', 'Please enter a product description.');
+                isValid = false;
+            } else if (!/^[a-zA-Z0-9\s;:"._-]+$/.test(description.trim())) {
+                displayErrorMessage('description-error', 'Product description can only contain letters, numbers, spaces, and the following characters: ; : " . _ -');
+                isValid = false;
             }
 
-           
-            return response.text().then(text => {
-                console.error('Unexpected response text:', text);
-                throw new Error('Unexpected server response');
-            });
-        })
-        .then(data => {
-            if (data) {
+            if (parseInt(quantity) < 0) {
+                displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
+                isValid = false;
+            }
 
-                if (data.productExists) {
-                    
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Product Already Exists',
-                        text: data.message || 'A product with this name already exists.',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3085d6'
+            const sanitizedSalePrice = saleprice.trim().replace(/,/g, '');
+            if (
+                !/^\d{4,6}(\.\d{1,2})?$/.test(sanitizedSalePrice) ||
+                parseFloat(sanitizedSalePrice) < 1000 ||
+                parseFloat(sanitizedSalePrice) > 100000
+            ) {
+                displayErrorMessage(
+                    'salePrice-error',
+                    'Please enter a valid sale price'
+                );
+                isValid = false;
+            }
+
+            if (images.files.length === 0) {
+                displayErrorMessage("images-error", 'Please select at least one image.');
+                isValid = false;
+            } else if (!validateImageFile(images.files[0])) {
+                displayErrorMessage("images-error", 'Please select a valid image file (JPG, JPEG, or PNG) under 5MB.');
+                isValid = false;
+            }
+
+            const additionalImages = [
+                document.getElementById('input2'),
+                document.getElementById('input3'),
+                document.getElementById('input4')
+            ];
+
+            for (let i = 0; i < additionalImages.length; i++) {
+                if (additionalImages[i].files.length > 0 && !validateImageFile(additionalImages[i].files[0])) {
+                    displayErrorMessage(`images-error`, 'All images must be valid image files (JPG, JPEG, or PNG) under 5MB.');
+                    isValid = false;
+                    break;
+                }
+            }
+
+            if (!isValid) {
+                return false;
+            }
+
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+
+
+            fetch('/admin/addProducts', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+
+                    console.log('Full response:', response);
+
+
+                    const contentType = response.headers.get('content-type');
+                    console.log('Content Type:', contentType);
+
+
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        return null;
+                    }
+
+
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    }
+
+
+                    return response.text().then(text => {
+                        console.error('Unexpected response text:', text);
+                        throw new Error('Unexpected server response');
                     });
-                } else if (data.error) {
-                    
+                })
+                .then(data => {
+                    if (data) {
+
+                        if (data.productExists) {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Product Already Exists',
+                                text: data.message || 'A product with this name already exists.',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        } else if (data.error) {
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Submission Error',
+                                text: data.message || 'Unable to add product. Please try again.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Submission Error:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Submission Error',
-                        text: data.message || 'Unable to add product. Please try again.',
+                        text: 'Unable to add product. Please try again.',
                         confirmButtonText: 'OK'
                     });
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Submission Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Submission Error',
-                text: 'Unable to add product. Please try again.',
-                confirmButtonText: 'OK'
+                });
+
+            return false;
+        }
+
+        function validateImageFile(file) {
+            if (!file) return false;
+
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) return false;
+
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) return false;
+
+            return true;
+        }
+
+        function displayErrorMessage(elementId, message) {
+            var errorElement = document.getElementById(elementId);
+            errorElement.innerText = message;
+            errorElement.style.display = "block";
+        }
+
+        function clearErrorMessages() {
+            const errorElements = document.getElementsByClassName('error-message');
+            Array.from(errorElements).forEach(element => {
+                element.innerText = '';
+                element.style.display = 'none';
             });
-        });
-
-        return false; 
-    }
-
-    function validateImageFile(file) {
-        if (!file) return false;
-        
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!allowedTypes.includes(file.type)) return false;
-        
-        const maxSize = 5 * 1024 * 1024;
-        if (file.size > maxSize) return false;
-        
-        return true;
-    }
-
-    function displayErrorMessage(elementId, message) {
-        var errorElement = document.getElementById(elementId);
-        errorElement.innerText = message;
-        errorElement.style.display = "block";
-    }
-
-    function clearErrorMessages() {
-        const errorElements = document.getElementsByClassName('error-message');
-        Array.from(errorElements).forEach(element => {
-            element.innerText = '';
-            element.style.display = 'none';
-        });
-    }
+        }
     </script>
 
-<%- include("../../views/partials/admin/footer") %>
+    <%- include("../../views/partials/admin/footer") %>

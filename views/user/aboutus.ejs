@@ -1,155 +1,185 @@
 <%- include("../../views/partials/user/header") %>
 
-<style>
-    .about-container {
-        max-width: 1200px;
-        margin: 60px auto 20px;
-        padding: 20px;
-    }
-    .about-tagline {
-        font-size: 24px;
-        font-weight: bold;
-        margin: 20px 0;
-    }
-    .about-intro {
-        margin-bottom: 30px;
-    }
-    .mission-box {
-        background-color: #f5f5f5;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 40px 0;
-        border-left: 4px solid #000;
-    }
-    .mission-title {
-        display: flex;
-        align-items: center;
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 15px;
-    }
-    .mission-title svg {
-        margin-right: 10px;
-    }
-    .features-section {
-        margin: 60px 0;
-    }
-    .section-title {
-        font-size: 28px;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 40px;
-    }
-    .features {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-    .feature {
-        flex-basis: calc(25% - 20px);
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .feature-icon {
-        margin-bottom: 15px;
-    }
-    .feature-title {
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-    .feature-desc {
-        font-size: 14px;
-        color: #555;
-    }
-    .about-logo {
-        font-size: 32px;
-        font-weight: bold;
-        color: #000;
-        display: flex;
-        align-items: center;
-        margin-bottom: 30px;
-    }
-    .about-logo svg {
-        margin-right: 10px;
-    }
-    @media (max-width: 768px) {
-        .feature {
-            flex-basis: calc(50% - 20px);
+    <style>
+        .about-container {
+            max-width: 1200px;
+            margin: 60px auto 20px;
+            padding: 20px;
         }
-    }
-</style>
 
-<div class="about-container">
-    <div class="about-logo">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        TimEdge
-    </div>
+        .about-tagline {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
 
-    <h1 class="about-tagline">Crafting Precision for Every Moment</h1>
+        .about-intro {
+            margin-bottom: 30px;
+        }
 
-    <div class="about-intro">
-        <p>At TimEdge, we're dedicated to blending timeless craftsmanship with cutting-edge technology. Our commitment to excellence ensures every timepiece enhances your personal style while delivering unparalleled functionality and reliability.</p>
-    </div>
+        .mission-box {
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 40px 0;
+            border-left: 4px solid #000;
+        }
 
-    <div class="mission-box">
-        <div class="mission-title">
+        .mission-title {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .mission-title svg {
+            margin-right: 10px;
+        }
+
+        .features-section {
+            margin: 60px 0;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .feature {
+            flex-basis: calc(25% - 20px);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .feature-icon {
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .about-logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #000;
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .about-logo svg {
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .feature {
+                flex-basis: calc(50% - 20px);
+            }
+        }
+    </style>
+
+    <div class="about-container">
+        <div class="about-logo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#000000" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            Our Mission
+            TimEdge
         </div>
-        <p>To create exceptional timepieces that combine innovative design, superior craftsmanship, and sustainable practices, enhancing how people experience and value time.</p>
+
+        <h1 class="about-tagline">Crafting Precision for Every Moment</h1>
+
+        <div class="about-intro">
+            <p>At TimEdge, we're dedicated to blending timeless craftsmanship with cutting-edge technology. Our
+                commitment to excellence ensures every timepiece enhances your personal style while delivering
+                unparalleled functionality and reliability.</p>
+        </div>
+
+        <div class="mission-box">
+            <div class="mission-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                Our Mission
+            </div>
+            <p>To create exceptional timepieces that combine innovative design, superior craftsmanship, and sustainable
+                practices, enhancing how people experience and value time.</p>
+        </div>
+
+        <div class="features-section">
+            <h2 class="section-title">Why Choose TimEdge</h2>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="feature-title">Premium Quality</div>
+                    <div class="feature-desc">Meticulously crafted with premium materials and rigorous quality control
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="feature-title">Innovative Design</div>
+                    <div class="feature-desc">Contemporary aesthetics meet practical functionality in every model</div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                                stroke="#000000" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div class="feature-title">Expert Craftsmanship</div>
+                    <div class="feature-desc">Combining traditional watchmaking skills with modern technology</div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="feature-title">Fair Value</div>
+                    <div class="feature-desc">Exceptional quality at prices that make luxury accessible</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="features-section">
-        <h2 class="section-title">Why Choose TimEdge</h2>
-        
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="feature-title">Premium Quality</div>
-                <div class="feature-desc">Meticulously crafted with premium materials and rigorous quality control</div>
-            </div>
-            
-            <div class="feature">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="feature-title">Innovative Design</div>
-                <div class="feature-desc">Contemporary aesthetics meet practical functionality in every model</div>
-            </div>
-            
-            <div class="feature">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="feature-title">Expert Craftsmanship</div>
-                <div class="feature-desc">Combining traditional watchmaking skills with modern technology</div>
-            </div>
-            
-            <div class="feature">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="feature-title">Fair Value</div>
-                <div class="feature-desc">Exceptional quality at prices that make luxury accessible</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<%- include("../../views/partials/user/footer") %>
+    <%- include("../../views/partials/user/footer") %>

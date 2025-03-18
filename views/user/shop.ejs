@@ -1,865 +1,834 @@
 <%- include("../../views/partials/user/header") %>
 
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-<style>
-  ::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
-}
+  <style>
+    ::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
 
 
-html {
-  scrollbar-width: none;
-}
+    html {
+      scrollbar-width: none;
+    }
 
-body {
-  overflow: auto; 
-}
+    body {
+      overflow: auto;
+    }
 
-  .shop-container {
-    padding: 40px 0;
-    background-color: #f8f9fa;
-  }
-  
+    .shop-container {
+      padding: 40px 0;
+      background-color: #f8f9fa;
+    }
 
-  .shop-sidebar {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .sidebar-heading {
-    font-size: 16px;
-    font-weight: 600;
-    padding: 10px 0;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .sidebar-content {
-    padding-bottom: 15px;
-  }
-  
-  .sidebar-search {
-    margin-bottom: 20px;
-    position: relative;
-  }
-  
-  .sidebar-search input {
-    width: 100%;
-    padding: 10px 40px 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: all 0.3s;
-  }
-  
-  .sidebar-search input:focus {
-    border-color: #777;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  }
-  
-  .sidebar-search button {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #777;
-    cursor: pointer;
-  }
-  
-  .filter-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-  
-  .filter-list li {
-    padding: 8px 0;
-  }
-  
-  .filter-list li a {
-    color: #555;
-    text-decoration: none;
-    transition: all 0.2s;
-    display: block;
-  }
-  
-  .filter-list li a:hover {
-    color: #000;
-    transform: translateX(5px);
-  }
-  
- 
-  .product-card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-bottom: 30px;
-    transition: all 0.3s;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  }
-  
-  .product-img-container {
-    position: relative;
-    padding-top: 100%;
-    overflow: hidden;
-    border-radius: 8px 8px 0 0;
-  }
-  
-  .product-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s;
-  }
-  
-  .product-card:hover .product-img {
-    transform: scale(1.05);
-  }
-  
-  .wishlist-icon {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(255,255,255,0.8);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-    transition: all 0.3s;
-  }
-  
-  .wishlist-icon:hover {
-    background: #fff;
-    transform: scale(1.1);
-  }
-  
-  .product-info {
-    padding: 15px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 0px;
-  }
-  
-  .product-name {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 10px;
-    line-height: 1.3;
-    height: 40px;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-  
-  .product-price {
-    font-size: 18px;
-    font-weight: 600;
-    color: #ff2a68;
-    margin-bottom: 10px;
-    display: flex;
-  }
-  
-  .original-price {
-    font-size: 14px;
-    text-decoration: line-through;
-    color: #999;
-    margin-left: 5px;
-  }
-  
-  .add-to-cart {
-    margin-top: 10px;
-    background: #000;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s;
-    width: 100%;
-    font-weight: 500;
-  }
-  
-  .add-to-cart:hover {
-    background: #333;
-  }
-  
-  .out-stock {
-    background: #ffebee;
-    color: #c62828;
-    
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 10px;
-    margin-left: 15px;
-    font-weight: 500;
-  }
-  
-  .rating {
-    margin-bottom: 10px;
-    color: #ffc107;
-  }
-  
-  .pagination-container {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .pagination {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    gap: 5px;
-  }
-  
-  .pagination-item {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    background: #fff;
-    color: #333;
-    text-decoration: none;
-    transition: all 0.3s;
-    border: 1px solid #ddd;
-  }
-  
-  .pagination-item:hover {
-    background: #f0f0f0;
-  }
-  
-  .pagination-item.active {
-    background: #000;
-    color: #fff;
-    border-color: #000;
-  }
-  
-  .pagination-nav {
-    padding: 0 15px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    border-radius: 4px;
-    background: #fff;
-    color: #333;
-    text-decoration: none;
-    transition: all 0.3s;
-    border: 1px solid #ddd;
-  }
-  
-  .pagination-nav:hover {
-    background: #f0f0f0;
-  }
-  
- 
-  .filter-tags {
-    margin-bottom: 20px;
-  }
-  
-  .filter-badge {
-    display: inline-block;
-    padding: 8px 15px;
-    background: #f0f0f0;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    border-radius: 30px;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  .clear-filters {
-    background: #333;
-    color: #fff;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 14px;
-  }
-  
-  .clear-filters:hover {
-    background: #555;
-  }
-  
 
-  .shop-breadcrumb {
-    background: #fff;
-    padding: 15px 0;
-    margin-bottom: 30px;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .bi-heart, .bi-heart-fill {
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #ff2a68; 
-  }
-  
-  .bi-heart-fill {
-    color: #ff0000; 
-  }
-</style>
+    .shop-sidebar {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
 
-<div class="shop-breadcrumb">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb bg-transparent p-0 m-0">
-            <li class="breadcrumb-item"><a href="/" class="text-dark">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Shop</li>
-          </ol>
-        </nav>
+    .sidebar-heading {
+      font-size: 16px;
+      font-weight: 600;
+      padding: 10px 0;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-content {
+      padding-bottom: 15px;
+    }
+
+    .sidebar-search {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .sidebar-search input {
+      width: 100%;
+      padding: 10px 40px 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+
+    .sidebar-search input:focus {
+      border-color: #777;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-search button {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #777;
+      cursor: pointer;
+    }
+
+    .filter-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .filter-list li {
+      padding: 8px 0;
+    }
+
+    .filter-list li a {
+      color: #555;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: block;
+    }
+
+    .filter-list li a:hover {
+      color: #000;
+      transform: translateX(5px);
+    }
+
+
+    .product-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 30px;
+      transition: all 0.3s;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-img-container {
+      position: relative;
+      padding-top: 100%;
+      overflow: hidden;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .product-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .product-card:hover .product-img {
+      transform: scale(1.05);
+    }
+
+    .wishlist-icon {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      transition: all 0.3s;
+    }
+
+    .wishlist-icon:hover {
+      background: #fff;
+      transform: scale(1.1);
+    }
+
+    .product-info {
+      padding: 15px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 0px;
+    }
+
+    .product-name {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      line-height: 1.3;
+      height: 40px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: 600;
+      color: #ff2a68;
+      margin-bottom: 10px;
+      display: flex;
+    }
+
+    .original-price {
+      font-size: 14px;
+      text-decoration: line-through;
+      color: #999;
+      margin-left: 5px;
+    }
+
+    .add-to-cart {
+      margin-top: 10px;
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+      font-weight: 500;
+    }
+
+    .add-to-cart:hover {
+      background: #333;
+    }
+
+    .out-stock {
+      background: #ffebee;
+      color: #c62828;
+
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 10px;
+      margin-left: 15px;
+      font-weight: 500;
+    }
+
+    .rating {
+      margin-bottom: 10px;
+      color: #ffc107;
+    }
+
+    .pagination-container {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pagination {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      gap: 5px;
+    }
+
+    .pagination-item {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      background: #fff;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s;
+      border: 1px solid #ddd;
+    }
+
+    .pagination-item:hover {
+      background: #f0f0f0;
+    }
+
+    .pagination-item.active {
+      background: #000;
+      color: #fff;
+      border-color: #000;
+    }
+
+    .pagination-nav {
+      padding: 0 15px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      background: #fff;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s;
+      border: 1px solid #ddd;
+    }
+
+    .pagination-nav:hover {
+      background: #f0f0f0;
+    }
+
+
+    .filter-tags {
+      margin-bottom: 20px;
+    }
+
+    .filter-badge {
+      display: inline-block;
+      padding: 8px 15px;
+      background: #f0f0f0;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      border-radius: 30px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .clear-filters {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .clear-filters:hover {
+      background: #555;
+    }
+
+
+    .shop-breadcrumb {
+      background: #fff;
+      padding: 15px 0;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .bi-heart,
+    .bi-heart-fill {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #ff2a68;
+    }
+
+    .bi-heart-fill {
+      color: #ff0000;
+    }
+  </style>
+
+  <div class="shop-breadcrumb">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-transparent p-0 m-0">
+              <li class="breadcrumb-item"><a href="/" class="text-dark">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Shop</li>
+            </ol>
+          </nav>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
-<div class="shop-container">
-  <div class="container">
-    <div class="row">
-     
-      <div class="col-lg-3">
-        <% 
-        function buildQueryString(params) {
-          const queryParams = new URLSearchParams();
-          
-         
-          if (locals.search) queryParams.set('search', search);
-          if (locals.selectedCategory) queryParams.set('category', selectedCategory);
-          if (locals.selectedBrand) queryParams.set('brand', selectedBrand);
-          if (locals.priceSort) queryParams.set('sort', priceSort);
-          if (locals.minPrice) queryParams.set('gt', minPrice);
-          if (locals.maxPrice) queryParams.set('lt', maxPrice);
-          
-        
-          Object.keys(params).forEach(key => {
+  <div class="shop-container">
+    <div class="container">
+      <div class="row">
+
+        <div class="col-lg-3">
+          <% function buildQueryString(params) { const queryParams=new URLSearchParams(); if (locals.search)
+            queryParams.set('search', search); if (locals.selectedCategory) queryParams.set('category',
+            selectedCategory); if (locals.selectedBrand) queryParams.set('brand', selectedBrand); if (locals.priceSort)
+            queryParams.set('sort', priceSort); if (locals.minPrice) queryParams.set('gt', minPrice); if
+            (locals.maxPrice) queryParams.set('lt', maxPrice); Object.keys(params).forEach(key=> {
             if (params[key] !== undefined && params[key] !== null) {
-              queryParams.set(key, params[key]);
+            queryParams.set(key, params[key]);
             }
-          });
-          
-          return queryParams.toString() ? '?' + queryParams.toString() : '';
-        }
-        %>
+            });
 
-      
-        <div class="shop-sidebar">
-          <div class="sidebar-search">
-            <form action="/shop" method="GET">
-              <input type="text" name="search" placeholder="Search products..." 
-                     value="<%= locals.search ? search : '' %>">
-              <button type="submit"><i class="bi bi-search"></i></button>
-            </form>
-          </div>
-        </div>
+            return queryParams.toString() ? '?' + queryParams.toString() : '';
+            }
+            %>
 
-       
-        <div class="shop-sidebar">
-          <div class="sidebar-heading" data-toggle="collapse" data-target="#categoriesCollapse" aria-expanded="true">
-            Categories <i class="bi bi-chevron-down"></i>
-          </div>
-          <div class="sidebar-content collapse show" id="categoriesCollapse">
-            <ul class="filter-list">
-              <% for (let cat of category) { %>
-                <li>
-                  <a href="/shop<%= buildQueryString({ category: cat._id }) %>"
-                     class="<%= (locals.selectedCategory && locals.selectedCategory === cat._id.toString()) ? 'font-weight-bold' : '' %>">
-                    <%= cat.name %>
-                  </a>
-                </li>
-              <% } %>
-            </ul>
-          </div>
-        </div>
 
-       
-        <div class="shop-sidebar">
-          <div class="sidebar-heading" data-toggle="collapse" data-target="#brandsCollapse" aria-expanded="true">
-            Brands <i class="bi bi-chevron-down"></i>
-          </div>
-          <div class="sidebar-content collapse show" id="brandsCollapse">
-            <ul class="filter-list">
-              <% for (let brandItem of brand) { %>
-                <li>
-                  <a href="/shop<%= buildQueryString({ brand: brandItem._id }) %>"
-                     class="<%= (locals.selectedBrand && locals.selectedBrand === brandItem._id.toString()) ? 'font-weight-bold' : '' %>">
-                    <%= brandItem.name %>
-                  </a>
-                </li>
-              <% } %>
-            </ul>
-          </div>
-        </div>
+            <div class="shop-sidebar">
+              <div class="sidebar-search">
+                <form action="/shop" method="GET">
+                  <input type="text" name="search" placeholder="Search products..."
+                    value="<%= locals.search ? search : '' %>">
+                  <button type="submit"><i class="bi bi-search"></i></button>
+                </form>
+              </div>
+            </div>
 
-      
-        <div class="shop-sidebar">
-          <div class="sidebar-heading" data-toggle="collapse" data-target="#sortCollapse" aria-expanded="true">
-            Sort By Price <i class="bi bi-chevron-down"></i>
-          </div>
-          <div class="sidebar-content collapse show" id="sortCollapse">
-            <ul class="filter-list">
-              <li>
-                <a href="/shop<%= buildQueryString({ sort: 'asc' }) %>"
-                   class="<%= (locals.priceSort === 'asc') ? 'font-weight-bold' : '' %>">
-                  <i class="bi bi-arrow-up"></i> Price: Low to High
-                </a>
-              </li>
-              <li>
-                <a href="/shop<%= buildQueryString({ sort: 'desc' }) %>"
-                   class="<%= (locals.priceSort === 'desc') ? 'font-weight-bold' : '' %>">
-                  <i class="bi bi-arrow-down"></i> Price: High to Low
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
 
-       
-        <div class="shop-sidebar">
-          <div class="sidebar-heading" data-toggle="collapse" data-target="#priceCollapse" aria-expanded="true">
-            Filter By Price <i class="bi bi-chevron-down"></i>
-          </div>
-          <div class="sidebar-content collapse show" id="priceCollapse">
-            <ul class="filter-list">
-              <% 
-              const priceRanges = [
-                { min: 1000, max: 3000, label: '₹1,000 - ₹3,000' },
-                { min: 3000, max: 5000, label: '₹3,000 - ₹5,000' },
-                { min: 5000, max: 10000, label: '₹5,000 - ₹10,000' },
-                { min: 10000, max: 20000, label: '₹10,000 - ₹20,000' },
-                { min: 20000, max: null, label: '₹20,000+' }
-              ];
-              %>
-              <% priceRanges.forEach(range => { %>
-                <li>
-                  <a href="/shop<%= buildQueryString({ 
+            <div class="shop-sidebar">
+              <div class="sidebar-heading" data-toggle="collapse" data-target="#categoriesCollapse"
+                aria-expanded="true">
+                Categories <i class="bi bi-chevron-down"></i>
+              </div>
+              <div class="sidebar-content collapse show" id="categoriesCollapse">
+                <ul class="filter-list">
+                  <% for (let cat of category) { %>
+                    <li>
+                      <a href="/shop<%= buildQueryString({ category: cat._id }) %>"
+                        class="<%= (locals.selectedCategory && locals.selectedCategory === cat._id.toString()) ? 'font-weight-bold' : '' %>">
+                        <%= cat.name %>
+                      </a>
+                    </li>
+                    <% } %>
+                </ul>
+              </div>
+            </div>
+
+
+            <div class="shop-sidebar">
+              <div class="sidebar-heading" data-toggle="collapse" data-target="#brandsCollapse" aria-expanded="true">
+                Brands <i class="bi bi-chevron-down"></i>
+              </div>
+              <div class="sidebar-content collapse show" id="brandsCollapse">
+                <ul class="filter-list">
+                  <% for (let brandItem of brand) { %>
+                    <li>
+                      <a href="/shop<%= buildQueryString({ brand: brandItem._id }) %>"
+                        class="<%= (locals.selectedBrand && locals.selectedBrand === brandItem._id.toString()) ? 'font-weight-bold' : '' %>">
+                        <%= brandItem.name %>
+                      </a>
+                    </li>
+                    <% } %>
+                </ul>
+              </div>
+            </div>
+
+
+            <div class="shop-sidebar">
+              <div class="sidebar-heading" data-toggle="collapse" data-target="#sortCollapse" aria-expanded="true">
+                Sort By Price <i class="bi bi-chevron-down"></i>
+              </div>
+              <div class="sidebar-content collapse show" id="sortCollapse">
+                <ul class="filter-list">
+                  <li>
+                    <a href="/shop<%= buildQueryString({ sort: 'asc' }) %>"
+                      class="<%= (locals.priceSort === 'asc') ? 'font-weight-bold' : '' %>">
+                      <i class="bi bi-arrow-up"></i> Price: Low to High
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/shop<%= buildQueryString({ sort: 'desc' }) %>"
+                      class="<%= (locals.priceSort === 'desc') ? 'font-weight-bold' : '' %>">
+                      <i class="bi bi-arrow-down"></i> Price: High to Low
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+
+            <div class="shop-sidebar">
+              <div class="sidebar-heading" data-toggle="collapse" data-target="#priceCollapse" aria-expanded="true">
+                Filter By Price <i class="bi bi-chevron-down"></i>
+              </div>
+              <div class="sidebar-content collapse show" id="priceCollapse">
+                <ul class="filter-list">
+                  <% const priceRanges=[ { min: 1000, max: 3000, label: '₹1,000 - ₹3,000' }, { min: 3000, max: 5000,
+                    label: '₹3,000 - ₹5,000' }, { min: 5000, max: 10000, label: '₹5,000 - ₹10,000' }, { min: 10000, max:
+                    20000, label: '₹10,000 - ₹20,000' }, { min: 20000, max: null, label: '₹20,000+' } ]; %>
+                    <% priceRanges.forEach(range=> { %>
+                      <li>
+                        <a href="/shop<%= buildQueryString({ 
                       gt: range.min, 
                       lt: range.max 
                     }) %>"
-                    class="<%= (locals.minPrice == range.min && (!range.max || locals.maxPrice == range.max)) ? 'font-weight-bold' : '' %>">
-                    <%= range.label %>
-                  </a>
-                </li>
-              <% }); %>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-     
-      <div class="col-lg-9">
-      
-        <% if (locals.search || locals.selectedCategory || locals.selectedBrand || locals.minPrice || locals.maxPrice || locals.priceSort) { %>
-          <div class="filter-tags">
-            <h5 class="mb-3">Applied Filters:</h5>
-            <% if (locals.search) { %>
-              <span class="filter-badge">
-                Search: <%= search %>
-              </span>
-            <% } %>
-            <% if (locals.selectedCategory) { %>
-              <span class="filter-badge">
-                Category: <%= category.find(c => c._id.toString() === selectedCategory).name %>
-              </span>
-            <% } %>
-            <% if (locals.selectedBrand) { %>
-              <span class="filter-badge">
-                Brand: <%= brand.find(b => b._id.toString() === selectedBrand).name %>
-              </span>
-            <% } %>
-            <% if (locals.minPrice || locals.maxPrice) { %>
-              <span class="filter-badge">
-                Price: 
-                <%= locals.minPrice ? '₹' + locals.minPrice : 'Min' %> - 
-                <%= locals.maxPrice ? '₹' + locals.maxPrice : 'Max' %>
-              </span>
-            <% } %>
-            <% if (locals.priceSort) { %>
-              <span class="filter-badge">
-                Sort: <%= locals.priceSort === 'asc' ? 'Price Low to High' : 'Price High to Low' %>
-              </span>
-            <% } %>
-            <a href="/shop" class="clear-filters">
-              <i class="bi bi-x"></i> Clear All
-            </a>
-          </div>
-        <% } %>
-        
-      
-        <div class="row">
-          <% if (product.length === 0) { %>
-            <div class="col-12 text-center py-5">
-              <i class="bi bi-search" style="font-size: 3rem; color: #ccc;"></i>
-              <h4 class="mt-3">No products found</h4>
-              <p class="text-muted">Try adjusting your search or filter criteria</p>
-            </div>
-          <% } else { %>
-            <% for (let item of product) { %>
-              <div class="col-lg-4 col-md-6 mb-4">
-                <div class="product-card">
-                  <a href="/productDetails?id=<%= item._id %>" class="text-decoration-none">
-                    <div class="product-img-container">
-                      <div class="product-img set-bg" data-setbg="/uploads/productImages/<%= item.productImage[0] %>"></div>
-                      <div class="wishlist-icon">
-                        <i class="bi <%= item.inWishlist ? 'bi-heart-fill' : 'bi-heart' %>" 
-                           id="wishlist-icon-<%= item._id %>" 
-                           data-id="<%= item._id %>"></i>
-                      </div>
-                    </div>
-                  </a>
-                  
-                  <div class="product-info">
-                    <h3 class="product-name">
-                      <a href="/productDetails?id=<%= item._id %>" class="text-decoration-none text-dark">
-                        <%= item.productName %>
-                      </a>
-                    </h3>
-                    
-                 
-                    
-                    <% 
-                    const productOffer = item.productOffer || 0;
-                    const categoryOffer = item.category.categoryOffer || 0;
-                    const bestOffer = Math.max(productOffer, categoryOffer);
-                    const salePrice = item.salePrice;
-                    const finalPrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
-                    %>
-                    
-                    <div class="product-price">
-                      ₹<%= finalPrice.toLocaleString() %>
-                      <% if (finalPrice < salePrice) { %>
-                        <span class="original-price">₹<%= salePrice.toLocaleString() %></span>
-                      <% } %>
-                      <div class="stock-status <%= item.quantity > 0 ? '' : 'out-stock' %>">
-                        <%= item.quantity > 0 ? '' : 'Out of Stock' %>
-                    </div>
-                    </div>
-                    
-                  
-                    
-                    <button class="add-to-cart" 
-                            data-id="<%= item._id %>" 
-                            data-quantity="1"
-                            data-price="<%= item.salePrice %>">
-                      <i class="bi bi-cart-plus"></i> Add to Cart
-                    </button>
-                  </div>
-                </div>
+                          class="<%= (locals.minPrice == range.min && (!range.max || locals.maxPrice == range.max)) ? 'font-weight-bold' : '' %>">
+                          <%= range.label %>
+                        </a>
+                      </li>
+                      <% }); %>
+                </ul>
               </div>
-            <% } %>
-          <% } %>
+            </div>
         </div>
-        
-      
-        <% if (product.length > 0 && totalpage > 1) { %>
-          <div class="pagination-container">
-            <% 
-            const basePageParams = {
-              search: locals.search,
-              category: locals.selectedCategory,
-              brand: locals.selectedBrand,
-              sort: locals.priceSort,
-              gt: locals.minPrice,
-              lt: locals.maxPrice
-            };
-            
-            const prevPage = currentpage > 1 ? currentpage - 1 : 1;
-            const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage;
-            
-            let startPage = Math.max(1, currentpage - 2);
-            let endPage = Math.min(totalpage, startPage + 4);
-            
-            if (endPage - startPage < 4) {
-              startPage = Math.max(1, endPage - 4);
-            }
-            %>
-            
-            <div class="pagination">
-              <% if (currentpage > 1) { %>
-                <a href="/shop<%= buildQueryString({ 
+
+
+        <div class="col-lg-9">
+
+          <% if (locals.search || locals.selectedCategory || locals.selectedBrand || locals.minPrice || locals.maxPrice
+            || locals.priceSort) { %>
+            <div class="filter-tags">
+              <h5 class="mb-3">Applied Filters:</h5>
+              <% if (locals.search) { %>
+                <span class="filter-badge">
+                  Search: <%= search %>
+                </span>
+                <% } %>
+                  <% if (locals.selectedCategory) { %>
+                    <span class="filter-badge">
+                      Category: <%= category.find(c=> c._id.toString() === selectedCategory).name %>
+                    </span>
+                    <% } %>
+                      <% if (locals.selectedBrand) { %>
+                        <span class="filter-badge">
+                          Brand: <%= brand.find(b=> b._id.toString() === selectedBrand).name %>
+                        </span>
+                        <% } %>
+                          <% if (locals.minPrice || locals.maxPrice) { %>
+                            <span class="filter-badge">
+                              Price:
+                              <%= locals.minPrice ? '₹' + locals.minPrice : 'Min' %> -
+                                <%= locals.maxPrice ? '₹' + locals.maxPrice : 'Max' %>
+                            </span>
+                            <% } %>
+                              <% if (locals.priceSort) { %>
+                                <span class="filter-badge">
+                                  Sort: <%= locals.priceSort==='asc' ? 'Price Low to High' : 'Price High to Low' %>
+                                </span>
+                                <% } %>
+                                  <a href="/shop" class="clear-filters">
+                                    <i class="bi bi-x"></i> Clear All
+                                  </a>
+            </div>
+            <% } %>
+
+
+              <div class="row">
+                <% if (product.length===0) { %>
+                  <div class="col-12 text-center py-5">
+                    <i class="bi bi-search" style="font-size: 3rem; color: #ccc;"></i>
+                    <h4 class="mt-3">No products found</h4>
+                    <p class="text-muted">Try adjusting your search or filter criteria</p>
+                  </div>
+                  <% } else { %>
+                    <% for (let item of product) { %>
+                      <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="product-card">
+                          <a href="/productDetails?id=<%= item._id %>" class="text-decoration-none">
+                            <div class="product-img-container">
+                              <div class="product-img set-bg"
+                                data-setbg="/uploads/productImages/<%= item.productImage[0] %>"></div>
+                              <div class="wishlist-icon">
+                                <i class="bi <%= item.inWishlist ? 'bi-heart-fill' : 'bi-heart' %>"
+                                  id="wishlist-icon-<%= item._id %>" data-id="<%= item._id %>"></i>
+                              </div>
+                            </div>
+                          </a>
+
+                          <div class="product-info">
+                            <h3 class="product-name">
+                              <a href="/productDetails?id=<%= item._id %>" class="text-decoration-none text-dark">
+                                <%= item.productName %>
+                              </a>
+                            </h3>
+
+
+
+                            <% const productOffer=item.productOffer || 0; const
+                              categoryOffer=item.category.categoryOffer || 0; const bestOffer=Math.max(productOffer,
+                              categoryOffer); const salePrice=item.salePrice; const finalPrice=bestOffer> 0 ?
+                              Math.floor(salePrice - (salePrice * bestOffer / 100)) : salePrice;
+                              %>
+
+                              <div class="product-price">
+                                ₹<%= finalPrice.toLocaleString() %>
+                                  <% if (finalPrice < salePrice) { %>
+                                    <span class="original-price">₹<%= salePrice.toLocaleString() %></span>
+                                    <% } %>
+                                      <div class="stock-status <%= item.quantity > 0 ? '' : 'out-stock' %>">
+                                        <%= item.quantity> 0 ? '' : 'Out of Stock' %>
+                                      </div>
+                              </div>
+
+
+
+                              <button class="add-to-cart" data-id="<%= item._id %>" data-quantity="1"
+                                data-price="<%= item.salePrice %>">
+                                <i class="bi bi-cart-plus"></i> Add to Cart
+                              </button>
+                          </div>
+                        </div>
+                      </div>
+                      <% } %>
+                        <% } %>
+              </div>
+
+
+              <% if (product.length> 0 && totalpage > 1) { %>
+                <div class="pagination-container">
+                  <% const basePageParams={ search: locals.search, category: locals.selectedCategory, brand:
+                    locals.selectedBrand, sort: locals.priceSort, gt: locals.minPrice, lt: locals.maxPrice }; const
+                    prevPage=currentpage> 1 ? currentpage - 1 : 1;
+                    const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage; let startPage=Math.max(1,
+                      currentpage - 2); let endPage=Math.min(totalpage, startPage + 4); if (endPage - startPage < 4) {
+                      startPage=Math.max(1, endPage - 4); } %>
+
+                      <div class="pagination">
+                        <% if (currentpage> 1) { %>
+                          <a href="/shop<%= buildQueryString({ 
                   ...basePageParams, 
                   page: prevPage 
                 }) %>" class="pagination-nav">
-                  <i class="bi bi-chevron-left mr-1"></i> Prev
-                </a>
-              <% } %>
-              
-              <% if (startPage > 1) { %>
-                <a href="/shop<%= buildQueryString({ 
+                            <i class="bi bi-chevron-left mr-1"></i> Prev
+                          </a>
+                          <% } %>
+
+                            <% if (startPage> 1) { %>
+                              <a href="/shop<%= buildQueryString({ 
                   ...basePageParams, 
                   page: 1 
                 }) %>" class="pagination-item">
-                  1
-                </a>
-                <% if (startPage > 2) { %>
-                  <span class="pagination-item">...</span>
-                <% } %>
-              <% } %>
-              
-              <% for(let i = startPage; i <= endPage; i++) { %>
-                <a href="/shop<%= buildQueryString({ 
+                                1
+                              </a>
+                              <% if (startPage> 2) { %>
+                                <span class="pagination-item">...</span>
+                                <% } %>
+                                  <% } %>
+
+                                    <% for(let i=startPage; i <=endPage; i++) { %>
+                                      <a href="/shop<%= buildQueryString({ 
                   ...basePageParams, 
                   page: i 
-                }) %>" 
-                   class="pagination-item <%= (i === currentpage) ? 'active' : '' %>">
-                  <%= i %>
-                </a>
-              <% } %>
-              
-              <% if (endPage < totalpage) { %>
-                <% if (endPage < totalpage - 1) { %>
-                  <span class="pagination-item">...</span>
-                <% } %>
-                <a href="/shop<%= buildQueryString({ 
+                }) %>" class="pagination-item <%= (i === currentpage) ? 'active' : '' %>">
+                                        <%= i %>
+                                      </a>
+                                      <% } %>
+
+                                        <% if (endPage < totalpage) { %>
+                                          <% if (endPage < totalpage - 1) { %>
+                                            <span class="pagination-item">...</span>
+                                            <% } %>
+                                              <a href="/shop<%= buildQueryString({ 
                   ...basePageParams, 
                   page: totalpage 
                 }) %>" class="pagination-item">
-                  <%= totalpage %>
-                </a>
-              <% } %>
-              
-              <% if (currentpage < totalpage) { %>
-                <a href="/shop<%= buildQueryString({ 
+                                                <%= totalpage %>
+                                              </a>
+                                              <% } %>
+
+                                                <% if (currentpage < totalpage) { %>
+                                                  <a href="/shop<%= buildQueryString({ 
                   ...basePageParams, 
                   page: nextPage 
                 }) %>" class="pagination-nav">
-                  Next <i class="bi bi-chevron-right ml-1"></i>
-                </a>
-              <% } %>
-            </div>
-          </div>
-        <% } %>
+                                                    Next <i class="bi bi-chevron-right ml-1"></i>
+                                                  </a>
+                                                  <% } %>
+                      </div>
+                </div>
+                <% } %>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
+  <script>
 
-  document.querySelectorAll('.set-bg').forEach(function (element) {
-    const bg = element.getAttribute('data-setbg');
-    if (bg) {
-      element.style.backgroundImage = `url('${bg}')`;
-    }
-  });
-  
+    document.querySelectorAll('.set-bg').forEach(function (element) {
+      const bg = element.getAttribute('data-setbg');
+      if (bg) {
+        element.style.backgroundImage = `url('${bg}')`;
+      }
+    });
 
-const addToCartbtn = document.querySelectorAll('.add-to-cart');
-addToCartbtn.forEach(function (button) {
-    button.addEventListener('click', function (event) {
+
+    const addToCartbtn = document.querySelectorAll('.add-to-cart');
+    addToCartbtn.forEach(function (button) {
+      button.addEventListener('click', function (event) {
         event.preventDefault();
         const productId = this.getAttribute('data-id');
         const quantity = this.getAttribute('data-quantity');
-        
-        
-        $.ajax({
-            url: '/check-auth',
-            method: 'GET',
-            success: function(response) {
-                if (response.isLoggedIn) {
-                  
-                    addProductToCart(productId, quantity);
-                } else {
-                  
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Login Required',
-                        text: 'Please login to add items to your cart',
-                        showCancelButton: true,
-                        confirmButtonText: 'Go to Login',
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = '/login';
-                        }
-                    });
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error checking authentication status:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Something went wrong. Please try again later.',
-                });
-            }
-        });
-    });
-});
 
-function addProductToCart(productId, quantity) {
-    $.ajax({
+
+        $.ajax({
+          url: '/check-auth',
+          method: 'GET',
+          success: function (response) {
+            if (response.isLoggedIn) {
+
+              addProductToCart(productId, quantity);
+            } else {
+
+              Swal.fire({
+                icon: 'info',
+                title: 'Login Required',
+                text: 'Please login to add items to your cart',
+                showCancelButton: true,
+                confirmButtonText: 'Go to Login',
+                cancelButtonText: 'Cancel'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = '/login';
+                }
+              });
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error checking authentication status:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Something went wrong. Please try again later.',
+            });
+          }
+        });
+      });
+    });
+
+    function addProductToCart(productId, quantity) {
+      $.ajax({
         url: `/addToCart/${productId}`,
         method: 'POST',
         data: JSON.stringify({ quantity: quantity }),
         contentType: 'application/json',
         success: function (response) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Added to Cart',
+            text: response.message,
+            confirmButtonText: 'OK',
+          }).then(() => {
             Swal.fire({
-                icon: 'success',
-                title: 'Added to Cart',
-                text: response.message,
-                confirmButtonText: 'OK',
-            }).then(() => {
-                Swal.fire({
-                    title: 'Go to cart?',
-                    text: 'Do you Want to go to cart?',
-                    showCancelButton: true,
-                    confirmButtonText: "YES",
-                    cancelButtonText: "NO",
-                })
-                .then((confirmation) => {
-                    if (confirmation.isConfirmed) {
-                        window.location.href = '/cart';
-                    }
-                });
-            });
+              title: 'Go to cart?',
+              text: 'Do you Want to go to cart?',
+              showCancelButton: true,
+              confirmButtonText: "YES",
+              cancelButtonText: "NO",
+            })
+              .then((confirmation) => {
+                if (confirmation.isConfirmed) {
+                  window.location.href = '/cart';
+                }
+              });
+          });
         },
         error: function (xhr, status, error) {
-            
-            let errorMessage = "Error while adding to cart. Please try again!";
-            try {
-                const response = JSON.parse(xhr.responseText);
-                if (response && response.message) {
-                    errorMessage = response.message;
-                }
-            } catch (e) {
-                console.error('Error parsing error response', e);
-            }
-            
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: errorMessage,
-                confirmButtonText: 'OK',
-            });
-            console.error('Error while adding to Cart', error);
-        }
-    });
-}
 
- 
-const addToWishbtn = document.querySelectorAll('.bi-heart, .bi-heart-fill');
-addToWishbtn.forEach(function(button) {
-    button.addEventListener('click', function(event) {
+          let errorMessage = "Error while adding to cart. Please try again!";
+          try {
+            const response = JSON.parse(xhr.responseText);
+            if (response && response.message) {
+              errorMessage = response.message;
+            }
+          } catch (e) {
+            console.error('Error parsing error response', e);
+          }
+
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage,
+            confirmButtonText: 'OK',
+          });
+          console.error('Error while adding to Cart', error);
+        }
+      });
+    }
+
+
+    const addToWishbtn = document.querySelectorAll('.bi-heart, .bi-heart-fill');
+    addToWishbtn.forEach(function (button) {
+      button.addEventListener('click', function (event) {
         event.preventDefault();
         const productId = this.getAttribute('data-id');
         const icon = document.getElementById(`wishlist-icon-${productId}`);
 
         // Check if user is logged in first
         $.ajax({
-            url: '/check-auth',
-            method: 'GET',
-            success: function(response) {
-                if (response.isLoggedIn) {
-                    // User is logged in, proceed with wishlist action
-                    updateWishlist(productId, icon);
-                } else {
-                    // User is not logged in, show login prompt
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Login Required',
-                        text: 'Please login to add items to your wishlist',
-                        showCancelButton: true,
-                        confirmButtonText: 'Go to Login',
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = '/login';
-                        }
-                    });
+          url: '/check-auth',
+          method: 'GET',
+          success: function (response) {
+            if (response.isLoggedIn) {
+              // User is logged in, proceed with wishlist action
+              updateWishlist(productId, icon);
+            } else {
+              // User is not logged in, show login prompt
+              Swal.fire({
+                icon: 'info',
+                title: 'Login Required',
+                text: 'Please login to add items to your wishlist',
+                showCancelButton: true,
+                confirmButtonText: 'Go to Login',
+                cancelButtonText: 'Cancel'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = '/login';
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error checking authentication status:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Something went wrong. Please try again later.',
-                });
+              });
             }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error checking authentication status:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Something went wrong. Please try again later.',
+            });
+          }
         });
+      });
     });
-});
 
-// Move the actual wishlist update functionality to a separate function
-function updateWishlist(productId, icon) {
-    $.ajax({
+    // Move the actual wishlist update functionality to a separate function
+    function updateWishlist(productId, icon) {
+      $.ajax({
         url: `/addToWishlist/${productId}`,
         method: 'POST',
         data: JSON.stringify({ productId: productId }),
         contentType: "application/json",
-        success: function(response) {
-            if (response.success) {
-                if (response.action === 'added') {
-                    icon.classList.remove('bi-heart');
-                    icon.classList.add('bi-heart-fill', 'text-danger');
-                    Swal.fire({
-                        icon: 'success',
-                        title: "Added to Wishlist",
-                        text: response.message,
-                        confirmButtonText: 'OK',
-                    });
-                } else if (response.action === 'removed') {
-                    icon.classList.remove('bi-heart-fill', 'text-danger');
-                    icon.classList.add('bi-heart');
-                    Swal.fire({
-                        icon: 'success',
-                        title: "Removed from Wishlist",
-                        text: response.message,
-                        confirmButtonText: 'OK',
-                    });
-                }
+        success: function (response) {
+          if (response.success) {
+            if (response.action === 'added') {
+              icon.classList.remove('bi-heart');
+              icon.classList.add('bi-heart-fill', 'text-danger');
+              Swal.fire({
+                icon: 'success',
+                title: "Added to Wishlist",
+                text: response.message,
+                confirmButtonText: 'OK',
+              });
+            } else if (response.action === 'removed') {
+              icon.classList.remove('bi-heart-fill', 'text-danger');
+              icon.classList.add('bi-heart');
+              Swal.fire({
+                icon: 'success',
+                title: "Removed from Wishlist",
+                text: response.message,
+                confirmButtonText: 'OK',
+              });
             }
+          }
         },
-        error: function(xhr, status, error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error while updating the wishlist.',
-                confirmButtonText: "Ok",
-            });
+        error: function (xhr, status, error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error while updating the wishlist.',
+            confirmButtonText: "Ok",
+          });
         }
-    });
-}
-</script>
+      });
+    }
+  </script>
 
-<%- include("../../views/partials/user/footer") %>
+  <%- include("../../views/partials/user/footer") %>

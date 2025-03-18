@@ -1,151 +1,151 @@
 <%- include("../../views/partials/admin/header") %>
 
   <style>
-body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f8f9fc;
-}
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fc;
+    }
 
-.container {
-  max-width: 1000px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-h1 {
-  text-align: center;
-  color: #333333;
-  margin-bottom: 20px;
-  font-size: 24px;
-}
+    h1 {
+      text-align: center;
+      color: #333333;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
 
-.orders-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
 
-.orders-table th,
-.orders-table td {
-  padding: 14px 12px;
-  text-align: left;
-}
+    .orders-table th,
+    .orders-table td {
+      padding: 14px 12px;
+      text-align: left;
+    }
 
-.orders-table th {
-  background-color: #f1f5f9;
-  color: #6b7280;
-  text-transform: uppercase;
-  font-size: 12px;
-  border-bottom: 2px solid #e5e7eb;
-}
+    .orders-table th {
+      background-color: #f1f5f9;
+      color: #6b7280;
+      text-transform: uppercase;
+      font-size: 12px;
+      border-bottom: 2px solid #e5e7eb;
+    }
 
-.orders-table td {
-  color: #374151;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-}
+    .orders-table td {
+      color: #374151;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-.orders-table tr:nth-child(odd) td {
-  background-color: #f9fafb;
-}
+    .orders-table tr:nth-child(odd) td {
+      background-color: #f9fafb;
+    }
 
-.orders-table tr:hover td {
-  background-color: #e5e7eb;
-}
+    .orders-table tr:hover td {
+      background-color: #e5e7eb;
+    }
 
-.orders-table .btn {
-  padding: 6px 10px;
-  font-size: 12px;
-  color: #2563eb;
-  text-decoration: none;
-  border: 1px solid #2563eb;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
+    .orders-table .btn {
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #2563eb;
+      text-decoration: none;
+      border: 1px solid #2563eb;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
 
-.orders-table .btn:hover {
-  background-color: #2563eb;
-  color: #ffffff;
-}
+    .orders-table .btn:hover {
+      background-color: #2563eb;
+      color: #ffffff;
+    }
 
-.orders-table td.pending {
-  color: #f59e0b; 
-  font-weight: bold;
-}
+    .orders-table td.pending {
+      color: #f59e0b;
+      font-weight: bold;
+    }
 
-.orders-table td.processing {
-  color: #3b82f6; 
-  font-weight: bold;
-}
+    .orders-table td.processing {
+      color: #3b82f6;
+      font-weight: bold;
+    }
 
-.orders-table td.shipped {
-  color: #6366f1; 
-  font-weight: bold;
-}
+    .orders-table td.shipped {
+      color: #6366f1;
+      font-weight: bold;
+    }
 
-.orders-table td.delivered {
-  color: #10b981; 
-  font-weight: bold;
-}
+    .orders-table td.delivered {
+      color: #10b981;
+      font-weight: bold;
+    }
 
-.orders-table td.cancelled {
-  color: #ef4444;
-  font-weight: bold;
-}
+    .orders-table td.cancelled {
+      color: #ef4444;
+      font-weight: bold;
+    }
 
-.orders-table td.return-request {
-  color: #f97316; 
-  font-weight: bold;
-}
+    .orders-table td.return-request {
+      color: #f97316;
+      font-weight: bold;
+    }
 
-.orders-table td.returned {
-  color: #6b7280; 
-  font-weight: bold;
-}
+    .orders-table td.returned {
+      color: #6b7280;
+      font-weight: bold;
+    }
 
 
-@media (max-width: 768px) {
-  .orders-table thead {
-    display: none;
-  }
+    @media (max-width: 768px) {
+      .orders-table thead {
+        display: none;
+      }
 
-  .orders-table tr {
-    display: block;
-    margin-bottom: 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    overflow: hidden;
-  }
+      .orders-table tr {
+        display: block;
+        margin-bottom: 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+      }
 
-  .orders-table td {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    font-size: 12px;
-  }
+      .orders-table td {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        font-size: 12px;
+      }
 
-  .orders-table td:before {
-    content: attr(data-label);
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #6b7280;
-    flex: 1;
-  }
+      .orders-table td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #6b7280;
+        flex: 1;
+      }
 
-  .orders-table td {
-    flex: 2;
-  }
+      .orders-table td {
+        flex: 2;
+      }
 
-  .btn {
-    display: block;
-    text-align: center;
-  }
-}
+      .btn {
+        display: block;
+        text-align: center;
+      }
+    }
 
     .container {
       position: absolute;
@@ -167,129 +167,128 @@ h1 {
     }
 
     .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 2rem;
-        gap: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 2rem;
+      gap: 1rem;
     }
 
     .page-numbers {
-        display: flex;
-        gap: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
     }
 
     .page-numbers a {
-        padding: 0.5rem 1rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        text-decoration: none;
-        color: inherit;
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-decoration: none;
+      color: inherit;
     }
 
     .page-numbers a.active {
-        background:  #0863dab9;
-        color: white;
-        border-color:  #0863dab9;
+      background: #0863dab9;
+      color: white;
+      border-color: #0863dab9;
     }
 
     .page-numbers a:hover:not(.active) {
-        background: #f5f5f5;
+      background: #f5f5f5;
     }
 
     .pagination button {
-        padding: 0.5rem 1rem;
-        border: 1px solid #ddd;
-        background: white;
-        border-radius: 4px;
-        cursor: pointer;
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
     .pagination button:disabled {
-        background: #f5f5f5;
-        cursor: not-allowed;
+      background: #f5f5f5;
+      cursor: not-allowed;
     }
   </style>
 
-    <div class="container">
-      <h1>Orders List</h1>
-      <table class="orders-table">
-        <thead>
+  <div class="container">
+    <h1>Orders List</h1>
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Order Id</th>
+          <th>Status</th>
+          <th>Total Price</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order=> { %>
           <tr>
-            <th>User</th>
-            <th>Order Id</th>
-            <th>Status</th>
-            <th>Total Price</th>
-            <th>Date</th>
-            <th>Actions</th>
+            <td data-label="User">
+              <%= order.user?.name %>
+            </td>
+            <td data-label="Order Id">#<%= order.orderId %>
+            </td>
+            <td data-label="Status" class="<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
+              <%= order.status %>
+            </td>
+
+            <td data-label="Total Price">₹<%= order.finalAmount %>
+            </td>
+            <td data-label="Date">
+              <%= order.createdOn.toLocaleDateString() %>
+            </td>
+            <td data-label="Actions">
+              <a href="/admin/orders/<%= order._id %>" class="btn">View Details</a>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <% orders.forEach(order => { %>
-            <tr>
-              <td data-label="User"><%= order.user?.name %></td>
-              <td data-label="Order Id">#<%= order.orderId %> </td>
-              <td data-label="Status" class="<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
-                <%= order.status %>
-              </td>
-              
-              <td data-label="Total Price">₹<%= order.finalAmount %></td>
-              <td data-label="Date"><%= order.createdOn.toLocaleDateString() %></td>
-              <td data-label="Actions">
-                <a href="/admin/orders/<%= order._id %>" class="btn">View Details</a>
-              </td>
-            </tr>
           <% }); %>
-        </tbody>
-      </table>
+      </tbody>
+    </table>
 
-      <div class="pagination">
-        <% 
-            const prevPage = currentpage > 1 ? currentpage - 1 : 1;
-            const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage;
-        %>
-        
-        <% if (currentpage > 1) { %>
+    <div class="pagination">
+      <% const prevPage=currentpage> 1 ? currentpage - 1 : 1;
+        const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage; %>
+
+          <% if (currentpage> 1) { %>
             <a href="?page=<%= prevPage %>" class="btn">
-                <i class="bi bi-chevron-left"></i> Previous
+              <i class="bi bi-chevron-left"></i> Previous
             </a>
-        <% } %>
-
-        <div class="page-numbers">
-            <% 
-            let startPage = Math.max(1, currentpage - 2);
-            let endPage = Math.min(totalpage, startPage + 4);
-            
-            if (endPage - startPage < 4) {
-                startPage = Math.max(1, endPage - 4);
-            }
-            
-            if (startPage > 1) { %>
-                <a href="?page=1">1</a>
-                <% if (startPage > 2) { %>
-                    <span>...</span>
-                <% } %>
             <% } %>
 
-            <% for(let i = startPage; i <= endPage; i++) { %>
-                <a href="?page=<%= i %>" class="<%= (i === currentpage) ? 'active' : '' %>">
-                    <%= i %>
+              <div class="page-numbers">
+                <% let startPage=Math.max(1, currentpage - 2); let endPage=Math.min(totalpage, startPage + 4); if
+                  (endPage - startPage < 4) { startPage=Math.max(1, endPage - 4); } if (startPage> 1) { %>
+                  <a href="?page=1">1</a>
+                  <% if (startPage> 2) { %>
+                    <span>...</span>
+                    <% } %>
+                      <% } %>
+
+                        <% for(let i=startPage; i <=endPage; i++) { %>
+                          <a href="?page=<%= i %>" class="<%= (i === currentpage) ? 'active' : '' %>">
+                            <%= i %>
+                          </a>
+                          <% } %>
+
+                            <% if (endPage < totalpage) { %>
+                              <% if (endPage < totalpage - 1) { %>
+                                <span>...</span>
+                                <% } %>
+                                  <a href="?page=<%= totalpage %>">
+                                    <%= totalpage %>
+                                  </a>
+                                  <% } %>
+              </div>
+
+              <% if (currentpage < totalpage) { %>
+                <a href="?page=<%= nextPage %>" class="btn">
+                  Next <i class="bi bi-chevron-right"></i>
                 </a>
-            <% } %>
-
-            <% if (endPage < totalpage) { %>
-                <% if (endPage < totalpage - 1) { %>
-                    <span>...</span>
                 <% } %>
-                <a href="?page=<%= totalpage %>"><%= totalpage %></a>
-            <% } %>
-        </div>
-
-        <% if (currentpage < totalpage) { %>
-            <a href="?page=<%= nextPage %>" class="btn">
-                Next <i class="bi bi-chevron-right"></i>
-            </a>
-        <% } %>
     </div>
-    </div>
+  </div>
   <%- include("../../views/partials/admin/footer") %>

@@ -1,396 +1,407 @@
 <%- include("../../views/partials/admin/header") %>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<style>
-    .content-header {
-        background: #f9fafb;
-        padding: 1.5rem 2rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .search-bar {
-        width: 300px;
-        margin: 0;
-        position: relative;
-        border: none;
-    }
-
-    .search-bar .form-control {
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: white;
-        width: 100%;
-    }
-
-    .search-bar .btn {
-        display: none;
-    }
-
-    .table-responsive {
-        background: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-top: 1rem;
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        background: #f9fafb;
-        border-bottom: 1px solid #e5e7eb;
-        color: #6b7280;
-        font-size: 0.875rem;
-        font-weight: 600;
-        padding: 0.75rem 1rem;
-        text-transform: uppercase;
-    }
-
-    .table tbody td {
-        padding: 1rem;
-        color: #374151;
-        border-bottom: 1px solid #e5e7eb;
-        font-size: 0.875rem;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.75rem;
-        font-size: 0.875rem;
-        border-radius: 0.375rem;
-    }
-
-    .pagination {
-        margin: 1.5rem 0;
-    }
-
-    .page-link {
-        color: #374151;
-        border: 1px solid #e5e7eb;
-        padding: 0.5rem 0.75rem;
-    }
-
-    .page-item.active .page-link {
-        background-color: #2563eb;
-        border-color: #2563eb;
-    }
-
-    .page-item.disabled .page-link {
-        color: #9ca3af;
-        background-color: #f9fafb;
-    }
-
-    .content-title {
-        color: #111827;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    @media (max-width: 768px) {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
         .content-header {
-            padding: 1rem;
+            background: #f9fafb;
+            padding: 1.5rem 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
         }
-        
+
         .search-bar {
+            width: 300px;
+            margin: 0;
+            position: relative;
+            border: none;
+        }
+
+        .search-bar .form-control {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
             width: 100%;
+        }
+
+        .search-bar .btn {
+            display: none;
+        }
+
+        .table-responsive {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             margin-top: 1rem;
         }
-        
-        .table-responsive {
-            margin-top: 0.5rem;
+
+        .table {
+            margin-bottom: 0;
         }
-    }
-    .status-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        display: inline-block;
-    }
 
-    .status-active {
-        background-color: #def7ec;
-        color: #03543f;
-    }
+        .table thead th {
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            text-transform: uppercase;
+        }
 
-    .status-blocked {
-        background-color: #fde8e8;
-        color: #9b1c1c;
-    }
+        .table tbody td {
+            padding: 1rem;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+        }
+
+        .pagination {
+            margin: 1.5rem 0;
+        }
+
+        .page-link {
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .page-item.active .page-link {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .page-item.disabled .page-link {
+            color: #9ca3af;
+            background-color: #f9fafb;
+        }
+
+        .content-title {
+            color: #111827;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .content-header {
+                padding: 1rem;
+            }
+
+            .search-bar {
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            .table-responsive {
+                margin-top: 0.5rem;
+            }
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-active {
+            background-color: #def7ec;
+            color: #03543f;
+        }
+
+        .status-blocked {
+            background-color: #fde8e8;
+            color: #9b1c1c;
+        }
 
 
-.action-dropdown {
-    position: relative;
-    display: inline-block;
-}
+        .action-dropdown {
+            position: relative;
+            display: inline-block;
+        }
 
-.action-btn {
-    background: none;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-}
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
 
-.action-btn:hover {
-    background-color: #f3f4f6;
-}
+        .action-btn:hover {
+            background-color: #f3f4f6;
+        }
 
-.action-dots {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-}
+        .action-dots {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
 
-.dot {
-    width: 4px;
-    height: 4px;
-    background-color: #6b7280;
-    border-radius: 50%;
-}
+        .dot {
+            width: 4px;
+            height: 4px;
+            background-color: #6b7280;
+            border-radius: 50%;
+        }
 
-.dropdown-menu {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background-color: white;
-    min-width: 120px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
-    display: none;
-    z-index: 1000;
-    transform: translateY(8px);
-}
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: white;
+            min-width: 120px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            display: none;
+            z-index: 1000;
+            transform: translateY(8px);
+        }
 
-.dropdown-menu.show {
-    display: block;
-}
+        .dropdown-menu.show {
+            display: block;
+        }
 
-.dropdown-item {
-    padding: 8px 16px;
-    display: block;
-    width: 100%;
-    text-align: left;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: #374151;
-    font-size: 14px;
-    transition: background-color 0.2s;
-}
+        .dropdown-item {
+            padding: 8px 16px;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #374151;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
 
-.dropdown-item:hover {
-    background-color: #f9fafb;
-}
+        .dropdown-item:hover {
+            background-color: #f9fafb;
+        }
 
-.table tbody td:last-child {
-    position: relative;
-    min-width: 100px;
-}
-.content-header {
-        position: absolute;
-        top: 70px;
-        left: 240px;
-        width: calc(100% - 240px);
-        padding: 2rem;
-    }
-    @media (max-width: 1000px) {
+        .table tbody td:last-child {
+            position: relative;
+            min-width: 100px;
+        }
+
         .content-header {
-        position: absolute;
-        top: 50px;
-        left: 20px;
-        width: calc(100% - 30px);
-        padding: 2rem;
-    }
-    }
-</style>
+            position: absolute;
+            top: 70px;
+            left: 240px;
+            width: calc(100% - 240px);
+            padding: 2rem;
+        }
 
-<div class="content-header row">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2 class="content-title card-title">Customers</h2>
+        @media (max-width: 1000px) {
+            .content-header {
+                position: absolute;
+                top: 50px;
+                left: 20px;
+                width: calc(100% - 30px);
+                padding: 2rem;
+            }
+        }
+    </style>
+
+    <div class="content-header row">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="content-title card-title">Customers</h2>
+        </div>
+
+
+        <header class="card-header text-center mb-20">
+            <form action="/admin/users" method="get" class="d-inline">
+                <div class="input-group input-group-sm search-bar">
+                    <input type="text" class="form-control" placeholder="Search customers..." name="search"
+                        value="<%= search %>" aria-label="Search customers" />
+                    <button class="btn btn-outline-primary" type="submit" aria-label="Search">Search</button>
+                </div>
+            </form>
+        </header>
+
+        <div class="table-responsive mt-5">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col"><b>Name</b></th>
+                        <th scope="col"><b>Email</b></th>
+                        <th scope="col"><b>Phone No</b></th>
+                        <th scope="col"><b>Status</b></th>
+                        <th scope="col"><b>Action</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (users && users.length> 0) { %>
+                        <% users.forEach((customer)=> { %>
+                            <tr>
+                                <td>
+                                    <%= customer.name || "N/A" %>
+                                </td>
+                                <td>
+                                    <%= customer.email || "N/A" %>
+                                </td>
+                                <td>
+                                    <%= customer.phone || "N/A" %>
+                                </td>
+                                <td>
+                                    <span
+                                        class="status-badge <%= customer.isBlocked ? 'status-blocked' : 'status-active' %>">
+                                        <%= customer.isBlocked ? 'Blocked' : 'Active' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-dropdown">
+                                        <button class="action-btn" aria-label="Actions">
+                                            <div class="action-dots">
+                                                <div class="dot"></div>
+                                                <div class="dot"></div>
+                                                <div class="dot"></div>
+                                            </div>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <% if (customer.isBlocked) { %>
+                                                <button class="dropdown-item unblock-btn" data-id="<%= customer._id %>">
+                                                    Unblock
+                                                </button>
+                                                <% } else { %>
+                                                    <button class="dropdown-item block-btn"
+                                                        data-id="<%= customer._id %>">
+                                                        Block
+                                                    </button>
+                                                    <% } %>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="text-center">No customers found</td>
+                                    </tr>
+                                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="container mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <% if (pagination && pagination.totalpage> 1) { %>
+
+                        <li class="page-item <%= pagination.currentpage == 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= pagination.currentpage - 1 %>&search=<%= search %>"
+                                aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+
+                        <% for (let i=1; i <=pagination.totalpage; i++) { %>
+                            <li class="page-item <%= i == pagination.currentpage ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                            <% } %>
+
+
+                                <li
+                                    class="page-item <%= pagination.currentpage == pagination.totalpage ? 'disabled' : '' %>">
+                                    <a class="page-link"
+                                        href="?page=<%= parseInt(pagination.currentpage) + 1 %>&search=<%= search %>"
+                                        aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <% } else { %>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">No pages available</span>
+                                    </li>
+                                    <% } %>
+                </ul>
+            </nav>
+        </div>
     </div>
 
 
-<header class="card-header text-center mb-20">
-    <form action="/admin/users" method="get" class="d-inline">
-        <div class="input-group input-group-sm search-bar">
-            <input
-                type="text"
-                class="form-control"
-                placeholder="Search customers..."
-                name="search"
-                value="<%= search %>"
-                aria-label="Search customers"
-            />
-            <button class="btn btn-outline-primary" type="submit" aria-label="Search">Search</button>
-        </div>
-    </form>
-</header>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-<div class="table-responsive mt-5">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col"><b>Name</b></th>
-                <th scope="col"><b>Email</b></th>
-                <th scope="col"><b>Phone No</b></th>
-                <th scope="col"><b>Status</b></th>
-                <th scope="col"><b>Action</b></th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if (users && users.length > 0) { %>
-                <% users.forEach((customer) => { %>
-                    <tr>
-                        <td><%= customer.name || "N/A" %></td>
-                        <td><%= customer.email || "N/A" %></td>
-                        <td><%= customer.phone || "N/A" %></td>
-                        <td>
-                            <span class="status-badge <%= customer.isBlocked ? 'status-blocked' : 'status-active' %>">
-                                <%= customer.isBlocked ? 'Blocked' : 'Active' %>
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-dropdown">
-                                <button class="action-btn" aria-label="Actions">
-                                    <div class="action-dots">
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
-                                        <div class="dot"></div>
-                                    </div>
-                                </button>
-                                <div class="dropdown-menu">
-                                    <% if (customer.isBlocked) { %>
-                                        <button class="dropdown-item unblock-btn" data-id="<%= customer._id %>">
-                                            Unblock
-                                        </button>
-                                    <% } else { %>
-                                        <button class="dropdown-item block-btn" data-id="<%= customer._id %>">
-                                            Block
-                                        </button>
-                                    <% } %>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                <% }); %>
-            <% } else { %>
-                <tr>
-                    <td colspan="5" class="text-center">No customers found</td>
-                </tr>
-            <% } %>
-        </tbody>
-    </table>
-</div>
+            const actionButtons = document.querySelectorAll('.action-btn');
 
-<div class="container mt-3">
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <% if (pagination && pagination.totalpage > 1) { %>
-            
-                <li class="page-item <%= pagination.currentpage == 1 ? 'disabled' : '' %>">
-                    <a class="page-link" href="?page=<%= pagination.currentpage - 1 %>&search=<%= search %>" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-
-               
-                <% for (let i = 1; i <= pagination.totalpage; i++) { %>
-                    <li class="page-item <%= i == pagination.currentpage ? 'active' : '' %>">
-                        <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
-                    </li>
-                <% } %>
-
-            
-                <li class="page-item <%= pagination.currentpage == pagination.totalpage ? 'disabled' : '' %>">
-                    <a class="page-link" href="?page=<%= parseInt(pagination.currentpage) + 1 %>&search=<%= search %>" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            <% } else { %>
-                <li class="page-item disabled">
-                    <span class="page-link">No pages available</span>
-                </li>
-            <% } %>
-        </ul>
-    </nav>
-</div>
-</div>
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
- document.addEventListener("DOMContentLoaded", function() {
- 
-    const actionButtons = document.querySelectorAll('.action-btn');
-    
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.action-dropdown')) {
-            document.querySelectorAll('.dropdown-menu').forEach(value => {
-                value.classList.remove('show');
-            });
-        }
-    });
-
-
-    actionButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-       
-            const value = this.closest('.action-dropdown').querySelector('.dropdown-menu');
-    
-            document.querySelectorAll('.dropdown-menu').forEach(val => {
-                if (val !== value) val.classList.remove('show');
-            });
-        
-            value.classList.toggle('show');
-        });
-    });
-
-
-    const blockBtns = document.querySelectorAll('.block-btn');
-    blockBtns.forEach(function(button) {
-        button.addEventListener('click', function() {
-            const userId = button.getAttribute('data-id');
-            $.ajax({
-                url: `/admin/user-block/${userId}`,
-                method: 'GET',
-                success: function(response) {
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error while blocking user', error);
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.action-dropdown')) {
+                    document.querySelectorAll('.dropdown-menu').forEach(value => {
+                        value.classList.remove('show');
+                    });
                 }
             });
-        });
-    });
 
- 
-    const unblockBtns = document.querySelectorAll('.unblock-btn');
-    unblockBtns.forEach(function(button) {
-        button.addEventListener('click', function() {
-            const userId = button.getAttribute('data-id');
-            $.ajax({
-                url: `/admin/user-unblock/${userId}`,
-                method: 'GET',
-                success: function(response) {
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error while unblocking user', error);
-                }
+
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.stopPropagation();
+
+                    const value = this.closest('.action-dropdown').querySelector('.dropdown-menu');
+
+                    document.querySelectorAll('.dropdown-menu').forEach(val => {
+                        if (val !== value) val.classList.remove('show');
+                    });
+
+                    value.classList.toggle('show');
+                });
+            });
+
+
+            const blockBtns = document.querySelectorAll('.block-btn');
+            blockBtns.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const userId = button.getAttribute('data-id');
+                    $.ajax({
+                        url: `/admin/user-block/${userId}`,
+                        method: 'GET',
+                        success: function (response) {
+                            location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error while blocking user', error);
+                        }
+                    });
+                });
+            });
+
+
+            const unblockBtns = document.querySelectorAll('.unblock-btn');
+            unblockBtns.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const userId = button.getAttribute('data-id');
+                    $.ajax({
+                        url: `/admin/user-unblock/${userId}`,
+                        method: 'GET',
+                        success: function (response) {
+                            location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error while unblocking user', error);
+                        }
+                    });
+                });
             });
         });
-    });
-});
 
-</script>
-<%- include("../../views/partials/admin/footer") %>
+    </script>
+    <%- include("../../views/partials/admin/footer") %>

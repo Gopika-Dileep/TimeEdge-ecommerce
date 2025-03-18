@@ -1,142 +1,154 @@
-<%-include("../../views/partials/user/header") %>
+<%-include(".. /../views/partials/user/header") %>
 
 
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-  .sidebar {
-    width: 240px;
-    background: #fff;
-    min-height: 100vh;
-    padding: 20px;
-    box-shadow: 1px 0 3px rgba(0,0,0,0.1);
-  }
+  <!DOCTYPE html>
+  <html>
 
-  .breadcrumb {
-    padding: 12px 24px;
-    background: #f1f5f9;
-    margin-bottom: 20px;
-  }
+  <head>
+    <style>
+      .sidebar {
+        width: 240px;
+        background: #fff;
+        min-height: 100vh;
+        padding: 20px;
+        box-shadow: 1px 0 3px rgba(0, 0, 0, 0.1);
+      }
 
-  .breadcrumb a {
-    color: #64748b;
-    text-decoration: none;
-  }
+      .breadcrumb {
+        padding: 12px 24px;
+        background: #f1f5f9;
+        margin-bottom: 20px;
+      }
 
-  .breadcrumb span {
-    color: #1e293b;
-    margin-left: 8px;
-  }
+      .breadcrumb a {
+        color: #64748b;
+        text-decoration: none;
+      }
 
-  .nav-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    margin-bottom: 4px;
-    color: #64748b;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: all 0.2s;
-  }
+      .breadcrumb span {
+        color: #1e293b;
+        margin-left: 8px;
+      }
 
-  .nav-item:hover {
-    background: #f1f5f9;
-  }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        margin-bottom: 4px;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
 
-  .nav-item.active {
-    background: #f1f5f9;
-    color: #1e293b;
-  }
+      .nav-item:hover {
+        background: #f1f5f9;
+      }
 
-  .nav-item svg {
-    width: 20px;
-    height: 20px;
-    margin-right: 12px;
-  }
+      .nav-item.active {
+        background: #f1f5f9;
+        color: #1e293b;
+      }
 
-  .nav-item span {
-    font-size: 14px;
-  }
+      .nav-item svg {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+      }
 
-  .layout-container {
-    display: flex;
-  }
+      .nav-item span {
+        font-size: 14px;
+      }
 
-  .main-content {
-    flex: 1;
-    padding: 20px;
-    background: #f8fafc;
-  }
-</style>
-</head>
-<body>
+      .layout-container {
+        display: flex;
+      }
 
-<div class="layout-container">
-  <div class="sidebar">
-    <a href="/orders" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-      </svg>
-      <span>Orders</span>
-    </a>
+      .main-content {
+        flex: 1;
+        padding: 20px;
+        background: #f8fafc;
+      }
+    </style>
+  </head>
 
-    <a href="/wishlist" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-      </svg>
-      <span>Wishlist</span>
-    </a>
+  <body>
 
-    <a href="/address" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-      <span>Address</span>
-    </a>
+    <div class="layout-container">
+      <div class="sidebar">
+        <a href="/orders" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Orders</span>
+        </a>
 
-    <a href="/password" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-      </svg>
-      <span>Password</span>
-    </a>
+        <a href="/wishlist" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          <span>Wishlist</span>
+        </a>
 
-    <a href="/accountdetails" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-      <span>Account Details</span>
-    </a>
+        <a href="/address" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Address</span>
+        </a>
 
-    <a href="/wallet" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-      </svg>
-      <span>Wallet</span>
-    </a>
+        <a href="/password" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>Password</span>
+        </a>
 
-    <a href="/refer" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-      </svg>
-      <span>Refer & Earn</span>
-    </a>
+        <a href="/accountdetails" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span>Account Details</span>
+        </a>
 
-    <a href="/logout" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-      </svg>
-      <span>Logout</span>
-    </a>
-  </div>
+        <a href="/wallet" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+          <span>Wallet</span>
+        </a>
 
-  <div class="main-content">
-   
-  </div>
-</div>
+        <a href="/refer" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Refer & Earn</span>
+        </a>
 
-</body>
-</html>
-<%-include("../../views/partials/user/footer") %>
+        <a href="/logout" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <div class="main-content">
+
+      </div>
+    </div>
+
+  </body>
+
+  </html>
+  <%-include(".. /../views/partials/user/footer") %>

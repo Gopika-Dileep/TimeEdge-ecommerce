@@ -1,265 +1,254 @@
 <%- include("../../views/partials/admin/header") %>
-<head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"/>
-  <link rel="stylesheet" href="/styles/category.css">
-</head>
 
-<style>
-    .content-main {
-        position: absolute;
-        top: 70px;
-        left: 240px;
-        width: calc(100% - 240px);
-        padding: 2rem;
-    }
-    @media (max-width: 1000px) {
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css" />
+        <link rel="stylesheet" href="/styles/category.css">
+    </head>
+
+    <style>
         .content-main {
-        position: absolute;
-        top: 50px;
-        left: 20px;
-        width: calc(100% - 30px);
-        padding: 2rem;
-    }
-    }
-</style>
-<body>
-  <section class="content-main">
-    <div class="content-header">
-      <h2 class="content-title card-title">Category</h2>
-    </div>
-
-
-    <header class="card-header text-center mb-4">
-      <form action="/admin/editCategory" method="GET" class="d-inline">
-        <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="max-width: 500px; margin: auto;">
-          <input
-            type="text"
-            class="form-control border-0 rounded-pill"
-            placeholder="Search categories"
-            name="search"
-            required
-          />
-          <button class="btn btn-primary rounded-pill" type="submit">Search</button>
-        </div>
-    </form>
-</header>
-<div class="col-md-3">
-    <form  id="categoryUpdateForm"   data-id="<%= category._id %>" onsubmit="return validateCategoryForm()">
-        <div class="mb-4">
-            <label for="product_name" class="form-label">Name</label>
-            <input
-            type="text"
-            name="name"
-            value="<%= category.name %>"
-            class="form-control"
-            id="product_name"
-            required
-            />
-            <div class="invalid-feedback" id="nameError"></div>
-          </div>
-          <div class="mb-4">
-            <label class="form-label">Description</label>
-            <textarea
-              name="description"
-              class="form-control"
-              id="descriptionId"
-              required
-            ><%= category.description %></textarea>
-            <div class="invalid-feedback" id="descriptionError"></div>
-          </div>
-          <div class="d-grid">
-            <button class="btn btn-primary" type="submit">Create category</button>
-          </div>
-        </form>
-      </div>
-
-   
-  </section>
-
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
- 
-  <script>
-    categoryUpdateForm.onsubmit = function(event) {
-    event.preventDefault();
-
-    const categoryId = categoryUpdateForm.getAttribute('data-id');
-    const name = document.getElementsByName("name")[0].value.trim();
-    const description = document.getElementById("descriptionId").value.trim();
-
-    
-        fetch(`/admin/editCategory/${categoryId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name, description })
-        })
-        .then(response => {
-           window.location ='/admin/category'
-        })
-       
-        .catch(error => {
-            console.log(error)
-        });
-    }
-    
-    function validateForm() {
-        clearErrorMessage(); 
-        const name = document.getElementsByName("name")[0].value.trim();
-        const description = document.getElementById("descriptionId").value.trim();
-        let isValid = true;
-    
-        
-        if (name === "") {
-            displayErrorMessage("name-error", "Please enter a name");
-            isValid = false;
-        } else if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
-            displayErrorMessage("name-error", "Category name should contain only alphanumeric characters");
-            isValid = false;
-        }
-    
-       
-        if (description === "") {
-            displayErrorMessage("description-error", "Please enter a description");
-            isValid = false;
-        }
-    
-        return isValid;
-    }
-    
-    function displayErrorMessage(elementId, message) {
-        const errorElement = document.getElementById(elementId);
-        if (errorElement) {
-            errorElement.innerHTML = message;
-            errorElement.style.display = "block";
-        }
-    }
-    async function addOffer(categoryId) {
-     
-    const { value: amount } = await Swal.fire({
-        title: "Offer in Percentage",
-        input: "number",
-        inputLabel: "Percentage",
-        inputPlaceholder: "%",
-        inputAttributes: {
-            min: 0,
-            max: 100,
-            step: 1
-        }
-    });
-
-    if (amount) {
-        if (amount < 0 || amount > 100 || isNaN(amount)) {
-            Swal.fire("Invalid Input", "Please enter a valid percentage between 0 and 100", "error");
-            return;
+            position: absolute;
+            top: 70px;
+            left: 240px;
+            width: calc(100% - 240px);
+            padding: 2rem;
         }
 
-        try {
-            Swal.fire({
-                title: "Adding Offer...",
-                text: "Please wait while the offer is being added",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            const response = await fetch("/admin/addCategoryOffer", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    percentage: amount,
-                    categoryId: categoryId,
-                }),
-            });
-
-            const data = await response.json();
-
-            Swal.close(); 
-
-            if (response.ok && data.status === true) {
-                Swal.fire("Offer Added", "The offer has been added successfully", "success").then(() => {
-                    location.reload();
-                });
-            } else {
-                Swal.fire("Failed", data.message || "Adding offer failed", "error");
+        @media (max-width: 1000px) {
+            .content-main {
+                position: absolute;
+                top: 50px;
+                left: 20px;
+                width: calc(100% - 30px);
+                padding: 2rem;
             }
-        } catch (error) {
-            Swal.fire(
-                "Error",
-                "An error occurred while adding the offer. Please try again.",
-                "error"
-            );
-            console.error("Error adding offer:", error);
         }
-    }
-}
-async function removeOffer(categoryId) {
-    const confirm = await Swal.fire({
-        title: "Remove Offer",
-        text: "Are you sure you want to remove the offer from this category?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, Remove",
-        cancelButtonText: "Cancel",
-    });
+    </style>
 
-    if (confirm.isConfirmed) {
-        try {
-            Swal.fire({
-                title: "Removing Offer...",
-                text: "Please wait while the offer is being removed",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
+    <body>
+        <section class="content-main">
+            <div class="content-header">
+                <h2 class="content-title card-title">Category</h2>
+            </div>
 
-            const response = await fetch("/admin/removeCategoryOffer", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    categoryId: categoryId,
-                }),
-            });
 
-            const data = await response.json();
+            <header class="card-header text-center mb-4">
+                <form action="/admin/editCategory" method="GET" class="d-inline">
+                    <div class="input-group input-group-sm border border-1 border-grey rounded-pill"
+                        style="max-width: 500px; margin: auto;">
+                        <input type="text" class="form-control border-0 rounded-pill" placeholder="Search categories"
+                            name="search" required />
+                        <button class="btn btn-primary rounded-pill" type="submit">Search</button>
+                    </div>
+                </form>
+            </header>
+            <div class="col-md-3">
+                <form id="categoryUpdateForm" data-id="<%= category._id %>" onsubmit="return validateCategoryForm()">
+                    <div class="mb-4">
+                        <label for="product_name" class="form-label">Name</label>
+                        <input type="text" name="name" value="<%= category.name %>" class="form-control"
+                            id="product_name" required />
+                        <div class="invalid-feedback" id="nameError"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" id="descriptionId"
+                            required><%= category.description %></textarea>
+                        <div class="invalid-feedback" id="descriptionError"></div>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-primary" type="submit">Create category</button>
+                    </div>
+                </form>
+            </div>
 
-            Swal.close(); 
 
-            if (response.ok && data.status === true) {
-                Swal.fire("Offer Removed", "The offer has been successfully removed", "success").then(() => {
-                    location.reload();
-                });
-            } else {
-                Swal.fire("Failed", data.message || "Removing offer failed", "error");
+        </section>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+
+        <script>
+            categoryUpdateForm.onsubmit = function (event) {
+                event.preventDefault();
+
+                const categoryId = categoryUpdateForm.getAttribute('data-id');
+                const name = document.getElementsByName("name")[0].value.trim();
+                const description = document.getElementById("descriptionId").value.trim();
+
+
+                fetch(`/admin/editCategory/${categoryId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ name, description })
+                })
+                    .then(response => {
+                        window.location = '/admin/category'
+                    })
+
+                    .catch(error => {
+                        console.log(error)
+                    });
             }
-        } catch (error) {
-            Swal.fire(
-                "Error",
-                "An error occurred while removing the offer. Please try again.",
-                "error"
-            );
-            console.error("Error removing offer:", error);
-        }
-    }
-}
-    function clearErrorMessage() {
 
-        const errorElements = document.getElementsByClassName("error-message");
-        Array.from(errorElements).forEach(element => {
-            element.innerText = "";
-            element.style.display = "none";
-        });
-    }
+            function validateForm() {
+                clearErrorMessage();
+                const name = document.getElementsByName("name")[0].value.trim();
+                const description = document.getElementById("descriptionId").value.trim();
+                let isValid = true;
 
 
+                if (name === "") {
+                    displayErrorMessage("name-error", "Please enter a name");
+                    isValid = false;
+                } else if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
+                    displayErrorMessage("name-error", "Category name should contain only alphanumeric characters");
+                    isValid = false;
+                }
 
-    </script>
+
+                if (description === "") {
+                    displayErrorMessage("description-error", "Please enter a description");
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            function displayErrorMessage(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.innerHTML = message;
+                    errorElement.style.display = "block";
+                }
+            }
+            async function addOffer(categoryId) {
+
+                const { value: amount } = await Swal.fire({
+                    title: "Offer in Percentage",
+                    input: "number",
+                    inputLabel: "Percentage",
+                    inputPlaceholder: "%",
+                    inputAttributes: {
+                        min: 0,
+                        max: 100,
+                        step: 1
+                    }
+                });
+
+                if (amount) {
+                    if (amount < 0 || amount > 100 || isNaN(amount)) {
+                        Swal.fire("Invalid Input", "Please enter a valid percentage between 0 and 100", "error");
+                        return;
+                    }
+
+                    try {
+                        Swal.fire({
+                            title: "Adding Offer...",
+                            text: "Please wait while the offer is being added",
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            },
+                        });
+
+                        const response = await fetch("/admin/addCategoryOffer", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                percentage: amount,
+                                categoryId: categoryId,
+                            }),
+                        });
+
+                        const data = await response.json();
+
+                        Swal.close();
+
+                        if (response.ok && data.status === true) {
+                            Swal.fire("Offer Added", "The offer has been added successfully", "success").then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire("Failed", data.message || "Adding offer failed", "error");
+                        }
+                    } catch (error) {
+                        Swal.fire(
+                            "Error",
+                            "An error occurred while adding the offer. Please try again.",
+                            "error"
+                        );
+                        console.error("Error adding offer:", error);
+                    }
+                }
+            }
+            async function removeOffer(categoryId) {
+                const confirm = await Swal.fire({
+                    title: "Remove Offer",
+                    text: "Are you sure you want to remove the offer from this category?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Remove",
+                    cancelButtonText: "Cancel",
+                });
+
+                if (confirm.isConfirmed) {
+                    try {
+                        Swal.fire({
+                            title: "Removing Offer...",
+                            text: "Please wait while the offer is being removed",
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            },
+                        });
+
+                        const response = await fetch("/admin/removeCategoryOffer", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                categoryId: categoryId,
+                            }),
+                        });
+
+                        const data = await response.json();
+
+                        Swal.close();
+
+                        if (response.ok && data.status === true) {
+                            Swal.fire("Offer Removed", "The offer has been successfully removed", "success").then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire("Failed", data.message || "Removing offer failed", "error");
+                        }
+                    } catch (error) {
+                        Swal.fire(
+                            "Error",
+                            "An error occurred while removing the offer. Please try again.",
+                            "error"
+                        );
+                        console.error("Error removing offer:", error);
+                    }
+                }
+            }
+            function clearErrorMessage() {
+
+                const errorElements = document.getElementsByClassName("error-message");
+                Array.from(errorElements).forEach(element => {
+                    element.innerText = "";
+                    element.style.display = "none";
+                });
+            }
 
 
-<%- include("../../views/partials/admin/footer") %>
+
+        </script>
+
+
+        <%- include("../../views/partials/admin/footer") %>

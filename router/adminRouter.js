@@ -67,8 +67,6 @@ router.get('/dashboard',adminAuth,dashboardController.loadDashboard)
     
 router.get('/filterData',adminAuth,dashboardController.filterData)
 
-// router.get('/admin/dashboard/filter',adminAuth,dashboardController.loadDashboard)
-
 router.get("/logout",adminController.logout);
 
 

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
- 
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -15,19 +16,24 @@
             justify-content: center;
             margin: 0;
         }
+
         .navbar {
             background-color: black;
         }
+
         .navbar-brand {
             color: white;
             font-size: 1.5rem;
         }
+
         .navbar-brand span {
             color: #007bff;
         }
+
         .navbar a {
             color: white;
         }
+
         .login-card {
             background-color: white;
             padding: 2rem;
@@ -36,15 +42,18 @@
             width: 100%;
             max-width: 400px;
         }
+
         .login-card h3 {
             text-align: center;
             margin-bottom: 1.5rem;
         }
+
         .login-card button {
             width: 100%;
         }
     </style>
 </head>
+
 <body>
 
 
@@ -58,67 +67,70 @@
                         <div class="alert alert-danger">
                             <%= error %>
                         </div>
-                    <% } %>
-                    <form action="/admin" method="post">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" value="<%= email || '' %>">
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password">
-                        </div>
-                        <button type="submit" class="btn btn-dark">Login</button>
-                    </form>
+                        <% } %>
+                            <form action="/admin" method="post">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        placeholder="Enter your email" value="<%= email || '' %>">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password"
+                                        placeholder="Enter your password">
+                                </div>
+                                <button type="submit" class="btn btn-dark">Login</button>
+                            </form>
                 </div>
             </div>
         </div>
     </div>
-    
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector("form");
-        form.addEventListener("submit", function (event) {
-            let email = document.getElementById("email").value.trim();
-            let password = document.getElementById("password").value.trim();
-            let isValid = true;
-  
-            
-            document.querySelectorAll(".error-message").forEach(e => e.remove());
-  
-            if (email === "") {
-                showError("email", "Email is required");
-                isValid = false;
-            } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-                showError("email", "Enter a valid email");
-                isValid = false;
-            }
-  
-            if (password === "") {
-                showError("password", "Password is required");
-                isValid = false;
-            } else if (password.length < 6) {
-                showError("password", "Password must be at least 6 characters long");
-                isValid = false;
-            }
-  
-            if (!isValid) {
-                event.preventDefault(); 
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+            form.addEventListener("submit", function (event) {
+                let email = document.getElementById("email").value.trim();
+                let password = document.getElementById("password").value.trim();
+                let isValid = true;
+
+
+                document.querySelectorAll(".error-message").forEach(e => e.remove());
+
+                if (email === "") {
+                    showError("email", "Email is required");
+                    isValid = false;
+                } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+                    showError("email", "Enter a valid email");
+                    isValid = false;
+                }
+
+                if (password === "") {
+                    showError("password", "Password is required");
+                    isValid = false;
+                } else if (password.length < 6) {
+                    showError("password", "Password must be at least 6 characters long");
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+
+            function showError(inputId, message) {
+                let inputField = document.getElementById(inputId);
+                let errorDiv = document.createElement("div");
+                errorDiv.className = "error-message text-danger mt-1";
+                errorDiv.innerText = message;
+                inputField.parentNode.appendChild(errorDiv);
             }
         });
-  
-        function showError(inputId, message) {
-            let inputField = document.getElementById(inputId);
-            let errorDiv = document.createElement("div");
-            errorDiv.className = "error-message text-danger mt-1";
-            errorDiv.innerText = message;
-            inputField.parentNode.appendChild(errorDiv);
-        }
-    });
-  </script>
-  
+    </script>
+
 </body>
+
 </html>

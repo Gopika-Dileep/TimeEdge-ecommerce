@@ -1,365 +1,372 @@
 <%- include("../../views/partials/admin/header") %>
 
-<style>
-    .content-main {
-        padding: 20px;
-    }
-    
-    .add-brand-btn {
-        background-color: #0d6efd;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-size: 14px;
-        cursor: pointer;
-    }
-    
-    .table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-    
-    .table th {
-        background-color: #f8f9fa;
-        padding: 12px 15px;
-        font-weight: 500;
-        color: #333;
-        border-bottom: 1px solid #dee2e6;
-        text-align: left;
-    }
-    
-    .table td {
-        padding: 12px 15px;
-        border-bottom: 1px solid #dee2e6;
-        vertical-align: middle;
-    }
-    
-    .badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: normal;
-    }
-    
-    .badge-success {
-        background-color: #dcfce7;
-        color: #15803d;
-    }
-    
-    .badge-danger {
-        background-color: #fee2e2;
-        color: #b91c1c;
-    }
-    
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
+    <style>
+        .content-main {
+            padding: 20px;
+        }
 
-.three-dots {
-    width: 24px;
-    height: 24px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    font-size: 20px;
-    line-height: 24px;
-    color: #6b7280;
-    position: relative;
-    z-index: 1;
-}
+        .add-brand-btn {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
 
-.three-dots:hover {
-    color: #374151;
-}
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
 
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    margin-top: 0.5rem;
-    min-width: 120px;
-    background: white;
-    border-radius: 6px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e5e7eb;
-    z-index: 1000;
-}
+        .table th {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            font-weight: 500;
+            color: #333;
+            border-bottom: 1px solid #dee2e6;
+            text-align: left;
+        }
 
-.dropdown:last-child .dropdown-menu,
-.dropdown:nth-last-child(2) .dropdown-menu {
-    bottom: 0;
-    top: auto;
-    margin-top: 0;
-    margin-bottom: 0rem;
-}
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
 
-.dropdown-menu.show {
-    display: block;
-}
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: normal;
+        }
 
-.dropdown-menu form {
-    margin: 0;
-    padding: 0;
-}
+        .badge-success {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
 
-.dropdown-menu button {
-    width: 100%;
-    padding: 8px 16px;
-    text-align: left;
-    background: none;
-    border: none;
-    font-size: 14px;
-    color: #374151;
-    cursor: pointer;
-    display: block;
-    white-space: nowrap;
-}
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
 
-.dropdown-menu button:hover {
-    background-color: #f3f4f6;
-}
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
 
-.table td {
-    position: relative;
-}
+        .three-dots {
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 20px;
+            line-height: 24px;
+            color: #6b7280;
+            position: relative;
+            z-index: 1;
+        }
 
-    .pagination-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        margin-top: 2rem;
-    }
-    
-    .pagination-container a,
-    .pagination-container span {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 32px;
-        height: 32px;
-        padding: 0 6px;
-        border: 1px solid #d1d5db;
-        border-radius: 4px;
-        background: white;
-        color: #374151;
-        font-size: 14px;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-    
-    .pagination-container a:hover {
-        background-color: #f3f4f6;
-        border-color: #0d6efd;
-        color: #0d6efd;
-    }
-    
-    .pagination-container .current-page {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-        color: white;
-    }
-    
-    .pagination-container .disabled {
-        background-color: #f3f4f6;
-        color: #9ca3af;
-        cursor: not-allowed;
-        pointer-events: none;
-    }
-    
-    .pagination-container .previous,
-    .pagination-container .next {
-        padding: 0 12px;
-        min-width: 80px;
-    }
-    
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-    }
-    
-    .modal-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 24px;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 400px;
-    }
-    
-    .content-main {
-        position: absolute;
-        top: 70px;
-        left: 240px;
-        width: calc(100% - 240px);
-        padding: 2rem;
-    }
-    
-    @media (max-width: 1000px) {
+        .three-dots:hover {
+            color: #374151;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            margin-top: 0.5rem;
+            min-width: 120px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            z-index: 1000;
+        }
+
+        .dropdown:last-child .dropdown-menu,
+        .dropdown:nth-last-child(2) .dropdown-menu {
+            bottom: 0;
+            top: auto;
+            margin-top: 0;
+            margin-bottom: 0rem;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu form {
+            margin: 0;
+            padding: 0;
+        }
+
+        .dropdown-menu button {
+            width: 100%;
+            padding: 8px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+            display: block;
+            white-space: nowrap;
+        }
+
+        .dropdown-menu button:hover {
+            background-color: #f3f4f6;
+        }
+
+        .table td {
+            position: relative;
+        }
+
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 2rem;
+        }
+
+        .pagination-container a,
+        .pagination-container span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .pagination-container a:hover {
+            background-color: #f3f4f6;
+            border-color: #0d6efd;
+            color: #0d6efd;
+        }
+
+        .pagination-container .current-page {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+
+        .pagination-container .disabled {
+            background-color: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .pagination-container .previous,
+        .pagination-container .next {
+            padding: 0 12px;
+            min-width: 80px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+        }
+
         .content-main {
             position: absolute;
-            top: 50px;
-            left: 20px;
-            width: calc(100% - 30px);
+            top: 70px;
+            left: 240px;
+            width: calc(100% - 240px);
             padding: 2rem;
         }
-    }
-</style>
 
-<div class="content-main">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="m-0">Brands</h2>
-        <button class="add-brand-btn" onclick="document.getElementById('addBrandModal').style.display='block'">+ Add Brand</button>
-    </div>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Brand</th>
-                <th class="text-center">Status</th>
-                <th class="text-center">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% brand.forEach((brand) => { %>
-                <tr>
-                    <td><%= brand.name %></td>
-                    <td class="text-center">
-                        <% if (!brand.isListed) { %>
-                            <span class="badge badge-danger">Unlisted</span>
-                        <% } else { %>
-                            <span class="badge badge-success">Listed</span>
-                        <% } %>
-                    </td>
-                    <td class="text-center">
-                        <div class="dropdown">
-                            <button type="button" class="three-dots" onclick="toggleDropdown(event, '<%= brand._id %>')">⋮</button>
-                            <div id="dropdown-<%= brand._id %>" class="dropdown-menu">
-                                <% if (!brand.isListed) { %>
-                                    <form method="POST" action="/admin/listBrand/<%= brand._id %>">
-                                        <button type="submit">List</button>
-                                    </form>
-                                <% } else { %>
-                                    <form method="POST" action="/admin/unlistBrand/<%= brand._id %>">
-                                        <button type="submit">Unlist</button>
-                                    </form>
-                                <% } %>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            <% }); %>
-        </tbody>
-    </table>
-
-    <div class="pagination-container">
-        <% if (currentpage > 1) { %>
-            <a href="?page=<%= currentpage - 1 %>" class="previous">Previous</a>
-        <% } else { %>
-            <span class="disabled previous">Previous</span>
-        <% } %>
-
-        <% 
-        let startPage = Math.max(1, currentpage - 2);
-        let endPage = Math.min(totalpage, startPage + 4);
-        
-        if (endPage - startPage < 4) {
-            startPage = Math.max(1, endPage - 4);
-        }
-        
-        if (startPage > 1) { %>
-            <a href="?page=1">1</a>
-            <% if (startPage > 2) { %>
-                <span>...</span>
-            <% } %>
-        <% } %>
-
-        <% for (let i = startPage; i <= endPage; i++) { %>
-            <% if (i === currentpage) { %>
-                <span class="current-page"><%= i %></span>
-            <% } else { %>
-                <a href="?page=<%= i %>"><%= i %></a>
-            <% } %>
-        <% } %>
-
-        <% if (endPage < totalpage) { %>
-            <% if (endPage < totalpage - 1) { %>
-                <span>...</span>
-            <% } %>
-            <a href="?page=<%= totalpage %>"><%= totalpage %></a>
-        <% } %>
-
-        <% if (currentpage < totalpage) { %>
-            <a href="?page=<%= currentpage + 1 %>" class="next">Next</a>
-        <% } else { %>
-            <span class="disabled next">Next</span>
-        <% } %>
-    </div>
-
-    <div id="addBrandModal" class="modal">
-        <div class="modal-content">
-            <form method="POST" action="/admin/addBrand">
-                <div class="mb-4">
-                    <label for="brand_name" class="form-label">Brand Name</label>
-                    <input type="text" name="name" id="brand_name" placeholder="Enter brand name" class="form-control" required />
-                </div>
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('addBrandModal').style.display='none'">Cancel</button>
-                    <button class="btn btn-primary" type="submit">Add Brand</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-    function toggleDropdown(event, brandId) {
-    event.stopPropagation();
-    event.preventDefault();
-    var dropdown = document.getElementById('dropdown-' + brandId);
-    
-    var dropdowns = document.getElementsByClassName("dropdown-menu");
-    for (var i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown !== dropdown && openDropdown.classList.contains('show')) {
-            openDropdown.classList.remove('show');
-        }
-    }
-    
-    dropdown.classList.toggle("show");
-}
-
-
-document.addEventListener('click', function(event) {
-    if (!event.target.matches('.three-dots')) {
-        var dropdowns = document.getElementsByClassName("dropdown-menu");
-        for (var i = 0; i < dropdowns.length; i++) {
-            var openDropdown = dropdowns[i];
-            if (openDropdown.classList.contains('show')) {
-                openDropdown.classList.remove('show');
+        @media (max-width: 1000px) {
+            .content-main {
+                position: absolute;
+                top: 50px;
+                left: 20px;
+                width: calc(100% - 30px);
+                padding: 2rem;
             }
         }
-    }
-});
-</script>
+    </style>
 
-<%- include("../../views/partials/admin/footer") %>
+    <div class="content-main">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="m-0">Brands</h2>
+            <button class="add-brand-btn" onclick="document.getElementById('addBrandModal').style.display='block'">+ Add
+                Brand</button>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Brand</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% brand.forEach((brand)=> { %>
+                    <tr>
+                        <td>
+                            <%= brand.name %>
+                        </td>
+                        <td class="text-center">
+                            <% if (!brand.isListed) { %>
+                                <span class="badge badge-danger">Unlisted</span>
+                                <% } else { %>
+                                    <span class="badge badge-success">Listed</span>
+                                    <% } %>
+                        </td>
+                        <td class="text-center">
+                            <div class="dropdown">
+                                <button type="button" class="three-dots"
+                                    onclick="toggleDropdown(event, '<%= brand._id %>')">⋮</button>
+                                <div id="dropdown-<%= brand._id %>" class="dropdown-menu">
+                                    <% if (!brand.isListed) { %>
+                                        <form method="POST" action="/admin/listBrand/<%= brand._id %>">
+                                            <button type="submit">List</button>
+                                        </form>
+                                        <% } else { %>
+                                            <form method="POST" action="/admin/unlistBrand/<%= brand._id %>">
+                                                <button type="submit">Unlist</button>
+                                            </form>
+                                            <% } %>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+        </table>
+
+        <div class="pagination-container">
+            <% if (currentpage> 1) { %>
+                <a href="?page=<%= currentpage - 1 %>" class="previous">Previous</a>
+                <% } else { %>
+                    <span class="disabled previous">Previous</span>
+                    <% } %>
+
+                        <% let startPage=Math.max(1, currentpage - 2); let endPage=Math.min(totalpage, startPage + 4);
+                            if (endPage - startPage < 4) { startPage=Math.max(1, endPage - 4); } if (startPage> 1) { %>
+                            <a href="?page=1">1</a>
+                            <% if (startPage> 2) { %>
+                                <span>...</span>
+                                <% } %>
+                                    <% } %>
+
+                                        <% for (let i=startPage; i <=endPage; i++) { %>
+                                            <% if (i===currentpage) { %>
+                                                <span class="current-page">
+                                                    <%= i %>
+                                                </span>
+                                                <% } else { %>
+                                                    <a href="?page=<%= i %>">
+                                                        <%= i %>
+                                                    </a>
+                                                    <% } %>
+                                                        <% } %>
+
+                                                            <% if (endPage < totalpage) { %>
+                                                                <% if (endPage < totalpage - 1) { %>
+                                                                    <span>...</span>
+                                                                    <% } %>
+                                                                        <a href="?page=<%= totalpage %>">
+                                                                            <%= totalpage %>
+                                                                        </a>
+                                                                        <% } %>
+
+                                                                            <% if (currentpage < totalpage) { %>
+                                                                                <a href="?page=<%= currentpage + 1 %>"
+                                                                                    class="next">Next</a>
+                                                                                <% } else { %>
+                                                                                    <span
+                                                                                        class="disabled next">Next</span>
+                                                                                    <% } %>
+        </div>
+
+        <div id="addBrandModal" class="modal">
+            <div class="modal-content">
+                <form method="POST" action="/admin/addBrand">
+                    <div class="mb-4">
+                        <label for="brand_name" class="form-label">Brand Name</label>
+                        <input type="text" name="name" id="brand_name" placeholder="Enter brand name"
+                            class="form-control" required />
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="document.getElementById('addBrandModal').style.display='none'">Cancel</button>
+                        <button class="btn btn-primary" type="submit">Add Brand</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown(event, brandId) {
+            event.stopPropagation();
+            event.preventDefault();
+            var dropdown = document.getElementById('dropdown-' + brandId);
+
+            var dropdowns = document.getElementsByClassName("dropdown-menu");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown !== dropdown && openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+
+            dropdown.classList.toggle("show");
+        }
+
+
+        document.addEventListener('click', function (event) {
+            if (!event.target.matches('.three-dots')) {
+                var dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        });
+    </script>
+
+    <%- include("../../views/partials/admin/footer") %>
