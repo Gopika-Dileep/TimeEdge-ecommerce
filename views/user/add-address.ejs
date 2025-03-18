@@ -5,157 +5,206 @@
        <div class="row mb-50">
            <div class="form-group col-md-4">
                <label for="addressType">Address Type:</label>
-               <input type="text" class="form-control border-3" id="addressType" name="addressType" required>
+               <input type="text" class="form-control border-3" id="addressType" name="addressType">
+               <div class="text-danger error-message" id="addressType-error"></div>
            </div>
            <div class="form-group col-md-4">
                <label for="name">Name:</label>
-               <input type="text" class="form-control border-3" id="name" name="name" required>
+               <input type="text" class="form-control border-3" id="name" name="name">
+               <div class="text-danger error-message" id="name-error"></div>
            </div>
            <div class="form-group col-md-4">
                <label for="city">City:</label>
-               <input type="text" class="form-control border-3" id="city" name="city" required>
+               <input type="text" class="form-control border-3" id="city" name="city">
+               <div class="text-danger error-message" id="city-error"></div>
            </div>
        </div>
        <div class="row mb-3">
            <div class="form-group col-md-4">
                <label for="landMark">Landmark:</label>
-               <input type="text" class="form-control border-3" id="landMark" name="landMark" required>
+               <input type="text" class="form-control border-3" id="landMark" name="landMark">
+               <div class="text-danger error-message" id="landMark-error"></div>
            </div>
            <div class="form-group col-md-4">
                <label for="state">State:</label>
-               <input type="text" class="form-control border-3" id="state" name="state" required>
+               <input type="text" class="form-control border-3" id="state" name="state">
+               <div class="text-danger error-message" id="state-error"></div>
            </div>
            <div class="form-group col-md-4">
                <label for="pincode">Pincode:</label>
-               <input type="number" class="form-control border-3" id="pincode" name="pincode" required>
+               <input type="number" class="form-control border-3" id="pincode" name="pincode">
+               <div class="text-danger error-message" id="pincode-error"></div>
            </div>
        </div>
        <div class="row mb-3">
            <div class="form-group col-md-4">
                <label for="phone">Phone:</label>
-               <input type="number" class="form-control border-3" id="phone" name="phone" required>
+               <input type="number" class="form-control border-3" id="phone" name="phone">
+               <div class="text-danger error-message" id="phone-error"></div>
            </div>
            <div class="form-group col-md-4">
                <label for="altPhone">Alternate Phone:</label>
-               <input type="number" class="form-control border-3" id="altPhone" name="altPhone" required>
+               <input type="number" class="form-control border-3" id="altPhone" name="altPhone">
+               <div class="text-danger error-message" id="altPhone-error"></div>
            </div>
        </div>
-       <button type="submit" id="submitButton" class="btn" style="background-color: black;">Submit</button>
+       <button type="submit" id="submitButton" class="btn" style="background-color: black; color: white;">Submit</button>
    </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  
    document.getElementById('addressForm').addEventListener('submit', function(event) {
        if (!validateForm()) {
            event.preventDefault();
        }
    });
 
+   function showError(fieldId, message) {
+       const errorElement = document.getElementById(fieldId + '-error');
+       errorElement.textContent = message;
+       document.getElementById(fieldId).classList.add('is-invalid');
+       return false;
+   }
+
+   function clearError(fieldId) {
+       const errorElement = document.getElementById(fieldId + '-error');
+       errorElement.textContent = '';
+       document.getElementById(fieldId).classList.remove('is-invalid');
+       return true;
+   }
+
+   function validateField(fieldId, value, message) {
+       if (value === "") {
+           return showError(fieldId, message || "This field is required.");
+       } else {
+           return clearError(fieldId);
+       }
+   }
+
+   function validatePhoneNumber(phoneId) {
+       const phoneValue = document.getElementById(phoneId).value.trim();
+       
+       // Check if empty
+       if (phoneValue === "") {
+           return showError(phoneId, "Phone number is required.");
+       }
+       
+       // Check if it's 10 digits
+       if (phoneValue.length !== 10) {
+           return showError(phoneId, "Phone number must be exactly 10 digits.");
+       }
+       
+       // Check if it starts with 0
+       if (phoneValue.startsWith('0')) {
+           return showError(phoneId, "Phone number should not start with 0.");
+       }
+       
+       // Check if it starts with 6 or higher
+       if (parseInt(phoneValue.charAt(0)) < 6) {
+           return showError(phoneId, "Phone number should start with 6, 7, 8, or 9.");
+       }
+       
+       // Check for more than two consecutive zeros
+       if (phoneValue.includes('000')) {
+           return showError(phoneId, "Phone number should not contain more than two consecutive zeros.");
+       }
+       
+       // Check if it's all zeros (shouldn't happen with above rules but just in case)
+       if (/^0+$/.test(phoneValue)) {
+           return showError(phoneId, "Phone number should not consist of only zeros.");
+       }
+       
+       return clearError(phoneId);
+   }
 
    function validateForm() {
        let isValid = true;
-       const requiredFields = ["addressType", "name", "city", "landMark", "state", "pincode", "phone", "altPhone"];
+       const requiredFields = ["addressType", "name", "city", "landMark", "state", "pincode"];
+       
+       // Validate required fields
        requiredFields.forEach(function(field) {
            const input = document.getElementById(field);
            const inputValue = input.value.trim();
-           const errorElement = document.getElementById(field + '-error');
-
-
-           if (inputValue === "") {
-               if (!errorElement) {
-                   const errorMessage = "This field is required.";
-                   const errorDiv = document.createElement('div');
-                   errorDiv.className = "text-danger";
-                   errorDiv.textContent = errorMessage;
-                   errorDiv.id = field + '-error';
-                   input.parentNode.appendChild(errorDiv);
-               }
+           if (!validateField(field, inputValue)) {
                isValid = false;
+           }
+       });
+       
+       // Validate name fields with pattern
+       const namePattern = /^[A-Za-z\s]+$/;
+       const nameFields = ["name", "city", "landMark", "state"];
+       
+       nameFields.forEach(function(field) {
+           const value = document.getElementById(field).value.trim();
+           if (value !== "" && !namePattern.test(value)) {
+               showError(field, field === "landMark" ? "Landmark should contain alphabets only." : 
+                              field.charAt(0).toUpperCase() + field.slice(1) + " should contain alphabets only.");
+               isValid = false;
+           }
+       });
+       
+       // Validate pincode
+       const pincode = document.getElementById('pincode').value.trim();
+       if (pincode !== "" && !/^\d{6}$/.test(pincode)) {
+           showError('pincode', "Pincode should be a 6-digit number.");
+           isValid = false;
+       }
+       
+       // Validate phone numbers
+       const phoneValid = validatePhoneNumber('phone');
+       const altPhoneValid = validatePhoneNumber('altPhone');
+       isValid = phoneValid && altPhoneValid && isValid;
+       
+       // Check if phone numbers are the same
+       const phone = document.getElementById('phone').value.trim();
+       const altPhone = document.getElementById('altPhone').value.trim();
+       
+       if (phone !== "" && altPhone !== "" && phone === altPhone) {
+           showError('altPhone', "Phone number and alternate phone number should be different.");
+           isValid = false;
+       }
+       
+       return isValid;
+   }
+
+   // Add real-time validation
+   const inputFields = document.querySelectorAll('input');
+   inputFields.forEach(function(input) {
+       input.addEventListener('blur', function() {
+           const fieldId = this.id;
+           const value = this.value.trim();
+           
+           if (fieldId === 'phone' || fieldId === 'altPhone') {
+               validatePhoneNumber(fieldId);
+           } else if (fieldId === 'pincode') {
+               if (value === "" || !/^\d{6}$/.test(value)) {
+                   showError(fieldId, value === "" ? "Pincode is required." : "Pincode should be a 6-digit number.");
+               } else {
+                   clearError(fieldId);
+               }
            } else {
-               if (errorElement) {
-                   errorElement.remove();
+               validateField(fieldId, value);
+               
+               // Additional validation for name fields
+               const nameFields = ["name", "city", "landMark", "state"];
+               if (nameFields.includes(fieldId) && value !== "") {
+                   const namePattern = /^[A-Za-z\s]+$/;
+                   if (!namePattern.test(value)) {
+                       showError(fieldId, fieldId === "landMark" ? "Landmark should contain alphabets only." : 
+                                       fieldId.charAt(0).toUpperCase() + fieldId.slice(1) + " should contain alphabets only.");
+                   }
                }
            }
        });
-
-
-       const addressType = document.getElementById('addressType').value;
-       const name = document.getElementById('name').value;
-       const city = document.getElementById('city').value;
-       const landMark = document.getElementById('landMark').value;
-       const state = document.getElementById('state').value;
-       const pincode = document.getElementById('pincode').value;
-       const phone = document.getElementById('phone').value;
-       const altPhone = document.getElementById('altPhone').value;
-       const namePattern = /^[A-Za-z\s]+$/;
-       const pincodePattern = /^\d{6}$/;
-       const phonePattern = /^\d{10}$/;
-       if (!namePattern.test(name)) {
-           Swal.fire({
-               title: 'Error',
-               text: 'Name should contain alphabets only.',
-               icon: 'error'
-           });
-           isValid = false;
-       }
-       if (!namePattern.test(city)) {
-           Swal.fire({
-               title: 'Error',
-               text: 'City should contain alphabets only.',
-               icon: 'error'
-           });
-           isValid = false;
-       }
-       if (!namePattern.test(landMark)) {
-           Swal.fire({
-               title: 'Error',
-               text: 'Landmark should contain alphabets only.',
-               icon: 'error'
-           });
-           isValid = false;
-       }
-       if (!namePattern.test(state)) {
-           Swal.fire({
-               title: 'Error',
-               text: 'State should contain alphabets only.',
-               icon: 'error'
-           });
-           isValid = false;
-       }
-       if (!pincodePattern.test(pincode)) {
-           Swal.fire({
-               title: 'Error',
-               text: 'Pincode should be a 6-digit number.',
-               icon: 'error'
-           });
-           isValid = false;
-       }
-       if (!phonePattern.test(phone)) {
-           Swal.fire({
-               title: 'Error',
-               text: 'Phone number should be a 10-digit number.',
-               icon: 'error'
-           });
-           isValid = false;
-       }
-       if (!phonePattern.test(altPhone)) {
-           Swal.fire({
-               title: 'Error',
-               text: 'Alternate phone number should be a 10-digit number.',
-               icon: 'error'
-           });
-           isValid = false;
-       }
-       if (phone === altPhone) {
-           Swal.fire({
-               title: 'Error',
-               text: 'Phone number and alternate phone number should be different.',
-               icon: 'error'
-           });
-           isValid = false;
-       }
-       return isValid;
-   }
+   });
 </script>
+<style>
+   .error-message {
+       font-size: 0.85rem;
+       margin-top: 0.25rem;
+   }
+   .is-invalid {
+       border-color: #dc3545 !important;
+   }
+</style>
 <%- include("../../views/partials/user/footer") %>

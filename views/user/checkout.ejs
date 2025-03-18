@@ -319,6 +319,22 @@
     color: #6c757d;
     margin-top: 10px;
   }
+  
+  /* New styles for form validation */
+  .error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: none;
+  }
+  
+  .form-group.error input {
+    border-color: #dc3545;
+  }
+  
+  .form-group.error .error-message {
+    display: block;
+  }
 </style>
 
 <div class="checkout-container">
@@ -525,51 +541,60 @@
           <input type="hidden" id="addressId" name="addressId">
           <div class="form-group">
             <label for="addressType">Address Type</label>
-            <input type="text" class="form-control" id="addressType" name="addressType" required />
+            <input type="text" class="form-control" id="addressType" name="addressType" />
+            <div class="error-message" id="addressType-error"></div>
           </div>
 
           <div class="form-group">
             <label for="name">Full Name</label>
-            <input type="text" class="form-control" id="name" name="name" required />
+            <input type="text" class="form-control" id="name" name="name" />
+            <div class="error-message" id="name-error"></div>
           </div>
 
           <div class="group-input">
             <div class="form-group">
               <label for="city">City</label>
-              <input type="text" class="form-control" id="city" name="city" required />
+              <input type="text" class="form-control" id="city" name="city" />
+              <div class="error-message" id="city-error"></div>
             </div>
 
             <div class="form-group">
               <label for="landMark">Landmark</label>
-              <input type="text" class="form-control" id="landMark" name="landMark" required />
+              <input type="text" class="form-control" id="landMark" name="landMark" />
+              <div class="error-message" id="landMark-error"></div>
             </div>
           </div>
 
           <div class="group-input">
             <div class="form-group">
               <label for="state">State</label>
-              <input type="text" class="form-control" id="state" name="state" required />
+              <input type="text" class="form-control" id="state" name="state" />
+              <div class="error-message" id="state-error"></div>
             </div>
 
             <div class="form-group">
               <label for="pincode">Pincode</label>
-              <input type="text" class="form-control" id="pincode" name="pincode" required pattern="[0-9]{6}" />
+              <input type="text" class="form-control" id="pincode" name="pincode" />
+              <div class="error-message" id="pincode-error"></div>
             </div>
           </div>
 
           <div class="form-group">
             <label for="phone">Phone Number</label>
-            <input type="tel" class="form-control" id="phone" name="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number" />
+            <input type="tel" class="form-control" id="phone" name="phone" placeholder="10-digit mobile number" />
+            <div class="error-message" id="phone-error"></div>
           </div>
 
           <div class="form-group">
-            <label for="altPhone">Alternative Phone Number (Optional)</label>
-            <input type="tel" class="form-control" id="altPhone" name="altPhone" pattern="[0-9]{10}" placeholder="10-digit mobile number" />
+            <label for="altPhone">Alternative Phone Number</label>
+            <input type="tel" class="form-control" id="altPhone" name="altPhone" placeholder="10-digit mobile number" />
+            <div class="error-message" id="altPhone-error"></div>
           </div>
 
           </div>
           <div style="width: 100%; padding: 9px; border-top: 1px solid #ddd;">
             <button type="submit" class="btn btn-primary">Save Address</button>
+            <div class="error-message" id="altPhone-error"></div>
           </div>
         </form>
     </div>
@@ -583,7 +608,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-
   $(document).ready(function () {
   let appliedCoupon = null;
 
@@ -695,12 +719,14 @@
     $("#addressModalLabel").text("Add New Address");
     addressForm[0].reset();
     $("#addressId").val("");
+    clearErrors();
     addressModal.modal("show");
   });
 
   $(document).on("click", ".btn-outline-primary", function() {
     const addressId = $(this).data("id");
     $("#addressModalLabel").text("Edit Address");
+    clearErrors();
     
     $.ajax({
         url: `/getAddress/${addressId}`,
@@ -716,7 +742,7 @@
                 $("#state").val(address.state);
                 $("#pincode").val(address.pincode);
                 $("#phone").val(address.phone);
-                $("#altPhone").val(address.altPhone || "");
+                $("#altPhone").val(address.altPhone);
                 $("#addressModal").modal("show");
             } else {
                 Swal.fire({
@@ -734,7 +760,7 @@
             });
         }
     });
-});
+  });
 
   function createAddressHTML(address) {
     return `
@@ -771,38 +797,117 @@
     existingAddressCard.replaceWith(updatedAddressHTML);
   }
 
+  function clearErrors() {
+    $(".form-group").removeClass("error");
+    $(".error-message").text("").hide();
+  }
+
+  function showError(field, message) {
+    const fieldElement = $("#" + field);
+    fieldElement.closest(".form-group").addClass("error");
+    $("#" + field + "-error").text(message).show();
+    return false;
+  }
+
+  function validatePhoneNumber(phoneNumber, fieldName) {
+    // Empty check handled separately
+    if (!phoneNumber) {
+      return fieldName === "phone" ? showError(fieldName, "Phone number is required") : true;
+    }
+    
+    // Check if it's 10 digits
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      return showError(fieldName, "Phone number must be exactly 10 digits");
+    }
+    
+    // Check if it starts with 0
+    if (phoneNumber.startsWith("0")) {
+      return showError(fieldName, "Phone number cannot start with 0");
+    }
+    
+    // Check if it starts with 6 or higher
+    if (parseInt(phoneNumber.charAt(0)) < 6) {
+      return showError(fieldName, "Phone number must start with 6 or higher");
+    }
+    
+    // Check for repeated zeros (more than two in a row)
+    if (phoneNumber.includes("000")) {
+      return showError(fieldName, "Phone number cannot have more than two zeros in a row");
+    }
+    
+    // Check if it's all zeros
+    if (/^0+$/.test(phoneNumber)) {
+      return showError(fieldName, "Phone number cannot be all zeros");
+    }
+    
+    return true;
+  }
+
+  function validateForm() {
+    clearErrors();
+    let isValid = true;
+    
+    // Required fields
+    const requiredFields = [
+      { field: "addressType", message: "Address type is required" },
+      { field: "name", message: "Full name is required" },
+      { field: "city", message: "City is required" },
+      { field: "landMark", message: "Landmark is required" },
+      { field: "state", message: "State is required" },
+      { field: "pincode", message: "Pincode is required" },
+      { field: "phone", message: "Phone number is required" },
+      { field: "altPhone", message: "Alternative phone number is required" }
+    ];
+    
+    requiredFields.forEach(item => {
+      const value = $("#" + item.field).val().trim();
+      if (!value) {
+        isValid = showError(item.field, item.message) && isValid;
+      }
+    });
+    
+    // Pincode validation
+    const pincode = $("#pincode").val().trim();
+    if (pincode && !/^\d{6}$/.test(pincode)) {
+      isValid = showError("pincode", "Pincode must be exactly 6 digits") && isValid;
+    }
+    
+    // Phone number validation
+    const phone = $("#phone").val().trim();
+    isValid = validatePhoneNumber(phone, "phone") && isValid;
+    
+    // Alt phone validation (if provided)
+    const altPhone = $("#altPhone").val().trim();
+    if (altPhone) {
+      isValid = validatePhoneNumber(altPhone, "altPhone") && isValid;
+    }
+    
+    // Check if both phone numbers are same
+    if (phone && altPhone && phone === altPhone) {
+      isValid = showError("altPhone", "Alternative phone number cannot be the same as primary phone number") && isValid;
+    }
+    
+    return isValid;
+  }
+
   addressForm.submit(function(e) {
     e.preventDefault();
     
+    if (!validateForm()) {
+      return;
+    }
+    
     const addressId = $("#addressId").val();
     const formData = {
-      addressType: $("#addressType").val(),
-      name: $("#name").val(),
-      phone: $("#phone").val(),
-      altPhone: $("#altPhone").val() || null,
-      landMark: $("#landMark").val(),
-      city: $("#city").val(),
-      state: $("#state").val(),
-      pincode: $("#pincode").val()
+      addressType: $("#addressType").val().trim(),
+      name: $("#name").val().trim(),
+      phone: $("#phone").val().trim(),
+      altPhone: $("#altPhone").val().trim() ,
+      landMark: $("#landMark").val().trim(),
+      city: $("#city").val().trim(),
+      state: $("#state").val().trim(),
+      pincode: $("#pincode").val().trim()
     };
-
-    if (!/^[0-9]{10}$/.test(formData.phone)) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Phone Number",
-        text: "Please enter a valid 10-digit phone number"
-      });
-      return;
-    }
-
-    if (formData.altPhone && !/^[0-9]{10}$/.test(formData.altPhone)) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Alternative Phone Number",
-        text: "Please enter a valid 10-digit phone number"
-      });
-      return;
-    }
 
     const url = addressId ? `/editAddressCheckout/${addressId}` : '/addAddressCheckout';
     const method = addressId ? 'PUT' : 'POST';

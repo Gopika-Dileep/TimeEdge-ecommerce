@@ -74,63 +74,75 @@
             const errorElement = document.getElementById(`${field}-error`);
             errorElement.classList.add('hidden');
         }
-
         function validateForm() {
-            let isValid = true;
-            
-            
-            const name = $('input[name="name"]').val().trim();
-            if (!name) {
-                showError('name', 'Username is required');
-                isValid = false;
-            } else if (name.length < 3) {
-                showError('name', 'Username must be at least 3 characters');
-                isValid = false;
-            } else {
-                hideError('name');
-            }
-            
-         
-            const email = $('input[name="email"]').val().trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email) {
-                showError('email', 'Email is required');
-                isValid = false;
-            } else if (!emailRegex.test(email)) {
-                showError('email', 'Please enter a valid email address');
-                isValid = false;
-            } else {
-                hideError('email');
-            }
-            
-            const phone = $('input[name="phone"]').val().trim();
-            if (!phone) {
-                showError('phone', 'Phone number is required');
-                isValid = false;
-            } else if (phone.length < 10) {
-                showError('phone', 'Please enter a valid phone number');
-                isValid = false;
-            } else {
-                hideError('phone');
-            }
-            
-           
-            const password = $('input[name="password"]').val();
-            if (!password) {
-                showError('password', 'Password is required');
-                isValid = false;
-            } else if (password.length < 8) {
-                showError('password', 'Password must be at least 8 characters');
-                isValid = false;
-            } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/.test(password)) {
-                showError('password', 'Password must include uppercase, lowercase, number and special character');
-                isValid = false;
-            } else {
-                hideError('password');
-            }
-            
-            return isValid;
-        }
+    let isValid = true;
+    
+    // Username validation
+    const name = $('input[name="name"]').val().trim();
+    if (!name) {
+        showError('name', 'Username is required');
+        isValid = false;
+    } else if (name.length < 3) {
+        showError('name', 'Username must be at least 3 characters');
+        isValid = false;
+    } else {
+        hideError('name');
+    }
+    
+    // Email validation
+    const email = $('input[name="email"]').val().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+        showError('email', 'Email is required');
+        isValid = false;
+    } else if (!emailRegex.test(email)) {
+        showError('email', 'Please enter a valid email address');
+        isValid = false;
+    } else {
+        hideError('email');
+    }
+    
+    // Enhanced phone number validation
+    const phone = $('input[name="phone"]').val().trim();
+    if (!phone) {
+        showError('phone', 'Phone number is required');
+        isValid = false;
+    } else if (phone.length < 10) {
+        showError('phone', 'Phone number must be at least 10 digits');
+        isValid = false;
+    } else if (phone.charAt(0) === '0') {
+        showError('phone', 'Phone number should not start with 0');
+        isValid = false;
+    } else if (parseInt(phone.charAt(0)) < 6) {
+        showError('phone', 'Phone number should start with 6 or higher');
+        isValid = false;
+    } else if (/000/.test(phone)) {
+        showError('phone', 'Phone number should not contain more than two zeros in a row');
+        isValid = false;
+    } else if (/^0+$/.test(phone)) {
+        showError('phone', 'Phone number cannot consist only of zeros');
+        isValid = false;
+    } else {
+        hideError('phone');
+    }
+    
+    // Password validation
+    const password = $('input[name="password"]').val();
+    if (!password) {
+        showError('password', 'Password is required');
+        isValid = false;
+    } else if (password.length < 8) {
+        showError('password', 'Password must be at least 8 characters');
+        isValid = false;
+    } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/.test(password)) {
+        showError('password', 'Password must include uppercase, lowercase, number and special character');
+        isValid = false;
+    } else {
+        hideError('password');
+    }
+    
+    return isValid;
+}
 
         $(document).ready(function() {
             
