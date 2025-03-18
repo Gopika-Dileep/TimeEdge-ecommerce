@@ -37,24 +37,21 @@ const loadAddToCart = async (req, res) => {
 
             const totalPrice = validItems.reduce((total, item) => {
                 const product = item.product;
-                let price = product.salePrice;
                 
+                // Calculate best offer similar to addToCart function
+                const productOffer = product.productOffer || 0;
+                const categoryOffer = product.category.categoryOffer || 0;
+                const bestOffer = Math.max(productOffer, categoryOffer);
                 
-                if (product.productOffer > 0) {
-                    price -= product.offerAmount;
-                }
+                // Apply the best offer to calculate final price
+                const finalPrice = bestOffer > 0 ? 
+                    product.salePrice - (product.salePrice * bestOffer / 100) : 
+                    product.salePrice;
                 
-              
-                if (product.category && product.category.categoryOffer > 0) {
-                    const categoryDiscount = (price * product.category.categoryOffer) / 100;
-                    price -= categoryDiscount;
-                }
-                
-                return total + (price * item.quantity);
+                return total + ((finalPrice) * item.quantity);
             }, 0);
 
             const user = await User.findById({ _id: userId });
-            
             
             const totalItems = validItems.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -90,8 +87,6 @@ const loadAddToCart = async (req, res) => {
         res.status(500).json("server error");
     }
 };
-
-
 const addToCart = async (req, res) => {
     try {
         const userId = req.session.user
@@ -120,7 +115,9 @@ const addToCart = async (req, res) => {
         const bestOffer = Math.max(productOffer, categoryOffer)
         const finalPrice = bestOffer > 0 ? product.salePrice - (product.salePrice * bestOffer / 100) : product.salePrice
 
-        
+        // console.log(productOffer,categoryOffer, bestOffer,finalPrice,'price calculation')
+
+        console.log(cart,'cart')
         if (!cart) {
             
             if (quantity > product.maxQtyPerPerson) {
@@ -134,15 +131,16 @@ const addToCart = async (req, res) => {
             
             cart = new Cart({
                 user: userId,
-                items: [{ product: productId, quantity, price: Math.floor(finalPrice * quantity) }]
+                items: [{ product: productId, quantity, price: (finalPrice * quantity) }]
             });
+            // console.log(cart,'cart1')
         } else {
             const existingItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-
+            // console.log(existingItemIndex,'existingItemIndex')
             
             if (existingItemIndex !== -1) {
                 const newQuantity = cart.items[existingItemIndex].quantity + quantity;
-                
+                // console.log(newQuantity,'newQuantity')
                 
                 if (newQuantity > product.maxQtyPerPerson) {
                     return res.status(400).json({ 
@@ -158,9 +156,9 @@ const addToCart = async (req, res) => {
                         message: 'Requested quantity exceeds available stock' 
                     });
                 }
-                
+                // console.log(newQuantity, Math.floor(finalPrice * newQuantity),'finalamount')
                 cart.items[existingItemIndex].quantity = newQuantity;
-                cart.items[existingItemIndex].price = Math.floor(finalPrice * newQuantity);
+                cart.items[existingItemIndex].price = (finalPrice * newQuantity);
             } else {
                 
                 if (quantity > product.maxQtyPerPerson) {
@@ -176,11 +174,11 @@ const addToCart = async (req, res) => {
                         message: 'Requested quantity exceeds available stock' 
                     });
                 }
-                
-                cart.items.push({ product: productId, quantity, price: Math.floor(finalPrice * quantity) });
+                // console.log(finalPrice,quantity,'quantity')
+                cart.items.push({ product: productId, quantity, price: (finalPrice * quantity) });
             }
         }
-
+        // console.log(cart,'cart2')
         await cart.save();
         return res.json({ success: true, message: "Added to cart" });
     } catch (error) {

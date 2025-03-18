@@ -817,7 +817,6 @@
           if (addressId) {
             updateAddressInDom(addressId, response);
           } else {
-          s
             const newAddress = response.address ? response.address[response.address.length - 1] : response;
             addAddressToDom(newAddress);
           }
