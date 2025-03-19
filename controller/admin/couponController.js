@@ -7,8 +7,37 @@ const Coupon = require('../../models/couponSchema')
 
 const loadCouponPage = async(req,res)=>{
     try {
-        const coupon = await Coupon.find()
-        res.render('coupon',{coupon})
+        const currentDate = new Date();
+        
+        // Get all coupons and update their status if needed
+        const coupons = await Coupon.find();
+        
+        // Update status for expired or maxed out coupons
+        for(let coupon of coupons) {
+            let shouldUpdate = false;
+            
+            // Check if coupon is expired
+            if(coupon.expireOn < currentDate && coupon.isList) {
+                coupon.isList = false;
+                shouldUpdate = true;
+            }
+            
+            // Check if usage limit is reached
+            if(coupon.UsageLimit && coupon.userId.length >= coupon.UsageLimit && coupon.isList) {
+                coupon.isList = false;
+                shouldUpdate = true;
+            }
+
+            // Save coupon if status changed
+            if(shouldUpdate) {
+                await coupon.save();
+            }
+        }
+
+        // Get updated coupons
+        const updatedCoupons = await Coupon.find();
+        res.render('coupon', { coupon: updatedCoupons });
+
     } catch (error) {
         console.error(error)
         res.status(500).json({message:"server error"})
@@ -16,24 +45,24 @@ const loadCouponPage = async(req,res)=>{
 }
 const addCoupon = async (req, res) => {
     try {
-        const { code, offerPrice, createon, expireOn, minimumPrice, UsageLimit, isList } = req.body
+        const { code, offerPrice, createon, expireOn, minimumPrice, UsageLimit } = req.body
         
-        // Convert discount and minimum amount to numbers
+        
         const discountAmount = parseFloat(offerPrice);
         const minAmount = parseFloat(minimumPrice);
         
-        // Check if discount amount is less than minimum amount
+       
         if (discountAmount >= minAmount) {
             return res.status(400).json({ error: 'Discount amount must be less than minimum amount' });
         }
         
-        // Check if coupon with same code already exists (case insensitive)
+       
         const existingCoupon = await Coupon.findOne({
             name: { $regex: new RegExp(`^${code}$`, 'i') }
         });
         
         if (existingCoupon) {
-            // Return error response that can be handled by frontend
+           
             return res.status(409).json({ error: 'Coupon code already exists' });
         }
         
@@ -44,7 +73,7 @@ const addCoupon = async (req, res) => {
             expireOn: expireOn,
             minimumPrice: minimumPrice,
             UsageLimit: UsageLimit,
-            isList: isList
+           
         })
         await coupon.save()
         
