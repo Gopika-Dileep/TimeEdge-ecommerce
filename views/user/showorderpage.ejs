@@ -74,8 +74,7 @@
                       <i class="bi bi-arrow-return-left"></i> Return
                     </button>
                     <% } %>
-                      <% if (!item.cancelReason && !['cancelled', 'delivered' , 'returned' ,'shipped','return
-                        request'].includes(item.status.toLowerCase())) { %>
+                      <% if (!item.cancelReason && !['cancelled', 'delivered' , 'returned' ,'shipped','returnrequest'].includes(item.status.toLowerCase())) { %>
                         <button class="btn btn-outline-danger btn-sm ms-2" onclick="showCancelModal('<%= item._id %>')">
                           <i class="bi bi-x-circle"></i> Cancel
                         </button>
