@@ -34,10 +34,7 @@ router.get('/editProduct',adminAuth,productController.loadeditproduct)
 router.post("/editProduct/:id",adminAuth,upload.array("images",4),productController.updateproduct);
 router.post("/editProduct/:id",adminAuth,upload.array("images",4),productController.editproduct);
 
-router.post('/deleteImage', (req, res, next) => {
-    console.log("Delete Image API hit");
-    next();
-},adminAuth, productController.deleteSingleImage);
+router.post('/deleteImage', adminAuth, productController.deleteSingleImage);
 
 router.get('/listProduct',adminAuth,productController.listproduct)
 router.get('/unlistProduct',adminAuth,productController.unlistproduct)

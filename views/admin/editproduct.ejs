@@ -249,6 +249,7 @@
                 }
             }
         </style>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </head>
 
     <section class="container">
@@ -588,39 +589,55 @@
 
         // Delete Single Image
         function deleteSingleImage(imageId, productId) {
-            $.ajax({
-                url: "/admin/deleteImage",
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    imageNameToserver: imageId,
-                    productIdToServer: productId
-                }),
-                success: (response) => {
-                    if (response.status == true) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Image Deleted',
-                            text: 'The image has been successfully deleted.',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message,
-                        });
-                    }
-                },
-                error: (xhr, status, error) => {
-                    console.error("Error:", error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Something went wrong. Please try again later.',
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to delete this image?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/deleteImage",
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            imageNameToserver: imageId,
+                            productIdToServer: productId
+                        }),
+                        success: (response) => {
+                            if (response.success) {
+                                // Remove the image element from DOM
+                                const imageElement = document.querySelector(`img[src="/uploads/productImages/${imageId}"]`);
+                                if (imageElement) {
+                                    imageElement.closest('.thumbnail').remove();
+                                }
+                                
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'Image has been deleted successfully.',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: response.message || 'Failed to delete image',
+                                });
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            console.error("Error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Something went wrong. Please try again later.',
+                            });
+                        }
                     });
                 }
             });

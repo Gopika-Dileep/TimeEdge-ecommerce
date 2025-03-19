@@ -1,8 +1,8 @@
 const Brand = require('../../models/brandSchema');
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
-const fs = require("fs");
-const path = require("path")
+const fs = require('fs').promises;
+const path = require('path');
 const sharp = require("sharp");
 
 const LoadProduct = async (req, res) => {
@@ -197,28 +197,38 @@ const editproduct = async (req, res) => {
         res.status(500).json("server error")
     }
 }
-const deleteSingleImage = async (req,res)=>{
+const deleteSingleImage = async (req, res) => {
     try {
-        console.log(req.body, 'fdsf');
         const { imageNameToserver, productIdToServer } = req.body;
-
-        console.log(imageNameToserver)
-        const product = await Product.findByIdAndUpdate(productIdToServer, { $pull: { productImage: imageNameToserver } })
-        const imagePath = path.join("public", "uploads", "productImages", imageNameToserver);
-        if (fs.existsSync(imagePath)) {
-            await fs.unlinkSync(imagePath);
-            console.log(`Image ${imageNameToserver} deleted successfully`);
-
-        } else {
-            console.log(`Image ${imageNameToserver} not found`);
-
+        
+        // Find the product
+        const product = await Product.findById(productIdToServer);
+        if (!product) {
+            return res.json({ success: false, message: 'Product not found' });
         }
-        res.send({ status: true })
+
+        // Check if image exists in product's images
+        const imageIndex = product.productImage.indexOf(imageNameToserver);
+        if (imageIndex === -1) {
+            return res.json({ success: false, message: 'Image not found in product' });
+        }
+
+        // Remove image from array
+        product.productImage.splice(imageIndex, 1);
+        
+        // Save the product
+        await product.save();
+
+        // Delete the physical file
+        const imagePath = path.join(__dirname, '../../public/uploads/productImages', imageNameToserver);
+        await fs.unlink(imagePath).catch(err => console.log('File delete error:', err));
+
+        res.json({ success: true, message: 'Image deleted successfully' });
     } catch (error) {
-        console.error(error)
-        res.status(500).json("server error")
+        console.error('Delete image error:', error);
+        res.json({ success: false, message: 'Failed to delete image' });
     }
-}
+};
 const updateproduct = async (req, res) => {
     try {
         const id = req.params.id;
