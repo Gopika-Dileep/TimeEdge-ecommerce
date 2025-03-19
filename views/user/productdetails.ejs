@@ -310,7 +310,12 @@
                         <div class="action-buttons">
                             <button class="add-to-cart button-add-to-cart" data-id="<%= product._id %>">Add to
                                 Cart</button>
-                            <button class="add-to-wishlist" data-id="<%= product._id %>">Add to Wishlist</button>
+                            <button class="add-to-wishlist" data-id="<%= product._id %>">
+                                <i class="bi <%= isInWishlist ? 'bi-heart-fill' : 'bi-heart' %>" 
+                                   id="wishlist-icon-<%= product._id %>" 
+                                   data-id="<%= product._id %>"></i>
+                                <%= isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' %>
+                            </button>
                         </div>
 
                         <div class="stock-status <%= product.quantity > 0 ? 'in-stock' : 'out-stock' %>">
@@ -567,80 +572,84 @@
                 }
             });
         }
-        const addToWishbtn = document.querySelectorAll('.add-to-wishlist');
-        addToWishbtn.forEach(function (button) {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-                const productId = this.getAttribute('data-id');
 
-                // Check if user is logged in first
-                $.ajax({
-                    url: '/check-auth',
-                    method: 'GET',
-                    success: function (response) {
-                        if (response.isLoggedIn) {
-                            // User is logged in, proceed with wishlist action
-                            addToWishlist(productId);
-                        } else {
-                            // User is not logged in, show login prompt
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Login Required',
-                                text: 'Please login to add items to your wishlist',
-                                showCancelButton: true,
-                                confirmButtonText: 'Go to Login',
-                                cancelButtonText: 'Cancel'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = '/login';
-                                }
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error checking authentication status:', error);
+        // Single wishlist button handler
+        $('.add-to-wishlist').on('click', function(e) {
+            e.preventDefault();
+            const productId = $(this).data('id');
+            const button = $(this);
+            const icon = button.find('i');
+
+            $.ajax({
+                url: '/check-auth',
+                method: 'GET',
+                success: function(response) {
+                    if (response.isLoggedIn) {
+                        updateWishlist(productId, icon, button);
+                    } else {
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Something went wrong. Please try again later.',
+                            icon: 'info',
+                            title: 'Login Required',
+                            text: 'Please login to manage your wishlist',
+                            showCancelButton: true,
+                            confirmButtonText: 'Go to Login',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/login';
+                            }
                         });
                     }
-                });
+                }
             });
         });
 
-        // Move the actual wishlist update functionality to a separate function
-        function addToWishlist(productId) {
+        function updateWishlist(productId, icon, button) {
             $.ajax({
                 url: `/addToWishlist/${productId}`,
                 method: 'POST',
-                data: JSON.stringify({ productId: productId }),
-                contentType: "application/json",
-                success: function (response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: "Added to Wishlist",
-                        text: response.message,
-                        confirmButtonText: 'OK',
-                    }).then(() => {
-                        Swal.fire({
-                            title: 'Go to Wishlist?',
-                            showCancelButton: true,
-                            confirmButtonText: "YES",
-                            cancelButtonText: "NO",
-                        }).then((confirmation) => {
-                            if (confirmation.isConfirmed) {
-                                window.location.href = '/wishlist';
-                            }
-                        });
-                    });
+                contentType: 'application/json',
+                success: function(response) {
+                    if (response.success) {
+                        if (response.action === 'added') {
+                            icon.removeClass('bi-heart').addClass('bi-heart-fill');
+                            button.html(`<i class="bi bi-heart-fill" data-id="${productId}"></i> Remove from Wishlist`);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Added to Wishlist',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        } else {
+                            icon.removeClass('bi-heart-fill').addClass('bi-heart');
+                            button.html(`<i class="bi bi-heart" data-id="${productId}"></i> Add to Wishlist`);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Removed from Wishlist',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    }
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
+                    let errorMessage = "Error updating wishlist";
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response && response.message) {
+                            errorMessage = response.message;
+                        }
+                    } catch (e) {
+                        console.error('Error parsing error response', e);
+                    }
+                    
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Error while adding to wishlist.',
-                        confirmButtonText: "OK",
+                        text: errorMessage,
+                        showConfirmButton: true
                     });
                 }
             });

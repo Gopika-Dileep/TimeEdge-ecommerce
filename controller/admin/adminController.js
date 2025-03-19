@@ -64,7 +64,7 @@ const loadUsers = async (req, res) => {
   try {
     let search = req.query.search || "";
     let page = req.query.page || 1;
-    const limit = 3;
+    const limit = 7;
 
     const user = await User.find({
       isAdmin: false,

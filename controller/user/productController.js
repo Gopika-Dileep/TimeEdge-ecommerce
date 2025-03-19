@@ -2,7 +2,7 @@ const Product = require("../../models/productSchema")
 const Category = require("../../models/categorySchema")
 const Brand = require("../../models/brandSchema")
 const User = require("../../models/userSchema")
-
+const Wishlist = require("../../models/wishlistSchema")
 
 
 const loadhome = async (req, res) => {
@@ -20,15 +20,27 @@ const loadhome = async (req, res) => {
         .limit(9)
         .populate('category')
         .populate('brand');
+
+        let productsWithWishlist = [...products];
+        if (userId) {
+            const wishlist = await Wishlist.findOne({ userId: userId });
+            productsWithWishlist = products.map(product => {
+                const productObj = product.toObject();
+                productObj.inWishlist = wishlist ? wishlist.products.some(item => 
+                    item.productId.toString() === product._id.toString()
+                ) : false;
+                return productObj;
+            });
+        }
         
         if (userId) {
             const user = await User.findById({ _id: userId })
             if(user.isBlocked===true){
               return  res.render('login', { message: "User is blocked by admin" });
             }
-            res.render('home', { user: user, product: products })
+            res.render('home', { user: user, product: productsWithWishlist})
         } else {
-            res.render("home", { product: products })
+            res.render("home", { product: productsWithWishlist})
         }
     } catch (error) {
         console.error(error)
@@ -89,120 +101,12 @@ const loadshop = async (req, res) => {
     }
 }
 
-const filterProduct = async (req, res) => {
-    try {
-        const user = req.session.user
-        const categoryId = req.query.category
-        const brandId = req.query.brand
-        const category = await Category.find({ isListed: true })
-        const brand = await Brand.find({ isListed: true })
-        if (categoryId) {
-            const findCategory = await Category.findOne({ _id: categoryId, isListed: true })
-            const category = await Category.find()
 
-            const product = await Product.find({ isListed: true, category: findCategory._id })
-
-            return res.render("shop", {
-                product: product,
-                category: category,
-                brand: brand,
-                selectedCategory: categoryId,
-                selectedBrand: null,
-                totalpage: 0,
-                currentpage: 1
-            })
-        }
-        if (brandId) {
-            const findBrand = await Brand.findOne({ _id: brandId, isListed: true })
-            const brand = await Brand.find()
-
-            const product = await Product.find({ isListed: true, brand: findBrand._id })
-            return res.render("shop", {
-                product: product,
-                category: category,
-                brand: brand,
-                selectedCategory: null,
-                selectedBrand: brandId,
-                totalpage: 0,
-                currentpage: 1
-
-            })
-
-        }
-        const product = await Product.find({ isListed: true, quantity: { $gt: 0 } }).sort({ createdAt: -1 })
-        const itemsperpage = 6
-        const currentpage = parseInt(req.query.page) || 1
-        const totalpage = Math.ceil(product.length / itemsperpage)
-        const startIndex = (currentpage - 1) * itemsperpage
-        const currentProducts = product.slice(startIndex, startIndex + itemsperpage)
-        if (user) {
-            const userData = await User.find({ isBlocked: false })
-            res.render("shop", {
-                user: userData,
-                products: currentProducts,
-                category,
-                brand,
-                selectedCategory: categoryId,
-                selectedBrand: brandId,
-                totalpage,
-                currentpage,
-            })
-        }
-
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).json("server error")
-    }
-}
-const filterProductByPrice = async (req, res) => {
-    try {
-        const user = req.session.user
-        const userData = await User.findOne({ _id: user })
-        const brand = await Brand.find({ isListed: true })
-
-        const category = await Category.find({ isListed: true })
-
-        const sort = req.query.sort || null
-
-        const product = await Product.find({ salePrice: { $gt: 0, $lt: 100000 }, isListed: true, quantity: { $gt: 0 } })
-
-        if (sort === "asc") {
-            product.sort((a, b) => a.salePrice - b.salePrice);
-        } else if (sort === "desc") {
-            product.sort((a, b) => b.salePrice - a.salePrice);
-        } else {
-            product.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        }
-
-        const page = parseInt(req.query.page) || 1
-        const limit = 9
-        const skip = (page - 1) * limit
-        const count = await Product.countDocuments({})
-        const totalpage = Math.ceil(count / limit)
-        const end = limit + skip
-        const currentProducts = product.slice(skip, end)
-
-        res.render("shop", {
-            user: userData,
-            product: currentProducts,
-            category: category,
-            brand: brand,
-            currentpage: page,
-            totalpage: totalpage
-        })
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).json("server error")
-    }
-}
 const productDetails = async (req, res) => {
     try {
         const userId = req.session.user
         const productId = req.query.id
 
-       
         const product = await Product.findOne({ 
             _id: productId,
             isListed: true 
@@ -216,34 +120,42 @@ const productDetails = async (req, res) => {
             match: { isListed: true } 
         })
 
-        console.log(product, 'product')
-
         if (!product || !product.category || !product.brand) {
             return res.status(404).render('product-not-found');
         }
 
         const findCategory = product.category
         const findBrand = product.brand
-
-       
+        
         const relatedProducts = await Product.find({ 
             category: findCategory._id, 
             _id: { $ne: productId },
             isListed: true 
         }).limit(3)
 
+        // Check if product is in user's wishlist
+        let isInWishlist = false;
         if (userId) {
-            const user = await User.findById({ _id: userId })
-            if(user.isBlocked===true){
-                return  res.render('login', { message: "User is blocked by admin" });
-              }
+            const user = await User.findById(userId);
+            if (user) {
+                if(user.isBlocked===true){
+                    return res.render('login', { message: "User is blocked by admin" });
+                }
+                const wishlist = await Wishlist.findOne({ userId: userId });
+                isInWishlist = wishlist ? wishlist.products.some(item => item.productId.toString() === productId) : false;
+            }
+        }
+
+        if (userId) {
+            const user = await User.findById(userId);
             res.render('productdetails', {
                 user: user,
                 product: product,
                 quantity: product.quantity,
                 category: findCategory,
                 brand: findBrand,
-                relatedProducts: relatedProducts
+                relatedProducts: relatedProducts,
+                isInWishlist: isInWishlist
             })
         } else {
             res.render('productdetails', {
@@ -251,7 +163,8 @@ const productDetails = async (req, res) => {
                 quantity: product.quantity,
                 category: findCategory,
                 brand: findBrand,
-                relatedProducts: relatedProducts
+                relatedProducts: relatedProducts,
+                isInWishlist: false
             })
         }
     } catch (error) {
@@ -260,15 +173,6 @@ const productDetails = async (req, res) => {
     }
 }
 
-const searchProducts = async (req, res) => {
-    try {
-        const search = req.query.search || '';
-        res.redirect(`/shop?search=${encodeURIComponent(search)}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json("server error");
-    }
-}
 const shopProducts = async (req, res) => {
     try {
         const user = req.session.user;
@@ -344,12 +248,12 @@ const shopProducts = async (req, res) => {
         
         let productsWithWishlist = [...products];
         if (user) {
-            const userData = await User.findOne({ _id: user });
-            const wishlist = userData.wishlist || [];
-            
+            const wishlist = await Wishlist.findOne({ userId: user });
             productsWithWishlist = products.map(product => {
                 const productObj = product.toObject();
-                productObj.inWishlist = wishlist.includes(product._id.toString());
+                productObj.inWishlist = wishlist ? wishlist.products.some(item => 
+                    item.productId.toString() === product._id.toString()
+                ) : false;
                 return productObj;
             });
         }
@@ -390,9 +294,6 @@ const shopProducts = async (req, res) => {
 module.exports = {
     loadhome,
     loadshop,
-    filterProduct,
-    filterProductByPrice,
     productDetails,
-    searchProducts,
     shopProducts
 }

@@ -32,7 +32,6 @@ const checkAdmin = async (req, res, next) => {
 }
 
 
-
 const adminAuth = (req,res,next)=>{
     if(!req.session.admin){
         res.redirect('/admin')
@@ -43,32 +42,32 @@ const adminAuth = (req,res,next)=>{
 
 const isLogin = async(req,res,next)=>{
     try {                  
-       if(req.session.user){
-        res.setHeader('Cache-Control', 'no-store')
-          return next();
-       }else{
-          return res.redirect('/')
-       }
+        if(req.session && req.session.user){
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+            res.setHeader('Expires', '0');
+            res.setHeader('Pragma', 'no-cache');
+            return next();
+        }
+        return res.redirect('/');
     } catch (error) {
-       console.log(error.message);
+        console.log(error.message);
+        return res.redirect('/');
     }
 }
 
 const isLogout = async(req,res,next)=>{
-   try {
-    console.log("first")
-    console.log(req.session,'fg')
-      if(req.session.user){
-        console.log("sec")
-        res.setHeader('Cache-Control', 'no-store')
-       return res.redirect('/');
-      } else {
-         return next();
-      }
-
-   } catch (error) {
-      console.log(error.message);
-   }
+    try {
+        if(req.session && req.session.user){
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+            res.setHeader('Expires', '0');
+            res.setHeader('Pragma', 'no-cache');
+            return res.redirect('/');
+        }
+        return next();
+    } catch (error) {
+        console.log(error.message);
+        return next();
+    }
 }
 
 module.exports ={

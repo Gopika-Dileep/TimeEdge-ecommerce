@@ -14,15 +14,20 @@ dbconnect()
 const PORT = process.env.PORT
 
 app.use(session({
-    secret:process.env.SECRET_KEY,
-    resave:false,
-    saveUninitialized:true,
-   
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }))
 
-
 app.use((req, res, next) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Expires', '0');
+    res.setHeader('Pragma', 'no-cache');
     next();
 });
  

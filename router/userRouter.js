@@ -22,7 +22,7 @@ router.get("/auth/google/callback", passport.authenticate("google", { failureRed
 
 
 
-router.get("/login",isLogout,userController.loadlogin)
+router.get("/login",isLogout,userController.loadlogin);
 router.post("/login",userController.login)
 router.get("/logout",userController.logout);
 
@@ -33,9 +33,6 @@ router.post('/otpverify',userController.otpverify)
 router.post('/resend-otp',userController.resendOtp);
 router.get('/',productController.loadhome)
 router.get('/shop',productController.shopProducts)
-router.get('/shop/search', productController.searchProducts);
-router.get('/filter',productController.filterProduct)
-router.get('/filterPriceRange',productController.filterProductByPrice)
 
 router.get('/productDetails',productController.productDetails)
 

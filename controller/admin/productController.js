@@ -136,9 +136,15 @@ const loadeditproduct = async (req,res)=>{
     try {
         const productId = req.query.id
         const product = await Product.findById({_id:productId})
+            .populate('category')  
+            .populate('brand');  
         const category = await Category.find({})
         const brand = await Brand.find({})
-        res.render("editproduct",{product:product,brand:brand,cat:category})
+        res.render("editproduct",{
+            product:product,
+            brand:brand,
+            cat:category
+        })
     } catch (error) {
         console.error(error)
         res.status(500).json("server error")
@@ -157,9 +163,10 @@ const editproduct = async (req, res) => {
 
         })
 
-        // if (existingProduct) {
-        //     return res.status(400).json({ error: "Product with this name already exists. Please try with another name" })
-        // }
+        if (existingProduct) {
+            return res.status(400).json({ error: "Product with this name already exists. Please try with another name" })
+        }
+        
         const images = [];
         if (req.files && req.files.length > 0) {
             for (let i = 0; i < req.files; i++) {
