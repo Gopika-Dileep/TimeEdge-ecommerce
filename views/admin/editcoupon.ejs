@@ -21,7 +21,7 @@
 
         .coupon-form {
             flex: 1;
-            max-width: 400px;
+            max-width: 700px;
             background: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -96,8 +96,8 @@
 
     <body>
 
-        <div class="coupon-form">
-            <h2>Add a Coupon</h2>
+        <div class="coupon-form" style="margin-left: 50px; margin-top: 20px;">
+            <h2>Edit Coupon</h2>
             <form id="add-coupon-form" method="post" action="/admin/editCoupon?id=<%= coupon._id%>">
                 <label for="coupon-code">Coupon Code:</label>
                 <input type="text" id="coupon-code" name="code" value="<%= coupon.name%>"
@@ -110,11 +110,13 @@
                 <span class="error" id="offer-error"></span>
 
                 <label for="start-date">Start Date:</label>
-                <input type="date" id="start-date" name="createon" value="<%= coupon.createon%>">
+                <input type="date" id="start-date" name="createon" 
+                    value="<%= new Date(coupon.createon).toISOString().split('T')[0] %>">
                 <span class="error" id="start-error"></span>
 
                 <label for="expiry-date">Expiry Date:</label>
-                <input type="date" id="expiry-date" name="expireOn" value="<%= coupon.expireOn%>">
+                <input type="date" id="expiry-date" name="expireOn" 
+                    value="<%= new Date(coupon.expireOn).toISOString().split('T')[0] %>">
                 <span class="error" id="expiry-error"></span>
 
                 <label for="min-amount">Minimum Amount (₹):</label>
