@@ -612,7 +612,47 @@
                                 // Remove the image element from DOM
                                 const imageElement = document.querySelector(`img[src="/uploads/productImages/${imageId}"]`);
                                 if (imageElement) {
-                                    imageElement.closest('.thumbnail').remove();
+                                    const thumbnailElement = imageElement.closest('.thumbnail');
+                                    if (thumbnailElement) {
+                                        thumbnailElement.remove();
+                                        
+                                        // Get current number of images
+                                        const currentImages = document.querySelectorAll('.thumbnail').length;
+                                        
+                                        // Create new image input if less than 4 images
+                                        if (currentImages < 4) {
+                                            const newIndex = currentImages + 1;
+                                            const cardBody = document.createElement('div');
+                                            cardBody.className = 'card-body';
+                                            cardBody.innerHTML = `
+                                                <div class="image-container">
+                                                    <label class="form-label">Product Image ${newIndex}</label>
+                                                    <input class="form-control" type="file" name="images" id="input${newIndex}"
+                                                        accept="image/png, image/jpeg, image/jpg"
+                                                        onchange="validateImageOnSelect(event, '${newIndex}')">
+                                                    <div class="image-cropper" id="cropper-container-${newIndex}">
+                                                        <div class="cropper-preview">
+                                                            <img src="" alt="" id="imgView${newIndex}" style="max-width: 100%;">
+                                                        </div>
+                                                        <div class="btn-crop-actions">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                onclick="cancelCrop('${newIndex}')">Cancel</button>
+                                                            <button type="button" class="btn btn-primary"
+                                                                id="saveButton${newIndex}">Save Crop</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-3" id="preview-container-${newIndex}" style="display:none;">
+                                                        <p>Cropped Image:</p>
+                                                        <img src="" id="croppedImg${newIndex}" alt="Cropped preview"
+                                                            style="max-width: 100%; max-height: 200px;">
+                                                    </div>
+                                                </div>
+                                            `;
+                                            
+                                            const imageUploadSection = document.querySelector('.card.mb-2');
+                                            imageUploadSection.appendChild(cardBody);
+                                        }
+                                    }
                                 }
                                 
                                 Swal.fire({
