@@ -44,7 +44,7 @@ jobs:
           port: 22
           script: |
             # Navigate to the app directory on the server
-            cd /home/${{ secrets.EC2_USERNAME }}/TimeEdge || mkdir -p /home/${{ secrets.EC2_USERNAME }}/TimeEdge && cd /home/${{ secrets.EC2_USERNAME }}/TimeEdge
+            cd /home/${{ secrets.EC2_USERNAME }}/TimeEdge-ecommerce || mkdir -p /home/${{ secrets.EC2_USERNAME }}/TimeEdge-ecommerce && cd /home/${{ secrets.EC2_USERNAME }}/TimeEdge-ecommerce
             
             # Pull latest changes from GitHub
             if [ -d ".git" ]; then
