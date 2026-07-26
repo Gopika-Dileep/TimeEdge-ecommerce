@@ -42,7 +42,7 @@ const userProfile = async (req, res) => {
 
 const changeEmail = async(req,res)=>{
     try {
-        res.render('change-email')
+        res.render('change-email', { path: '/change-email' })
     } catch (error) {
        console.error(error)
        res.status(500).json({message:"server error"}) 

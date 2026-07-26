@@ -1,136 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-
+    <title>Administration Login — TimeEdge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --bg-body: #fbfbf9;
+            --bg-card: #ffffff;
+            --text-primary: #1c1a17;
+            --text-secondary: #5c554c;
+            --text-muted: #948c82;
+            --gold: #b39343;
+            --gold-light: #d4b66a;
+            --gold-glow: rgba(179, 147, 67, 0.05);
+            --border: #edece8;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         body {
-            background-color: #f0f0f0;
-            height: 100vh;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
-        }
-
-        .navbar {
-            background-color: black;
-        }
-
-        .navbar-brand {
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .navbar-brand span {
-            color: #007bff;
-        }
-
-        .navbar a {
-            color: white;
+            padding: 20px;
         }
 
         .login-card {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: var(--bg-card);
+            padding: 48px;
+            border: 1px solid var(--border);
             width: 100%;
-            max-width: 400px;
+            max-width: 440px;
         }
 
-        .login-card h3 {
+        .brand-header {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 32px;
         }
 
-        .login-card button {
+        .brand-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .brand-title span { color: var(--gold); }
+
+        .brand-sub {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .form-label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            background: rgba(0,0,0,0.01) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 0 !important;
+            color: var(--text-primary) !important;
+            font-size: 13px !important;
+            padding: 12px 14px !important;
+            outline: none !important;
+        }
+        .form-control:focus {
+            border-color: var(--gold) !important;
+            background: var(--gold-glow) !important;
+            box-shadow: none !important;
+        }
+
+        .btn-submit {
             width: 100%;
+            background: var(--gold) !important;
+            border-color: var(--gold) !important;
+            color: #ffffff !important;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1.5px !important;
+            text-transform: uppercase !important;
+            border-radius: 0 !important;
+            padding: 14px !important;
+            transition: var(--transition) !important;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background: var(--gold-light) !important;
+            border-color: var(--gold-light) !important;
+            box-shadow: 0 4px 15px rgba(179, 147, 67, 0.15) !important;
         }
     </style>
 </head>
-
 <body>
 
-
-
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="login-card">
-                    <h3>👤 Admin</h3>
-                    <% if (error) { %>
-                        <div class="alert alert-danger">
-                            <%= error %>
-                        </div>
-                        <% } %>
-                            <form action="/admin" method="post">
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email"
-                                        placeholder="Enter your email" value="<%= email || '' %>">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password"
-                                        placeholder="Enter your password">
-                                </div>
-                                <button type="submit" class="btn btn-dark">Login</button>
-                            </form>
-                </div>
-            </div>
-        </div>
+<div class="login-card animate-up">
+    <div class="brand-header">
+        <div class="brand-title">TIME<span>EDGE</span></div>
+        <div class="brand-sub">Administration Portal</div>
     </div>
+    <form action="/admin" method="post">
+        <div class="mb-4">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="admin@timeedge.com" required autocomplete="email" autofocus>
+        </div>
+        <div class="mb-4">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-submit">Sign In</button>
+    </form>
+</div>
 
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const form = document.querySelector("form");
-            form.addEventListener("submit", function (event) {
-                let email = document.getElementById("email").value.trim();
-                let password = document.getElementById("password").value.trim();
-                let isValid = true;
-
-
-                document.querySelectorAll(".error-message").forEach(e => e.remove());
-
-                if (email === "") {
-                    showError("email", "Email is required");
-                    isValid = false;
-                } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-                    showError("email", "Enter a valid email");
-                    isValid = false;
-                }
-
-                if (password === "") {
-                    showError("password", "Password is required");
-                    isValid = false;
-                } else if (password.length < 6) {
-                    showError("password", "Password must be at least 6 characters long");
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    event.preventDefault();
-                }
-            });
-
-            function showError(inputId, message) {
-                let inputField = document.getElementById(inputId);
-                let errorDiv = document.createElement("div");
-                errorDiv.className = "error-message text-danger mt-1";
-                errorDiv.innerText = message;
-                inputField.parentNode.appendChild(errorDiv);
-            }
-        });
-    </script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

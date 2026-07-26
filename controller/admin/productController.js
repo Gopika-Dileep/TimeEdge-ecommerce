@@ -250,13 +250,12 @@ const updateproduct = async (req, res) => {
 
         const updateFields = {
             productName: data.productName,
-            description: data.descriptionData,
+            description: data.description,
             brand: brandDoc._id,
             category: categoryId,
             regularPrice: data.regularPrice, 
             salePrice: data.salePrice,
             quantity: data.quantity || product.quantity
-
         };
 
         if (image.length > 0) {

@@ -340,7 +340,7 @@ const loadbrand = async (req, res) => {
       .limit(limit);
 
     const totalBrands = await Brand.countDocuments({});
-    const totalPages = Math.ceil(totalBrands / limit);
+    const totalPages = Math.ceil(totalBrands / limit) || 1;
 
     if (page < 1 || page > totalPages) {
       return res.redirect("/admin/brand?page=1");

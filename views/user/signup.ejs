@@ -1,213 +1,280 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Sign Up Page</title>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create your TimeEdge account — Join the world of luxury timepieces">
+    <title>Sign Up — TimeEdge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary:#080808; --bg-secondary:#111111;
+            --gold:#c9a84c; --gold-light:#e8c96d; --gold-glow:rgba(201,168,76,0.12);
+            --text-primary:#f0ede8; --text-secondary:#a09484; --text-muted:#5a5248;
+            --border:rgba(201,168,76,0.2); --transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg-primary); color:var(--text-primary); font-family:'Inter',sans-serif; min-height:100vh; display:flex; }
 
-<body class="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 font-jost">
-    <div class="w-full max-w-md p-8 space-y-6 bg-[#27303F] rounded-lg shadow-lg">
-        <form id="signupform" class="space-y-6">
-            <h2 class="text-2xl font-bold text-center text-white">Sign up</h2>
-            <div class="space-y-4">
-                <div>
-                    <input type="text" name="name" placeholder="User name"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <p class="text-red-500 text-sm mt-1 hidden" id="name-error"></p>
-                </div>
-                <div>
-                    <input type="email" name="email" placeholder="Email"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <p class="text-red-500 text-sm mt-1 hidden" id="email-error"></p>
-                </div>
-                <div>
-                    <input type="number" name="phone" placeholder="Phone"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <p class="text-red-500 text-sm mt-1 hidden" id="phone-error"></p>
-                </div>
-                <div>
-                    <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="Password"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
-                            onclick="togglePassword()">
-                            <i class="fas fa-eye" id="password-icon"></i>
-                        </span>
-                    </div>
-                    <p class="text-red-500 text-sm mt-1 hidden" id="password-error"></p>
-                </div>
+        .auth-container { display:flex; width:100%; min-height:100vh; }
+        .auth-visual {
+            flex:1; position:relative; overflow:hidden;
+            background:#0a0a0a; display:flex; flex-direction:column; justify-content:flex-end; padding:60px;
+        }
+        .auth-visual-bg {
+            position:absolute; inset:0;
+            background:
+                linear-gradient(135deg, rgba(201,168,76,0.07) 0%, transparent 50%),
+                linear-gradient(to top, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.2) 70%),
+                url('https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=900&auto=format') center/cover;
+        }
+        .auth-logo {
+            position:absolute; top:48px; left:60px;
+            font-family:'Playfair Display',serif; font-size:20px; font-weight:700;
+            letter-spacing:3px; text-transform:uppercase; color:var(--text-primary);
+            text-decoration:none; z-index:2;
+        }
+        .auth-logo span { color:var(--gold); }
+        .auth-visual-content { position:relative; z-index:2; }
+        .auth-visual-content h2 {
+            font-family:'Playfair Display',serif; font-size:2rem; font-weight:400;
+            color:var(--text-primary); margin-bottom:12px; line-height:1.3;
+        }
+        .auth-visual-content p { font-size:13px; color:var(--text-secondary); line-height:1.7; max-width:380px; }
+        .perks { margin-top:28px; display:flex; flex-direction:column; gap:12px; }
+        .perk { display:flex; align-items:center; gap:12px; }
+        .perk i { color:var(--gold); font-size:13px; width:16px; }
+        .perk span { font-size:12px; color:var(--text-secondary); letter-spacing:0.3px; }
+
+        .auth-form-panel {
+            width:520px; min-width:440px;
+            background:var(--bg-secondary); display:flex; flex-direction:column;
+            justify-content:center; padding:70px 60px;
+            border-left:1px solid var(--border);
+            overflow-y:auto;
+        }
+        .auth-eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+        .auth-title { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:400; color:var(--text-primary); margin-bottom:8px; line-height:1.2; }
+        .auth-title em { font-style:italic; color:var(--gold); }
+        .auth-subtitle { font-size:13px; color:var(--text-secondary); margin-bottom:40px; line-height:1.6; }
+
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .form-group { margin-bottom:22px; }
+        .form-label { display:block; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:10px; }
+        .form-input {
+            width:100%; padding:13px 16px;
+            background:rgba(255,255,255,0.03); border:1px solid var(--border);
+            color:var(--text-primary); font-family:'Inter',sans-serif; font-size:13px;
+            outline:none; transition:var(--transition);
+        }
+        .form-input:focus { border-color:var(--gold); background:var(--gold-glow); }
+        .form-input::placeholder { color:var(--text-muted); }
+        .input-wrap { position:relative; }
+        .input-icon { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px; cursor:pointer; transition:color 0.3s; }
+        .input-icon:hover { color:var(--gold); }
+
+        .auth-alert { padding:13px 16px; background:rgba(201,60,60,0.08); border:1px solid rgba(201,60,60,0.25); color:#e07070; font-size:12px; margin-bottom:24px; display:flex; align-items:center; gap:10px; }
+        .btn-submit { width:100%; padding:15px; background:var(--gold); border:none; color:#080808; font-family:'Inter',sans-serif; font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:var(--transition); margin-top:8px; }
+        .btn-submit:hover { background:var(--gold-light); box-shadow:0 0 30px rgba(201,168,76,0.3); }
+        .or-divider { display:flex; align-items:center; gap:16px; margin:24px 0; }
+        .or-divider::before, .or-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+        .or-divider span { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); }
+        .btn-google { width:100%; padding:13px; background:transparent; border:1px solid var(--border); color:var(--text-secondary); font-family:'Inter',sans-serif; font-size:12px; letter-spacing:1.5px; cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; }
+        .btn-google:hover { border-color:var(--gold); color:var(--text-primary); background:var(--gold-glow); }
+        .auth-footer { margin-top:28px; font-size:12px; color:var(--text-muted); text-align:center; }
+        .auth-footer a { color:var(--gold); text-decoration:none; transition:color 0.3s; }
+        .auth-footer a:hover { color:var(--gold-light); }
+        .terms-text { font-size:11px; color:var(--text-muted); margin-top:14px; text-align:center; line-height:1.6; }
+        .terms-text a { color:var(--text-secondary); text-decoration:underline; }
+
+        @media (max-width:1000px) { .auth-visual { display:none; } .auth-form-panel { width:100%; min-width:unset; border-left:none; } }
+        @media (max-width:600px) { .auth-form-panel { padding:60px 28px; } .form-row { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-visual">
+        <div class="auth-visual-bg"></div>
+        <a href="/" class="auth-logo"><span>TIME</span> EDGE</a>
+        <div class="auth-visual-content">
+            <h2>Join the world of<br>fine horology</h2>
+            <p>Become a TimeEdge member and unlock a curated world of luxury timepieces, exclusive offers, and collector events.</p>
+            <div class="perks">
+                <div class="perk"><i class="fa-solid fa-star"></i><span>Exclusive member-only collections</span></div>
+                <div class="perk"><i class="fa-solid fa-tag"></i><span>Early access to new arrivals & sales</span></div>
+                <div class="perk"><i class="fa-solid fa-shield-halved"></i><span>30-day return guarantee on all pieces</span></div>
+                <div class="perk"><i class="fa-solid fa-headset"></i><span>Dedicated concierge support</span></div>
             </div>
-            <button type="submit"
-                class="w-full py-2 text-white bg-[#6d44b8] rounded-lg hover:bg-[#573b8a] focus:outline-none focus:ring-2 focus:ring-indigo-500">Sign
-                up</button>
-            <div class="flex items-center justify-center w-full py-2 mt-4 bg-white border border-gray-300 rounded-lg">
-                <a href="/auth/google" class="flex items-center space-x-2">
-                    <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google Icon">
-                    <span>Sign up with Google</span>
-                </a>
-            </div>
-            <p class="text-center text-white">
-                Already have an account? <a href="/login" class="text-indigo-600 hover:underline">Sign in</a>
-            </p>
-        </form>
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const passwordIcon = document.getElementById('password-icon');
+    <div class="auth-form-panel">
+        <div class="auth-eyebrow">New Member</div>
+        <h1 class="auth-title">Create an <em>account</em></h1>
+        <p class="auth-subtitle">Start your journey into the world of exceptional timepieces.</p>
 
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                passwordIcon.classList.remove('fa-eye');
-                passwordIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                passwordIcon.classList.remove('fa-eye-slash');
-                passwordIcon.classList.add('fa-eye');
-            }
+        <% if (typeof message !== 'undefined' && message) { %>
+        <div class="auth-alert"><i class="fa-solid fa-circle-exclamation"></i><span><%= message %></span></div>
+        <% } %>
+
+        <form action="/signup" method="POST" id="signupForm">
+            <div class="form-group">
+                <label class="form-label" for="name">Full Name</label>
+                <input type="text" class="form-input" id="name" name="name" placeholder="Your full name" required autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" class="form-input" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="phone">Phone Number</label>
+                <input type="tel" class="form-input" id="phone" name="phone" placeholder="+91 00000 00000" autocomplete="tel">
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" class="form-input" id="password" name="password" placeholder="Min. 8 characters" required autocomplete="new-password">
+                        <i class="fa-regular fa-eye input-icon" onclick="togglePwd('password','icon1')" id="icon1"></i>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                    <div class="input-wrap">
+                        <input type="password" class="form-input" id="confirmPassword" name="confirmPassword" placeholder="Repeat password" required>
+                        <i class="fa-regular fa-eye input-icon" onclick="togglePwd('confirmPassword','icon2')" id="icon2"></i>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top:28px;">
+                Create Account &nbsp; <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <p class="terms-text">By registering you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+        </form>
+
+        <div class="or-divider"><span>or</span></div>
+
+        <a href="/auth/google" class="btn-google">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+        </a>
+
+        <div class="auth-footer">Already a member? &nbsp;<a href="/login">Sign in</a></div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function togglePwd(id, iconId) {
+    const f = document.getElementById(id);
+    const i = document.getElementById(iconId);
+    if (f.type === 'password') { f.type = 'text'; i.className = 'fa-regular fa-eye-slash input-icon'; }
+    else { f.type = 'password'; i.className = 'fa-regular fa-eye input-icon'; }
+}
+
+function validateForm() {
+    let isValid = true;
+
+    // Clear previous errors if any
+    $(".error-msg").remove();
+
+    const showError = (fieldId, message) => {
+        $(`#${fieldId}`).after(`<div class="error-msg" style="color:#e07070; font-size:11px; margin-top:4px;">${message}</div>`);
+        isValid = false;
+    };
+
+    // Username validation
+    const name = $('#name').val().trim();
+    if (!name) {
+        showError('name', 'Username is required');
+    } else if (name.length < 3) {
+        showError('name', 'Username must be at least 3 characters');
+    }
+
+    // Email validation
+    const email = $('#email').val().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+        showError('email', 'Email is required');
+    } else if (!emailRegex.test(email)) {
+        showError('email', 'Please enter a valid email address');
+    }
+
+    // Phone validation
+    const phone = $('#phone').val().trim();
+    if (!phone) {
+        showError('phone', 'Phone number is required');
+    } else if (phone.length < 10) {
+        showError('phone', 'Phone number must be at least 10 digits');
+    } else if (phone.charAt(0) === '0') {
+        showError('phone', 'Phone number should not start with 0');
+    } else if (parseInt(phone.charAt(0)) < 6) {
+        showError('phone', 'Phone number should start with 6 or higher');
+    }
+
+    // Password validation
+    const password = $('#password').val();
+    const confirmPassword = $('#confirmPassword').val();
+    if (!password) {
+        showError('password', 'Password is required');
+    } else if (password.length < 8) {
+        showError('password', 'Password must be at least 8 characters');
+    } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/.test(password)) {
+        showError('password', 'Password must include uppercase, lowercase, number and special character');
+    } else if (password !== confirmPassword) {
+        showError('confirmPassword', 'Passwords do not match');
+    }
+
+    return isValid;
+}
+
+$(document).ready(function() {
+    $('#signupForm').on('submit', function(e) {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            return false;
         }
 
-        function showError(field, message) {
-            const errorElement = document.getElementById(`${field}-error`);
-            errorElement.textContent = message;
-            errorElement.classList.remove('hidden');
-        }
+        const formData = {
+            name: $('#name').val().trim(),
+            email: $('#email').val().trim(),
+            phone: $('#phone').val().trim(),
+            password: $('#password').val()
+        };
 
-        function hideError(field) {
-            const errorElement = document.getElementById(`${field}-error`);
-            errorElement.classList.add('hidden');
-        }
-        function validateForm() {
-            let isValid = true;
-
-            // Username validation
-            const name = $('input[name="name"]').val().trim();
-            if (!name) {
-                showError('name', 'Username is required');
-                isValid = false;
-            } else if (name.length < 3) {
-                showError('name', 'Username must be at least 3 characters');
-                isValid = false;
-            } else {
-                hideError('name');
-            }
-
-            // Email validation
-            const email = $('input[name="email"]').val().trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email) {
-                showError('email', 'Email is required');
-                isValid = false;
-            } else if (!emailRegex.test(email)) {
-                showError('email', 'Please enter a valid email address');
-                isValid = false;
-            } else {
-                hideError('email');
-            }
-
-            // Enhanced phone number validation
-            const phone = $('input[name="phone"]').val().trim();
-            if (!phone) {
-                showError('phone', 'Phone number is required');
-                isValid = false;
-            } else if (phone.length < 10) {
-                showError('phone', 'Phone number must be at least 10 digits');
-                isValid = false;
-            } else if (phone.charAt(0) === '0') {
-                showError('phone', 'Phone number should not start with 0');
-                isValid = false;
-            } else if (parseInt(phone.charAt(0)) < 6) {
-                showError('phone', 'Phone number should start with 6 or higher');
-                isValid = false;
-            } else if (/000/.test(phone)) {
-                showError('phone', 'Phone number should not contain more than two zeros in a row');
-                isValid = false;
-            } else if (/^0+$/.test(phone)) {
-                showError('phone', 'Phone number cannot consist only of zeros');
-                isValid = false;
-            } else {
-                hideError('phone');
-            }
-
-            // Password validation
-            const password = $('input[name="password"]').val();
-            if (!password) {
-                showError('password', 'Password is required');
-                isValid = false;
-            } else if (password.length < 8) {
-                showError('password', 'Password must be at least 8 characters');
-                isValid = false;
-            } else if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/.test(password)) {
-                showError('password', 'Password must include uppercase, lowercase, number and special character');
-                isValid = false;
-            } else {
-                hideError('password');
-            }
-
-            return isValid;
-        }
-
-        $(document).ready(function () {
-
-            $('input[name="name"]').on('input', function () {
-                hideError('name');
-            });
-
-            $('input[name="email"]').on('input', function () {
-                hideError('email');
-            });
-
-            $('input[name="phone"]').on('input', function () {
-                hideError('phone');
-            });
-
-            $('input[name="password"]').on('input', function () {
-                hideError('password');
-            });
-
-            $('#signupform').on('submit', function (e) {
-                e.preventDefault();
-
-                if (!validateForm()) {
-                    return false;
+        $.ajax({
+            url: '/signup',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(result) {
+                if (result.userId) {
+                    window.location.href = `/otpverify?id=${result.userId}`;
                 }
-
-                const formData = {
-                    name: $('input[name="name"]').val(),
-                    email: $('input[name="email"]').val(),
-                    phone: $('input[name="phone"]').val(),
-                    password: $('input[name="password"]').val()
-                };
-
-                $.ajax({
-                    url: '/signup',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(formData),
-                    success: function (result) {
-                        if (result.userId) {
-                            window.location.href = `/otpverify?id=${result.userId}`;
-                        }
-                    },
-                    error: function (xhr) {
-                        const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again later.';
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: errorMessage,
-                            confirmButtonText: 'OK'
-                        });
-                    }
+            },
+            error: function(xhr) {
+                const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Registration Failed',
+                    text: errorMessage,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#c9a84c'
                 });
-            });
+            }
         });
-    </script>
+    });
+});
+</script>
 </body>
-
 </html>

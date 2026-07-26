@@ -1,23 +1,6 @@
 <%- include("../../views/partials/admin/header") %>
+
   <style>
-    .content-main {
-      position: absolute;
-      top: 70px;
-      left: 240px;
-      width: calc(100% - 240px);
-      padding: 2rem;
-    }
-
-    @media (max-width: 1000px) {
-      .content-main {
-        position: absolute;
-        top: 50px;
-        left: 20px;
-        width: calc(100% - 30px);
-        padding: 2rem;
-      }
-    }
-
     .truncate {
       max-width: 150px;
       white-space: nowrap;
@@ -44,208 +27,222 @@
       z-index: 100;
     }
 
-    .pagination-container {
+    /* Summary cards layout styling */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .summary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 24px;
+      transition: var(--transition);
+    }
+    .summary-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 4px 20px rgba(179,147,67,0.08);
+    }
+
+    .icon-container {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
       display: flex;
+      align-items: center;
       justify-content: center;
-      margin-top: 20px;
     }
 
-    .pagination {
-      display: flex;
-      list-style: none;
-      padding: 0;
+    .bg-light-green {
+      background-color: rgba(46, 204, 113, 0.08);
     }
 
-    .page-item {
-      margin: 0 5px;
+    .bg-light-blue {
+      background-color: rgba(74, 144, 226, 0.08);
     }
 
-    .page-link {
-      display: block;
-      padding: 8px 12px;
-      color: #007bff;
-      text-decoration: none;
-      border: 1px solid #dee2e6;
-      border-radius: 4px;
+    .bg-light-orange {
+      background-color: rgba(230, 126, 34, 0.08);
     }
 
-    .page-item.active .page-link {
-      background-color: #007bff;
-      color: white;
-      border-color: #007bff;
+    .bg-light-red {
+      background-color: rgba(231, 76, 60, 0.08);
+    }
+
+    @media (max-width: 1024px) {
+      .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+    }
+    @media (max-width: 576px) {
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
+
   <section class="content-main">
-    <div class="content-header">
+    <div class="content-header mb-5 d-flex justify-content-between align-items-center animate-up">
       <div>
-        <h2 class="content-title card-title">Admin Sales Report</h2>
+        <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Business Analytics</span>
+        <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:500; margin-top:4px;">Sales Report</h2>
       </div>
-      <div class="download-buttons">
-        <button class="btn btn-primary" id="downloadPdf">Download PDF</button>
-        <button class="btn btn-primary" id="downloadExcel">Download Excel</button>
+      <div class="download-buttons d-flex gap-2">
+        <button class="btn btn-primary" id="downloadPdf">
+            <i class="fa-solid fa-file-pdf"></i> Download PDF
+        </button>
+        <button class="btn btn-secondary" id="downloadExcel" style="padding: 12px 24px !important;">
+            <i class="fa-solid fa-file-excel"></i> Download Excel
+        </button>
       </div>
     </div>
 
     <div class="content-body">
-      <div class="row mb-4">
-        <div class="col-lg-12">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Sales Report Filters</h5>
-              <div class="row">
-                <div class="col-md-3">
-                  <label for="report-type" class="form-label">Report Type</label>
-                  <select id="filter-order" class="form-select" onchange="filterOrder()">
-                    <option value="custom">Default</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                  </select>
-                </div>
-                <div class="col-md-3">
-                  <label for="start-date" class="form-label">Start Date</label>
-                  <input type="date" id="start-date" class="form-control" />
-                </div>
-                <div class="col-md-3">
-                  <label for="end-date" class="form-label">End Date</label>
-                  <input type="date" id="end-date" class="form-control" />
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                  <button class="btn btn-primary w-100" onClick="filterByDate()">
-                    Filter
-                  </button>
-                </div>
-              </div>
+      <!-- Sales Report Filters Card -->
+      <div class="card animate-up delay-1 mb-5">
+        <div class="card-body">
+          <h5 class="form-section-title" style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:500; margin-bottom:20px; padding-bottom:8px; border-bottom:1px solid var(--border);">Sales Report Filters</h5>
+          <div class="row g-4">
+            <div class="col-md-3">
+              <label for="filter-order" class="form-label" style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; display:block;">Report Type</label>
+              <select id="filter-order" class="form-select" onchange="filterOrder()">
+                <option value="custom">Default</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="start-date" class="form-label" style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; display:block;">Start Date</label>
+              <input type="date" id="start-date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+              <label for="end-date" class="form-label" style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; display:block;">End Date</label>
+              <input type="date" id="end-date" class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button class="btn btn-primary w-100" onClick="filterByDate()" style="height: 42px;">
+                Filter Report
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Total Orders</h5>
-              <h3 class="text-primary">
+      <!-- Dashboard-style Summary Cards Grid -->
+      <div class="summary-cards mb-5 animate-up delay-2">
+        <div class="summary-card">
+            <div class="icon-container bg-light-blue mb-3">
+                <i class="fa-solid fa-bag-shopping text-primary" style="color: #4A90E2 !important;"></i>
+            </div>
+            <h6 style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Total Orders</h6>
+            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
                 <%= saleCount %>
-              </h3>
-            </div>
-          </div>
+            </h3>
         </div>
-        <div class="col-md-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Total Revenue</h5>
-              <h3 class="text-success">₹ <%= totalSalePrice %>
-              </h3>
+
+        <div class="summary-card">
+            <div class="icon-container bg-light-green mb-3">
+                <i class="fa-solid fa-indian-rupee-sign text-success" style="color: #2ECC71 !important;"></i>
             </div>
-          </div>
+            <h6 style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Total Revenue</h6>
+            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
+                ₹<%= totalSalePrice.toLocaleString('en-IN') %>
+            </h3>
         </div>
-        <div class="col-md-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Total Discounts</h5>
-              <h3 class="text-warning">₹ <%= Math.round(totalDiscount) %>
-              </h3>
+
+        <div class="summary-card">
+            <div class="icon-container bg-light-orange mb-3">
+                <i class="fa-solid fa-tags text-warning" style="color: #E67E22 !important;"></i>
             </div>
-          </div>
+            <h6 style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Total Discounts</h6>
+            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
+                ₹<%= Math.round(totalDiscount).toLocaleString('en-IN') %>
+            </h3>
         </div>
-        <div class="col-md-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Coupon Discount</h5>
-              <h3 class="text-danger">
-                <%= couponDiscount %>
-              </h3>
+
+        <div class="summary-card">
+            <div class="icon-container bg-light-red mb-3">
+                <i class="fa-solid fa-gift text-danger" style="color: #E74C3C !important;"></i>
             </div>
-          </div>
+            <h6 style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Coupon Discount</h6>
+            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
+                ₹<%= couponDiscount.toLocaleString('en-IN') %>
+            </h3>
         </div>
       </div>
 
-      <div class="row mt-4">
-        <div class="col-lg-12">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="card-title">Sales Report</h5>
-            </div>
-            <div class="card-body">
-              <table id="salesTable" class="table table-striped">
-                <thead>
+      <!-- Sales Table Card -->
+      <div class="card animate-up delay-3">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table id="salesTable" class="table mb-0" style="vertical-align: middle;">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>User</th>
+                  <th>Order ID</th>
+                  <th>Subtotal</th>
+                  <th>Product Discount</th>
+                  <th>Coupon Discount</th>
+                  <th>Total Amount</th>
+                  <th>Payment Method</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (order.length > 0) { %> 
+                  <% order.forEach(order => { %>
+                    <tr>
+                      <td>
+                        <%= new Date(order.createdOn).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %>
+                      </td>
+                      <td style="font-weight: 600; color: var(--text-primary);">
+                        <%= order.user ? order.user.name : 'Guest User' %>
+                      </td>
+                      <td class="order-ref">
+                        <%= order.orderId %>
+                      </td>
+                      <td>₹<%= order.subtotal.toLocaleString('en-IN') %></td>
+                      <td>₹<%= (order.productdiscount || 0).toLocaleString('en-IN') %></td>
+                      <td>₹<%= (order.couponDiscount || 0).toLocaleString('en-IN') %></td>
+                      <td style="font-weight: 600; color: var(--text-primary);">₹<%= order.finalAmount.toLocaleString('en-IN') %></td>
+                      <td style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">
+                        <%= order.paymentMethod %>
+                      </td>
+                    </tr>
+                  <% }); %>
+                <% } else { %>
                   <tr>
-                    <th>Date</th>
-                    <th>User</th>
-                    <th>OrderId</th>
-                    <th>Price</th>
-                    <th>productDiscount</th>
-                    <th>couponDiscount</th>
-                    <th>Total</th>
-                    <th>Payment Method</th>
+                    <td colspan="8" class="text-center py-5 text-muted">No orders found.</td>
                   </tr>
-                </thead>
-                <tbody>
-                  <% if (order.length> 0) { %> <% order.forEach(order=> { %>
-
-                      <tr>
-                        <td>
-                          <%= new Date(order.createdOn).toLocaleDateString() %>
-                        </td>
-                        <td class="truncate truncate-tooltip"
-                          data-tooltip="<%= order.user ? order.user.name : 'N/A' %>">
-                          <%= order.user ? order.user.name : 'N/A' %>
-                        </td>
-                        <td class="truncate truncate-tooltip" data-tooltip="<%= order.orderId %>">
-                          <%= order.orderId %>
-                        </td>
-                        <td>₹ <%= order.subtotal%>
-                        </td>
-
-                        <td>₹ <%= order.productdiscount || 0 %>
-                        </td>
-                        <td>₹ <%= order.couponDiscount || 0 %>
-                        </td>
-                        <td>₹ <%= order.finalAmount %>
-                        </td>
-                        <td>
-                          <%= order.paymentMethod %>
-                        </td>
-                      </tr>
-                      <% }); %>
-                        <% } else { %>
-                          <tr>
-                            <td colspan="7" class="text-center">No orders found.</td>
-                          </tr>
-                          <% } %>
-                </tbody>
-              </table>
-            </div>
+                <% } %>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
-    <div class="pagination-container">
-      <% if (totalPage> 1) { %>
-        <ul class="pagination">
-          <% if (page> 1) { %>
-            <li class="page-item">
-              <a class="page-link" href="?page=<%= page - 1 %>">&laquo; Previous</a>
-            </li>
+
+    <% if (totalPage > 1) { %>
+    <div class="pagination-container animate-up" style="display: flex; justify-content: center; gap: 8px; margin-top: 32px;">
+        <% if (page > 1) { %>
+            <a href="?page=<%= page - 1 %>" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);"><i class="fa-solid fa-chevron-left"></i></a>
+        <% } %>
+        <% for (let i = 1; i <= totalPage; i++) { %>
+            <% if (i === page) { %>
+                <span class="current-page" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--gold); color: var(--gold); background: var(--gold-glow); font-size: 13px;"><%= i %></span>
+            <% } else { %>
+                <a href="?page=<%= i %>" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);"><%= i %></a>
             <% } %>
-              <% for (let i=1; i <=totalPage; i++) { %>
-                <li class="page-item <%= i === page ? 'active' : '' %>">
-                  <a class="page-link" href="?page=<%= i %>">
-                    <%= i %>
-                  </a>
-                </li>
-                <% } %>
-                  <% if (page < totalPage) { %>
-                    <li class="page-item">
-                      <a class="page-link" href="?page=<%= page + 1 %>">Next &raquo;</a>
-                    </li>
-                    <% } %>
-        </ul>
+        <% } %>
+        <% if (page < totalPage) { %>
+            <a href="?page=<%= page + 1 %>" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);"><i class="fa-solid fa-chevron-right"></i></a>
         <% } %>
     </div>
+    <% } %>
   </section>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>

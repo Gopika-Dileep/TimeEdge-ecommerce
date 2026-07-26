@@ -1,240 +1,248 @@
-<%-include("../../views/partials/user/header") %>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f5f5f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<%- include("../../views/partials/user/header") %>
 
-        .refer-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-top: 30px;
-        }
+<link rel="stylesheet" href="/css/profile.css">
+<style>
+.refer-card-new {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 40px;
+}
+.referral-box-new {
+    background: rgba(212, 175, 55, 0.03);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin: 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.referral-icon-new {
+    font-size: 32px;
+    color: var(--gold);
+}
+.referral-number-new {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--gold);
+    font-weight: 500;
+}
+.code-box-new {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    margin-top: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text-primary);
+}
+.copy-btn-new {
+    background: none;
+    border: none;
+    color: var(--gold);
+    cursor: pointer;
+    font-size: 16px;
+    transition: var(--transition);
+}
+.copy-btn-new:hover {
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+.terms-text-new {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 24px;
+    letter-spacing: 0.5px;
+}
+.apply-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+.apply-input {
+    flex: 1;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: var(--transition);
+}
+.apply-input:focus {
+    border-color: var(--gold);
+    background: var(--gold-glow);
+}
+</style>
 
-        .referral-box {
-            background-color: #f0f8ea;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 20px 0;
-        }
+<div class="te-container profile-page">
+    <div class="animate-up">
+        <span class="section-label">Your Dashboard</span>
+        <h1 class="section-title">Refer & <em>Earn</em></h1>
+    </div>
 
-        .referral-icon {
-            color: #7cb342;
-            font-size: 24px;
-            margin-right: 10px;
-        }
+    <div class="profile-layout">
+        <!-- Sidebar Navigation -->
+        <%- include("../../views/partials/user/profile-sidebar") %>
 
-        .referral-count {
-            font-size: 24px;
-            font-weight: bold;
-            color: #7cb342;
-            text-align: right;
-        }
+        <!-- Profile Panel Contents -->
+        <div class="profile-content animate-up delay-2">
 
-        .code-box {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 8px 12px;
-            margin-top: 8px;
-            position: relative;
-        }
+            <!-- Refer & Earn Panel -->
+            <div class="profile-section">
+                <div class="profile-section-title">Share the <span>Experience</span></div>
+                
+                <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.6; margin-bottom: 20px;">
+                    Invite your friends to TimeEdge. Share your unique referral code and both you and your friend will receive flat <strong style="color: var(--gold);">₹100</strong> added directly to your wallets when they sign up!
+                </p>
 
-        .copy-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #6c757d;
-        }
-
-        .apply-button {
-            background-color: #7cb342;
-            border: none;
-        }
-
-        .apply-button:hover {
-            background-color: #6a9739;
-        }
-
-        .terms-text {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 15px;
-        }
-    </style>
-    </head>
-
-    <body>
-
-        <div style="display: flex; background-color: #f8fafc;">
-            <%-include("../../views/partials/user/profile-sidebar") %>
-                <div style="width: 100%; padding-right: 40px; margin-top: 40px;">
-                    <div class="container">
-
-                        <div class="row justify-content-center">
-
-                            <div class="col-md-8">
-                                <div class="refer-card">
-                                    <h4 class="mb-1">Refer a Friend & Earn</h4>
-                                    <p class="text-muted">Share your unique code and both you and your friend get FLAT
-                                        100</p>
-
-
-                                    <div class="referral-box">
-                                        <div class="row align-items-center">
-                                            <div class="col-8">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="bi bi-people-fill referral-icon"></i>
-                                                    <div>
-                                                        <div>Referred Users</div>
-                                                        <div class="text-muted small">Total referrals</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-4 referral-count">
-                                                <span class="referral-number">
-                                                    <%= referralCount %>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-4">
-                                        <label for="referralCode" class="form-label">Your Referral Code</label>
-                                        <div class="code-box" id="referralCode">
-                                            <%= referralCode %>
-                                                <span class="copy-icon">
-                                                    <i class="bi bi-clipboard"></i>
-                                                </span>
-                                        </div>
-                                    </div>
-
-
-                                    <% if(!user.referredBy) { %>
-                                        <div class="mt-4">
-
-                                            <label for="applyCode" class="form-label">Apply a Referral Code</label>
-                                            <div class="input-group mb-3">
-                                                <input type="text" class="form-control" id="applyCode"
-                                                    placeholder="Enter code">
-                                                <button class="btn apply-button text-white" type="button">Apply</button>
-                                            </div>
-                                        </div>
-                                        <% } %>
-
-
-                                            <div class="terms-text">
-                                                Terms and conditions apply. Offer valid for new customers only.
-                                            </div>
-                                </div>
-                            </div>
+                <div class="referral-box-new">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <i class="fa-solid fa-user-group referral-icon-new"></i>
+                        <div>
+                            <div style="color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Successful Referrals</div>
+                            <div style="color: var(--text-muted); font-size: 11px;">Total friends joined</div>
                         </div>
                     </div>
+                    <div class="referral-number-new">
+                        <%= referralCount %>
+                    </div>
                 </div>
+
+                <div style="margin-top: 32px;">
+                    <label class="form-label" style="display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px;">Your Referral Code</label>
+                    <div class="code-box-new">
+                        <span id="referralCodeText"><%= referralCode %></span>
+                        <button type="button" class="copy-btn-new" id="copyReferralBtn" title="Copy code">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <% if (!user.referredBy) { %>
+                <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 32px;">
+                    <label class="form-label" style="display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px;">Apply a Referral Code</label>
+                    <div class="apply-group">
+                        <input type="text" class="apply-input" id="applyCodeInput" placeholder="Enter referral code received from a friend">
+                        <button class="btn-gold" id="applyCodeBtn" style="padding: 0 28px;"><span>Apply</span></button>
+                    </div>
+                </div>
+                <% } %>
+
+                <div class="terms-text-new">
+                    * Terms and conditions apply. Wallet rewards are credited instantly upon code verification. Valid for new user registrations only.
+                </div>
+            </div>
+
         </div>
+    </div>
+</div>
 
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-
-            document.querySelector('.copy-icon').addEventListener('click', function () {
-
-                const referralCode = document.getElementById('referralCode').textContent.trim();
-
-
-                navigator.clipboard.writeText(referralCode)
-                    .then(() => {
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Copied!',
-                            text: 'Referral code copied to clipboard',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    })
-                    .catch(err => {
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Failed to copy code to clipboard'
-                        });
-                        console.error('Failed to copy: ', err);
-                    });
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('copyReferralBtn').addEventListener('click', function () {
+    const referralCode = document.getElementById('referralCodeText').textContent.trim();
+    navigator.clipboard.writeText(referralCode)
+        .then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Copied!',
+                text: 'Referral code copied to clipboard',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#1a1a1a',
+                color: '#ffffff'
             });
-            document.querySelector('.apply-button').addEventListener('click', function () {
+        })
+        .catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Failed to copy code to clipboard',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            });
+        });
+});
 
-                const referralCode = document.getElementById('applyCode').value.trim();
+const applyCodeBtn = document.getElementById('applyCodeBtn');
+if (applyCodeBtn) {
+    applyCodeBtn.addEventListener('click', function () {
+        const referralCode = document.getElementById('applyCodeInput').value.trim();
 
+        if (!referralCode) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Empty Code',
+                text: 'Please enter a referral code',
+                confirmButtonColor: '#d4af37',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            });
+            return;
+        }
 
-                if (!referralCode) {
+        Swal.fire({
+            title: 'Applying code...',
+            background: '#1a1a1a',
+            color: '#ffffff',
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false
+        });
+
+        fetch('/apply-referral', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code: referralCode })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     Swal.fire({
-                        icon: 'warning',
-                        title: 'Empty Code',
-                        text: 'Please enter a referral code',
-                        confirmButtonColor: '#7cb342'
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message || 'Referral code applied successfully',
+                        confirmButtonColor: '#d4af37',
+                        background: '#1a1a1a',
+                        color: '#ffffff'
+                    }).then(() => {
+                        window.location.reload();
                     });
-                    return;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: data.message || 'Failed to apply referral code',
+                        confirmButtonColor: '#d4af37',
+                        background: '#1a1a1a',
+                        color: '#ffffff'
+                    });
                 }
-
-
+            })
+            .catch(error => {
+                console.error('Error:', error);
                 Swal.fire({
-                    title: 'Applying code...',
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong. Please try again later.',
+                    confirmButtonColor: '#d4af37',
+                    background: '#1a1a1a',
+                    color: '#ffffff'
                 });
-
-
-                fetch('/apply-referral', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ code: referralCode })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: data.message || 'Referral code applied successfully',
-                                confirmButtonColor: '#7cb342'
-                            }).then(() => {
-
-                                window.location.reload();
-                            });
-                        } else {
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Failed',
-                                text: data.message || 'Failed to apply referral code',
-                                confirmButtonColor: '#7cb342'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Something went wrong. Please try again later.',
-                            confirmButtonColor: '#7cb342'
-                        });
-                    });
             });
-        </script>
-    </body>
-    <%-include("../../views/partials/user/footer") %>
+    });
+}
+</script>
+
+<%- include("../../views/partials/user/footer") %>

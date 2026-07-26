@@ -2,66 +2,135 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>TimeEdge</title>
+    <title>TimeEdge — Administration Portal</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/x-icon" href="#">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --header-height: 60px;
-            --sidebar-width: 240px;
-            --body-bg: #f8fafc;
-            --sidebar-bg: #ffffff;
-            --text-muted: #64748b;
+            --bg-body: #fbfbf9;
+            --bg-card: #ffffff;
+            --text-primary: #1c1a17;
+            --text-secondary: #5c554c;
+            --text-muted: #948c82;
+            --gold: #b39343;
+            --gold-light: #d4b66a;
+            --gold-glow: rgba(179, 147, 67, 0.05);
+            --border: #edece8;
+            --border-hover: #d1cfc9;
+            --sidebar-width: 260px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background-color: var(--body-bg);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
             min-height: 100vh;
-            color: #1e293b;
         }
 
+        /* Layout Structure */
         .app-container {
             display: flex;
             min-height: 100vh;
         }
 
-       
-        .header {
-            height: var(--header-height);
-            background: #fff;
-            border-bottom: 1px solid #e5e7eb;
+        /* Sidebar - Elegant and Slim Dark Theme contrast */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #11100e;
+            height: 100vh;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            left: 0; top: 0;
+            overflow-y: auto;
+            border-right: 1px solid #1c1a17;
+            padding: 2rem 1.5rem;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding-bottom: 20px;
+        }
+        .brand span { color: var(--gold); }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 6px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #a39c93;
+            text-decoration: none;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            border-radius: 4px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link i {
+            margin-right: 14px;
+            width: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #706960;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 255, 255, 0.03);
+            color: #ffffff;
+            font-weight: 500;
+            border-left-color: var(--gold);
+        }
+        .nav-link:hover i, .nav-link.active i {
+            color: var(--gold);
+        }
+
+        /* Top Header */
+        .header {
+            height: 64px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            top: 0; left: var(--sidebar-width); right: 0;
             z-index: 1000;
             display: flex;
             align-items: center;
-            padding: 0 1rem;
+            padding: 0 2rem;
             justify-content: space-between;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .header-right {
-            display: flex;
-            justify-content: end;
-            width: 100%;
+            transition: var(--transition);
         }
 
         .toggle-btn {
@@ -70,228 +139,262 @@
             border: none;
             font-size: 1.25rem;
             cursor: pointer;
-            color: #1e293b;
+            color: var(--text-primary);
         }
 
-        .brand {
-            font-size: 1.25rem;
+        .logout-link {
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
             font-weight: 600;
-            color: #1e293b;
-            text-decoration: none;
-        }
-
-       
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            border-right: 1px solid #e5e7eb;
-            padding: 1.5rem;
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-            margin-top: 2rem;
-        }
-
-        .nav-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-link {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            padding: 0.75rem 1rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
+            gap: 8px;
         }
+        .logout-link:hover { color: var(--gold); }
 
-        .nav-link:hover, .nav-link.active {
-            background: #f1f5f9;
-            color: #2563eb;
-        }
-
-        .nav-link i {
-            margin-right: 0.75rem;
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        
+        /* Workspace Main Content Wrapper */
         .content-area {
             flex: 1;
             margin-left: var(--sidebar-width);
             min-height: 100vh;
-            background-color: #f8fafc;
-            transition: margin-left 0.3s ease;
+            padding-top: 64px;
+            background-color: var(--bg-body);
+            transition: var(--transition);
         }
 
+        .content-main {
+            padding: 2.5rem;
+            width: 100%;
+        }
+
+        /* General Card & Forms Overrides */
+        .card {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        .card-header {
+            background: transparent !important;
+            border-bottom: 1px solid var(--border) !important;
+            padding: 1.5rem !important;
+        }
+        .card-header h4, .card-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin: 0;
+            font-weight: 500;
+        }
+        .card-body { padding: 1.5rem !important; }
+
+        /* Table Aesthetics */
+        .table {
+            --bs-table-bg: transparent !important;
+            border-color: var(--border) !important;
+        }
+        .table th {
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1.5px !important;
+            color: var(--text-muted) !important;
+            font-weight: 600 !important;
+            border-bottom: 1px solid var(--border) !important;
+            padding: 12px 10px !important;
+        }
+        .table td {
+            font-size: 13px !important;
+            color: var(--text-secondary) !important;
+            vertical-align: middle !important;
+            padding: 14px 10px !important;
+            border-bottom: 1px solid var(--border) !important;
+        }
+
+        /* Buttons styling */
+        .btn-primary, .btn-submit, .btn-gold-fill {
+            background: var(--gold) !important;
+            border-color: var(--gold) !important;
+            color: #ffffff !important;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1.5px !important;
+            text-transform: uppercase !important;
+            border-radius: 0 !important;
+            padding: 12px 24px !important;
+            transition: var(--transition) !important;
+        }
+        .btn-primary:hover, .btn-submit:hover, .btn-gold-fill:hover {
+            background: var(--gold-light) !important;
+            border-color: var(--gold-light) !important;
+            box-shadow: 0 4px 15px rgba(179, 147, 67, 0.15) !important;
+        }
+
+        .btn-secondary, .btn-table-action {
+            background: none !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text-secondary) !important;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1.5px !important;
+            text-transform: uppercase !important;
+            border-radius: 0 !important;
+            padding: 12px 24px !important;
+            transition: var(--transition) !important;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .btn-secondary:hover, .btn-table-action:hover {
+            border-color: var(--border-hover) !important;
+            color: var(--text-primary) !important;
+            background: rgba(0,0,0,0.02) !important;
+        }
+
+        /* Form Inputs */
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.01) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 0 !important;
+            color: var(--text-primary) !important;
+            font-size: 13px !important;
+            padding: 10px 14px !important;
+            outline: none !important;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--gold) !important;
+            background: var(--gold-glow) !important;
+            box-shadow: none !important;
+        }
+
+        /* Responsive Design */
         @media (max-width: 1024px) {
-            .content-area {
-                margin-left: 0;
-            }
-            .sidebar-open .content-area {
-                margin-left: var(--sidebar-width);
-            }
-        }
-
-      
-        .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-       
-        @media (max-width: 1000px) {
             .sidebar {
                 transform: translateX(-100%);
-                z-index: 1000;
             }
-
             .sidebar.active {
                 transform: translateX(0);
             }
-
-            .content {
+            .header {
+                left: 0;
+            }
+            .content-area {
                 margin-left: 0;
             }
-
             .toggle-btn {
                 display: block;
             }
-        }
-
-      
-        .chart-container {
-            background: #fff;
-            border-radius: 8px;
-            padding: 1rem;
-            height: 200px;
-        }
-
-        .small-chart {
-            height: 50px;
-            width: 100%;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-       
-        <header class="header" >
-            <div class="header-left">
-                <button class="toggle-btn" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <a href="/admin" class="brand">TimeEdge</a>
+        <!-- Top Header -->
+        <header class="header">
+            <button class="toggle-btn" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div style="font-family:'Playfair Display',serif; font-size:14px; font-weight:600; color:var(--text-muted);">
+                TimeEdge Portal
             </div>
-            <div class="header-right" >
-                <a href="/admin/logout" class="btn btn-outline-danger">Logout</a>
+            <div class="header-right">
+                <a href="/admin/logout" class="logout-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
             </div>
         </header>
 
-       
+        <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
-            <a href="/admin" class="brand">TimeEdge</a>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="/admin" class="nav-link">
-                        <i class="fas fa-th-large"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/salesreport" class="nav-link">
-                        <i class="fas fa-th-large"></i>
-                        <span>SalesReport</span>
-                    </a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a href="/admin/addProducts" class="nav-link">
-                        <i class="fas fa-box"></i>
-                        <span>AddProducts</span>
-                    </a>
-                </li> -->
-                <li class="nav-item">
-                    <a href="/admin/Product" class="nav-link">
-                        <i class="fas fa-box"></i>
-                        <span>Products</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/orders" class="nav-link">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Orders</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/users" class="nav-link">
-                        <i class="fas fa-users"></i>
-                        <span>Customers</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/coupon" class="nav-link">
-                        <i class="fas fa-star"></i>
-                        <span>Coupons</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/category" class="nav-link">
-                        <i class="fas fa-list"></i>
-                        <span>Categories</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/brand" class="nav-link">
-                        <i class="fas fa-cogs"></i>
-                        <span>Brands</span>
-                    </a>
-                </li>
-            </ul>
+            <div>
+                <a href="/admin" class="brand">TIME<span>EDGE</span></a>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/admin" class="nav-link">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/salesreport" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Sales Report</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/Product" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/orders" class="nav-link">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Orders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/users" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Customers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/coupon" class="nav-link">
+                            <i class="fas fa-star"></i>
+                            <span>Coupons</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/category" class="nav-link">
+                            <i class="fas fa-list"></i>
+                            <span>Categories</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/brand" class="nav-link">
+                            <i class="fas fa-cogs"></i>
+                            <span>Brands</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </aside>
 
-       
-        <main class="content-area">
-            <div class="content-main">
-            </div>
-        </main>
-
         <script>
-           
-            document.getElementById('sidebarToggle').addEventListener('click', function() {
-                document.getElementById('sidebar').classList.toggle('active');
-            });
+            document.addEventListener("DOMContentLoaded", function () {
+                const currentPath = window.location.pathname;
+                const navLinks = document.querySelectorAll(".sidebar .nav-link");
+                navLinks.forEach(link => {
+                    link.classList.remove("active");
+                    const linkPath = new URL(link.href, window.location.origin).pathname;
+                    // Strict match for dashboard, prefix matches for other subpaths
+                    if (linkPath === "/admin" && (currentPath === "/admin" || currentPath === "/admin/dashboard")) {
+                        link.classList.add("active");
+                    } else if (linkPath !== "/admin" && currentPath.startsWith(linkPath)) {
+                        link.classList.add("active");
+                    }
+                });
 
-           
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 1000) {
-                    document.getElementById('sidebar').classList.remove('active');
+                // Toggle menu drawer responsiveness
+                const toggleBtn = document.getElementById("sidebarToggle");
+                if (toggleBtn) {
+                    toggleBtn.addEventListener("click", function () {
+                        document.getElementById("sidebar").classList.toggle("active");
+                    });
                 }
             });
         </script>
-    </div>
-</body>
-</html>
+
+        <!-- Main Workspace Area -->
+        <main class="content-area">
+            <div class="content-main">
+                <!-- views template injection wrapper -->

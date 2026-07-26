@@ -1,294 +1,152 @@
 <%- include("../../views/partials/admin/header") %>
 
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f8f9fc;
-    }
+<head>
+    <style>
+        .order-status-select {
+            background: rgba(0,0,0,0.01);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 12px;
+            padding: 6px 12px;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .order-status-select:focus {
+            border-color: var(--gold);
+        }
+        .order-ref {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        /* Pagination */
+        .pagination-container { display: flex; justify-content: center; gap: 8px; margin-top: 32px; }
+        .pagination-container a, .pagination-container .current-page {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border: 1px solid var(--border);
+            text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);
+        }
+        .pagination-container a:hover, .pagination-container .current-page {
+            border-color: var(--gold); color: var(--gold); background: var(--gold-glow);
+        }
+    </style>
+</head>
 
-    .container {
-      max-width: 1000px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-      text-align: center;
-      color: #333333;
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
-
-    .orders-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    .orders-table th,
-    .orders-table td {
-      padding: 14px 12px;
-      text-align: left;
-    }
-
-    .orders-table th {
-      background-color: #f1f5f9;
-      color: #6b7280;
-      text-transform: uppercase;
-      font-size: 12px;
-      border-bottom: 2px solid #e5e7eb;
-    }
-
-    .orders-table td {
-      color: #374151;
-      background-color: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .orders-table tr:nth-child(odd) td {
-      background-color: #f9fafb;
-    }
-
-    .orders-table tr:hover td {
-      background-color: #e5e7eb;
-    }
-
-    .orders-table .btn {
-      padding: 6px 10px;
-      font-size: 12px;
-      color: #2563eb;
-      text-decoration: none;
-      border: 1px solid #2563eb;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
-
-    .orders-table .btn:hover {
-      background-color: #2563eb;
-      color: #ffffff;
-    }
-
-    .orders-table td.pending {
-      color: #f59e0b;
-      font-weight: bold;
-    }
-
-    .orders-table td.processing {
-      color: #3b82f6;
-      font-weight: bold;
-    }
-
-    .orders-table td.shipped {
-      color: #6366f1;
-      font-weight: bold;
-    }
-
-    .orders-table td.delivered {
-      color: #10b981;
-      font-weight: bold;
-    }
-
-    .orders-table td.cancelled {
-      color: #ef4444;
-      font-weight: bold;
-    }
-
-    .orders-table td.return-request {
-      color: #f97316;
-      font-weight: bold;
-    }
-
-    .orders-table td.returned {
-      color: #6b7280;
-      font-weight: bold;
-    }
-
-
-    @media (max-width: 768px) {
-      .orders-table thead {
-        display: none;
-      }
-
-      .orders-table tr {
-        display: block;
-        margin-bottom: 16px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-
-      .orders-table td {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-        font-size: 12px;
-      }
-
-      .orders-table td:before {
-        content: attr(data-label);
-        font-weight: bold;
-        text-transform: uppercase;
-        color: #6b7280;
-        flex: 1;
-      }
-
-      .orders-table td {
-        flex: 2;
-      }
-
-      .btn {
-        display: block;
-        text-align: center;
-      }
-    }
-
-    .container {
-      position: absolute;
-      top: 78px;
-      left: 280px;
-      width: calc(100% - 240px);
-      min-width: 1350px;
-      padding: 2rem;
-    }
-
-    @media (max-width: 1000px) {
-      .container {
-        position: absolute;
-        top: 50px;
-        left: 20px;
-        width: calc(100% - 30px);
-        padding: 2rem;
-      }
-    }
-
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 2rem;
-      gap: 1rem;
-    }
-
-    .page-numbers {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .page-numbers a {
-      padding: 0.5rem 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .page-numbers a.active {
-      background: #0863dab9;
-      color: white;
-      border-color: #0863dab9;
-    }
-
-    .page-numbers a:hover:not(.active) {
-      background: #f5f5f5;
-    }
-
-    .pagination button {
-      padding: 0.5rem 1rem;
-      border: 1px solid #ddd;
-      background: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .pagination button:disabled {
-      background: #f5f5f5;
-      cursor: not-allowed;
-    }
-  </style>
-
-  <div class="container">
-    <h1>Orders List</h1>
-    <table class="orders-table">
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Order Id</th>
-          <th>Status</th>
-          <th>Total Price</th>
-          <th>Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% orders.forEach(order=> { %>
-          <tr>
-            <td data-label="User">
-              <%= order.user?.name %>
-            </td>
-            <td data-label="Order Id">#<%= order.orderId %>
-            </td>
-            <td data-label="Status" class="<%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
-              <%= order.status %>
-            </td>
-
-            <td data-label="Total Price">₹<%= order.finalAmount %>
-            </td>
-            <td data-label="Date">
-              <%= order.createdOn.toLocaleDateString() %>
-            </td>
-            <td data-label="Actions">
-              <a href="/admin/orders/<%= order._id %>" class="btn">View Details</a>
-            </td>
-          </tr>
-          <% }); %>
-      </tbody>
-    </table>
-
-    <div class="pagination">
-      <% const prevPage=currentpage> 1 ? currentpage - 1 : 1;
-        const nextPage = currentpage < totalpage ? currentpage + 1 : totalpage; %>
-
-          <% if (currentpage> 1) { %>
-            <a href="?page=<%= prevPage %>" class="btn">
-              <i class="bi bi-chevron-left"></i> Previous
-            </a>
-            <% } %>
-
-              <div class="page-numbers">
-                <% let startPage=Math.max(1, currentpage - 2); let endPage=Math.min(totalpage, startPage + 4); if
-                  (endPage - startPage < 4) { startPage=Math.max(1, endPage - 4); } if (startPage> 1) { %>
-                  <a href="?page=1">1</a>
-                  <% if (startPage> 2) { %>
-                    <span>...</span>
-                    <% } %>
-                      <% } %>
-
-                        <% for(let i=startPage; i <=endPage; i++) { %>
-                          <a href="?page=<%= i %>" class="<%= (i === currentpage) ? 'active' : '' %>">
-                            <%= i %>
-                          </a>
-                          <% } %>
-
-                            <% if (endPage < totalpage) { %>
-                              <% if (endPage < totalpage - 1) { %>
-                                <span>...</span>
-                                <% } %>
-                                  <a href="?page=<%= totalpage %>">
-                                    <%= totalpage %>
-                                  </a>
-                                  <% } %>
-              </div>
-
-              <% if (currentpage < totalpage) { %>
-                <a href="?page=<%= nextPage %>" class="btn">
-                  Next <i class="bi bi-chevron-right"></i>
-                </a>
-                <% } %>
+<div class="content-container">
+    <div class="content-header mb-5 animate-up">
+        <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Sales Operations</span>
+        <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:500; margin-top:4px;">Orders Management</h2>
     </div>
-  </div>
-  <%- include("../../views/partials/admin/footer") %>
+
+    <!-- Orders Card Table -->
+    <div class="card animate-up delay-1">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table mb-0" style="vertical-align: middle;">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Date</th>
+                            <th>Payment</th>
+                            <th>Total Amount</th>
+                            <th>Delivery Status</th>
+                            <th style="width: 120px; text-align: right; padding-right: 24px !important;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (locals.orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                                <tr>
+                                    <td class="order-ref">#<%= order._id.toString().slice(-8).toUpperCase() %></td>
+                                    <td style="font-weight: 600; color: var(--text-primary);">
+                                        <%= (order.user && order.user.name) ? order.user.name : 'Guest User' %>
+                                    </td>
+                                    <td><%= new Date(order.createdOn).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %></td>
+                                    <td style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">
+                                        <%= order.paymentMethod || 'COD' %>
+                                    </td>
+                                    <td style="font-weight: 600; color: var(--text-primary);">
+                                        ₹<%= order.finalAmount.toLocaleString('en-IN') %>
+                                    </td>
+                                    <td>
+                                        <span id="badge-<%= order._id %>" style="padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px;
+                                            <% if(order.status === 'delivered') { %>
+                                                background:rgba(109,191,127,0.08); color:#6dbf7f; border:1px solid rgba(109,191,127,0.15);
+                                            <% } else if(order.status === 'Cancelled' || order.status === 'Returned') { %>
+                                                background:rgba(224,112,112,0.08); color:#e07070; border:1px solid rgba(224,112,112,0.15);
+                                            <% } else { %>
+                                                background:rgba(240,180,48,0.08); color:#f0b430; border:1px solid rgba(240,180,48,0.15);
+                                            <% } %>">
+                                            <%= order.status %>
+                                        </span>
+                                    </td>
+                                    <td style="text-align: right; padding-right: 24px !important;">
+                                        <a href="/admin/orders/<%= order._id %>" class="btn-primary" style="padding: 6px 12px; font-size: 10px; text-decoration: none; display: inline-block;">
+                                            <i class="fa-regular fa-eye"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">No Orders Found</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <% if (locals.totalpage && totalpage > 1) { %>
+    <div class="pagination-container animate-up">
+        <% if (currentpage > 1) { %>
+            <a href="?page=<%= currentpage - 1 %>"><i class="fa-solid fa-chevron-left"></i></a>
+        <% } %>
+        <% for (let i = 1; i <= totalpage; i++) { %>
+            <% if (i === currentpage) { %>
+                <span class="current-page"><%= i %></span>
+            <% } else { %>
+                <a href="?page=<%= i %>"><%= i %></a>
+            <% } %>
+        <% } %>
+        <% if (currentpage < totalpage) { %>
+            <a href="?page=<%= currentpage + 1 %>"><i class="fa-solid fa-chevron-right"></i></a>
+        <% } %>
+    </div>
+    <% } %>
+</div>
+
+<script>
+async function updateStatus(orderId, status) {
+    try {
+        const response = await fetch('/admin/orders/change-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, status })
+        });
+        const result = await response.json();
+        if (result.success) {
+            const badge = document.getElementById('badge-' + orderId);
+            badge.innerText = status;
+            if (status === 'delivered') {
+                badge.style.cssText = 'padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; background:rgba(109,191,127,0.08); color:#6dbf7f; border:1px solid rgba(109,191,127,0.15);';
+            } else if (status === 'Cancelled' || status === 'Returned') {
+                badge.style.cssText = 'padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; background:rgba(224,112,112,0.08); color:#e07070; border:1px solid rgba(224,112,112,0.15);';
+            } else {
+                badge.style.cssText = 'padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; background:rgba(240,180,48,0.08); color:#f0b430; border:1px solid rgba(240,180,48,0.15);';
+            }
+        } else {
+            alert('Failed to update status: ' + result.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Network error while updating status');
+    }
+}
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

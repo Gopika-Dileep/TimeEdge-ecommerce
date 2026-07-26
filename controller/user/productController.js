@@ -10,37 +10,37 @@ const loadhome = async (req, res) => {
         const userId = req.session.user
         const categories = await Category.find({ isListed: true })
         const brands = await Brand.find({ isListed: true })
-        
-        const products = await Product.find({ 
+
+        const products = await Product.find({
             isListed: true,
             category: { $in: categories.map(cat => cat._id) },
             brand: { $in: brands.map(brand => brand._id) }
         })
-        .sort({ createdAt: -1 })
-        .limit(9)
-        .populate('category')
-        .populate('brand');
+            .sort({ createdAt: -1 })
+            .limit(9)
+            .populate('category')
+            .populate('brand');
 
         let productsWithWishlist = [...products];
         if (userId) {
             const wishlist = await Wishlist.findOne({ userId: userId });
             productsWithWishlist = products.map(product => {
                 const productObj = product.toObject();
-                productObj.inWishlist = wishlist ? wishlist.products.some(item => 
+                productObj.inWishlist = wishlist ? wishlist.products.some(item =>
                     item.productId.toString() === product._id.toString()
                 ) : false;
                 return productObj;
             });
         }
-        
+
         if (userId) {
             const user = await User.findById({ _id: userId })
-            if(user.isBlocked===true){
-              return  res.render('login', { message: "User is blocked by admin" });
+            if (user.isBlocked === true) {
+                return res.render('login', { message: "User is blocked by admin" });
             }
-            res.render('home', { user: user, product: productsWithWishlist})
+            res.render('home', { user: user, product: productsWithWishlist })
         } else {
-            res.render("home", { product: productsWithWishlist})
+            res.render("home", { product: productsWithWishlist })
         }
     } catch (error) {
         console.error(error)
@@ -59,8 +59,10 @@ const loadshop = async (req, res) => {
         const search = req.query.search || '';
         const query = search ? { productName: { $regex: search, $options: 'i' } } : {};
 
-        const product = await Product.find({ ...query, isListed: true ,    category: { $in: category.map(cat => cat._id) },
-        brand: { $in: brand.map(brand => brand._id) } })
+        const product = await Product.find({
+            ...query, isListed: true, category: { $in: category.map(cat => cat._id) },
+            brand: { $in: brand.map(brand => brand._id) }
+        })
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
@@ -107,18 +109,18 @@ const productDetails = async (req, res) => {
         const userId = req.session.user
         const productId = req.query.id
 
-        const product = await Product.findOne({ 
+        const product = await Product.findOne({
             _id: productId,
-            isListed: true 
+            isListed: true
         })
-        .populate({
-            path: 'category',
-            match: { isListed: true }
-        })
-        .populate({
-            path: 'brand',
-            match: { isListed: true } 
-        })
+            .populate({
+                path: 'category',
+                match: { isListed: true }
+            })
+            .populate({
+                path: 'brand',
+                match: { isListed: true }
+            })
 
         if (!product || !product.category || !product.brand) {
             return res.status(404).render('product-not-found');
@@ -126,11 +128,11 @@ const productDetails = async (req, res) => {
 
         const findCategory = product.category
         const findBrand = product.brand
-        
-        const relatedProducts = await Product.find({ 
-            category: findCategory._id, 
+
+        const relatedProducts = await Product.find({
+            category: findCategory._id,
             _id: { $ne: productId },
-            isListed: true 
+            isListed: true
         }).limit(3)
 
         // Check if product is in user's wishlist
@@ -138,7 +140,7 @@ const productDetails = async (req, res) => {
         if (userId) {
             const user = await User.findById(userId);
             if (user) {
-                if(user.isBlocked===true){
+                if (user.isBlocked === true) {
                     return res.render('login', { message: "User is blocked by admin" });
                 }
                 const wishlist = await Wishlist.findOne({ userId: userId });
@@ -169,7 +171,7 @@ const productDetails = async (req, res) => {
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json("server error") 
+        res.status(500).json("server error")
     }
 }
 
@@ -184,17 +186,17 @@ const shopProducts = async (req, res) => {
         const priceLt = req.query.lt ? parseInt(req.query.lt) : null;
         const page = parseInt(req.query.page) || 1;
         const itemsPerPage = 6;
-        
-       
+
+
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isListed: true });
 
-    
+
         const listedCategoryIds = categories.map(cat => cat._id);
         const listedBrandIds = brands.map(brand => brand._id);
 
-      
-        let query = { 
+
+        let query = {
             isListed: true,
             category: { $in: listedCategoryIds },
             brand: { $in: listedBrandIds }
@@ -202,23 +204,23 @@ const shopProducts = async (req, res) => {
 
         if (search) {
             const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            
+
             query.$or = [
                 { productName: { $regex: escapedSearch, $options: 'i' } },
                 { description: { $regex: escapedSearch, $options: 'i' } }
             ];
         }
-        
+
         if (categoryId && listedCategoryIds.some(id => id.toString() === categoryId)) {
             query.category = categoryId;
         }
 
-        
+
         if (brandId && listedBrandIds.some(id => id.toString() === brandId)) {
             query.brand = brandId;
         }
 
-      
+
         if (priceGt !== null && priceLt !== null) {
             query.salePrice = { $gte: priceGt, $lte: priceLt };
         } else if (priceGt !== null) {
@@ -227,7 +229,7 @@ const shopProducts = async (req, res) => {
             query.salePrice = { $lte: priceLt };
         }
 
-      
+
         let sortOption = {};
         if (priceSort === 'asc') {
             sortOption = { salePrice: 1 };
@@ -245,20 +247,20 @@ const shopProducts = async (req, res) => {
             .skip((page - 1) * itemsPerPage)
             .limit(itemsPerPage);
 
-        
+
         let productsWithWishlist = [...products];
         if (user) {
             const wishlist = await Wishlist.findOne({ userId: user });
             productsWithWishlist = products.map(product => {
                 const productObj = product.toObject();
-                productObj.inWishlist = wishlist ? wishlist.products.some(item => 
+                productObj.inWishlist = wishlist ? wishlist.products.some(item =>
                     item.productId.toString() === product._id.toString()
                 ) : false;
                 return productObj;
             });
         }
 
-     
+
         const renderOptions = {
             product: productsWithWishlist,
             category: categories,
@@ -270,16 +272,19 @@ const shopProducts = async (req, res) => {
             minPrice: priceGt,
             maxPrice: priceLt,
             currentpage: page,
-            totalpage: totalPages
+            currentPage: page,
+            totalpage: totalPages,
+            totalPages: totalPages,
+            totalProducts: totalProducts
         };
 
-       
+
         if (user) {
             const userData = await User.findOne({ _id: user });
-            if(userData.isBlocked===true){
-                return  res.render('login', { message: "User is blocked by admin" });
-              }
-      
+            if (userData.isBlocked === true) {
+                return res.render('login', { message: "User is blocked by admin" });
+            }
+
             renderOptions.user = userData;
         }
 

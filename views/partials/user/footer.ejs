@@ -1,80 +1,128 @@
+<!-- ===== FOOTER ===== -->
+<footer style="background: #0d0d0d; border-top: 1px solid rgba(201,168,76,0.15); margin-top: 100px;">
 
- <footer class="footer">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3 col-md-6 col-sm-6">
-                <div class="footer__about">
-                    <div class="footer__logo">
-                        <a href="#"><h2 class="title" style="color: white;"><b> Time Edge</b> </h2> </a>
+    <!-- Newsletter bar -->
+    <div style="background: linear-gradient(135deg, #161616 0%, #1a1510 100%); border-bottom: 1px solid rgba(201,168,76,0.15); padding: 56px 0;">
+        <div class="te-container" style="display:flex; align-items:center; justify-content:space-between; gap:40px; flex-wrap:wrap;">
+            <div>
+                <span class="section-label">Stay Connected</span>
+                <h3 class="serif" style="font-size:1.8rem; font-weight:400; color:var(--text-primary); margin:0;">
+                    Exclusive arrivals & <em style="font-style:italic; color:var(--gold);">private events</em>
+                </h3>
+            </div>
+            <form style="display:flex; gap:0; max-width:440px; width:100%;" onsubmit="return false;">
+                <input type="email" placeholder="Your email address"
+                    style="flex:1; padding:14px 20px; background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.25); border-right:none; color:var(--text-primary); font-family:'Inter',sans-serif; font-size:13px; outline:none; transition:border-color 0.3s;"
+                    onfocus="this.style.borderColor='rgba(201,168,76,0.6)'"
+                    onblur="this.style.borderColor='rgba(201,168,76,0.25)'">
+                <button class="btn-gold-fill" style="white-space:nowrap; font-size:10px; padding:14px 24px;">
+                    Subscribe
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main footer -->
+    <div class="te-container" style="padding-top:72px; padding-bottom:72px;">
+        <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:60px; flex-wrap:wrap;">
+
+            <!-- Brand col -->
+            <div>
+                <a href="/" style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--text-primary); text-decoration:none; letter-spacing:3px; text-transform:uppercase; display:block; margin-bottom:20px;">
+                    <span style="color:var(--gold);">TIME</span> EDGE
+                </a>
+                <div class="gold-divider"></div>
+                <p style="font-size:13px; color:var(--text-secondary); line-height:1.9; margin-bottom:28px; max-width:280px;">
+                    Curators of exceptional timepieces. Each watch in our collection is a testament to the art of horology and the pursuit of excellence.
+                </p>
+                <!-- Social -->
+                <div style="display:flex; gap:14px;">
+                    <% [
+                        {icon:'fa-instagram', href:'#'},
+                        {icon:'fa-pinterest', href:'#'},
+                        {icon:'fa-x-twitter', href:'#'},
+                    ].forEach(s => { %>
+                    <a href="<%= s.href %>" style="width:38px; height:38px; border:1px solid rgba(201,168,76,0.25); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:14px; text-decoration:none; transition:all 0.3s;"
+                        onmouseover="this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'; this.style.background='rgba(201,168,76,0.08)';"
+                        onmouseout="this.style.borderColor='rgba(201,168,76,0.25)'; this.style.color='var(--text-secondary)'; this.style.background='transparent';">
+                        <i class="fa-brands <%= s.icon %>"></i>
+                    </a>
+                    <% }) %>
+                </div>
+            </div>
+
+            <!-- Collections -->
+            <div>
+                <h6 style="font-size:10px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:24px;">Collections</h6>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:12px;">
+                    <% ['All Watches','New Arrivals','Bestsellers','Limited Edition','Sale'].forEach(item => { %>
+                    <li>
+                        <a href="/shop" style="font-size:13px; color:var(--text-secondary); text-decoration:none; transition:all 0.3s; display:inline-flex; align-items:center; gap:8px;"
+                           onmouseover="this.style.color='var(--gold)'; this.style.paddingLeft='6px';"
+                           onmouseout="this.style.color='var(--text-secondary)'; this.style.paddingLeft='0';">
+                            <%= item %>
+                        </a>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
+
+            <!-- Support -->
+            <div>
+                <h6 style="font-size:10px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:24px;">Support</h6>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:12px;">
+                    <% [
+                        {text:'My Account', href:'/profile'},
+                        {text:'Order Tracking', href:'#'},
+                        {text:'Returns & Exchanges', href:'#'},
+                        {text:'Authenticity', href:'#'},
+                        {text:'Care & Service', href:'#'},
+                    ].forEach(item => { %>
+                    <li>
+                        <a href="<%= item.href %>" style="font-size:13px; color:var(--text-secondary); text-decoration:none; transition:all 0.3s; display:inline-block;"
+                           onmouseover="this.style.color='var(--gold)'; this.style.paddingLeft='6px';"
+                           onmouseout="this.style.color='var(--text-secondary)'; this.style.paddingLeft='0';">
+                            <%= item.text %>
+                        </a>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <h6 style="font-size:10px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:24px;">Contact</h6>
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                    <div style="display:flex; align-items:flex-start; gap:12px;">
+                        <i class="fa-regular fa-envelope" style="color:var(--gold); font-size:13px; margin-top:2px;"></i>
+                        <span style="font-size:13px; color:var(--text-secondary);">support@timeedge.com</span>
                     </div>
-                    <p>The customer is at the heart of our unique business model, which includes design.</p>
-                    <a href="#"><img src="img/payment.png" alt=""></a>
-                </div>
-            </div>
-            <div class="col-lg-2 offset-lg-1 col-md-3 col-sm-6">
-                <div class="footer__widget">
-                    <h6>Shopping</h6>
-                    <ul>
-                        <li><a href="#">Clothing Store</a></li>
-                        <li><a href="#">Trending Shoes</a></li>
-                        <li><a href="#">Accessories</a></li>
-                        <li><a href="#">Sale</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-3 col-sm-6">
-                <div class="footer__widget">
-                    <h6>Shopping</h6>
-                    <ul>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Payment Methods</a></li>
-                        <li><a href="#">Delivary</a></li>
-                        <li><a href="#">Return & Exchanges</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-lg-3 offset-lg-1 col-md-6 col-sm-6">
-                <div class="footer__widget">
-                    <h6>NewLetter</h6>
-                    <div class="footer__newslatter">
-                        <p>Be the first to know about new arrivals, sales & promos!</p>
-                        <form action="#">
-                            <input type="text" placeholder="Your email">
-                            <button type="submit"><span class="icon_mail_alt"></span></button>
-                        </form>
+                    <div style="display:flex; align-items:flex-start; gap:12px;">
+                        <i class="fa-regular fa-clock" style="color:var(--gold); font-size:13px; margin-top:2px;"></i>
+                        <span style="font-size:13px; color:var(--text-secondary);">Mon – Sat: 10am – 7pm</span>
+                    </div>
+                    <div style="display:flex; align-items:flex-start; gap:12px;">
+                        <i class="fa-solid fa-shield-halved" style="color:var(--gold); font-size:13px; margin-top:2px;"></i>
+                        <span style="font-size:13px; color:var(--text-secondary);">30-Day Returns Guaranteed</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <div class="footer__copyright__text">
-                   
-                    <p>Copyright ©
-                        <script>
-                            document.write(new Date().getFullYear());
-                        </script>2020
-                        All rights reserved | This template is made with <i class="fa fa-heart-o"
-                        aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                    </p>
-                   
-                </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div style="border-top: 1px solid rgba(201,168,76,0.1); padding:20px 0;">
+        <div class="te-container" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <p style="font-size:12px; color:var(--text-muted); letter-spacing:0.5px;">
+                &copy; <script>document.write(new Date().getFullYear())</script> TimeEdge. All rights reserved.
+            </p>
+            <div style="display:flex; gap:24px;">
+                <a href="#" style="font-size:11px; color:var(--text-muted); text-decoration:none; letter-spacing:0.5px; transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'">Privacy Policy</a>
+                <a href="#" style="font-size:11px; color:var(--text-muted); text-decoration:none; letter-spacing:0.5px; transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'">Terms of Service</a>
             </div>
         </div>
     </div>
 </footer>
 
-
-<script src="js/jquery-3.3.1.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/jquery.nice-select.min.js"></script>
-<script src="js/jquery.nicescroll.min.js"></script>
-<script src="js/jquery.magnific-popup.min.js"></script>
-<script src="js/jquery.countdown.min.js"></script>
-<script src="js/jquery.slicknav.js"></script>
-<script src="js/mixitup.min.js"></script>
-<script src="js/owl.carousel.min.js"></script>
-<script src="js/main.js"></script>
 </body>
-
 </html>

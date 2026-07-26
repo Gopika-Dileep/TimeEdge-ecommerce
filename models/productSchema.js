@@ -29,6 +29,10 @@ const productSchema = mongoose.Schema({
     },
 
    
+    regularPrice:{
+        type:Number,
+        required:true
+    },
     salePrice:{
         type:Number,
         required:true

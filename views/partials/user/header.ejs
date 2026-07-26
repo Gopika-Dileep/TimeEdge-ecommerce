@@ -1,281 +1,553 @@
 <!DOCTYPE html>
-<html lang="zxx">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Male_Fashion Template">
-    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="description" content="TimeEdge — Luxury Watches & Fine Timepieces">
+    <meta name="keywords" content="TimeEdge, luxury watches, premium watches, fine timepieces">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Time Edge </title>
+    <title>TimeEdge — Luxury Timepieces</title>
 
-  
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-    rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
-    <link rel="stylesheet" href="css/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="css/magnific-popup.css" type="text/css">
-    <link rel="stylesheet" href="css/nice-select.css" type="text/css">
-    <link rel="stylesheet" href="css/owl.carousel.min.css" type="text/css">
-    <link rel="stylesheet" href="css/slicknav.min.css" type="text/css">
-    <link rel="stylesheet" href="css/header.css" type="text/css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<style>
-.sign-in-link:hover {
-    text-decoration: none;
-    color: white;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    right: 0;
-    left: 13;
-    background-color: white;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-align: center;
-    width: 100%;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-    text-decoration: none;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-.bi-cart {
-    font-size: 22px; 
-    color: #333;
-}
-
-
-.search-container {
-    position: relative;
-    display: inline-block;
-}
-
-.search-dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    padding: 10px;
-    z-index: 1000;
-    width: 300px;
-    border-radius: 4px;
-}
-
-.search-dropdown.active {
-    display: block;
-}
-
-.search-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    outline: none;
-    background: transparent;
-}
-
-.search-input:focus {
-    border-color: #666;
-}
-
-
-.tranpartnt {
-    display: none;
-}
-</style>
-</head>
-
-<body>
-    
-    <!-- <div id="preloder">
-        <div class="loader"></div>
-    </div> -->
-
-  
-    <div class="offcanvas-menu-overlay"></div>
-    <div class="offcanvas-menu-wrapper">
-        <div class="offcanvas__option">
-            <div class="offcanvas__links">
-                <a href="/signup" class="sign-in-link">Sign up</a>
-                <a href="/login" class="sign-in-link">log in</a>
-            </div>
-        </div>
-        <div class="offcanvas__nav__option">
-            <div class="search-container">
-                <a href="#" class="search-switch" id="mobileSearchIcon">
-                    <img src="img/icon/search.png" alt="">
-                </a>
-                <div class="search-dropdown" id="mobileSearchDropdown">
-                    <input type="text" 
-                           class="search-input" 
-                           id="mobileSearchInput" 
-                           placeholder="Search products..."
-                           autocomplete="off">
-                </div>
-            </div>
-            <a href="#"><img src="img/icon/heart.png" alt=""></a>
-            <a href="#"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
-            <div class="price">$0.00</div>
-        </div>
-        <div id="mobile-menu-wrap"></div>
-        <div class="offcanvas__text">
-            <p>Free shipping, 30-day return or refund guarantee.</p>
-        </div>
-    </div>
-    
-
-  
-    <header class="header">
-        <div class="header__top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 col-md-7">
-                        <div class="header__top__left">
-                            <p>Free shipping, 30-day return or refund guarantee.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-5">
-                        <div class="header__top__right">
-                            <div class="header__top__links">
-                                <% if (locals.user) { %>
-                                    <div class="dropdown">
-                                        <a href="#" class="sign-in-link"><%= locals.user.name %></a>
-                                        <div class="dropdown-content">
-                                            <a href="/orders">Profile</a>
-                                            <a href="/logout">Logout</a>
-                                        </div>
-                                    </div>
-                                <% } else { %>
-                                    <a href="/signup" class="sign-in-link">Sign up</a>
-                                    <a href="/login" class="sign-in-link">Log in</a>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="header__logo">
-                        <a href="/"><h2 class="title"><b>Time Edge</b></h2></a>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <nav class="header__menu mobile-menu">
-                        <ul>
-                            <li class=""><a href="/">Home</a></li>
-                            <li><a href="/shop">Shop</a></li>
-                            <li><a href="#">Pages</a>
-                                <ul class="dropdown">
-                                    <li><a href="./wishlist">Wishlist</a></li>
-                                    <li><a href="./shop">Shop</a></li>
-                                    <li><a href="./cart">Shopping Cart</a></li>
-                                    <li><a href="./orders">Orders</a></li>
-                                    <li><a href="./accountdetails">Account Details</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="./aboutus">About us</a></li>
-                            <li><a href="./contact">Contacts</a></li>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="header__nav__option">
-                        <div class="search-container">
-                            <a href="#" class="search-switch" id="searchIcon">
-                                <img src="img/icon/search.png" alt="">
-                            </a>
-                            <div class="search-dropdown" id="searchDropdown">
-                                <input type="text" 
-                                       class="search-input" 
-                                       id="searchInput" 
-                                       placeholder="Search products..."
-                                       autocomplete="off">
-                            </div>
-                        </div>
-                        <a href="wishlist"><img src="img/icon/heart.png" alt=""></a>
-                        <a href="/cart">
-                            <i class="bi bi-cart"></i> 
-                            <span></span>
-                        </a>              
-                    </div>
-                </div>
-            </div>
-            <div class="canvas__open"><i class="fa fa-bars"></i></div>
-        </div>
-    </header>
-  
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      
-        const searchIcon = document.getElementById('searchIcon');
-        const searchDropdown = document.getElementById('searchDropdown');
-        const searchInput = document.getElementById('searchInput');
-
-     
-        const mobileSearchIcon = document.getElementById('mobileSearchIcon');
-        const mobileSearchDropdown = document.getElementById('mobileSearchDropdown');
-        const mobileSearchInput = document.getElementById('mobileSearchInput');
-
-        function setupSearch(icon, dropdown, input) {
-            
-            icon.addEventListener('click', function(e) {
-                e.preventDefault();
-                dropdown.classList.toggle('active');
-                if (dropdown.classList.contains('active')) {
-                    input.focus();
-                }
-            });
-
-            
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const searchTerm = input.value.trim();
-                    if (searchTerm) {
-                        window.location.href = `/shop?search=${encodeURIComponent(searchTerm)}`;
-                    }
-                }
-            });
+    <style>
+        /* ============================================================
+           GLOBAL DESIGN SYSTEM — TimeEdge Luxury Theme
+        ============================================================ */
+        :root {
+            --bg-primary:    #080808;
+            --bg-secondary:  #111111;
+            --bg-card:       #161616;
+            --bg-glass:      rgba(22, 22, 22, 0.85);
+            --gold:          #c9a84c;
+            --gold-light:    #e8c96d;
+            --gold-dark:     #8b6914;
+            --gold-glow:     rgba(201, 168, 76, 0.15);
+            --text-primary:  #f0ede8;
+            --text-secondary:#a09484;
+            --text-muted:    #5a5248;
+            --border:        rgba(201, 168, 76, 0.2);
+            --border-hover:  rgba(201, 168, 76, 0.55);
+            --shadow-gold:   0 0 30px rgba(201, 168, 76, 0.08);
+            --transition:    all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-       
-        setupSearch(searchIcon, searchDropdown, searchInput);
-        setupSearch(mobileSearchIcon, mobileSearchDropdown, mobileSearchInput);
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
 
-       
-        document.addEventListener('click', function(e) {
-            if (!searchIcon.contains(e.target) && !searchDropdown.contains(e.target)) {
-                searchDropdown.classList.remove('active');
-            }
-            if (!mobileSearchIcon.contains(e.target) && !mobileSearchDropdown.contains(e.target)) {
-                mobileSearchDropdown.classList.remove('active');
-            }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+           SCROLLBAR
+        ============================================================ */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+        /* ============================================================
+           TYPOGRAPHY UTILITIES
+        ============================================================ */
+        .serif { font-family: 'Playfair Display', serif; }
+        .italic { font-style: italic; }
+        .gold { color: var(--gold); }
+        .text-muted { color: var(--text-secondary) !important; }
+
+        /* ============================================================
+           COMMON COMPONENTS
+        ============================================================ */
+        .btn-gold {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 32px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-gold::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gold);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+        .btn-gold:hover::before { transform: translateX(0); }
+        .btn-gold span, .btn-gold i { position: relative; z-index: 1; }
+        .btn-gold:hover { color: #080808; border-color: var(--gold); }
+
+        .btn-gold-fill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 36px;
+            background: var(--gold);
+            border: 1px solid var(--gold);
+            color: #080808;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-gold-fill:hover {
+            background: var(--gold-light);
+            border-color: var(--gold-light);
+            color: #080808;
+            box-shadow: 0 0 30px rgba(201,168,76,0.35);
+        }
+
+        /* Section headings */
+        .section-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 16px;
+            display: block;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.25;
+        }
+        .section-title em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        /* Divider */
+        .gold-divider {
+            width: 48px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 20px 0;
+        }
+
+        /* ============================================================
+           NAV
+        ============================================================ */
+        .te-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 0 60px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+            background: transparent;
+        }
+        .te-nav.scrolled {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            height: 68px;
+        }
+
+        /* Logo */
+        .nav-logo a {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: var(--transition);
+        }
+        .nav-logo a span { color: var(--gold); }
+        .nav-logo a:hover { color: var(--gold); }
+
+        /* Nav Links */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 42px;
+            list-style: none;
+        }
+        .nav-links > li > a {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            padding-bottom: 4px;
+        }
+        .nav-links > li > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 1px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+        .nav-links > li > a:hover,
+        .nav-links > li.active > a {
+            color: var(--text-primary);
+        }
+        .nav-links > li > a:hover::after,
+        .nav-links > li.active > a::after { width: 100%; }
+
+        /* Nav Actions */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .nav-actions a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 16px;
+            transition: var(--transition);
+            position: relative;
+        }
+        .nav-actions a:hover { color: var(--gold); }
+
+        /* Cart badge */
+        .cart-link { position: relative; }
+        .cart-badge {
+            position: absolute;
+            top: -6px; right: -8px;
+            width: 16px; height: 16px;
+            background: var(--gold);
+            color: #080808;
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* User dropdown */
+        .nav-user-wrap {
+            position: relative;
+        }
+        .nav-user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .nav-user-btn:hover { color: var(--gold); }
+        .nav-user-btn i { font-size: 14px; }
+
+        .nav-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            min-width: 180px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition: var(--transition);
+        }
+        /* Bridge the gap so mouse movement doesn't close dropdown */
+        .nav-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 0;
+            right: 0;
+            height: 24px;
+            background: transparent;
+        }
+        .nav-user-wrap:hover .nav-dropdown {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .nav-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 20px;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-dropdown a:last-child { border-bottom: none; }
+        .nav-dropdown a:hover {
+            color: var(--gold);
+            background: var(--gold-glow);
+            padding-left: 26px;
+        }
+
+        /* Auth links */
+        .nav-auth-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .nav-auth-links a {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .nav-auth-links a:hover { color: var(--gold); }
+        .nav-auth-links .btn-gold {
+            padding: 8px 22px;
+            font-size: 10px;
+        }
+
+        /* Mobile hamburger */
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .nav-hamburger span {
+            width: 24px; height: 1px;
+            background: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .nav-hamburger:hover span { background: var(--gold); }
+
+        /* Mobile menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-primary);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .mobile-menu.open { opacity: 1; }
+        .mobile-menu-close {
+            position: absolute;
+            top: 30px; right: 30px;
+            background: none; border: none;
+            color: var(--text-secondary);
+            font-size: 22px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .mobile-menu-close:hover { color: var(--gold); }
+        .mobile-menu a {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 2px;
+            transition: var(--transition);
+        }
+        .mobile-menu a:hover { color: var(--gold); }
+
+        /* Spacer for fixed nav */
+        .nav-spacer { height: 80px; }
+
+        @media (max-width: 1024px) {
+            .te-nav { padding: 0 30px; }
+            .nav-links { display: none; }
+            .nav-hamburger { display: flex; }
+        }
+        @media (max-width: 600px) {
+            .te-nav { padding: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav class="te-nav" id="mainNav">
+    <!-- Logo -->
+    <div class="nav-logo">
+        <a href="/"><span>TIME</span> EDGE</a>
+    </div>
+
+    <!-- Center nav links -->
+    <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/shop">Collections</a></li>
+        <li><a href="/wishlist">Wishlist</a></li>
+        <li><a href="/aboutus">About Us</a></li>
+        <li><a href="/contact">Contact</a></li>
+    </ul>
+
+    <!-- Right actions -->
+    <div class="nav-actions">
+        <a href="/cart" class="cart-link" title="Cart">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span class="cart-badge" id="cartCount">0</span>
+        </a>
+
+        <% if (locals.user) { %>
+        <div class="nav-user-wrap">
+            <button class="nav-user-btn">
+                <i class="fa-regular fa-user"></i>
+                <span><%= locals.user.name.split(' ')[0] %></span>
+                <i class="fa-solid fa-chevron-down" style="font-size:9px;"></i>
+            </button>
+            <div class="nav-dropdown">
+                <a href="/accountdetails"><i class="fa-regular fa-user"></i> Account Details</a>
+                <a href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            </div>
+        </div>
+        <% } else { %>
+        <div class="nav-auth-links">
+            <a href="/login">Login</a>
+            <a href="/signup" class="btn-gold"><span>Join</span></a>
+        </div>
+        <% } %>
+
+        <!-- Hamburger -->
+        <div class="nav-hamburger" id="hamburger" onclick="openMobileMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== MOBILE MENU ===== -->
+<div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="closeMobileMenu()">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+    <a href="/" onclick="closeMobileMenu()">Home</a>
+    <a href="/shop" onclick="closeMobileMenu()">Collections</a>
+    <a href="/cart" onclick="closeMobileMenu()">Cart</a>
+    <% if (locals.user) { %>
+    <a href="/accountdetails" onclick="closeMobileMenu()">Account Details</a>
+    <a href="/logout" onclick="closeMobileMenu()">Logout</a>
+    <% } else { %>
+    <a href="/login" onclick="closeMobileMenu()">Login</a>
+    <a href="/signup" onclick="closeMobileMenu()">Join</a>
+    <% } %>
+</div>
+
+<div class="nav-spacer"></div>
+
+<script>
+    // Nav scroll effect
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Mobile menu
+    function openMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.style.display = 'flex';
+        setTimeout(() => menu.classList.add('open'), 10);
+    }
+    function closeMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.remove('open');
+        setTimeout(() => menu.style.display = 'none', 400);
+    }
+
+    // Intersection Observer for scroll animations
+    document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-up, .animate-fade').forEach(el => {
+            observer.observe(el);
         });
     });
-    </script>
-</body>
-</html>
+</script>
+
+<style>
+    /* Scroll animations */
+    .animate-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .animate-up.visible { opacity: 1; transform: translateY(0); }
+    .animate-fade {
+        opacity: 0;
+        transition: opacity 0.9s ease;
+    }
+    .animate-fade.visible { opacity: 1; }
+
+    /* Stagger delays */
+    .delay-1 { transition-delay: 0.1s !important; }
+    .delay-2 { transition-delay: 0.2s !important; }
+    .delay-3 { transition-delay: 0.3s !important; }
+    .delay-4 { transition-delay: 0.4s !important; }
+    .delay-5 { transition-delay: 0.5s !important; }
+    .delay-6 { transition-delay: 0.6s !important; }
+
+    /* Container */
+    .te-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+    @media (max-width: 768px) {
+        .te-container { padding: 0 20px; }
+    }
+</style>

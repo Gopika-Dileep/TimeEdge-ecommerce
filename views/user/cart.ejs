@@ -1,482 +1,211 @@
 <%- include("../../views/partials/user/header") %>
 
-    <head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+<style>
+.cart-page { padding: 60px 0 100px; min-height: 70vh; }
+.cart-header-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:48px; gap:16px; flex-wrap:wrap; }
 
-        <style>
-            a {
-                text-decoration: none;
-                color: black;
-            }
+/* Cart table */
+.cart-table { width:100%; border-collapse:collapse; margin-bottom:40px; }
+.cart-table thead tr th {
+    font-size:10px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--gold); font-weight:500; padding:16px 0;
+    border-bottom:1px solid var(--border); text-align:left;
+}
+.cart-table thead tr th:last-child { text-align:right; }
+.cart-table tbody tr { border-bottom:1px solid var(--border); transition:background 0.3s; }
+.cart-table tbody tr:hover { background:rgba(201,168,76,0.02); }
 
-            a:hover {
-                color: black;
-            }
+.cart-img-cell { width:100px; padding:20px 20px 20px 0; }
+.cart-img-wrap { width:80px; height:80px; overflow:hidden; border:1px solid var(--border); }
+.cart-img-wrap img { width:100%; height:100%; object-fit:cover; }
 
+.cart-name-cell { padding:20px; }
+.cart-product-brand { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+.cart-product-name { font-family:'Playfair Display',serif; font-size:1rem; font-weight:400; color:var(--text-primary); }
 
-            .cart-page {
-                background-color: #f8f9fa;
-                min-height: 100vh;
-                padding: 2rem 0;
-            }
+.cart-qty-cell { padding:20px; }
+.qty-control-sm { display:flex; align-items:center; border:1px solid var(--border); width:fit-content; }
+.qty-btn-sm { width:36px; height:36px; background:transparent; border:none; color:var(--text-secondary); font-size:13px; cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; }
+.qty-btn-sm:hover { color:var(--gold); background:var(--gold-glow); }
+.qty-num { width:40px; text-align:center; font-size:14px; color:var(--text-primary); line-height:36px; border-left:1px solid var(--border); border-right:1px solid var(--border); }
 
-            .cart-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 1rem;
-            }
+.cart-price-cell { padding:20px; font-size:1rem; color:var(--text-primary); font-weight:500; text-align:right; white-space:nowrap; }
+.cart-remove { background:none; border:none; color:var(--text-muted); font-size:14px; cursor:pointer; transition:color 0.3s; padding:4px; }
+.cart-remove:hover { color:#e07070; }
 
-            .page-title {
-                font-size: 2rem;
-                color: #333;
-                margin-bottom: 2rem;
-                padding-bottom: 1rem;
-                border-bottom: 2px solid #e9ecef;
-            }
+/* Summary card */
+.cart-layout { display:grid; grid-template-columns:1fr 380px; gap:40px; align-items:start; }
+.order-summary-card {
+    background:var(--bg-card); border:1px solid var(--border);
+    padding:36px; position:sticky; top:100px;
+}
+.summary-title { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:28px; }
+.summary-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); font-size:13px; }
+.summary-row:last-of-type { border-bottom:none; }
+.summary-label { color:var(--text-secondary); }
+.summary-val { color:var(--text-primary); font-weight:500; }
+.summary-total { padding:20px 0 28px; }
+.summary-total-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px; }
+.summary-total-val { font-family:'Playfair Display',serif; font-size:2rem; font-weight:400; color:var(--text-primary); }
 
-            .cart-item {
-                background: #fff;
-                border-radius: 10px;
-                padding: 1.5rem;
-                margin-bottom: 1rem;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-                transition: transform 0.2s;
-            }
+/* Empty cart */
+.cart-empty { text-align:center; padding:100px 20px; }
+.cart-empty i { font-size:56px; color:var(--text-muted); margin-bottom:20px; display:block; }
+.cart-empty p { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--text-secondary); margin-bottom:8px; }
+.cart-empty span { font-size:13px; color:var(--text-muted); }
 
-            .cart-item:hover {
-                transform: translateY(-2px);
-            }
+@media (max-width:960px) { .cart-layout { grid-template-columns:1fr; } .order-summary-card { position:static; } }
+@media (max-width:640px) {
+    .cart-table thead { display:none; }
+    .cart-table tbody tr { display:block; padding:16px 0; }
+    .cart-img-cell, .cart-name-cell, .cart-qty-cell, .cart-price-cell { display:block; padding:4px 0; }
+}
+</style>
 
-            .product-image {
-                width: 120px;
-                height: 120px;
-                object-fit: cover;
-                border-radius: 8px;
-            }
+<div class="te-container cart-page">
+    <!-- Header -->
+    <div class="cart-header-row animate-up">
+        <div>
+            <span class="section-label">Your Selection</span>
+            <h1 class="section-title">Shopping <em>Cart</em></h1>
+        </div>
+        <a href="/shop" style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); text-decoration:none; display:flex; align-items:center; gap:8px; transition:color 0.3s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-muted)'">
+            <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+        </a>
+    </div>
 
-            .product-info h4 {
-                font-size: 1.1rem;
-                margin-bottom: 0.5rem;
-                color: #2c3e50;
-            }
-
-            .product-description {
-                color: #6c757d;
-                font-size: 0.9rem;
-            }
-
-            .quantity-controls {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .quantity-btn {
-                background-color: #f8f9fa;
-                border: 1px solid #dee2e6;
-                color: #495057;
-                width: 32px;
-                height: 32px;
-                border-radius: 6px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.2s;
-            }
-
-            .quantity-btn:hover {
-                background-color: #e9ecef;
-                color: #212529;
-            }
-
-            .quantity-display {
-                font-weight: 600;
-                min-width: 40px;
-                text-align: center;
-            }
-
-            .price {
-                font-size: 1.2rem;
-                font-weight: 600;
-                color: #2c3e50;
-            }
-
-            .remove-btn {
-                color: #dc3545;
-                background: none;
-                border: none;
-                padding: 0.5rem;
-                transition: color 0.2s;
-            }
-
-            .remove-btn:hover {
-                color: #c82333;
-            }
-
-            .cart-summary {
-                background: #fff;
-                border-radius: 10px;
-                padding: 1.5rem;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            }
-
-            .summary-row {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 1rem;
-                color: #6c757d;
-            }
-
-            .total-row {
-                font-size: 1.25rem;
-                font-weight: 600;
-                color: #2c3e50;
-                border-top: 2px solid #e9ecef;
-                padding-top: 1rem;
-                margin-top: 1rem;
-            }
-
-            .checkout-btn {
-                background-color: black;
-                color: white;
-                border: none;
-                width: 100%;
-                padding: 1rem;
-                border-radius: 8px;
-                font-weight: 600;
-                transition: background-color 0.2s;
-            }
-
-            .checkout-btn:hover {
-                background-color: rgb(63, 59, 59);
-            }
-
-            .empty-cart {
-                text-align: center;
-                padding: 3rem;
-            }
-
-            .empty-cart i {
-                font-size: 4rem;
-                color: #dee2e6;
-                margin-bottom: 1rem;
-            }
-
-            .empty-cart h3 {
-                color: #6c757d;
-                margin-bottom: 1rem;
-            }
-
-            .continue-shopping {
-                color: #007bff;
-                text-decoration: none;
-            }
-
-            .pagination {
-                margin-top: 2rem;
-            }
-
-            .page-link {
-                color: #2c3e50;
-                border: 1px solid #dee2e6;
-                padding: 0.5rem 1rem;
-                margin: 0 0.25rem;
-                border-radius: 4px;
-                transition: all 0.2s;
-            }
-
-            .page-link:hover {
-                background-color: #e9ecef;
-                color: #2c3e50;
-                border-color: #dee2e6;
-            }
-
-            .page-item.active .page-link {
-                background-color: #2c3e50;
-                border-color: #2c3e50;
-                color: white;
-            }
-
-            .page-item.disabled .page-link {
-                color: #6c757d;
-                pointer-events: none;
-                background-color: #fff;
-                border-color: #dee2e6;
-            }
-        </style>
-    </head>
-
-    <body>
-        <div class="cart-page">
-            <div class="cart-container">
-                <h1 class="page-title">Shopping Cart</h1>
-
-                <div class="row">
-                    <div class="col-lg-8">
-                        <% if (typeof cart !=='undefined' && cart.items && cart.items.length> 0) { %>
-                            <% cart.items.forEach(item=> { %>
-                                <div class="cart-item">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-2">
-                                            <a href="/productDetails?id=<%= item.product._id %>">
-                                                <img class="product-image"
-                                                    src="<%= item.product.productImage && item.product.productImage.length > 0 ? '/uploads/productImages/' + item.product.productImage[0] : '/uploads/productImages/default.png' %>"
-                                                    alt="<%= item.product.productName %>">
-                                            </a>
-                                        </div>
-                                        <div class="col-md-4 product-info">
-                                            <h4>
-                                                <%= item.product.productName %>
-                                            </h4>
-                                            <p class="product-description">
-                                                <%= item.product.description %>
-                                            </p>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="quantity-controls">
-                                                <button class="quantity-btn"
-                                                    onclick="decreaseQuantity('<%= item._id %>')">−</button>
-                                                <span class="quantity-display">
-                                                    <%= item.quantity %>
-                                                </span>
-                                                <button class="quantity-btn"
-                                                    onclick="increaseQuantity('<%= item._id %>')">+</button>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <div class="price">
-                                                <% const salePrice=item.product.salePrice; const
-                                                    productOffer=item.product.productOffer || 0; const
-                                                    categoryOffer=item.product.category.categoryOffer || 0; const
-                                                    bestOffer=Math.max(productOffer, categoryOffer); const
-                                                    finalPrice=bestOffer> 0 ? Math.floor((salePrice - (salePrice *
-                                                    bestOffer / 100)) * item.quantity) : salePrice * item.quantity;
-                                                    %>
-                                                    ₹<%= finalPrice %>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-1">
-                                            <button class="remove-btn" onclick="removeItem('<%= item._id %>')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <% }) %>
-                                    <% } else { %>
-                                        <div class="empty-cart">
-                                            <i class="bi bi-cart-x"></i>
-                                            <h3>Your cart is empty!</h3>
-                                            <a href="/shop" class="continue-shopping">Continue Shopping</a>
-                                        </div>
-                                        <% } %>
-                    </div>
-
-
-                    <% if (typeof cart !=='undefined' && cart.items && cart.items.length> 0) { %>
-                        <div class="col-lg-4">
-                            <div class="cart-summary">
-                                <h4 class="mb-4">Order Summary</h4>
-                                <div class="summary-row">
-                                    <span>Subtotal</span>
-                                    <span>₹<%= totalPrice %></span>
-                                </div>
-                                <div class="summary-row">
-                                    <span>Shipping</span>
-                                    <span>Free</span>
-                                </div>
-                                <div class="summary-row total-row">
-                                    <span>Total</span>
-                                    <span>₹<%= totalPrice %></span>
-                                </div>
-                                <button id="btn-checkout" class="checkout-btn mt-4">
-                                    Proceed to Checkout
+    <% if (typeof cart !== 'undefined' && cart && cart.items && cart.items.length > 0) { %>
+    <div class="cart-layout">
+        <!-- Items -->
+        <div class="animate-up">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th colspan="2">Product</th>
+                        <th>Quantity</th>
+                        <th style="text-align:right;">Price</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="cartBody">
+                    <% cart.items.forEach(item => { %>
+                    <tr id="row-<%= item._id %>">
+                        <td class="cart-img-cell">
+                            <div class="cart-img-wrap">
+                                <img src="/uploads/productImages/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
+                            </div>
+                        </td>
+                        <td class="cart-name-cell">
+                            <div class="cart-product-brand"><%= item.productId.brand %></div>
+                            <div class="cart-product-name"><%= item.productId.productName %></div>
+                            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">₹<%= item.productId.salePrice.toLocaleString('en-IN') %> each</div>
+                        </td>
+                        <td class="cart-qty-cell">
+                            <div class="qty-control-sm">
+                                <button class="qty-btn-sm" onclick="changeQty('<%= item._id %>', -1)">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                                <span class="qty-num" id="qty-<%= item._id %>"><%= item.quantity %></span>
+                                <button class="qty-btn-sm" onclick="changeQty('<%= item._id %>', 1)">
+                                    <i class="fa-solid fa-plus"></i>
                                 </button>
                             </div>
-                        </div>
-                        <% } %>
-                </div>
-
-                <% if (typeof totalPages !=='undefined' && totalPages> 1) { %>
-                    <nav aria-label="Cart pagination" class="mt-4 mb-4">
-                        <ul class="pagination justify-content-center">
-                            <% if (hasPrevPage) { %>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                                <% } %>
-
-                                    <% for(let i=1; i <=totalPages; i++) { %>
-                                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                            <a class="page-link" href="?page=<%= i %>">
-                                                <%= i %>
-                                            </a>
-                                        </li>
-                                        <% } %>
-
-                                            <% if (hasNextPage) { %>
-                                                <li class="page-item">
-                                                    <a class="page-link" href="?page=<%= currentPage + 1 %>"
-                                                        aria-label="Next">
-                                                        <span aria-hidden="true">&raquo;</span>
-                                                    </a>
-                                                </li>
-                                                <% } %>
-                        </ul>
-                    </nav>
-                    <% } %>
-            </div>
+                        </td>
+                        <td class="cart-price-cell" id="price-<%= item._id %>">
+                            ₹<%= item.price.toLocaleString('en-IN') %>
+                        </td>
+                        <td style="padding:20px 0 20px 16px; text-align:right;">
+                            <button class="cart-remove" onclick="removeItem('<%= item._id %>')" title="Remove">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script>
-            function increaseQuantity(itemId) {
-                $.ajax({
-                    url: `/increment/${itemId}`,
-                    type: 'PATCH',
-                    contentType: 'application/json',
-                    success: function (result) {
-                        if (result.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Quantity Updated',
-                                text: 'The quantity has been successfully incremented.',
-                                showConfirmButton: false,
-                                timer: 1500
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: result.message,
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        let errorMessage = "Something went wrong. Please try again later.";
+        <!-- Summary -->
+        <div class="order-summary-card animate-up delay-2">
+            <div class="summary-title">Order Summary</div>
 
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
+            <div class="summary-row">
+                <span class="summary-label">Subtotal</span>
+                <span class="summary-val" id="summarySubtotal">₹<%= totalPrice.toLocaleString('en-IN') %></span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Shipping</span>
+                <span class="summary-val" style="color:#6dbf7f;">Free</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Taxes</span>
+                <span class="summary-val" style="color:var(--text-muted);">Included</span>
+            </div>
 
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: errorMessage,
-                        });
-                    },
-                });
-            }
+            <div class="gold-divider" style="margin:20px 0;"></div>
 
-            function decreaseQuantity(itemId) {
-                $.ajax({
-                    url: `/decrement/${itemId}`,
-                    type: 'PATCH',
-                    contentType: 'application/json',
-                    success: function (result) {
-                        if (result.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Quantity Updated',
-                                text: 'The quantity has been successfully decremented.',
-                                showConfirmButton: false,
-                                timer: 1500
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: result.message,
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Something went wrong. Please try again later.',
-                        });
-                    },
-                });
-            }
+            <div class="summary-total">
+                <div class="summary-total-label">Total</div>
+                <div class="summary-total-val" id="summaryTotal">₹<%= totalPrice.toLocaleString('en-IN') %></div>
+            </div>
 
-            function removeItem(itemId) {
-                Swal.fire({
-                    title: 'Remove Item?',
-                    text: 'Are you sure you want to remove this item from your cart?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, remove it',
-                    cancelButtonText: 'No, keep it',
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: `/remove/${itemId}`,
-                            type: 'POST',
-                            contentType: 'application/json',
-                            success: function (result) {
-                                if (result.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Removed!',
-                                        text: 'The item has been removed from your cart.',
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    }).then(() => {
-                                        location.reload();
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: result.message,
-                                    });
-                                }
-                            },
-                            error: function (xhr, status, error) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'Something went wrong. Please try again later.',
-                                });
-                            },
-                        });
-                    }
-                });
-            }
+            <a href="/checkout" class="btn-gold-fill" style="width:100%; justify-content:center; padding:16px; display:flex; text-decoration:none;">
+                <span>Proceed to Checkout</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
 
-            $(document).ready(function () {
-                $('#btn-checkout').on('click', function () {
-                    $.ajax({
-                        url: '/checkout',
-                        type: 'GET',
-                        success: function (response) {
-                            window.location.href = '/checkout';
-                        },
-                        error: function (xhr, status, error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Checkout Error',
-                                text: 'Unable to proceed to checkout. Please try again.',
-                            });
-                        },
-                    });
-                });
-            });
-        </script>
-    </body>
+            <div style="margin-top:16px; text-align:center; font-size:11px; color:var(--text-muted); display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fa-solid fa-lock" style="color:var(--gold);"></i>
+                Secure & encrypted checkout
+            </div>
+        </div>
+    </div>
 
-    </html>
-    <%- include("../../views/partials/user/footer") %>
+    <% } else { %>
+    <div class="cart-empty animate-up">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <p>Your cart is empty</p>
+        <span>Discover our collection of exceptional timepieces</span>
+        <br><br>
+        <a href="/shop" class="btn-gold-fill" style="margin-top:24px; text-decoration:none; display:inline-flex; gap:8px; padding:14px 36px;">
+            <span>Browse Collection</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+    <% } %>
+</div>
+
+<script>
+async function changeQty(itemId, delta) {
+    const action = delta > 0 ? 'increment' : 'decrement';
+    const res = await fetch(`/${action}/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (res.ok && (data.success || data.status === true)) {
+        location.reload();
+    } else if (data.message) {
+        alert(data.message);
+    } else {
+        alert(data || 'Error updating quantity');
+    }
+}
+
+async function removeItem(itemId) {
+    if (!confirm('Remove this item from your cart?')) return;
+    const res = await fetch(`/remove/${itemId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.success || data.status === true) {
+        document.getElementById('row-' + itemId)?.remove();
+        location.reload();
+    } else {
+        alert(data.message || 'Error removing item');
+    }
+}
+</script>
+
+<%- include("../../views/partials/user/footer") %>

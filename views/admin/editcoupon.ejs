@@ -76,27 +76,21 @@
         }
 
         .coupon-form {
-            position: absolute;
-            top: 70px;
-            left: 240px;
-            width: calc(100% - 240px);
-            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem 0;
         }
 
         @media (max-width: 1000px) {
             .coupon-form {
-                position: absolute;
-                top: 50px;
-                left: 20px;
-                width: calc(100% - 30px);
-                padding: 2rem;
+                padding: 1rem 0;
             }
         }
     </style>
 
     <body>
 
-        <div class="coupon-form" style="margin-left: 50px; margin-top: 20px;">
+        <div class="coupon-form">
             <h2>Edit Coupon</h2>
             <form id="add-coupon-form" method="post" action="/admin/editCoupon?id=<%= coupon._id%>">
                 <label for="coupon-code">Coupon Code:</label>

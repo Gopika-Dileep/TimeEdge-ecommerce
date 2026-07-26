@@ -1,127 +1,108 @@
 <%- include("../../views/partials/user/header") %>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
 
-        .content-main {
-            margin-top: 80px;
-            margin-bottom: 80px;
-            padding: 20px;
-            min-height: 600px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f8f9fa;
-        }
+<style>
+.profile-page { padding: 60px 0 100px; background-color: var(--bg-primary); }
+.profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 40px; margin-top: 48px; }
 
-        .card-login {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
+/* Sidebar Navigation */
+.profile-sidebar { position: sticky; top: 100px; }
+.profile-nav-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 24px;
+}
+.profile-nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.profile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+.profile-nav-item i { font-size: 14px; color: var(--text-muted); transition: var(--transition); }
+.profile-nav-item:hover, .profile-nav-item.active {
+    background: var(--gold-glow);
+    color: var(--gold);
+    border-color: var(--border);
+}
+.profile-nav-item:hover i, .profile-nav-item.active i { color: var(--gold); }
 
-        .card-title {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-        }
+/* Main Profile Panel */
+.profile-content { min-height: 500px; }
+.profile-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 40px;
+    animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-        .error-message {
-            color: red;
-            font-size: 0.875rem;
-            margin-top: 5px;
-        }
+.profile-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.profile-section-title span { color: var(--gold); font-style: italic; }
 
+/* Form Fields */
+.form-group { margin-bottom: 22px; }
+.form-label { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
+.form-input { width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: var(--transition); }
+.form-input:focus { border-color: var(--gold); background: var(--gold-glow); }
+.auth-alert { padding: 13px 16px; background: rgba(201, 60, 60, 0.08); border: 1px solid rgba(201, 60, 60, 0.25); color: #e07070; font-size: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
+@media (max-width: 1024px) {
+    .profile-layout { grid-template-columns: 1fr; }
+    .profile-sidebar { position: static; }
+}
+</style>
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-            transform: scale(1.02);
-        }
+<div class="te-container profile-page">
+    <div class="animate-up">
+        <span class="section-label">Your Dashboard</span>
+        <h1 class="section-title">Update <em>Email</em></h1>
+    </div>
 
+    <div class="profile-layout">
+        <!-- Sidebar Navigation -->
+        <%- include("../../views/partials/user/profile-sidebar") %>
 
-        @media (max-width: 768px) {
-            .card-login {
-                width: 80%;
-                margin: 20px auto;
-            }
+        <!-- Profile Panel Contents -->
+        <div class="profile-content animate-up delay-2">
 
-            .card-title {
-                font-size: 1.25rem;
-            }
+            <!-- Change Email Form -->
+            <div class="profile-section">
+                <div class="profile-section-title">Verify <span>Current Email</span></div>
 
-            .content-main {
-                min-height: 500px;
-            }
-        }
+                <% if (typeof message !== 'undefined' && message) { %>
+                <div class="auth-alert"><i class="fa-solid fa-circle-exclamation"></i><span><%= message %></span></div>
+                <% } %>
 
-        @media (max-width: 576px) {
-            .card-login {
-                width: 90%;
-                margin: 10px auto;
-            }
-
-            .content-main {
-                margin-top: 40px;
-                margin-bottom: 40px;
-            }
-
-            .btn-primary {
-                font-size: 0.9rem;
-                padding: 10px;
-            }
-        }
-    </style>
-    <section class="content-main mt-80 mb-80">
-        <div class="card mx-auto card-login col-4">
-            <div class="card-body">
-                <h4 class="card-title mb-4">Enter Current Email</h4>
-                <form method="post" action="/change-email" onsubmit="return validateLoginForm()">
-                    <div class="mb-3">
-                        <input class="form-control" name="email" placeholder="Email" type="text" id="email">
-                        <div class="error-message" id="email-error"></div>
+                <form action="/change-email" method="POST" style="max-width: 500px;">
+                    <div class="form-group">
+                        <label class="form-label" for="email">Current Email Address</label>
+                        <input type="email" class="form-input" id="email" name="email" placeholder="you@example.com" required autofocus>
                     </div>
-                    <div class="mb-4">
-                        <button type="submit" class="btn btn-primary w-100">Verify</button>
-                    </div>
+                    <button type="submit" class="btn-gold-fill"><span>Send Verification OTP</span></button>
                 </form>
-
-
             </div>
+
         </div>
-    </section>
-    <script>
-        function validateLoginForm() {
-            const emailInput = document.getElementById('email');
-            const emailError = document.getElementById('email-error');
-            const emailValue = emailInput.value.trim();
-            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    </div>
+</div>
 
-
-            if (emailValue === '') {
-                emailError.textContent = 'Please enter your email.';
-                emailInput.classList.add('is-invalid');
-                return false;
-            } else if (!emailValue.match(emailPattern)) {
-                emailError.textContent = 'Please enter a valid email address';
-                emailInput.classList.add('is-invalid');
-                return false;
-            } else {
-                emailError.textContent = '';
-                emailInput.classList.remove('is-invalid');
-                return true;
-            }
-        }
-    </script>
-    <%- include("../../views/partials/user/footer") %>
+<%- include("../../views/partials/user/footer") %>

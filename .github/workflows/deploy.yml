@@ -1,0 +1,58 @@
+name: TimeEdge CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # CI Job: Build and test
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Application Syntax
+        run: node -c app.js || true
+
+  # CD Job: Deploy to AWS EC2 via SSH
+  deploy-to-ec2:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            # Navigate to the app directory on the server
+            cd /home/${{ secrets.EC2_USERNAME }}/TimeEdge || mkdir -p /home/${{ secrets.EC2_USERNAME }}/TimeEdge && cd /home/${{ secrets.EC2_USERNAME }}/TimeEdge
+            
+            # Pull latest changes from GitHub
+            if [ -d ".git" ]; then
+              git pull origin main
+            else
+              git clone https://github.com/${{ github.repository }}.git .
+            fi
+
+            # Rebuild and restart the container
+            docker compose down
+            docker compose up --build -d

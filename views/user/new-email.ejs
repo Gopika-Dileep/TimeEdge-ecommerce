@@ -1,45 +1,52 @@
-<%- include("../../views/partials/user/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Email Address — TimeEdge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { --bg-primary:#080808; --bg-secondary:#111111; --gold:#c9a84c; --gold-light:#e8c96d; --gold-glow:rgba(201,168,76,0.12); --text-primary:#f0ede8; --text-secondary:#a09484; --text-muted:#5a5248; --border:rgba(201,168,76,0.2); --transition:all 0.35s cubic-bezier(0.4,0,0.2,1); }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg-primary); color:var(--text-primary); font-family:'Inter',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+        .auth-mini-card { width:100%; max-width:460px; background:var(--bg-secondary); border:1px solid var(--border); padding:56px 48px; }
+        .auth-logo { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--text-primary); text-decoration:none; display:block; margin-bottom:40px; }
+        .auth-logo span { color:var(--gold); }
+        .auth-eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+        .auth-title { font-family:'Playfair Display',serif; font-size:1.9rem; font-weight:400; color:var(--text-primary); margin-bottom:8px; }
+        .auth-title em { font-style:italic; color:var(--gold); }
+        .auth-sub { font-size:13px; color:var(--text-secondary); line-height:1.6; margin-bottom:36px; }
+        .form-group { margin-bottom:22px; }
+        .form-label { display:block; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:10px; }
+        .form-input { width:100%; padding:14px 18px; background:rgba(255,255,255,0.03); border:1px solid var(--border); color:var(--text-primary); font-family:'Inter',sans-serif; font-size:14px; outline:none; transition:var(--transition); }
+        .form-input:focus { border-color:var(--gold); background:var(--gold-glow); }
+        .btn-submit { width:100%; padding:15px; background:var(--gold); border:none; color:#080808; font-family:'Inter',sans-serif; font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:var(--transition); }
+        .btn-submit:hover { background:var(--gold-light); box-shadow:0 0 30px rgba(201,168,76,0.3); }
+        .auth-footer { margin-top:28px; font-size:12px; color:var(--text-muted); text-align:center; }
+        .auth-footer a { color:var(--gold); text-decoration:none; }
+        .auth-footer a:hover { color:var(--gold-light); }
+        .auth-alert { padding:13px 16px; background:rgba(201,60,60,0.08); border:1px solid rgba(201,60,60,0.25); color:#e07070; font-size:12px; margin-bottom:24px; display:flex; align-items:center; gap:10px; }
+    </style>
+</head>
+<body>
+<div class="auth-mini-card">
+    <a href="/" class="auth-logo"><span>TIME</span> EDGE</a>
+    <div class="auth-eyebrow">Security</div>
+    <h1 class="auth-title">New <em>Email</em></h1>
+    <p class="auth-sub">Enter your new email address below. We will send a verification code to complete the update.</p>
 
+    <% if (typeof message !== 'undefined' && message) { %>
+    <div class="auth-alert"><i class="fa-solid fa-circle-exclamation"></i><span><%= message %></span></div>
+    <% } %>
 
-    <section class="content-main mt-80 mb-80">
-        <div class="card mx-auto card-login col-4">
-            <div class="card-body">
-                <h4 class="card-title mb-4">Enter New Email</h4>
-                <form method="post" action="/update-email" onsubmit="return validateEmailForm()">
-                    <div class="mb-3">
-                        <input class="form-control" name="newEmail" placeholder="New Email" type="text" id="email">
-                        <div class="error-message" id="email-error"></div>
-                    </div>
-                    <div class="mb-4">
-                        <button type="submit" class="btn btn-primary w-100">Submit</button>
-                    </div>
-                </form>
-            </div>
+    <form action="/new-email" method="POST">
+        <div class="form-group">
+            <label class="form-label" for="email">New Email Address</label>
+            <input type="email" class="form-input" id="email" name="email" placeholder="new@example.com" required autofocus>
         </div>
-    </section>
-
-
-    <script>
-        function validateEmailForm() {
-            const emailInput = document.getElementById('email');
-            const emailError = document.getElementById('email-error');
-            const emailValue = emailInput.value.trim();
-            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-
-
-            if (emailValue === '') {
-                emailError.textContent = 'Please enter your new email.';
-                emailInput.classList.add('is-invalid');
-                return false;
-            } else if (!emailValue.match(emailPattern)) {
-                emailError.textContent = 'Please enter a valid email address';
-                emailInput.classList.add('is-invalid');
-                return false;
-            } else {
-                emailError.textContent = '';
-                emailInput.classList.remove('is-invalid');
-                return true;
-            }
-        }
-    </script>
-    <%- include("../../views/partials/user/footer") %>
+        <button type="submit" class="btn-submit">Verify New Email &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
+    </form>
+</div>
+</body>
+</html>
