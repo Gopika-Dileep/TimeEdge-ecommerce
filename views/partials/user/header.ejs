@@ -436,7 +436,7 @@
     <div class="nav-actions">
         <a href="/cart" class="cart-link" title="Cart">
             <i class="fa-solid fa-bag-shopping"></i>
-            <span class="cart-badge" id="cartCount">0</span>
+            <span class="cart-badge" id="cartCount"><%= locals.cartCount || 0 %></span>
         </a>
 
         <% if (locals.user) { %>

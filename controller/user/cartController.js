@@ -52,36 +52,19 @@ const loadAddToCart = async (req, res) => {
             }, 0);
 
            
-            
-            const totalItems = validItems.length;
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
-            const startIndex = (page - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            
-            const paginatedItems = validItems.slice(startIndex, endIndex);
-            const paginatedCart = {
-                ...cart.toObject(),
-                items: paginatedItems
-            };
-
             cart.items = validItems;
             await cart.save();
 
             res.render('cart', {
-                user:user,
-                cart: paginatedCart,
-                totalPrice: Math.floor(totalPrice),
                 user: user,
-                currentPage: page,
-                totalPages: totalPages,
-                hasNextPage: endIndex < totalItems,
-                hasPrevPage: page > 1,
+                cart: cart,
+                totalPrice: Math.floor(totalPrice),
                 message: validItems.length < cart.items.length ? 
                     "Some items were removed from your cart because they are no longer available." : 
                     null
             });
         } else {
-            res.render('cart',{ user:user, message: "Cart is empty" });
+            res.render('cart', { user: user, cart: null, totalPrice: 0, message: "Cart is empty" });
         }
     } catch (error) {
         console.error("Cart loading error:", error);
@@ -122,10 +105,9 @@ const addToCart = async (req, res) => {
         if (!cart) {
             
             if (quantity > product.maxQtyPerPerson) {
-                return res.status(400).json({ success: false, message: 'Maximum quantity for one product exceeded' });
+                return res.status(400).json({ success: false, message: `You already have the maximum allowed quantity (${product.maxQtyPerPerson}) of this product in your cart.` });
             }
             
-          
             if (quantity > product.quantity) {
                 return res.status(400).json({ success: false, message: 'Requested quantity exceeds available stock' });
             }
@@ -134,22 +116,18 @@ const addToCart = async (req, res) => {
                 user: userId,
                 items: [{ product: productId, quantity, price: (finalPrice * quantity) }]
             });
-            // console.log(cart,'cart1')
         } else {
             const existingItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
-            // console.log(existingItemIndex,'existingItemIndex')
             
             if (existingItemIndex !== -1) {
                 const newQuantity = cart.items[existingItemIndex].quantity + quantity;
-                // console.log(newQuantity,'newQuantity')
                 
                 if (newQuantity > product.maxQtyPerPerson) {
                     return res.status(400).json({ 
                         success: false, 
-                        message: 'Maximum quantity for one product exceeded' 
+                        message: `You already have the maximum allowed quantity (${product.maxQtyPerPerson}) of this product in your cart.` 
                     });
                 }
-                
                 
                 if (newQuantity > product.quantity) {
                     return res.status(400).json({ 
@@ -157,15 +135,13 @@ const addToCart = async (req, res) => {
                         message: 'Requested quantity exceeds available stock' 
                     });
                 }
-                // console.log(newQuantity, Math.floor(finalPrice * newQuantity),'finalamount')
                 cart.items[existingItemIndex].quantity = newQuantity;
                 cart.items[existingItemIndex].price = (finalPrice * newQuantity);
             } else {
-                
                 if (quantity > product.maxQtyPerPerson) {
                     return res.status(400).json({ 
                         success: false, 
-                        message: 'Maximum quantity for one product exceeded' 
+                        message: `You already have the maximum allowed quantity (${product.maxQtyPerPerson}) of this product in your cart.` 
                     });
                 }
                 
@@ -175,7 +151,6 @@ const addToCart = async (req, res) => {
                         message: 'Requested quantity exceeds available stock' 
                     });
                 }
-                // console.log(finalPrice,quantity,'quantity')
                 cart.items.push({ product: productId, quantity, price: (finalPrice * quantity) });
             }
         }
@@ -215,7 +190,7 @@ const incrementQuantity = async (req, res) => {
         if (currentQuantity >= product.quantity) {
             return res.status(400).json({message:"product is out of stock"});
         } else if (currentQuantity >= product.maxQtyPerPerson) {
-            return res.status(400).json({message:"Maximum quantity for one product exceeded"});
+            return res.status(400).json({message: `You already have the maximum allowed quantity (${product.maxQtyPerPerson}) of this product in your cart.`});
         } else {
             const productOffer = product.productOffer || 0
             const categoryOffer = product.category.categoryOffer || 0
@@ -246,21 +221,21 @@ const decrementQuantity = async (req, res) => {
         const cart = await Cart.findOne({ user: userId }).populate({ path: "items.product", populate: { path: "category", select: "categoryOffer" } })
       
         if (!cart) {
-            return res.status(404).json("Cart not found")
+            return res.status(404).json({ message: "Cart not found" })
         }
         const item = cart.items.find(item => item._id.toString() === itemId)
         if (!item) {
-            return res.status(404).json("Item not found in cart")
+            return res.status(404).json({ message: "Item not found in cart" })
         }
         if (item.quantity === 1) {
-            return res.status(400).json("Minimum quantity reached")
+            return res.status(400).json({ message: "Minimum quantity reached" })
         }
         const product = await Product.findById(item.product).populate('category')
 
         const currentQuantity = item.quantity
 
         if (currentQuantity >= product.quantity) {
-            return res.status(400).json("Quantity exceeded");
+            return res.status(400).json({ message: "Quantity exceeded" });
         } else {
             const productOffer = product.productOffer || 0
             const categoryOffer = product.category.categoryOffer || 0
@@ -270,7 +245,7 @@ const decrementQuantity = async (req, res) => {
             item.quantity -= 1;
             item.price = Math.floor(item.quantity * finalPrice);
             await cart.save();
-            return res.status(200).json({ success: true, message: "Quantity incremented" });
+            return res.status(200).json({ success: true, message: "Quantity decremented" });
         }
 
     } catch (error) {

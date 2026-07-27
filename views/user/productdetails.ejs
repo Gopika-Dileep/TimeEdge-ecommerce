@@ -303,13 +303,22 @@ async function addToCart() {
         } else {
             btn.innerHTML = '<i class="fa-solid fa-bag-shopping"></i> <span>Add to Cart</span>';
             btn.disabled = false;
-            alert('Could not add to cart. Please try again.');
+            const data = await res.json();
+            Swal.fire({
+                icon: 'error',
+                title: 'Add to Cart Failed',
+                text: data.message || 'Could not add to cart. Please try again.',
+                confirmButtonColor: '#c9a84c'
+            });
         }
     } catch(e) {
         btn.innerHTML = '<i class="fa-solid fa-bag-shopping"></i> <span>Add to Cart</span>';
         btn.disabled = false;
     }
 }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
 
 async function toggleWishlist() {
     try {

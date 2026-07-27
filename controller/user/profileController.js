@@ -99,7 +99,7 @@ const changeEmailValid = async(req,res)=>{
 
             },60000)
 
-            res.render('change-email-otp',{message:"email send to your mail"})
+            res.render('change-email-otp',{success:"Email sent successfully."})
         }else{
             res.render('change-email',{message:"error while sending mail"})
         }
@@ -136,6 +136,12 @@ const updateEmail=async(req,res)=>{
     try {
         const {newEmail}=req.body
         const userId = req.session.user
+        
+        const existingUser = await User.findOne({ email: newEmail });
+        if (existingUser) {
+            return res.render('new-email', { message: "A user with this email already exists." });
+        }
+        
         const user=await User.findByIdAndUpdate({_id:userId},{$set:{email:newEmail}},{new:true})
         res.redirect('/')
 
@@ -244,25 +250,33 @@ const verifyForgotPassOtp = async(req,res)=>{
 const resendOtp = async(req,res)=>{
     try {
         const {email} = req.body
-        console.log(req.body,'req.body')
+        
+        // Cooldown check
+        const now = Date.now();
+        if (req.session.lastOtpTime && (now - req.session.lastOtpTime < 60000)) {
+            const waitSecs = Math.ceil((60000 - (now - req.session.lastOtpTime)) / 1000);
+            return res.status(400).json({ success: false, message: `Please wait ${waitSecs} seconds before resending OTP.` });
+        }
+
         const findUser = await User.findOne({email:email})
-        console.log(findUser,'findUser')
         if(findUser){
             const otp = generateOtp()
             console.log(otp,'otp')
             const emailsend = await sendVerificationMail(email,otp);
             if(emailsend){
+                req.session.lastOtpTime = now;
                 await User.updateOne({email:email},{$set:{otp:otp}})
 
                 setTimeout(async()=>{
                      await User.updateOne({email:email},{$unset:{otp:1}})
                 },60000)
                 res.status(200).json({success:true,message:"Otp resent successfully"})
-
-        }else{
-            res.status(400).json({success:false,message:"error while sending otp"})
+            } else {
+                res.status(400).json({success:false,message:"error while sending otp"})
+            }
+        } else {
+            res.status(404).json({success:false,message:"User not found"})
         }
-    }
     } catch (error) {
         console.error(error)
         res.status(500).json({message:"server error"})

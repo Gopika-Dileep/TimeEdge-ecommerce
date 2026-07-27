@@ -231,10 +231,16 @@ const shopProducts = async (req, res) => {
 
 
         let sortOption = {};
-        if (priceSort === 'asc') {
+        if (priceSort === 'price-asc' || priceSort === 'asc') {
             sortOption = { salePrice: 1 };
-        } else if (priceSort === 'desc') {
+        } else if (priceSort === 'price-desc' || priceSort === 'desc') {
             sortOption = { salePrice: -1 };
+        } else if (priceSort === 'newest') {
+            sortOption = { createdAt: -1 };
+        } else if (priceSort === 'oldest') {
+            sortOption = { createdAt: 1 };
+        } else {
+            sortOption = { createdAt: -1 };
         }
 
         const totalProducts = await Product.countDocuments(query);

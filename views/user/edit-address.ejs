@@ -1,64 +1,81 @@
 <%- include("../../views/partials/user/header") %>
-    <div class="container mt-4">
-        <h3 class="mt-3" style="color: #046963; margin-bottom:70px">Edit User Address</h3>
-        <form id="addressForm" method="POST" action="/editAddress?id=<%= address._id.toLocaleString() %>"
-            class="border-0 p-3">
-            <div class="row mb-50">
-                <div class="form-group col-md-4">
-                    <label for="addressType">Address Type:</label>
-                    <input type="text" class="form-control border-3" value="<%= address.addressType %>" id="addressType"
-                        name="addressType">
-                    <div class="text-danger error-message" id="addressType-error"></div>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="name">Name:</label>
-                    <input type="text" class="form-control border-3" value="<%= address.name %>" id="name" name="name">
-                    <div class="text-danger error-message" id="name-error"></div>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="city">City:</label>
-                    <input type="text" class="form-control border-3" id="city" value="<%= address.city %>" name="city">
-                    <div class="text-danger error-message" id="city-error"></div>
+    <link rel="stylesheet" href="/css/profile.css">
+
+    <div class="te-container profile-page">
+        <div class="animate-up">
+            <span class="section-label">Your Dashboard</span>
+            <h1 class="section-title">My <em>Addresses</em></h1>
+        </div>
+
+        <div class="profile-layout">
+            <!-- Sidebar Navigation -->
+            <%- include("../../views/partials/user/profile-sidebar") %>
+
+            <!-- Profile Panel Contents -->
+            <div class="profile-content animate-up delay-2" style="width: 100%;">
+                <div class="profile-section" style="background: var(--bg-card); border: 1px solid var(--border); padding: 40px;">
+                    <div class="profile-section-title">Edit User <span>Address</span></div>
+                    
+                    <form id="addressForm" method="POST" action="/editAddress?id=<%= address._id.toLocaleString() %>" class="border-0 p-3">
+                        <div class="form-grid mb-4">
+                            <div class="form-group">
+                                <label class="form-label" for="addressType">Address Type</label>
+                                <input type="text" class="form-input" id="addressType" name="addressType" value="<%= address.addressType %>" placeholder="Home / Work / Temporary">
+                                <div class="text-danger error-message" id="addressType-error" style="color: #ff3333; font-size: 11px; margin-top: 4px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="name">Name</label>
+                                <input type="text" class="form-input" id="name" name="name" value="<%= address.name %>" placeholder="Full name">
+                                <div class="text-danger error-message" id="name-error" style="color: #ff3333; font-size: 11px; margin-top: 4px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-grid mb-4">
+                            <div class="form-group">
+                                <label class="form-label" for="city">City</label>
+                                <input type="text" class="form-input" id="city" name="city" value="<%= address.city %>" placeholder="City">
+                                <div class="text-danger error-message" id="city-error" style="color: #ff3333; font-size: 11px; margin-top: 4px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="landMark">Landmark</label>
+                                <input type="text" class="form-input" id="landMark" name="landMark" value="<%= address.landMark %>" placeholder="Nearby landmark">
+                                <div class="text-danger error-message" id="landMark-error" style="color: #ff3333; font-size: 11px; margin-top: 4px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-grid mb-4">
+                            <div class="form-group">
+                                <label class="form-label" for="state">State</label>
+                                <input type="text" class="form-input" id="state" name="state" value="<%= address.state %>" placeholder="State">
+                                <div class="text-danger error-message" id="state-error" style="color: #ff3333; font-size: 11px; margin-top: 4px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="pincode">Pincode</label>
+                                <input type="text" class="form-input" id="pincode" name="pincode" value="<%= address.pincode %>" placeholder="6-digit pincode" maxlength="6">
+                                <div class="text-danger error-message" id="pincode-error" style="color: #ff3333; font-size: 11px; margin-top: 4px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-grid mb-5">
+                            <div class="form-group">
+                                <label class="form-label" for="phone">Phone</label>
+                                <input type="tel" class="form-input" id="phone" name="phone" value="<%= address.phone %>" placeholder="10-digit mobile number" maxlength="10">
+                                <div class="text-danger error-message" id="phone-error" style="color: #ff3333; font-size: 11px; margin-top: 4px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="altPhone">Alternate Phone</label>
+                                <input type="tel" class="form-input" id="altPhone" name="altPhone" value="<%= address.altPhone %>" placeholder="10-digit alternate number" maxlength="10">
+                                <div class="text-danger error-message" id="altPhone-error" style="color: #ff3333; font-size: 11px; margin-top: 4px;"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitButton" class="btn-gold-fill" style="padding: 14px 36px; cursor: pointer; border: none; font-weight: 600;">Submit</button>
+                    </form>
                 </div>
             </div>
-            <div class="row mb-3">
-                <div class="form-group col-md-4">
-                    <label for="landMark">Landmark:</label>
-                    <input type="text" class="form-control border-3" value="<%= address.landMark%>" id="landMark"
-                        name="landMark">
-                    <div class="text-danger error-message" id="landMark-error"></div>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="state">State:</label>
-                    <input type="text" class="form-control border-3" value="<%= address.state %>" id="state"
-                        name="state">
-                    <div class="text-danger error-message" id="state-error"></div>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="pincode">Pincode:</label>
-                    <input type="number" class="form-control border-3" value="<%= address.pincode %>" id="pincode"
-                        name="pincode">
-                    <div class="text-danger error-message" id="pincode-error"></div>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="form-group col-md-4">
-                    <label for="phone">Phone:</label>
-                    <input type="number" class="form-control border-3" id="phone" value="<%= address.phone %>"
-                        name="phone">
-                    <div class="text-danger error-message" id="phone-error"></div>
-                </div>
-                <div class="form-group col-md-4">
-                    <label for="altPhone">Alternate Phone:</label>
-                    <input type="number" class="form-control border-3" id="altPhone" value="<%= address.altPhone %>"
-                        name="altPhone">
-                    <div class="text-danger error-message" id="altPhone-error"></div>
-                </div>
-            </div>
-            <button type="submit" id="submitButton" class="btn"
-                style="background-color: black; color: white;">Submit</button>
-        </form>
+        </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.getElementById('addressForm').addEventListener('submit', function (event) {
@@ -91,37 +108,14 @@
 
         function validatePhoneNumber(phoneId) {
             const phoneValue = document.getElementById(phoneId).value.trim();
+            const phoneRegex = /^[6-9]\d{9}$/;
 
-            // Check if empty
             if (phoneValue === "") {
                 return showError(phoneId, "Phone number is required.");
             }
-
-            // Check if it's 10 digits
-            if (phoneValue.length !== 10) {
-                return showError(phoneId, "Phone number must be exactly 10 digits.");
+            if (!phoneRegex.test(phoneValue)) {
+                return showError(phoneId, "Phone number must be exactly 10 digits and start with 6, 7, 8, or 9.");
             }
-
-            // Check if it starts with 0
-            if (phoneValue.startsWith('0')) {
-                return showError(phoneId, "Phone number should not start with 0.");
-            }
-
-            // Check if it starts with 6 or higher
-            if (parseInt(phoneValue.charAt(0)) < 6) {
-                return showError(phoneId, "Phone number should start with 6, 7, 8, or 9.");
-            }
-
-            // Check for more than two consecutive zeros
-            if (phoneValue.includes('000')) {
-                return showError(phoneId, "Phone number should not contain more than two consecutive zeros.");
-            }
-
-            // Check if it's all zeros (shouldn't happen with above rules but just in case)
-            if (/^0+$/.test(phoneValue)) {
-                return showError(phoneId, "Phone number should not consist of only zeros.");
-            }
-
             return clearError(phoneId);
         }
 
@@ -176,7 +170,7 @@
         }
 
         // Add real-time validation
-        const inputFields = document.querySelectorAll('input');
+        const inputFields = document.querySelectorAll('.form-input');
         inputFields.forEach(function (input) {
             input.addEventListener('blur', function () {
                 const fieldId = this.id;
@@ -193,7 +187,6 @@
                 } else {
                     validateField(fieldId, value);
 
-                    // Additional validation for name fields
                     const nameFields = ["name", "city", "landMark", "state"];
                     if (nameFields.includes(fieldId) && value !== "") {
                         const namePattern = /^[A-Za-z\s]+$/;
@@ -208,7 +201,6 @@
 
         // Validate all fields on load since they come pre-filled
         window.addEventListener('load', function () {
-            // Only validate - don't prevent form submission on initial load
             const phoneFields = ["phone", "altPhone"];
             phoneFields.forEach(function (field) {
                 validatePhoneNumber(field);
@@ -238,7 +230,7 @@
         }
 
         .is-invalid {
-            border-color: #dc3545 !important;
+            border-color: #ff3333 !important;
         }
     </style>
     <%- include("../../views/partials/user/footer") %>

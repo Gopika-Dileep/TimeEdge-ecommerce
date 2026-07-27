@@ -22,6 +22,7 @@
         .btn-submit { width:100%; padding:15px; background:var(--gold); border:none; color:#080808; font-family:'Inter',sans-serif; font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:var(--transition); }
         .btn-submit:hover { background:var(--gold-light); box-shadow:0 0 30px rgba(201,168,76,0.3); }
         .auth-alert { padding:13px 16px; background:rgba(201,60,60,0.08); border:1px solid rgba(201,60,60,0.25); color:#e07070; font-size:12px; margin-bottom:24px; display:flex; align-items:center; gap:10px; text-align:left; }
+        .auth-success { padding:13px 16px; background:rgba(109,191,127,0.08); border:1px solid rgba(109,191,127,0.25); color:#6dbf7f; font-size:12px; margin-bottom:24px; display:flex; align-items:center; gap:10px; text-align:left; }
     </style>
 </head>
 <body>
@@ -31,24 +32,31 @@
     <h1 class="otp-title">Email Verification</h1>
     <p class="otp-sub">We sent a verification code to your current email address. Enter it below to proceed.</p>
 
+    <% if (typeof success !== 'undefined' && success) { %>
+    <div class="auth-success" id="authSuccess"><i class="fa-solid fa-circle-check"></i><span id="authSuccessText"><%= success %></span></div>
+    <% } %>
+
     <% if (typeof message !== 'undefined' && message) { %>
-    <div class="auth-alert"><i class="fa-solid fa-circle-exclamation"></i><%= message %></div>
+    <div class="auth-alert" id="authAlert"><i class="fa-solid fa-circle-exclamation"></i><span id="authAlertText"><%= message %></span></div>
+    <% } else { %>
+    <div class="auth-alert" id="authAlert" style="display:none;"><i class="fa-solid fa-circle-exclamation"></i><span id="authAlertText"></span></div>
     <% } %>
 
     <form action="/change-email-otp" method="POST" id="otpForm">
         <div class="otp-inputs">
-            <input type="text" class="otp-digit" maxlength="1" id="d1" autofocus>
-            <input type="text" class="otp-digit" maxlength="1" id="d2">
-            <input type="text" class="otp-digit" maxlength="1" id="d3">
-            <input type="text" class="otp-digit" maxlength="1" id="d4">
-            <input type="text" class="otp-digit" maxlength="1" id="d5">
-            <input type="text" class="otp-digit" maxlength="1" id="d6">
+            <input type="text" class="otp-digit" maxlength="1" id="d1" autofocus oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="text" class="otp-digit" maxlength="1" id="d2" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="text" class="otp-digit" maxlength="1" id="d3" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="text" class="otp-digit" maxlength="1" id="d4" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="text" class="otp-digit" maxlength="1" id="d5" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="text" class="otp-digit" maxlength="1" id="d6" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
         <input type="hidden" name="otp" id="otpHidden">
         <button type="submit" class="btn-submit">Verify &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
     </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 const digits = document.querySelectorAll('.otp-digit');
 digits.forEach((d, i) => {
@@ -66,7 +74,16 @@ function combineOtp() {
 document.getElementById('otpForm').addEventListener('submit', e => {
     combineOtp();
     const otp = document.getElementById('otpHidden').value;
-    if (otp.length < 6) { e.preventDefault(); alert('Please enter all 6 digits.'); }
+    if (otp.length < 6) { 
+        e.preventDefault(); 
+        const alertEl = document.getElementById('authAlert');
+        const textEl = document.getElementById('authAlertText');
+        textEl.textContent = 'Please enter all 6 digits.';
+        alertEl.style.display = 'flex';
+        if (document.getElementById('authSuccess')) {
+            document.getElementById('authSuccess').style.display = 'none';
+        }
+    }
 });
 </script>
 </body>

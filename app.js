@@ -43,6 +43,22 @@ app.set("views",[path.join(__dirname,'views/user'),path.join(__dirname,'views/ad
 app.use(express.static(path.join(__dirname, "public")));
             
 
+app.use(async (req, res, next) => {
+    try {
+        if (req.session && req.session.user) {
+            const Cart = require('./models/cartSchema');
+            const cart = await Cart.findOne({ user: req.session.user });
+            res.locals.cartCount = cart ? cart.items.length : 0;
+        } else {
+            res.locals.cartCount = 0;
+        }
+    } catch (err) {
+        console.error("Error setting cartCount middleware:", err);
+        res.locals.cartCount = 0;
+    }
+    next();
+});
+
 app.use("/",userRouter)
 app.use("/admin",adminRouter)
 

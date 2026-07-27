@@ -230,63 +230,66 @@
             }
         }
     </style>
-    <div style="display: flex;  background-color: #f8f9fa;">
-        <%-include("../../views/partials/user/profile-sidebar") %>
-            <div style="width: 100%; padding-right: 50px;">
-                <div class="wishlist-page ">
-                    <div class="wishlist-container">
-                        <div class="wishlist-header">
-                            <h1>My Wishlist</h1>
-                            <p class="items-count">
-                                <%= wishlist?.products?.length || 0 %> items
-                            </p>
-                        </div>
-
-                        <% if (wishlist && wishlist.products && wishlist.products.length> 0) { %>
-                            <div class="products-grid">
-                                <% wishlist.products.forEach(product=> { %>
-                                    <div class="product-card">
-                                        <div class="product-image">
-                                            <a href="/productDetails?id=<%= product.productId._id %>">
-                                                <img src="<%= product.productId.productImage && product.productId.productImage.length > 0 ? '/uploads/productImages/' + product.productId.productImage[0] : '/uploads/productImages/default.png' %>"
-                                                    alt="<%= product.productId.productName %>" />
-                                            </a>
-                                            <button class="remove-btn"
-                                                onclick="removeItem('<%= product.productId._id %>')">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                        <div class="product-info">
-                                            <h3 class="product-name">
-                                                <%= product.productId.productName %>
-                                            </h3>
-                                            <div class="product-details">
-                                                <span class="price">₹<%= product.price %></span>
-                                                <span class="status <%= product.productId.status.toLowerCase() %>">
-                                                    <%= product.productId.status %>
-                                                </span>
-                                            </div>
-                                            <button class="add-cart-btn"
-                                                onclick="addToCart('<%= product.productId._id %>', 1)">
-                                                Add to Cart
-                                            </button>
-                                        </div>
+    <link rel="stylesheet" href="/css/profile.css">
+    
+    <div class="te-container profile-page">
+        <div class="animate-up">
+            <span class="section-label">Your Dashboard</span>
+            <h1 class="section-title">My <em>Wishlist</em></h1>
+        </div>
+    
+        <div class="profile-layout">
+            <!-- Sidebar Navigation -->
+            <%- include("../../views/partials/user/profile-sidebar") %>
+    
+            <!-- Profile Panel Contents -->
+            <div class="profile-content animate-up delay-2" style="width: 100%;">
+                <div class="profile-section" style="background: var(--bg-card); border: 1px solid var(--border); padding: 40px;">
+                    <div class="profile-section-title">My <span>Wishlist</span></div>
+                    
+                    <% if (wishlist && wishlist.products && wishlist.products.length > 0) { %>
+                        <div class="products-grid">
+                            <% wishlist.products.forEach(product => { %>
+                                <div class="product-card" style="background: var(--bg-primary); border: 1px solid var(--border);">
+                                    <div class="product-image">
+                                        <a href="/productDetails?id=<%= product.productId._id %>">
+                                            <img src="<%= product.productId.productImage && product.productId.productImage.length > 0 ? '/uploads/productImages/' + product.productId.productImage[0] : '/uploads/productImages/default.png' %>"
+                                                alt="<%= product.productId.productName %>" />
+                                        </a>
+                                        <button class="remove-btn" onclick="removeItem('<%= product.productId._id %>')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </div>
-                                    <% }) %>
-                            </div>
-                            <% } else { %>
-                                <div class="empty-wishlist">
-                                    <div class="empty-icon">
-                                        <i class="fas fa-heart"></i>
+                                    <div class="product-info" style="background: var(--bg-card); border-top: 1px solid var(--border);">
+                                        <h3 class="product-name" style="color: var(--text-primary);">
+                                            <%= product.productId.productName %>
+                                        </h3>
+                                        <div class="product-details">
+                                            <span class="price" style="color: var(--text-primary);">₹<%= product.price %></span>
+                                            <span class="status <%= product.productId.status.toLowerCase() %>">
+                                                <%= product.productId.status %>
+                                            </span>
+                                        </div>
+                                        <button class="add-cart-btn" onclick="addToCart('<%= product.productId._id %>', 1)" style="background: var(--gold); color: #080808; border-radius: 0;">
+                                            Add to Cart
+                                        </button>
                                     </div>
-                                    <h2>Your Wishlist is Empty</h2>
-                                    <p>Save your favorite items to purchase them later</p>
-                                    <a href="/shop" class="shop-now-btn">Start Shopping</a>
                                 </div>
-                                <% } %>
-                    </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <div class="empty-wishlist" style="background: var(--bg-card); color: var(--text-primary); border: none; text-align: center;">
+                            <div class="empty-icon" style="color: var(--gold);">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h2 style="color: var(--text-primary);">Your Wishlist is Empty</h2>
+                            <p style="color: var(--text-secondary);">Save your favorite items to purchase them later</p>
+                            <a href="/shop" class="shop-now-btn" style="background: var(--gold); color: #080808; border-radius: 0;">Start Shopping</a>
+                        </div>
+                    <% } %>
                 </div>
             </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -298,14 +301,14 @@
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                cancelButtonColor: '#757575',
                 confirmButtonText: 'Yes, remove it',
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/removeitem/${itemId}`,
-                        type: 'POST',
+                        url: `/removeFromWishlist/${itemId}`,
+                        method: 'POST',
                         success: function (response) {
                             if (response.success) {
                                 Swal.fire({
@@ -349,11 +352,13 @@
                         }
                     });
                 },
-                error: function () {
+                error: function (xhr) {
+                    const message = xhr.responseJSON?.message || 'Could not add to cart. Please try again.';
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Could not add to cart. Please try again.'
+                        text: message,
+                        confirmButtonColor: '#c9a84c'
                     });
                 }
             });

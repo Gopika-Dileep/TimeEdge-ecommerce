@@ -188,7 +188,9 @@ function validateForm() {
     $(".error-msg").remove();
 
     const showError = (fieldId, message) => {
-        $(`#${fieldId}`).after(`<div class="error-msg" style="color:#e07070; font-size:11px; margin-top:4px;">${message}</div>`);
+        const input = $(`#${fieldId}`);
+        const parent = input.closest('.input-wrap').length ? input.closest('.input-wrap') : input;
+        parent.after(`<div class="error-msg" style="color:#ff3333; font-size:11px; margin-top:4px;">${message}</div>`);
         isValid = false;
     };
 
@@ -211,14 +213,11 @@ function validateForm() {
 
     // Phone validation
     const phone = $('#phone').val().trim();
+    const phoneRegex = /^[6-9]\d{9}$/;
     if (!phone) {
         showError('phone', 'Phone number is required');
-    } else if (phone.length < 10) {
-        showError('phone', 'Phone number must be at least 10 digits');
-    } else if (phone.charAt(0) === '0') {
-        showError('phone', 'Phone number should not start with 0');
-    } else if (parseInt(phone.charAt(0)) < 6) {
-        showError('phone', 'Phone number should start with 6 or higher');
+    } else if (!phoneRegex.test(phone)) {
+        showError('phone', 'Please enter a valid mobile number.');
     }
 
     // Password validation

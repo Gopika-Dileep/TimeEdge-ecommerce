@@ -382,7 +382,7 @@
                     <% if (brand && brand.length > 0) { %>
                     <% brand.forEach(b => { %>
                     <li class="<%= (locals.selectedBrand && locals.selectedBrand.toString() === b._id.toString()) ? 'active' : '' %>">
-                        <a href="/shop<%= buildQueryString({ brand: b._id, page: 1 }) %>"><%= b.brandName %></a>
+                        <a href="/shop<%= buildQueryString({ brand: b._id, page: 1 }) %>"><%= b.name %></a>
                     </li>
                     <% }) %>
                     <% } %>
@@ -425,7 +425,7 @@
                         </div>
                     </a>
                     <div class="product-info">
-                        <div class="product-brand"><%= product.brand ? product.brand.brandName : '' %></div>
+                        <div class="product-brand"><%= product.brand ? product.brand.name : '' %></div>
                         <div class="product-name"><%= product.productName %></div>
                         <div class="product-price-row" style="display: flex; justify-content: space-between; align-items: center;">
                             <div>

@@ -40,10 +40,10 @@
     <div class="auth-alert"><i class="fa-solid fa-circle-exclamation"></i><span><%= message %></span></div>
     <% } %>
 
-    <form action="/new-email" method="POST">
+    <form action="/update-email" method="POST">
         <div class="form-group">
             <label class="form-label" for="email">New Email Address</label>
-            <input type="email" class="form-input" id="email" name="email" placeholder="new@example.com" required autofocus>
+            <input type="email" class="form-input" id="email" name="newEmail" placeholder="new@example.com" required autofocus>
         </div>
         <button type="submit" class="btn-submit">Verify New Email &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
     </form>
