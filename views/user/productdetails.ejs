@@ -208,7 +208,7 @@
                     <span>Add to Cart</span>
                 </button>
                 <button class="btn-gold" id="wishlistBtn" onclick="toggleWishlist()" title="Add to Wishlist">
-                    <i class="bi <%= product.inWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" id="wishlistIcon"></i>
+                    <i class="bi <%= locals.isInWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" id="wishlistIcon"></i>
                 </button>
             </div>
 
@@ -322,6 +322,25 @@ async function addToCart() {
 
 async function toggleWishlist() {
     try {
+        const isUserLoggedIn = <%= typeof user !== 'undefined' && user ? 'true' : 'false' %>;
+        if (!isUserLoggedIn) {
+            Swal.fire({
+                title: 'Login Required',
+                text: 'Please login to add products to your wishlist.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#c9a84c',
+                cancelButtonColor: '#757575',
+                confirmButtonText: 'Login Now',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/login';
+                }
+            });
+            return;
+        }
+
         const icon = document.getElementById('wishlistIcon');
         const res = await fetch(`/addToWishlist/${productId}`, {
             method: 'POST',
@@ -333,9 +352,23 @@ async function toggleWishlist() {
             if (response.action === 'added') {
                 icon.classList.remove('bi-heart');
                 icon.classList.add('bi-heart-fill', 'text-danger');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Wishlist Updated',
+                    text: 'Product added to wishlist.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             } else {
                 icon.classList.remove('bi-heart-fill', 'text-danger');
                 icon.classList.add('bi-heart');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Wishlist Updated',
+                    text: 'Product removed from wishlist.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             }
         }
     } catch (e) {

@@ -10,9 +10,10 @@
 
     .page-title {
       font-size: 1.60rem;
-      color: #1a1a1a;
+      color: var(--text-primary);
       margin-bottom: 1.50rem;
       font-weight: 600;
+      font-family: "Playfair Display", serif;
     }
 
     .checkout-grid {
@@ -28,24 +29,25 @@
     }
 
     .section-card {
-      background: white;
+      background: var(--bg-card, #111111);
+      border: 1px solid var(--border, rgba(201,168,76,0.2));
       border-radius: 12px;
       padding: 1.5rem;
       padding-bottom: 10px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
     }
 
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--border, rgba(201,168,76,0.2));
     }
 
     .section-title {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #1a1a1a;
+      color: var(--gold, #c9a84c);
       display: flex;
       align-items: center;
       gap: 0.3rem;
@@ -53,39 +55,46 @@
     }
 
     .address-card {
-      border: 1px solid #e5e5e5;
+      border: 1px solid var(--border, rgba(201,168,76,0.2));
+      background: rgba(255, 255, 255, 0.02);
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1rem;
+      color: var(--text-primary, #f0ede8);
       transition: all 0.2s;
     }
 
     .address-card:hover {
-      border-color: #007bff;
-      background: #f8f9ff;
+      border-color: var(--gold, #c9a84c);
+      background: rgba(201, 168, 76, 0.05);
     }
 
     .address-card input[type="radio"] {
       margin-right: 1rem;
+      accent-color: var(--gold, #c9a84c);
     }
 
     .address-details {
       margin-top: 0.5rem;
-      color: #666;
+      color: var(--text-secondary, #a09484);
     }
 
     .btn-primary {
-      background: #007bff;
-      color: white;
+      background: var(--gold, #c9a84c);
+      color: #080808;
       padding: 0.75rem 1.5rem;
       border-radius: 6px;
       border: none;
-      font-weight: 500;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 11px;
       transition: all 0.2s;
     }
 
     .btn-primary:hover {
-      background: #0056b3;
+      background: var(--gold-light, #e8c96d);
+      box-shadow: 0 0 15px rgba(201,168,76,0.3);
     }
 
     .order-table {
@@ -100,98 +109,120 @@
     }
 
     .order-table th {
-      background: #f8f9fa;
+      background: rgba(255, 255, 255, 0.04);
       padding: 1rem;
       text-align: left;
       font-weight: 500;
-      color: #666;
+      color: var(--gold, #c9a84c);
+      border: none;
     }
 
     .order-table td {
       padding: 1rem;
-      border-top: 1px solid #eee;
+      border-top: 1px solid var(--border, rgba(201,168,76,0.2));
+      color: var(--text-primary, #f0ede8);
     }
 
     .price-summary {
       margin-top: 1.5rem;
       padding-top: 1.5rem;
-      border-top: 1px solid #eee;
+      border-top: 1px solid var(--border, rgba(201,168,76,0.2));
     }
 
     .price-row {
       display: flex;
       justify-content: space-between;
       margin-bottom: 0.75rem;
-      color: #666;
+      color: var(--text-secondary, #a09484);
     }
 
     .price-row.total {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #1a1a1a;
+      color: var(--text-primary, #f0ede8);
     }
 
     .coupon-section {
-      background: #f8f9fa;
-      padding: 0.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border, rgba(201,168,76,0.2));
+      padding: 0.75rem;
       border-radius: 8px;
       display: flex;
       align-items: center;
     }
 
     .coupon-section button {
-      color: #28a745;
+      color: var(--gold, #c9a84c);
+      background: transparent;
+      border: 1px solid var(--gold, #c9a84c);
+      border-radius: 4px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .coupon-section button:hover {
+      background: var(--gold, #c9a84c);
+      color: #080808;
     }
 
     .coupon-card {
-      border: 1px dashed #007bff;
+      border: 1px dashed var(--gold, #c9a84c);
       border-radius: 6px;
       padding: 1rem;
       margin-bottom: 0.75rem;
-      background: white;
+      background: var(--bg-secondary, #111111);
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .coupon-card:hover {
-      background: #f8f9ff;
+      background: rgba(201, 168, 76, 0.05);
     }
 
     .payment-option {
       margin: 1rem 0;
       padding: 1rem;
-      border: 1px solid #eee;
+      border: 1px solid var(--border, rgba(201,168,76,0.2));
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-primary, #f0ede8);
       border-radius: 8px;
       cursor: pointer;
+      display: block;
       transition: all 0.2s;
     }
 
     .payment-option:hover {
-      border-color: #007bff;
-      background: #f8f9ff;
+      border-color: var(--gold, #c9a84c);
+      background: rgba(201, 168, 76, 0.05);
     }
 
     .payment-option input[type="radio"] {
       margin-right: 1rem;
+      accent-color: var(--gold, #c9a84c);
     }
 
     #place-order {
-      padding: 0.6rem;
-      padding-left: 1.3rem;
-      padding-right: 1.3rem;
-      background: #27da51;
-      color: white;
+      padding: 0.75rem 2rem;
+      background: var(--gold, #c9a84c);
+      color: #080808;
       border: none;
       border-radius: 8px;
-      font-size: 1rem;
-      font-weight: bold;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
       margin-top: 0.7rem;
       cursor: pointer;
       transition: all 0.2s;
+      width: 100%;
     }
 
     #place-order:hover {
-      background: #218838;
+      background: var(--gold-light, #e8c96d);
+      box-shadow: 0 0 15px rgba(201,168,76,0.3);
     }
 
 
@@ -203,7 +234,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.7);
     }
 
     .modal-dialog {
@@ -213,21 +244,22 @@
     }
 
     .modal-content {
-      background-color: #fefefe;
+      background-color: var(--bg-secondary, #111111);
       margin: auto;
       padding: 20px;
-      border: 1px solid #888;
+      border: 1px solid var(--border, rgba(201,168,76,0.2));
       width: 100%;
       max-height: 580px;
       border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      color: var(--text-primary, #f0ede8);
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid var(--border, rgba(201,168,76,0.2));
       padding-bottom: 10px;
     }
 
@@ -245,6 +277,8 @@
     .modal-title {
       margin: 0;
       font-size: 1.25rem;
+      color: var(--gold, #c9a84c);
+      font-family: "Playfair Display", serif;
     }
 
     .close {
@@ -252,11 +286,11 @@
       border: none;
       font-size: 1.5rem;
       cursor: pointer;
-      color: #999;
+      color: var(--text-secondary, #a09484);
     }
 
     .close:hover {
-      color: #333;
+      color: var(--gold, #c9a84c);
     }
 
     .form-group {
@@ -266,20 +300,27 @@
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
-      color: #666;
+      color: var(--text-secondary, #a09484);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .form-group input {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid #ddd;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border, rgba(201,168,76,0.2));
+      color: var(--text-primary, #f0ede8);
       border-radius: 6px;
-      font-size: 1rem;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
     }
 
     .form-group input:focus {
-      border-color: #007bff;
-      outline: none;
+      border-color: var(--gold, #c9a84c);
+      background: rgba(201, 168, 76, 0.05);
     }
 
     .group-input {
@@ -293,14 +334,15 @@
       justify-content: space-between;
       align-items: center;
       padding: 15px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border, rgba(201,168,76,0.2));
+      background: rgba(255,255,255,0.02);
       margin-bottom: 10px;
       border-radius: 5px;
       transition: background-color 0.3s ease;
     }
 
     .coupon-item:hover {
-      background-color: #f8f9fa;
+      background-color: rgba(201, 168, 76, 0.05);
     }
 
     .coupon-details {
@@ -311,26 +353,27 @@
     .coupon-details h6 {
       margin-bottom: 5px;
       font-weight: bold;
+      color: var(--gold, #c9a84c);
     }
 
     .coupon-conditions {
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
-      color: #6c757d;
+      color: var(--text-secondary, #a09484);
       margin-top: 10px;
     }
 
     /* New styles for form validation */
     .error-message {
-      color: #dc3545;
+      color: #ff3333;
       font-size: 0.85rem;
       margin-top: 0.25rem;
       display: none;
     }
 
     .form-group.error input {
-      border-color: #dc3545;
+      border-color: #ff3333;
     }
 
     .form-group.error .error-message {
@@ -633,7 +676,7 @@
       </div>
     `);
 
-        $("#couponModal").modal("hide");
+        $("#couponModal").hide();
 
         $.ajax({
           url: "/apply-coupon",
@@ -705,7 +748,7 @@
         addressForm[0].reset();
         $("#addressId").val("");
         clearErrors();
-        addressModal.modal("show");
+        addressModal.show();
       });
 
       $(document).on("click", ".btn-outline-primary", function () {
@@ -728,7 +771,7 @@
               $("#pincode").val(address.pincode);
               $("#phone").val(address.phone);
               $("#altPhone").val(address.altPhone);
-              $("#addressModal").modal("show");
+              $("#addressModal").show();
             } else {
               Swal.fire({
                 icon: "error",
@@ -911,7 +954,7 @@
                 addAddressToDom(newAddress);
               }
 
-              addressModal.modal("hide");
+              addressModal.hide();
               Swal.fire({
                 icon: "success",
                 title: "Success!",
@@ -940,8 +983,14 @@
         });
       });
 
-      $(".close").click(function () {
-        addressModal.modal("hide");
+      $(".close, [data-dismiss='modal']").click(function () {
+        addressModal.hide();
+        $("#couponModal").hide();
+      });
+
+      $('[data-target="#couponModal"]').click(function (e) {
+        e.preventDefault();
+        $("#couponModal").show();
       });
 
       $("#place-order").click(function () {

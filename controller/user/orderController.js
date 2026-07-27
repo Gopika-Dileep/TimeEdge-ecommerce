@@ -649,53 +649,31 @@ const postNewAddress = async (req, res) => {
     const userId = req.session.user;
 
     const userAddress = await Address.findOne({ userId });
-    let newAddress;
+    
+    const addressItem = {
+      _id: new mongoose.Types.ObjectId(),
+      addressType,
+      name,
+      phone,
+      altPhone,
+      landMark,
+      city,
+      state,
+      pincode,
+    };
 
     if (!userAddress) {
-      newAddress = new Address({
+      const newAddress = new Address({
         userId,
-        address: [
-          {
-            addressType,
-            name,
-            phone,
-            altPhone,
-            landMark,
-            city,
-            state,
-            pincode,
-          },
-        ],
+        address: [addressItem],
       });
       await newAddress.save();
     } else {
-      newAddress = {
-        _id: new mongoose.Types.ObjectId(),
-        addressType,
-        name,
-        phone,
-        altPhone,
-        landMark,
-        city,
-        state,
-        pincode,
-      };
-      userAddress.address.push(newAddress);
+      userAddress.address.push(addressItem);
       await userAddress.save();
     }
-    console.log("fgjgh");
 
-    res.status(200).json({
-      _id: newAddress._id,
-      name: newAddress.name,
-      addressType: newAddress.addressType,
-      phone: newAddress.phone,
-      altPhone: newAddress.altPhone,
-      landMark: newAddress.landMark,
-      city: newAddress.city,
-      state: newAddress.state,
-      pincode: newAddress.pincode,
-    });
+    res.status(200).json(addressItem);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "server error" });

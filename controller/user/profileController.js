@@ -378,9 +378,11 @@ const postNewPassword = async(req,res)=>{
 
 const addAddress = async (req,res)=>{
     try {
-        const user = req.session.user;
+        const userId = req.session.user;
+        const user = await User.findById(userId);
         res.render('add-address',{user:user})
     } catch (error) {
+        console.error(error);
         res.redirect("/pageNotFound");
     }
 }
@@ -388,19 +390,20 @@ const addAddress = async (req,res)=>{
 const postAddAddress = async(req,res)=>{
     try {
         const userId = req.session.user
-        const user = await User.findById({_id:userId})
+        if (!userId) {
+            return res.redirect('/login');
+        }
         const {addressType,name,city,landMark,state,pincode,phone,altPhone} = req.body
-        const userAddress = await Address.findOne({userId:user._id})
+        const userAddress = await Address.findOne({userId: userId})
         if(!userAddress){
             const newaddress = new Address({
-                userId:user._id,
+                userId: userId,
                 address:[{addressType,name,city,landMark,state,pincode,phone,altPhone}]
-
             })
             await newaddress.save()
         }else{
            userAddress.address.push({addressType,name,city,landMark,state,pincode,phone,altPhone})
-            await userAddress.save()
+           await userAddress.save()
         }
         res.redirect('/address')
 
@@ -425,11 +428,10 @@ const postAddAddress = async(req,res)=>{
 const editAddress = async (req,res)=>{
     try {
         const addressId = req.query.id;
-    
-        const user = req.session.user;
+        const userId = req.session.user;
+        const user = await User.findById(userId);
         const currAddress = await Address.findOne({
             "address._id": addressId,
-            
         })
  
         if(!currAddress){
