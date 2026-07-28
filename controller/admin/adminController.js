@@ -183,48 +183,33 @@ const loadcategory = async (req, res) => {
 };
 const unlistCategory = async (req, res) => {
   try {
-    const categoryId = req.params.catId;
-    console.log(categoryId, "categoryId");
+    const categoryId = req.query.id || req.params.catId;
     if (categoryId) {
-      console.log("dfgfs");
-
-      const news = await Category.findByIdAndUpdate(
+      await Category.findByIdAndUpdate(
         { _id: categoryId },
-        { isListed: false },
-        { new: true }
+        { isListed: false }
       );
-      console.log(news, "new");
-      return res.status(200).json("category unlisted ");
-    } else {
-      res.status(404).json({ message: "category not found" });
     }
+    return res.redirect("/admin/category");
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while unlisting category" });
+    return res.redirect("/admin/category");
   }
 };
 
 const listCategory = async (req, res) => {
   try {
-    const listCategory = req.params.catId;
-    console.log(listCategory, "listCategory");
-
-    if (listCategory) {
-      console.log("sdf");
-      const news = await Category.findByIdAndUpdate(
-        { _id: listCategory },
-        { isListed: true },
-        { new: true }
+    const categoryId = req.query.id || req.params.catId;
+    if (categoryId) {
+      await Category.findByIdAndUpdate(
+        { _id: categoryId },
+        { isListed: true }
       );
-      console.log(news, "new");
-
-      return res.status(200).json("category listed ");
-    } else {
-      res.status(404).json({ message: "category not found" });
     }
+    return res.redirect("/admin/category");
   } catch (error) {
     console.error(error);
-    req.status(400).json({ message: "error while listing category" });
+    return res.redirect("/admin/category");
   }
 };
 
@@ -280,7 +265,6 @@ const loadEditCategory = async (req, res) => {
 const editCategory = async (req, res) => {
   try {
     const catid = req.params.categoryId;
-    console.log(catid, "catid");
     const { name, description } = req.body;
 
     const category = await Category.findById({ _id: catid });
@@ -295,12 +279,13 @@ const editCategory = async (req, res) => {
         { new: true }
       );
       if (updatedCategory) {
-        return res.redirect("/editCategory");
+        return res.json({ success: true, message: "Category updated successfully" });
       }
     }
+    return res.status(400).json({ success: false, message: "Category not found" });
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while eiting the category " });
+    res.status(500).json({ success: false, message: "Server error while editing the category" });
   }
 };
 const addOffer = async (req, res) => {

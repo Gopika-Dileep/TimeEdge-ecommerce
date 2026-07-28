@@ -3,53 +3,72 @@
     <style>
         .container {
             width: 100%;
-            padding: 0;
+            padding: 2rem 0;
         }
 
         .filter-container {
-            background: #fff;
+            background: var(--bg-card);
             padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--border);
             width: fit-content;
             margin-left: auto;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .select-filter {
             width: auto !important;
-            min-width: 120px;
-            height: 35px;
+            min-width: 140px;
+            height: 38px;
             font-size: 14px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 4px;
         }
 
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 24px;
+            margin-bottom: 24px;
         }
 
         .dashboard-card {
-            background: #fff;
+            background: var(--bg-card);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            border: 1px solid var(--border);
+            padding: 24px;
             height: 100%;
+        }
+
+        .dashboard-card h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
         }
 
         .summary-cards {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 24px;
+            margin-bottom: 24px;
         }
 
         .summary-card {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 24px;
+            transition: var(--transition);
+        }
+        
+        .summary-card:hover {
+            border-color: var(--gold);
         }
 
         .icon-container {
@@ -59,24 +78,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
         }
 
         .bg-light-green {
-            background-color: rgba(0, 255, 0, 0.1);
+            background-color: rgba(179, 147, 67, 0.08);
+            color: var(--gold);
         }
 
         .bg-light-blue {
-            background-color: rgba(0, 0, 255, 0.1);
+            background-color: rgba(92, 85, 76, 0.08);
+            color: var(--text-secondary);
         }
 
         .bg-light-orange {
-            background-color: rgba(255, 165, 0, 0.1);
+            background-color: rgba(212, 182, 106, 0.08);
+            color: var(--gold-light);
         }
 
         .bg-light-red {
-            background-color: rgba(255, 0, 0, 0.1);
+            background-color: rgba(224, 112, 112, 0.08);
+            color: #e07070;
         }
+
+        .text-success { color: var(--gold) !important; }
+        .text-primary { color: var(--text-secondary) !important; }
+        .text-warning { color: var(--gold-light) !important; }
+        .text-danger { color: #e07070 !important; }
 
         @media (max-width: 1000px) {
             .container {

@@ -111,6 +111,9 @@
             const phoneRegex = /^[6-9]\d{9}$/;
 
             if (phoneValue === "") {
+                if (phoneId === 'altPhone') {
+                    return clearError(phoneId);
+                }
                 return showError(phoneId, "Phone number is required.");
             }
             if (!phoneRegex.test(phoneValue)) {

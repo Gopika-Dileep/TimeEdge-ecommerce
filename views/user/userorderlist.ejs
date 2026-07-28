@@ -34,13 +34,13 @@
                         <tbody>
                             <% orders.forEach(order => { %>
                             <tr>
-                                <td class="order-id">#<%= order._id.toString().slice(-8).toUpperCase() %></td>
-                                <td><%= new Date(order.createdOn).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %></td>
-                                <td><%= order.ordereditems.length %> Item(s)</td>
-                                <td style="color: var(--text-primary); font-weight: 500;">₹<%= order.finalAmount.toLocaleString('en-IN') %></td>
+                                <td class="order-id">#<%= (order.orderId || order._id.toString().slice(-8)).toUpperCase() %></td>
+                                <td><%= new Date(order.createdOn || order.createdAt).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %></td>
+                                <td><%= (order.orderedItems || []).length %> Item(s)</td>
+                                <td style="color: var(--text-primary); font-weight: 500;">₹<%= (order.finalAmount || 0).toLocaleString('en-IN') %></td>
                                 <td>
-                                    <span class="order-status status-<%= order.status.toLowerCase() %>">
-                                        <%= order.status %>
+                                    <span class="order-status status-<%= (order.status || 'pending').toLowerCase() %>">
+                                        <%= order.status || 'Pending' %>
                                     </span>
                                 </td>
                                 <td style="text-align: right; padding-right: 24px !important;">

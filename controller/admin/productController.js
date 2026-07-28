@@ -293,11 +293,17 @@ const unlistproduct = async (req,res)=>{
 }
 const addOffer = async (req, res) => {
     try {
-        const productId = req.query.id;
-        const percentage = req.query.percentage;
-        const product = await Product.findById({ _id: productId });
-        product.productOffer = percentage;
-        product.offerAmount = Math.floor(product.salePrice * percentage / 100);
+        const { productId, percentage } = req.body;
+        const percentNum = parseFloat(percentage);
+        if (isNaN(percentNum) || percentNum < 0 || percentNum > 99) {
+            return res.status(400).json({ status: false, message: "Invalid percentage value (must be 0-99)" });
+        }
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ status: false, message: "Product not found" });
+        }
+        product.productOffer = percentNum;
+        product.offerAmount = Math.floor(product.salePrice * percentNum / 100);
         await product.save();
         res.json({ status: true });
     } catch (error) {
@@ -308,15 +314,18 @@ const addOffer = async (req, res) => {
 
 const removeOffer = async (req, res) => {
     try {
-        const productId = req.query.id;
-        const product = await Product.findById({ _id: productId });
+        const { productId } = req.body;
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ status: false, message: "Product not found" });
+        }
         product.productOffer = 0;
         product.offerAmount = 0;
         await product.save();
         res.json({ status: true });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ status: false, message: "Server error" });
     }
 }
 

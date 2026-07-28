@@ -395,7 +395,7 @@
             <h2 class="section-title" style="margin-bottom: 35px;">
               Delivery Address
             </h2>
-            <a href="/addAddress" class="btn btn-outline-info" style="border-radius: 5px;">New Address</a>
+            <a href="/addAddress" class="btn-outline-info">New Address</a>
           </div>
 
           <div id="saved-addresses">
@@ -409,8 +409,7 @@
                   <div class="address-details">
                     <%= addr.landMark %>, <%= addr.city %>, <%= addr.state %>, <%= addr.pincode %>
                   </div>
-                  <button type="button" class="btn btn-outline-primary"
-                    style="border-radius: 5px; padding-bottom: 2px; margin-top: 2px;"
+                  <button type="button" class="btn-outline-primary"
                     data-id="<%= addr._id %>">Edit</button>
                 </div>
                 <% }) %>
@@ -663,6 +662,7 @@
         $("#couponDiscount").text(discountAmount.toFixed(2));
         $("#final-total").text(`₹${finalTotal.toFixed(2)}`);
         $("#total").val(finalTotal.toFixed(2));
+        checkCodAvailability();
 
         appliedCoupon = {
           code: couponCode,
@@ -711,12 +711,48 @@
         return couponDisplay.length > 0 ? couponDisplay.data("coupon-code") : "";
       }
 
+      function checkCodAvailability() {
+        const total = parseFloat($("#total").val());
+        const codRadio = $('input[name="paymentMethod"][value="COD"]');
+        const codLabel = codRadio.closest('.payment-option');
+        
+        $('#cod-notice').remove();
+        
+        if (total > 2000) {
+          codRadio.prop('disabled', true);
+          codLabel.css({
+            'opacity': '0.5',
+            'cursor': 'not-allowed',
+            'pointer-events': 'none'
+          });
+          if (codRadio.is(':checked')) {
+            $('input[name="paymentMethod"][value="Online"]').prop('checked', true);
+          }
+          codLabel.after(`
+            <div id="cod-notice" style="color: #ff3333; font-size: 11px; margin-top: -6px; margin-bottom: 12px; margin-left: 8px;">
+              Cash on Delivery is unavailable for orders above ₹2000. Please select an online payment option.
+            </div>
+          `);
+        } else {
+          codRadio.prop('disabled', false);
+          codLabel.css({
+            'opacity': '1',
+            'cursor': 'pointer',
+            'pointer-events': 'auto'
+          });
+        }
+      }
+
+      // Initial check on page load
+      checkCodAvailability();
+
       function removeCoupon() {
         const subtotal = parseFloat($("#subtotal").text());
 
         $("#couponDiscount").text("0.00");
         $("#final-total").text(`₹${subtotal.toFixed(2)}`);
         $("#total").val(subtotal.toFixed(2));
+        checkCodAvailability();
         $("#applied-coupon-display").empty();
         appliedCoupon = null;
       }
@@ -883,8 +919,7 @@
           { field: "landMark", message: "Landmark is required" },
           { field: "state", message: "State is required" },
           { field: "pincode", message: "Pincode is required" },
-          { field: "phone", message: "Phone number is required" },
-          { field: "altPhone", message: "Alternative phone number is required" }
+          { field: "phone", message: "Phone number is required" }
         ];
 
         requiredFields.forEach(item => {

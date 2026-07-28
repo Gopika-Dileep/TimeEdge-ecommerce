@@ -87,7 +87,7 @@
                                             <td>₹<%= coupon.minimumPrice.toLocaleString('en-IN') %></td>
                                             <td><%= new Date(coupon.expireOn).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %></td>
                                             <td style="text-align: right; padding-right: 24px !important;">
-                                                <a href="/admin/deleteCoupon?id=<%= coupon._id %>" class="action-del" onclick="return confirm('Delete this coupon?')">
+                                                <a href="/admin/deleteCoupon?id=<%= coupon._id %>" class="action-del">
                                                     <i class="fa-solid fa-trash-can"></i> Delete
                                                 </a>
                                             </td>
@@ -103,8 +103,106 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Pagination block -->
+            <% if (locals.totalpage && totalpage > 1) { %>
+            <div class="pagination-container animate-up" style="display: flex; justify-content: center; gap: 8px; margin-top: 32px;">
+                <% if (currentpage > 1) { %>
+                    <a href="?page=<%= currentpage - 1 %>" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);"><i class="fa-solid fa-chevron-left"></i></a>
+                <% } %>
+                <% for (let i = 1; i <= totalpage; i++) { %>
+                    <% if (i === currentpage) { %>
+                        <span class="current-page" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--gold); color: var(--gold); background: var(--gold-glow); font-size: 13px;"><%= i %></span>
+                    <% } else { %>
+                        <a href="?page=<%= i %>" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);"><%= i %></a>
+                    <% } %>
+                <% } %>
+                <% if (currentpage < totalpage) { %>
+                    <a href="?page=<%= currentpage + 1 %>" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);"><i class="fa-solid fa-chevron-right"></i></a>
+                <% } %>
+            </div>
+            <% } %>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('form').submit(function(event) {
+        event.preventDefault();
+        
+        const name = $('#coupon_name').val().trim().toUpperCase();
+        const offerPrice = parseFloat($('#offerPrice').val());
+        const minimumPrice = parseFloat($('#minimumPrice').val());
+        const expireOn = $('#expireOn').val();
+        
+        if (!name) {
+            Swal.fire('Error', 'Coupon Code is required', 'error');
+            return;
+        }
+        if (isNaN(offerPrice) || offerPrice <= 0) {
+            Swal.fire('Error', 'Discount Amount must be greater than 0', 'error');
+            return;
+        }
+        if (isNaN(minimumPrice) || minimumPrice < 0) {
+            Swal.fire('Error', 'Minimum Purchase must be at least 0', 'error');
+            return;
+        }
+        if (offerPrice >= minimumPrice) {
+            Swal.fire('Error', 'Discount amount must be less than minimum purchase amount', 'error');
+            return;
+        }
+        if (!expireOn) {
+            Swal.fire('Error', 'Expiry Date is required', 'error');
+            return;
+        }
+        
+        $.ajax({
+            url: '/admin/addCoupon',
+            method: 'POST',
+            data: {
+                name: name,
+                offerPrice: offerPrice,
+                minimumPrice: minimumPrice,
+                expireOn: expireOn
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Created',
+                    text: 'Coupon has been successfully created.',
+                    confirmButtonColor: '#b39343'
+                }).then(() => {
+                    window.location.reload();
+                });
+            },
+            error: function(xhr) {
+                const errorMsg = xhr.responseJSON ? (xhr.responseJSON.error || xhr.responseJSON.message) : 'Failed to create coupon';
+                Swal.fire('Error', errorMsg, 'error');
+            }
+        });
+    });
+
+    $(document).on('click', '.action-del', function(e) {
+        e.preventDefault();
+        const href = $(this).attr('href');
+        Swal.fire({
+            title: 'Delete Coupon?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#b39343',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = href;
+            }
+        });
+    });
+});
+</script>
 
 <%- include("../../views/partials/admin/footer") %>

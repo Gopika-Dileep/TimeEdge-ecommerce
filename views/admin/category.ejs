@@ -167,7 +167,41 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+document.getElementById('categoryCreateForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    if (!validateCategoryForm()) {
+        return;
+    }
+    const name = document.getElementById("product_name").value.trim();
+    const description = document.getElementById("descriptionId").value.trim();
+
+    $.ajax({
+        url: "/admin/addCategory",
+        method: "POST",
+        data: { name, description },
+        success: (response) => {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Category Created',
+                    text: response.message || 'Category added successfully',
+                    confirmButtonColor: '#b39343'
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire('Failed', response.message || 'Unable to add category', 'error');
+            }
+        },
+        error: (err) => {
+            const errorMsg = err.responseJSON ? err.responseJSON.message : 'An error occurred while adding the category';
+            Swal.fire('Error', errorMsg, 'error');
+        }
+    });
+});
+
 function validateCategoryForm() {
     var name = document.getElementById("product_name").value.trim();
     var desc = document.getElementById("descriptionId").value.trim();

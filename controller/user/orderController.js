@@ -86,8 +86,8 @@ const createOrder = async (req, res) => {
       subtotal,
     } = req.body;
     console.log(req.body,'dfdddddddd');
-    if(finalAmount>=2000){
-      return res.status(400).json({success:false,message:"item above 2000 cant be in COD "})
+    if (paymentMethod === "COD" && finalAmount > 2000) {
+      return res.status(400).json({success:false,message:"Cash on Delivery is not available for orders above ₹2000. Please select an online payment option."})
     }
 
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");

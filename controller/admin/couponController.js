@@ -34,9 +34,20 @@ const loadCouponPage = async(req,res)=>{
             }
         }
 
-        // Get updated coupons
-        const updatedCoupons = await Coupon.find();
-        res.render('coupon', { coupon: updatedCoupons });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const totalCoupons = await Coupon.countDocuments();
+        const totalpage = Math.ceil(totalCoupons / limit) || 1;
+
+        const paginatedCoupons = await Coupon.find()
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        res.render('coupon', { 
+            coupon: paginatedCoupons,
+            currentpage: page,
+            totalpage: totalpage
+        });
 
     } catch (error) {
         console.error(error)
