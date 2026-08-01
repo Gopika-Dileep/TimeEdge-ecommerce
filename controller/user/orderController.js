@@ -398,13 +398,19 @@ const showOrder = async (req, res) => {
     const order = await Order.findById({ _id: orderId }).populate(
       "orderedItems.products"
     );
+
+    if (!order) {
+      return res.status(404).render("404");
+    }
+
     const address = await Address.findOne({ userId: req.session.user });
+    let specificAddress = null;
 
-    const addressess = address.address;
-
-    const specificAddress = addressess.find(
-      (addr) => addr._id.toString() == order.address.toString()
-    );
+    if (address && address.address) {
+      specificAddress = address.address.find(
+        (addr) => addr._id.toString() == order.address.toString()
+      );
+    }
     console.log(order, specificAddress);
 
     res.render("showorderpage", { order, specificAddress, user });

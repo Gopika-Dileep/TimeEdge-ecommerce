@@ -56,7 +56,8 @@ const loadCouponPage = async(req,res)=>{
 }
 const addCoupon = async (req, res) => {
     try {
-        const { code, offerPrice, createon, expireOn, minimumPrice, UsageLimit } = req.body
+        const code = req.body.code || req.body.name;
+        const { offerPrice, createon, expireOn, minimumPrice, UsageLimit } = req.body
         
         
         const discountAmount = parseFloat(offerPrice);
@@ -118,7 +119,8 @@ const editCoupon = async(req,res)=>{
     try {
         const couponId=req.query.id
         console.log(couponId,'couponId')
-        const {code,offerPrice,createon,expireOn,minimumPrice,UsageLimit,isList} = req.body
+        const code = req.body.code || req.body.name;
+        const {offerPrice,createon,expireOn,minimumPrice,UsageLimit,isList} = req.body
         const coupon = await Coupon.findById({_id:couponId})
         coupon.name = code
         coupon.offerPrice =offerPrice

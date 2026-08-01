@@ -18,9 +18,21 @@ passport.use(
         if (user) {
           return done(null, user);
         } else {
+          const email = profile.emails && profile.emails[0] && profile.emails[0].value;
+          if (email) {
+            let existingUser = await User.findOne({ email: email });
+            if (existingUser) {
+              existingUser.googleId = profile.id;
+              if (!existingUser.name) {
+                existingUser.name = profile.displayName;
+              }
+              await existingUser.save();
+              return done(null, existingUser);
+            }
+          }
           user = new User({
             name: profile.displayName,
-            email: profile.emails[0].value,
+            email: email,
             googleId: profile.id,
           });
           await user.save();

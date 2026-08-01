@@ -86,16 +86,20 @@
 
             <!-- Change Email Form -->
             <div class="profile-section">
-                <div class="profile-section-title">Verify <span>Current Email</span></div>
+                <div class="profile-section-title">Update <span>Email Address</span></div>
 
                 <% if (typeof message !== 'undefined' && message) { %>
                 <div class="auth-alert"><i class="fa-solid fa-circle-exclamation"></i><span><%= message %></span></div>
                 <% } %>
 
+                <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+                <div class="auth-alert" style="background: rgba(109,191,127,0.08); border-color: rgba(109,191,127,0.25); color: #6dbf7f;"><i class="fa-solid fa-circle-check"></i><span><%= successMessage %></span></div>
+                <% } %>
+
                 <form action="/change-email" method="POST" style="max-width: 500px;">
                     <div class="form-group">
-                        <label class="form-label" for="email">Current Email Address</label>
-                        <input type="email" class="form-input" id="email" name="email" placeholder="you@example.com" required autofocus>
+                        <label class="form-label" for="email">New Email Address</label>
+                        <input type="email" class="form-input" id="email" name="email" placeholder="newemail@example.com" required autofocus>
                     </div>
                     <button type="submit" class="btn-gold-fill"><span>Send Verification OTP</span></button>
                 </form>

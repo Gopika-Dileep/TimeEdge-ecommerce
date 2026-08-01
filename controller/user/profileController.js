@@ -86,29 +86,42 @@ async function sendVerificationMail(email,otp){
 const changeEmailValid = async(req,res)=>{
     try {
         const {email}=req.body
-        const existUser=await User.findOne({email})
-        if(existUser){
-            const otp = generateOtp()
-            const emailsend=await sendVerificationMail(email,otp)
-            console.log(otp, 'otp')
-        if(emailsend){
-            await User.updateOne({email:email},{$set:{otp:otp}})
-            
-            setTimeout(async()=>{
-                await User.updateOne({email:email},{$unset:{otp:1}})
+        const userId = req.session.user;
+        const currentUser = await User.findById(userId);
 
-            },60000)
-
-            res.render('change-email-otp',{success:"Email sent successfully."})
-        }else{
-            res.render('change-email',{message:"error while sending mail"})
+        if (!email) {
+            return res.render('change-email', { message: "Email is required." });
         }
 
-    }else{
-        res.render('change-email',{message:"user not found"})
+        // If the user enters their current email address
+        if (email.toLowerCase() === currentUser.email.toLowerCase()) {
+            return res.render('change-email', { message: "This is already your current email address." });
+        }
 
-    }
+        // If the entered email already belongs to another user
+        const existUser = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+        if (existUser) {
+            return res.render('change-email', { message: "This email is already in use." });
+        }
 
+        // Send verification OTP to the new email address
+        const otp = generateOtp()
+        const emailsend = await sendVerificationMail(email, otp)
+        console.log("OTP sent to new email:", otp)
+        
+        if (emailsend) {
+            await User.updateOne({ _id: userId }, { $set: { otp: otp } })
+            req.session.tempNewEmail = email; // Store the new email in session
+
+            // Clear OTP in 60 seconds
+            setTimeout(async () => {
+                await User.updateOne({ _id: userId }, { $unset: { otp: 1 } })
+            }, 60000)
+
+            return res.render('change-email-otp', { success: "Verification OTP has been sent to your new email." })
+        } else {
+            return res.render('change-email', { message: "Error sending OTP verification email. Please try again." })
+        }
     } catch (error) {
         console.error(error)
         res.status(500).json({message:"server error"})
@@ -121,10 +134,21 @@ const verifyEmailOtp = async(req,res)=>{
         const userId = req.session.user;
         const user = await User.findById({_id:userId})
         const userOtp = user.otp
-        if(userOtp===otp){
-            res.render('new-email')
-        }else{
-            res.render('change-email-otp',{message:"invalid otp"})
+        if (userOtp && userOtp === otp) {
+            const newEmail = req.session.tempNewEmail;
+            if (!newEmail) {
+                return res.render('change-email', { message: "Session expired. Please start the process again." });
+            }
+
+            // Update user email
+            await User.findByIdAndUpdate(userId, { $set: { email: newEmail } });
+            // Clean up OTP and session variable
+            await User.updateOne({ _id: userId }, { $unset: { otp: 1 } });
+            delete req.session.tempNewEmail;
+
+            return res.render('change-email', { successMessage: "Email updated successfully!" });
+        } else {
+            return res.render('change-email-otp', { message: "Invalid OTP code. Please try again." });
         }
     } catch (error) {
         console.error(error)
@@ -133,23 +157,7 @@ const verifyEmailOtp = async(req,res)=>{
 }
 
 const updateEmail=async(req,res)=>{
-    try {
-        const {newEmail}=req.body
-        const userId = req.session.user
-        
-        const existingUser = await User.findOne({ email: newEmail });
-        if (existingUser) {
-            return res.render('new-email', { message: "A user with this email already exists." });
-        }
-        
-        const user=await User.findByIdAndUpdate({_id:userId},{$set:{email:newEmail}},{new:true})
-        res.redirect('/')
-
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"server error"})
-    }
-
+    res.redirect('/accountdetails');
 }
 
 const securepassword = async (password) => {

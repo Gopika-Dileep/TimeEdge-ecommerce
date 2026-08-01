@@ -88,7 +88,56 @@
     </div>
 
     <div class="row g-4">
-      <div class="col-md-4">
+      <!-- Customer Details -->
+      <div class="col-md-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-person me-2"></i>Customer Details
+            </h6>
+            <h6 class="mb-2"><%= user.name %></h6>
+            <p class="mb-1 text-muted" style="word-break: break-all;"><%= user.email %></p>
+            <% if (user.phone) { %>
+              <p class="mb-0 text-muted">Phone: <%= user.phone %></p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping Details -->
+      <div class="col-md-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title mb-3">
+              <i class="bi bi-truck me-2"></i>Shipping Details
+            </h6>
+            <% if (locals.specificAddress) { %>
+              <h6 class="mb-2">
+                <%= specificAddress.name %>
+              </h6>
+              <p class="mb-1 text-muted">
+                <%= specificAddress.addressType %>
+              </p>
+              <p class="mb-1 text-muted">
+                <%= specificAddress.landMark %>
+              </p>
+              <p class="mb-1 text-muted">
+                <%= specificAddress.city %>, <%= specificAddress.state %>
+                    <%= specificAddress.pincode %>
+              </p>
+              <p class="mb-0">
+                <i class="bi bi-telephone me-2"></i>
+                <%= specificAddress.phone %>
+              </p>
+            <% } else { %>
+              <p class="text-warning mb-0">Shipping address not found or was deleted.</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Information -->
+      <div class="col-md-3">
         <div class="card h-100">
           <div class="card-body">
             <h6 class="card-title mb-3">
@@ -105,34 +154,8 @@
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h6 class="card-title mb-3">
-              <i class="bi bi-truck me-2"></i>Shipping Details
-            </h6>
-            <h6 class="mb-2">
-              <%= specificAddress?.name %>
-            </h6>
-            <p class="mb-1 text-muted">
-              <%= specificAddress?.addressType %>
-            </p>
-            <p class="mb-1 text-muted">
-              <%= specificAddress?.landMark %>
-            </p>
-            <p class="mb-1 text-muted">
-              <%= specificAddress?.city %>, <%= specificAddress?.state %>
-                  <%= specificAddress?.pincode %>
-            </p>
-            <p class="mb-0">
-              <i class="bi bi-telephone me-2"></i>
-              <%= specificAddress?.phone %>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
+      <!-- Order Summary -->
+      <div class="col-md-3">
         <div class="card h-100">
           <div class="card-body">
             <h6 class="card-title mb-3">
