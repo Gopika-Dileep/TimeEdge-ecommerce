@@ -1,4 +1,5 @@
 <%- include("../../views/partials/user/header") %>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
 /* Product Details Page */
@@ -293,6 +294,13 @@ async function addToCart() {
             body: JSON.stringify({ quantity: qty })
         });
         if (res.ok) {
+            const data = await res.json();
+            if (data.cartCount !== undefined) {
+                const countBadge = document.getElementById('cartCount');
+                if (countBadge) {
+                    countBadge.innerText = data.cartCount;
+                }
+            }
             btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Added!</span>';
             btn.style.background = '#4caf50';
             setTimeout(() => {

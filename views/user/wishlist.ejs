@@ -337,6 +337,9 @@
                 data: JSON.stringify({ quantity }),
                 contentType: 'application/json',
                 success: function (response) {
+                    if (response.cartCount !== undefined) {
+                        $('#cartCount').text(response.cartCount);
+                    }
                     Swal.fire({
                         title: 'Added to Cart!',
                         text: 'Would you like to view your cart?',

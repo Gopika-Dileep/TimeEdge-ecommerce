@@ -167,12 +167,14 @@ const loadcategory = async (req, res) => {
       .limit(limit);
 
     const count = await Category.countDocuments(condition);
-    const totalpage = Math.ceil(count / limit);
+    const totalpage = Math.ceil(count / limit) || 1;
 
     res.render("category", {
       category: category,
       currentpage: page,
       totalpage: totalpage,
+      currentPage: page,
+      totalPages: totalpage,
       totalcategories: count,
       searchQuery: searchQuery,
     });
@@ -318,17 +320,23 @@ const loadbrand = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 3;
     const skip = (page - 1) * limit;
+    const search = req.query.search || '';
 
-    const brand = await Brand.find({})
+    let query = {};
+    if (search) {
+      query = { name: { $regex: search, $options: 'i' } };
+    }
+
+    const brand = await Brand.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalBrands = await Brand.countDocuments({});
+    const totalBrands = await Brand.countDocuments(query);
     const totalPages = Math.ceil(totalBrands / limit) || 1;
 
-    if (page < 1 || page > totalPages) {
-      return res.redirect("/admin/brand?page=1");
+    if (page < 1 || (totalPages > 0 && page > totalPages)) {
+      return res.redirect(`/admin/brand?page=1${search ? '&search=' + search : ''}`);
     }
 
     res.render("brand", {
@@ -336,6 +344,7 @@ const loadbrand = async (req, res) => {
       currentpage: page,
       totalpage: totalPages,
       totalbrand: totalBrands,
+      search,
     });
   } catch (error) {
     console.error(error);
@@ -394,20 +403,41 @@ const getOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 7;
-    const orders = await Order.find()
+    const search = req.query.search || '';
+    const status = req.query.status || '';
+
+    let query = {};
+    if (search) {
+      const User = require("../../models/userSchema");
+      const matchingUsers = await User.find({ name: { $regex: search, $options: 'i' } });
+      const userIds = matchingUsers.map(u => u._id);
+      
+      query.$or = [
+        { orderId: { $regex: search, $options: 'i' } },
+        { user: { $in: userIds } }
+      ];
+    }
+    
+    if (status) {
+      query.status = status;
+    }
+
+    const orders = await Order.find(query)
       .populate("orderedItems.products")
       .populate("user")
       .sort({ createdOn: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const count = await Order.countDocuments();
-    const totalpage = Math.ceil(count / limit);
+    const count = await Order.countDocuments(query);
+    const totalpage = Math.ceil(count / limit) || 1;
 
     res.render("orderslist", {
       orders,
       currentpage: page,
       totalpage: totalpage,
+      search,
+      status,
     });
   } catch (error) {
     console.error(error);

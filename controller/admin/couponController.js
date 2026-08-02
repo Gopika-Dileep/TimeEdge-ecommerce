@@ -36,17 +36,25 @@ const loadCouponPage = async(req,res)=>{
 
         const page = parseInt(req.query.page) || 1;
         const limit = 5;
-        const totalCoupons = await Coupon.countDocuments();
+        const search = req.query.search || '';
+        
+        let query = {};
+        if (search) {
+            query = { name: { $regex: search, $options: 'i' } };
+        }
+
+        const totalCoupons = await Coupon.countDocuments(query);
         const totalpage = Math.ceil(totalCoupons / limit) || 1;
 
-        const paginatedCoupons = await Coupon.find()
+        const paginatedCoupons = await Coupon.find(query)
             .skip((page - 1) * limit)
             .limit(limit);
 
         res.render('coupon', { 
-            coupon: paginatedCoupons,
+            coupons: paginatedCoupons,
             currentpage: page,
-            totalpage: totalpage
+            totalpage: totalpage,
+            search
         });
 
     } catch (error) {

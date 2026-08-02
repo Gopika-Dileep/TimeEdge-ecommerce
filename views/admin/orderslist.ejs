@@ -39,6 +39,28 @@
         <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:500; margin-top:4px;">Orders Management</h2>
     </div>
 
+    <!-- Controls Bar -->
+    <div class="controls-row mb-4 animate-up delay-1" style="display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;">
+        <form action="/admin/orders" method="GET" style="display:flex; gap:10px; max-width:480px; flex:1;">
+            <input type="text" class="form-control" placeholder="Search Order ID or customer..." name="search" value="<%= locals.search || '' %>" />
+            <button class="btn-primary" type="submit">Search</button>
+        </form>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:12px; font-weight:500; color:var(--text-secondary);">Status Filter:</span>
+            <form action="/admin/orders" method="GET" style="margin:0;">
+                <% if (locals.search) { %>
+                    <input type="hidden" name="search" value="<%= locals.search %>">
+                <% } %>
+                <select name="status" class="form-select" onchange="this.form.submit()" style="min-width:150px; height: 38px; font-size: 13px;">
+                    <option value="">All Statuses</option>
+                    <% ['pending', 'Processing', 'Shipped', 'delivered', 'Cancelled', 'Return request', 'Returned'].forEach(s => { %>
+                        <option value="<%= s %>" <%= (locals.status === s) ? 'selected' : '' %>><%= s %></option>
+                    <% }) %>
+                </select>
+            </form>
+        </div>
+    </div>
+
     <!-- Orders Card Table -->
     <div class="card animate-up delay-1">
         <div class="card-body p-0">
@@ -104,17 +126,17 @@
     <% if (locals.totalpage && totalpage > 1) { %>
     <div class="pagination-container animate-up">
         <% if (currentpage > 1) { %>
-            <a href="?page=<%= currentpage - 1 %>"><i class="fa-solid fa-chevron-left"></i></a>
+            <a href="?page=<%= currentpage - 1 %><%= locals.search ? '&search=' + locals.search : '' %><%= locals.status ? '&status=' + locals.status : '' %>"><i class="fa-solid fa-chevron-left"></i></a>
         <% } %>
         <% for (let i = 1; i <= totalpage; i++) { %>
             <% if (i === currentpage) { %>
                 <span class="current-page"><%= i %></span>
             <% } else { %>
-                <a href="?page=<%= i %>"><%= i %></a>
+                <a href="?page=<%= i %><%= locals.search ? '&search=' + locals.search : '' %><%= locals.status ? '&status=' + locals.status : '' %>"><%= i %></a>
             <% } %>
         <% } %>
         <% if (currentpage < totalpage) { %>
-            <a href="?page=<%= currentpage + 1 %>"><i class="fa-solid fa-chevron-right"></i></a>
+            <a href="?page=<%= currentpage + 1 %><%= locals.search ? '&search=' + locals.search : '' %><%= locals.status ? '&status=' + locals.status : '' %>"><i class="fa-solid fa-chevron-right"></i></a>
         <% } %>
     </div>
     <% } %>

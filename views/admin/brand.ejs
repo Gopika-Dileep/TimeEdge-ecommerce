@@ -50,6 +50,14 @@
         <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:500; margin-top:4px;">Brands Management</h2>
     </div>
 
+    <!-- Search Form -->
+    <div class="search-container mb-4 animate-up delay-1">
+        <form action="/admin/brand" method="GET" class="w-100 d-flex gap-2">
+            <input type="text" class="form-control" placeholder="Search brands by name..." name="search" value="<%= locals.search || '' %>" />
+            <button class="btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+
     <div class="row g-4 animate-up delay-1">
         <!-- Add Brand Side Panel -->
         <div class="col-lg-4">
@@ -125,17 +133,17 @@
             <% if (locals.totalpage && totalpage > 1) { %>
             <div class="pagination-container animate-up">
                 <% if (currentpage > 1) { %>
-                    <a href="?page=<%= currentpage - 1 %>"><i class="fa-solid fa-chevron-left"></i></a>
+                    <a href="?page=<%= currentpage - 1 %><%= locals.search ? '&search=' + locals.search : '' %>"><i class="fa-solid fa-chevron-left"></i></a>
                 <% } %>
                 <% for (let i = 1; i <= totalpage; i++) { %>
                     <% if (i === currentpage) { %>
                         <span class="current-page"><%= i %></span>
                     <% } else { %>
-                        <a href="?page=<%= i %>"><%= i %></a>
+                        <a href="?page=<%= i %><%= locals.search ? '&search=' + locals.search : '' %>"><%= i %></a>
                     <% } %>
                 <% } %>
                 <% if (currentpage < totalpage) { %>
-                    <a href="?page=<%= currentpage + 1 %>"><i class="fa-solid fa-chevron-right"></i></a>
+                    <a href="?page=<%= currentpage + 1 %><%= locals.search ? '&search=' + locals.search : '' %>"><i class="fa-solid fa-chevron-right"></i></a>
                 <% } %>
             </div>
             <% } %>

@@ -61,7 +61,7 @@
     <!-- Search Form -->
     <div class="search-container animate-up delay-1">
         <form action="/admin/category" method="GET" class="w-100 d-flex gap-2">
-            <input type="text" class="form-control" placeholder="Search categories..." name="search" required />
+            <input type="text" class="form-control" placeholder="Search categories..." name="search" value="<%= locals.searchQuery || '' %>" />
             <button class="btn-primary" type="submit">Search</button>
         </form>
     </div>
@@ -148,17 +148,17 @@
             <% if (locals.totalPages && totalPages > 1) { %>
             <div class="pagination-container">
                 <% if (currentPage > 1) { %>
-                    <a href="?page=<%= currentPage - 1 %>"><i class="fa-solid fa-chevron-left"></i></a>
+                    <a href="?page=<%= currentPage - 1 %><%= locals.searchQuery ? '&search=' + locals.searchQuery : '' %>"><i class="fa-solid fa-chevron-left"></i></a>
                 <% } %>
                 <% for (let i = 1; i <= totalPages; i++) { %>
                     <% if (i === currentPage) { %>
                         <span class="current-page"><%= i %></span>
                     <% } else { %>
-                        <a href="?page=<%= i %>"><%= i %></a>
+                        <a href="?page=<%= i %><%= locals.searchQuery ? '&search=' + locals.searchQuery : '' %>"><%= i %></a>
                     <% } %>
                 <% } %>
                 <% if (currentPage < totalPages) { %>
-                    <a href="?page=<%= currentPage + 1 %>"><i class="fa-solid fa-chevron-right"></i></a>
+                    <a href="?page=<%= currentPage + 1 %><%= locals.searchQuery ? '&search=' + locals.searchQuery : '' %>"><i class="fa-solid fa-chevron-right"></i></a>
                 <% } %>
             </div>
             <% } %>

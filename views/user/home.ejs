@@ -577,6 +577,9 @@
             data: JSON.stringify({ quantity: quantity }),
             contentType: 'application/json',
             success: function (response) {
+                if (response.cartCount !== undefined) {
+                    $('#cartCount').text(response.cartCount);
+                }
                 Swal.fire({
                     icon: 'success',
                     title: 'Added to Cart',

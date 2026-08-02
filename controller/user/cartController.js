@@ -156,7 +156,7 @@ const addToCart = async (req, res) => {
         }
         // console.log(cart,'cart2')
         await cart.save();
-        return res.json({ success: true, message: "Added to cart" });
+        return res.json({ success: true, message: "Added to cart", cartCount: cart.items.length });
     } catch (error) {
         console.error("Add to cart error:", error);
         return res.status(500).json({ success: false, message: "Server error" });
