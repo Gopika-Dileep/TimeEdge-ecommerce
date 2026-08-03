@@ -8,7 +8,7 @@ const loadSalesReport = async (req, res) => {
     try {
         const page = req.query.page || 1;
         const limit = 5;    
-        const filtervalue = req.query.filtervalue || 'monthly';
+        const filtervalue = req.query.filtervalue || 'daily';
         const startDate = req.query.startDate || '';
         const endDate = req.query.endDate || '';
 

@@ -379,6 +379,92 @@
     .form-group.error .error-message {
       display: block;
     }
+
+    /* Premium styled buttons and inputs for Checkout */
+    .btn-outline-primary, .btn-outline-info, .btn-outline-success, .apply-coupon-btn {
+      background: transparent !important;
+      border: 1px solid var(--gold, #c9a84c) !important;
+      color: var(--gold, #c9a84c) !important;
+      padding: 6px 14px !important;
+      border-radius: 4px !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      letter-spacing: 1px !important;
+      text-transform: uppercase !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      display: inline-block !important;
+      text-decoration: none !important;
+      line-height: 1.5 !important;
+    }
+    .btn-outline-primary:hover, .btn-outline-info:hover, .btn-outline-success:hover, .apply-coupon-btn:hover {
+      background: var(--gold, #c9a84c) !important;
+      color: #080808 !important;
+      box-shadow: 0 0 10px rgba(201,168,76,0.2) !important;
+    }
+
+    .address-card input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border, rgba(201,168,76,0.3));
+      border-radius: 50%;
+      outline: none;
+      margin-right: 12px;
+      position: relative;
+      cursor: pointer;
+      vertical-align: middle;
+      transition: all 0.2s;
+    }
+    .address-card input[type="radio"]:checked {
+      border-color: var(--gold, #c9a84c);
+      background: transparent;
+    }
+    .address-card input[type="radio"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold, #c9a84c);
+    }
+
+    .alert-success {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(40, 167, 69, 0.1) !important;
+      border: 1px solid rgba(40, 167, 69, 0.3) !important;
+      color: #28a745 !important;
+      padding: 12px 16px !important;
+      border-radius: 6px !important;
+      margin-top: 15px !important;
+      font-size: 13px !important;
+    }
+    .remove-coupon-btn {
+      color: #ff3333 !important;
+      background: transparent !important;
+      border: 1px solid #ff3333 !important;
+      border-radius: 4px !important;
+      padding: 4px 10px !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      cursor: pointer !important;
+      transition: all 0.2s !important;
+      text-decoration: none !important;
+      display: inline-block !important;
+    }
+    .remove-coupon-btn:hover {
+      background: #ff3333 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 8px rgba(255, 51, 51, 0.3) !important;
+    }
   </style>
 
   <div class="checkout-container">
@@ -759,11 +845,11 @@
         };
 
         $("#applied-coupon-display").html(`
-      <div class="alert alert-success" data-coupon-code="${couponCode}">
-        ${couponCode} applied: ₹${discountAmount.toFixed(2)}
-        <button class="btn btn-sm btn-link remove-coupon-btn">Remove</button>
-      </div>
-    `);
+          <div class="alert alert-success" data-coupon-code="${couponCode}">
+            <span><strong>${couponCode}</strong> applied: ₹${discountAmount.toFixed(2)}</span>
+            <button class="btn btn-sm btn-link remove-coupon-btn">Remove</button>
+          </div>
+        `);
 
         $("#couponModal").hide();
 

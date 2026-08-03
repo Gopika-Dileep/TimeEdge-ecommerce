@@ -126,25 +126,7 @@ const unblockUser = async (req, res) => {
     res.status(400).json("error while unblocking user");
   }
 };
-// const loadcategory = async (req, res) => {
-//     try {
-//         const page = parseInt(req.query.page) || 1
-//         const limit = 3
-//         const category = await Category.find({}).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit)
-//         const count = await Category.countDocuments({})
-//         const totalpage = Math.ceil(count / limit)
-//         res.render('category', {
-//             category: category,
-//             currentpage: page,
-//             totalpage: totalpage,
-//             totalcategories: count,
 
-//         })
-//     } catch (error) {
-//         console.error(error)
-//         res.status(400).json("error while loading category")
-//     }
-// }
 const loadcategory = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -663,7 +645,6 @@ const approveReturn = async (req, res) => {
   
     const { itemId } = req.params;
     const order = await Order.findOne({ "orderedItems._id": itemId });
-    console.log(order,"orderrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
     if (!order) {
       return res.status(404).json({ success: false, error: "Order not found" });
     }

@@ -81,6 +81,12 @@
         grid-template-columns: 1fr;
       }
     }
+    
+    /* Table Row Hover Effects */
+    #salesTable tbody tr:hover {
+      background-color: rgba(179, 147, 67, 0.02) !important;
+      transition: background-color 0.2s ease;
+    }
   </style>
 
   <div class="content-container">
@@ -107,12 +113,12 @@
           <div class="row g-4">
             <div class="col-md-3">
               <label for="filter-order" class="form-label" style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; display:block;">Report Type</label>
-              <select id="filter-order" class="form-select" onchange="filterOrder()">
-                <option value="custom">Default</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
+              <select id="filter-order" class="form-select" onchange="filterOrder(); toggleDateInputs();">
+                <option value="daily" <%= filtervalue === 'daily' ? 'selected' : '' %>>Daily</option>
+                <option value="weekly" <%= filtervalue === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                <option value="monthly" <%= filtervalue === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                <option value="yearly" <%= filtervalue === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                <option value="custom" <%= filtervalue === 'custom' ? 'selected' : '' %>>Custom Date Range</option>
               </select>
             </div>
             <div class="col-md-3">
@@ -209,8 +215,14 @@
                       <td>₹<%= (order.productdiscount || 0).toLocaleString('en-IN') %></td>
                       <td>₹<%= (order.couponDiscount || 0).toLocaleString('en-IN') %></td>
                       <td style="font-weight: 600; color: var(--text-primary);">₹<%= order.finalAmount.toLocaleString('en-IN') %></td>
-                      <td style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">
-                        <%= order.paymentMethod %>
+                      <td>
+                        <% if(order.paymentMethod === 'COD') { %>
+                          <span style="background:rgba(179,147,67,0.08); color:#b39343; border:1px solid rgba(179,147,67,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;"><%= order.paymentMethod %></span>
+                        <% } else if(order.paymentMethod === 'Online' || order.paymentMethod === 'RazorPay' || order.paymentMethod === 'razorpay') { %>
+                          <span style="background:rgba(74,144,226,0.08); color:#4a90e2; border:1px solid rgba(74,144,226,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;"><%= order.paymentMethod %></span>
+                        <% } else { %>
+                          <span style="background:rgba(46,204,113,0.08); color:#2ecc71; border:1px solid rgba(46,204,113,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;"><%= order.paymentMethod %></span>
+                        <% } %>
                       </td>
                     </tr>
                   <% }); %>
@@ -251,6 +263,27 @@
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('start-date').setAttribute('max', today);
     document.getElementById('end-date').setAttribute('max', today);
+
+    function toggleDateInputs() {
+      const filterValue = document.getElementById("filter-order").value;
+      const startDateInput = document.getElementById("start-date");
+      const endDateInput = document.getElementById("end-date");
+      const filterButton = document.querySelector('button[onClick="filterByDate()"]');
+      
+      if (filterValue === 'custom') {
+        startDateInput.disabled = false;
+        endDateInput.disabled = false;
+        if (filterButton) filterButton.disabled = false;
+      } else {
+        startDateInput.disabled = true;
+        endDateInput.disabled = true;
+        if (filterButton) filterButton.disabled = true;
+        startDateInput.value = '';
+        endDateInput.value = '';
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", toggleDateInputs);
 
     document.getElementById('start-date').addEventListener('change', function () {
       const startDate = this.value;
@@ -343,6 +376,14 @@
           const filterTable = document.querySelector("table tbody");
           filterTable.textContent = "";
           response.orders.forEach((order) => {
+            let paymentBadge = '';
+            if (order.paymentMethod === 'COD') {
+              paymentBadge = `<span style="background:rgba(179,147,67,0.08); color:#b39343; border:1px solid rgba(179,147,67,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">COD</span>`;
+            } else if (order.paymentMethod === 'Online' || order.paymentMethod === 'RazorPay' || order.paymentMethod === 'razorpay') {
+              paymentBadge = `<span style="background:rgba(74,144,226,0.08); color:#4a90e2; border:1px solid rgba(74,144,226,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
+            } else {
+              paymentBadge = `<span style="background:rgba(46,204,113,0.08); color:#2ecc71; border:1px solid rgba(46,204,113,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
+            }
             const row = `
               <tr>
                 <td>${new Date(order.createdOn).toLocaleDateString()}</td>
@@ -355,7 +396,7 @@
                             </td>
                             <td>₹  ${order.finalAmount} 
                             </td>
-                <td>${order.paymentMethod}</td>
+                <td>${paymentBadge}</td>
               </tr>`;
             filterTable.insertAdjacentHTML("beforeend", row);
           });
@@ -392,6 +433,14 @@
           const filterTable = document.querySelector("table tbody");
           filterTable.textContent = "";
           response.orders.forEach((order) => {
+            let paymentBadge = '';
+            if (order.paymentMethod === 'COD') {
+              paymentBadge = `<span style="background:rgba(179,147,67,0.08); color:#b39343; border:1px solid rgba(179,147,67,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">COD</span>`;
+            } else if (order.paymentMethod === 'Online' || order.paymentMethod === 'RazorPay' || order.paymentMethod === 'razorpay') {
+              paymentBadge = `<span style="background:rgba(74,144,226,0.08); color:#4a90e2; border:1px solid rgba(74,144,226,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
+            } else {
+              paymentBadge = `<span style="background:rgba(46,204,113,0.08); color:#2ecc71; border:1px solid rgba(46,204,113,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
+            }
             const row = `
               <tr>
                 <td>${new Date(order.createdOn).toLocaleDateString()}</td>
@@ -404,7 +453,7 @@
                             </td>
                             <td>₹  ${order.finalAmount} 
                             </td>
-                <td>${order.paymentMethod}</td>
+                <td>${paymentBadge}</td>
               </tr>`;
             filterTable.insertAdjacentHTML("beforeend", row);
           });

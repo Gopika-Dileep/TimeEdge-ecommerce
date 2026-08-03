@@ -40,7 +40,7 @@ const getCheckoutPage = async (req, res) => {
       }
     }
 
-    console.log(filteredCoupons, "filtered coupon");
+
    
     if (!cart || cart.items.length == 0) {
       return res.render("cart", { message: "cart is empty" });
@@ -49,9 +49,7 @@ const getCheckoutPage = async (req, res) => {
 
     let subtotal = 0;
     cart.items.forEach((item) => {
-      console.log(item.price, item.quantity, "item.price");
       subtotal += item.price;
-      console.log(subtotal, "subtotal");
     });
 
     const user = await User.findById({ _id: userId });
@@ -82,7 +80,7 @@ const createOrder = async (req, res) => {
       couponDiscount,
       subtotal,
     } = req.body;
-    console.log(req.body,'dfdddddddd');
+
     if (paymentMethod === "COD" && finalAmount > 2000) {
       return res.status(400).json({success:false,message:"Cash on Delivery is not available for orders above ₹2000. Please select an online payment option."})
     }
@@ -95,10 +93,6 @@ const createOrder = async (req, res) => {
     for (let item of cart.items) {
       const product = item.product;
       const quantity = item.quantity;
-
-      console.log(item.product.salePrice, "saleprice")
-      console.log(item.price, "item price")
-      console.log(item.quantity, "quantity")
 
       discountTotalPrice += (item.product.salePrice * quantity) - item.price
 

@@ -292,6 +292,7 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function removeItem(itemId) {
@@ -307,7 +308,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/removeFromWishlist/${itemId}`,
+                        url: `/removeitem/${itemId}`,
                         method: 'POST',
                         success: function (response) {
                             if (response.success) {
