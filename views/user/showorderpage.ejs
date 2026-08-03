@@ -254,21 +254,43 @@
   </div>
 
   <style>
-     .container {
+    body {
+      background-color: var(--bg-primary, #080808) !important;
+      color: var(--text-primary, #f0ede8) !important;
+    }
+    
+    .container {
       max-width: 1000px;
-      color: var(--text-primary, #f0ede8);
+      color: var(--text-primary, #f0ede8) !important;
     }
 
     .card {
-      background: var(--bg-card, #111111);
-      border: 1px solid var(--border, rgba(201,168,76,0.2));
-      color: var(--text-primary, #f0ede8);
+      background-color: var(--bg-card, #161616) !important;
+      border: 1px solid var(--border, rgba(201,168,76,0.2)) !important;
+      color: var(--text-primary, #f0ede8) !important;
       border-radius: 8px;
       transition: box-shadow 0.3s ease;
     }
 
     .card:hover {
       box-shadow: 0 0 15px rgba(201,168,76,0.1);
+    }
+    
+    .card-body {
+      background-color: var(--bg-card, #161616) !important;
+      color: var(--text-primary, #f0ede8) !important;
+    }
+
+    .text-muted {
+      color: var(--text-secondary, #a09484) !important;
+    }
+    
+    .bg-light {
+      background-color: var(--bg-secondary, #111111) !important;
+    }
+
+    .table {
+      color: var(--text-primary, #f0ede8) !important;
     }
 
     .card-body h6.card-title {

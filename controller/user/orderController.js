@@ -26,24 +26,21 @@ const getCheckoutPage = async (req, res) => {
     const currentDate = new Date();
 
     const coupon = await Coupon.find({
-    expireOn: { $gt: currentDate },  
-    $or: [
-        { UsageLimit: { $gt: 0 } },  
-        { UsageLimit: { $exists: false } }  
-    ]
+      isList: true,
+      expireOn: { $gt: currentDate }
     }); 
 
 
     let filteredCoupons = [] 
 
     for(let c of coupon) {
-      const couponUsed = await Order.countDocuments({couponId:c._id, user: userId})
-      if(couponUsed <  c.UsageLimit) {
-        filteredCoupons.push(c)
+      const couponUsed = await Order.countDocuments({couponId:c._id, user: userId});
+      if(!c.UsageLimit || couponUsed < c.UsageLimit) {
+        filteredCoupons.push(c);
       }
     }
 
-    console.log(filteredCoupons, "filtered coupon")
+    console.log(filteredCoupons, "filtered coupon");
    
     if (!cart || cart.items.length == 0) {
       return res.render("cart", { message: "cart is empty" });
@@ -117,6 +114,12 @@ const createOrder = async (req, res) => {
     let coupon;
     if (couponCode) {
       coupon = await Coupon.findOne({ name: couponCode });
+      if (coupon) {
+        if (!coupon.userId.includes(user)) {
+          coupon.userId.push(user);
+          await coupon.save();
+        }
+      }
     }
 
     const newOrder = new Order({
@@ -231,15 +234,21 @@ const verifyRazorPayOrder = async (req, res) => {
     const orderPaymentStatus = paymentStatus || 
       (paymentVerificationStatus ? 'Paid' : 'Failed');
 
-    let coupon;
-    if (couponCode) {
-      coupon = await Coupon.findOne({ name: couponCode });
-    }
-
     const cart = await Cart.findById({ _id: cartId }).populate(
       "items.product"
     );
     const user = cart.user;
+
+    let coupon;
+    if (couponCode) {
+      coupon = await Coupon.findOne({ name: couponCode });
+      if (coupon && user) {
+        if (!coupon.userId.includes(user)) {
+          coupon.userId.push(user);
+          await coupon.save();
+        }
+      }
+    }
     let discountTotalPrice = 0;
 
    
@@ -318,12 +327,18 @@ const walletPayment = async (req, res) => {
         .status(400)
         .json({ message: "insufficient blance in your wallet" });
     }
-    let coupon = 0;
+    const cart = await Cart.findById({ _id: cartId }).populate("items.product");
+
+    let coupon;
     if (couponCode) {
       coupon = await Coupon.findOne({ name: couponCode });
+      if (coupon && userId) {
+        if (!coupon.userId.includes(userId)) {
+          coupon.userId.push(userId);
+          await coupon.save();
+        }
+      }
     }
-
-    const cart = await Cart.findById({ _id: cartId }).populate("items.product");
 
     let discountTotalPrice = 0;
     for (let item of cart.items) {

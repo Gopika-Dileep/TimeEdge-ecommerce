@@ -86,9 +86,33 @@
 .qty-val { width:52px; text-align:center; font-size:16px; font-weight:500; color:var(--text-primary); line-height:44px; border-left:1px solid var(--border); border-right:1px solid var(--border); }
 
 /* CTA */
-.pd-cta { display:flex; gap:12px; margin-bottom:32px; flex-wrap:wrap; }
+.pd-cta { display:flex; gap:12px; margin-bottom:32px; flex-wrap:wrap; align-items:center; }
 .pd-cta .btn-gold-fill { flex:1; min-width:200px; justify-content:center; padding:16px; }
-.pd-cta .btn-gold { padding:16px 20px; }
+.pd-cta .btn-wishlist {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--gold);
+    width: 54px;
+    height: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.pd-cta .btn-wishlist:hover {
+    border-color: var(--gold);
+    background: var(--gold-glow);
+    transform: translateY(-2px);
+}
+.pd-cta .btn-wishlist i {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+.pd-cta .btn-wishlist:hover i {
+    transform: scale(1.15);
+}
 
 /* Guarantees */
 .pd-guarantees { display:flex; flex-direction:column; gap:14px; padding:24px; background:var(--bg-card); border:1px solid var(--border); }
@@ -111,7 +135,111 @@
 .pd-tab-content { display:none; font-size:14px; color:var(--text-secondary); line-height:1.9; }
 .pd-tab-content.active { display:block; }
 
+/* Image Zoom Effect */
+.pd-main-img {
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+}
+.pd-main-img img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+    transition: transform 0.1s ease-out;
+    transform-origin: center center;
+}
+
+/* Related Products Section */
+.related-section {
+    margin-top: 80px;
+    padding-top: 60px;
+    border-top: 1px solid var(--border);
+    animation: fadeInUp 0.8s ease;
+}
+
+.related-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 32px;
+}
+
+.related-title em {
+    font-style: italic;
+    color: var(--gold);
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.related-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    transition: var(--transition);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.related-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(201,168,76,0.05);
+}
+
+.related-img-container {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.related-img-container img {
+    max-height: 80%;
+    max-width: 80%;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+}
+
+.related-card:hover .related-img-container img {
+    transform: scale(1.08);
+}
+
+.related-brand {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.related-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    text-decoration: none;
+    display: block;
+}
+
+.related-price {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gold);
+}
+
 @media (max-width:1024px) { .pd-layout { grid-template-columns:1fr; gap:48px; } .pd-gallery { position:static; } }
+@media (max-width:768px) { .related-grid { grid-template-columns: 1fr; } }
 @media (max-width:600px) { .pd-cta { flex-direction:column; } .pd-thumbs { grid-template-columns:repeat(4,1fr); } }
 </style>
 
@@ -208,7 +336,7 @@
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span>Add to Cart</span>
                 </button>
-                <button class="btn-gold" id="wishlistBtn" onclick="toggleWishlist()" title="Add to Wishlist">
+                <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlist()" title="Add to Wishlist">
                     <i class="bi <%= locals.isInWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" id="wishlistIcon"></i>
                 </button>
             </div>
@@ -257,6 +385,27 @@
             <p>We offer insured express delivery across India within 3–7 business days. Returns accepted within 30 days of delivery in original condition with packaging. Refunds processed within 5–7 business days.</p>
         </div>
     </div>
+
+    <!-- Related Products -->
+    <% if (locals.relatedProducts && relatedProducts.length > 0) { %>
+    <div class="related-section">
+        <h3 class="related-title">Related <em>Timepieces</em></h3>
+        <div class="related-grid">
+            <% relatedProducts.forEach(rel => { %>
+            <div class="related-card">
+                <a href="/productDetails?id=<%= rel._id %>" style="text-decoration:none;">
+                    <div class="related-img-container">
+                        <img src="/uploads/productImages/<%= rel.productImage[0] %>" alt="<%= rel.productName %>">
+                    </div>
+                    <div class="related-brand"><%= rel.brand ? rel.brand.brandName : '' %></div>
+                    <span class="related-name"><%= rel.productName %></span>
+                    <div class="related-price">₹<%= rel.salePrice.toLocaleString('en-IN') %></div>
+                </a>
+            </div>
+            <% }) %>
+        </div>
+    </div>
+    <% } %>
 </div>
 
 <script>
@@ -383,6 +532,27 @@ async function toggleWishlist() {
         console.error(e);
     }
 }
+
+// Image Zoom Effect
+document.addEventListener('DOMContentLoaded', function() {
+    const mainImgContainer = document.querySelector('.pd-main-img');
+    const mainImg = document.getElementById('mainImg');
+    if (mainImgContainer && mainImg) {
+        mainImgContainer.addEventListener('mousemove', function(e) {
+            const rect = mainImgContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const xPercent = (x / rect.width) * 100;
+            const yPercent = (y / rect.height) * 100;
+            mainImg.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+            mainImg.style.transform = 'scale(2.2)';
+        });
+        mainImgContainer.addEventListener('mouseleave', function() {
+            mainImg.style.transform = 'scale(1)';
+            mainImg.style.transformOrigin = 'center center';
+        });
+    }
+});
 </script>
 
 <%- include("../../views/partials/user/footer") %>

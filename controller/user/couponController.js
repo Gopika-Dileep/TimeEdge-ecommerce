@@ -34,44 +34,43 @@ const applycoupon = async(req,res)=>{
         const userId = req.session.user
         const { couponCode, totalAmount } = req.body;
         console.log(couponCode,totalAmount,'req.body')
-        const coupon = await Coupon.findOne({ name: couponCode });
+        if (!couponCode) {
+            return res.json({ success: false, message: 'Please enter a coupon code' });
+        }
+        const coupon = await Coupon.findOne({ name: { $regex: new RegExp("^" + couponCode.trim() + "$", "i") } });
         console.log(coupon,'coupon')
+
+        if (!coupon) {
+            console.log('coupon1')
+            return res.json({ success: false, message: 'Invalid coupon code' });
+        }
 
         const couponUsed = await Order.countDocuments({couponId:coupon._id, user: userId})
 
-        if (!coupon) {
-        console.log('coupon1')
-
-            return res.json({ success: false, message: 'Invalid coupon' });
-        }
-
-        if(couponUsed >  coupon.UsageLimit) {
-            return res.json({ success: false, message: 'Coupon usage exced' });
+        if(coupon.UsageLimit && couponUsed >= coupon.UsageLimit) {
+            return res.json({ success: false, message: 'Coupon usage limit exceeded' });
         }
 
         if (new Date() > coupon.expireOn) {
-        console.log('coupon2')
-
+            console.log('coupon2')
             return res.json({ success: false, message: 'Coupon has expired' });
         }
 
         if (totalAmount < coupon.minimumPrice) {
-        console.log('coupon3')
-
-            return res.json({ success: false, message: 'Minimum purchase amount not met' });
+            console.log('coupon3')
+            return res.json({ success: false, message: `Minimum purchase of ₹${coupon.minimumPrice} required` });
         }
         console.log(coupon,'coupon1')
 
-      
         req.session.appliedCoupon = coupon;
         console.log(coupon.offerPrice,'coupon.discountPercentage')
-
 
         res.json({ 
             success: true, 
             offerPrice: coupon.offerPrice 
         });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };

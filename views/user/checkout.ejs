@@ -471,11 +471,18 @@
             </tbody>
           </table>
 
-          <div class="coupon-section">
-            <button type="button" class="btn btn-light" data-toggle="modal" data-target="#couponModal">
-              See Coupons
-            </button>
-            <div id="applied-coupon-display" class="mt-2" style="margin-left: 30px;"></div>
+          <div class="coupon-section-wrapper mb-4 animate-up delay-3">
+            <div style="font-size:12px; font-weight:600; color:var(--gold); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Coupons & Offers</div>
+            <div class="coupon-input-group" style="display:flex; gap:10px; margin-bottom:12px;">
+              <input type="text" id="manualCouponInput" class="form-control" placeholder="Enter coupon code..." style="text-transform:uppercase; flex:1; height:42px; font-size:13px; background:rgba(255,255,255,0.02); border:1px solid var(--border); color:var(--text-primary); border-radius:4px; padding:0 12px;" />
+              <button type="button" id="applyManualCouponBtn" class="btn-primary" style="height:42px; border-radius:4px; font-size:11px; padding:0 20px;">Apply</button>
+            </div>
+            <div class="coupon-select-trigger">
+              <button type="button" class="btn-outline-gold" data-toggle="modal" data-target="#couponModal" style="background:transparent; border:1px solid var(--gold); color:var(--gold); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1px; padding:10px 16px; border-radius:4px; width:100%; cursor:pointer; transition:var(--transition);">
+                <i class="fa-solid fa-tags" style="margin-right:6px;"></i> View Available Coupons
+              </button>
+            </div>
+            <div id="applied-coupon-display" class="mt-2"></div>
           </div>
 
           <div class="price-summary">
@@ -637,6 +644,88 @@
   <script>
     $(document).ready(function () {
       let appliedCoupon = null;
+
+      // Open modals programmatically since Bootstrap JS is not loaded
+      $(document).on("click", '[data-toggle="modal"]', function () {
+        const target = $(this).data("target");
+        $(target).show();
+      });
+
+      $(document).on("click", '.close, [data-dismiss="modal"]', function () {
+        $(this).closest(".modal").hide();
+      });
+
+      // Handle click outside modal to close it
+      $(window).on("click", function (e) {
+        if ($(e.target).hasClass("modal")) {
+          $(e.target).hide();
+        }
+      });
+
+      // Apply Manual Coupon Code
+      $("#applyManualCouponBtn").on("click", function () {
+        const couponCode = $("#manualCouponInput").val().trim().toUpperCase();
+        if (!couponCode) {
+          Swal.fire({
+            icon: "warning",
+            title: "Input Required",
+            text: "Please enter a coupon code.",
+            confirmButtonColor: "#c9a84c"
+          });
+          return;
+        }
+
+        const subtotal = parseFloat($("#subtotal").text());
+
+        $.ajax({
+          url: "/apply-coupon",
+          method: "POST",
+          data: {
+            couponCode: couponCode,
+            totalAmount: subtotal,
+          },
+          success: function (response) {
+            if (response.success) {
+              const discountAmount = parseFloat(response.offerPrice);
+              const finalTotal = subtotal - discountAmount;
+
+              $("#couponDiscount").text(discountAmount.toFixed(2));
+              $("#final-total").text(`₹${finalTotal.toFixed(2)}`);
+              $("#total").val(finalTotal.toFixed(2));
+              checkCodAvailability();
+
+              appliedCoupon = {
+                code: couponCode,
+                discountAmount: discountAmount
+              };
+
+              $("#applied-coupon-display").html(`
+                <div class="alert alert-success" data-coupon-code="${couponCode}" style="display:flex; justify-content:space-between; align-items:center; background:rgba(40,167,69,0.1); border:1px solid rgba(40,167,69,0.3); color:#28a745; padding:10px 15px; border-radius:4px; margin-top:10px; font-size:13px;">
+                  <span><strong>${couponCode}</strong> applied: ₹${discountAmount.toFixed(2)}</span>
+                  <button class="btn btn-sm btn-link remove-coupon-btn" style="color:#dc3545; text-decoration:none; font-weight:600; cursor:pointer;">Remove</button>
+                </div>
+              `);
+              
+              $("#manualCouponInput").val("");
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Coupon Not Applied",
+                text: response.message || "Invalid coupon code.",
+                confirmButtonColor: "#c9a84c"
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Could not apply coupon. Please try again.",
+              confirmButtonColor: "#c9a84c"
+            });
+          },
+        });
+      });
 
       $(".apply-coupon-btn").on("click", function () {
         const couponItem = $(this).closest(".coupon-item");
