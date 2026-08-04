@@ -11,8 +11,7 @@
           </span>
         </h5>
         <p class="text-muted mb-0">
-          Placed on <%= new Date(order.createdOn).toLocaleDateString() %> at <%= new
-              Date(order.createdOn).toLocaleTimeString() %>
+          Placed on <%= new Date(order.createdOn).toLocaleDateString('en-IN') %> at <%= new Date(order.createdOn).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) %>
         </p>
       </div>
       <% if (order.paymentStatus==='Failed' ) { %>

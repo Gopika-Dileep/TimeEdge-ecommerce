@@ -11,7 +11,23 @@ const LoadProduct = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 5;
         const search = req.query.search || '';
-        const query = search ? { productName: { $regex: search, $options: 'i' } } : {};
+        
+        let query = {};
+        if (search) {
+            const matchingBrands = await Brand.find({ name: { $regex: search, $options: 'i' } });
+            const brandIds = matchingBrands.map(b => b._id);
+
+            const matchingCategories = await Category.find({ name: { $regex: search, $options: 'i' } });
+            const categoryIds = matchingCategories.map(c => c._id);
+
+            query = {
+                $or: [
+                    { productName: { $regex: search, $options: 'i' } },
+                    { brand: { $in: brandIds } },
+                    { category: { $in: categoryIds } }
+                ]
+            };
+        }
 
         const product = await Product.find(query)
             .sort({ createdAt: -1 })
@@ -166,15 +182,17 @@ const editproduct = async (req, res) => {
             }
         }
 
+        const categoryDoc = await Category.findOne({ name: data.category });
+        const brandDoc = await Brand.findOne({ name: data.brand });
+
         const updateFields = {
             productName: data.productName,
             description: data.description,
-            brand: data.brand,
-            category: product.category,
+            brand: brandDoc ? brandDoc._id : product.brand,
+            category: categoryDoc ? categoryDoc._id : product.category,
             regularPrice: data.regularPrice,
             salePrice: data.salePrice,
-            quantity: data.quantity,
-            color: data.color
+            quantity: data.quantity
         };
 
         if (req.files && req.files.length > 0) {

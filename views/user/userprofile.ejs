@@ -40,7 +40,7 @@
                     <div class="form-group">
                         <label class="form-label">Member Since</label>
                         <div class="form-input" style="background: rgba(255,255,255,0.02); display: flex; align-items: center; min-height: 48px; border: 1px solid var(--border); padding: 0 16px; color: var(--text-primary);">
-                            <%= new Date(user.createdOn).toLocaleDateString('en-IN', {year:'numeric',month:'long',day:'numeric'}) %>
+                            <%= new Date(user.createdAt).toLocaleDateString('en-IN', {year:'numeric',month:'long',day:'numeric'}) %>
                         </div>
                     </div>
                 </div>

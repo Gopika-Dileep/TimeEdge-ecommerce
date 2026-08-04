@@ -17,44 +17,78 @@ dotenv.config();
 
 const Razorpay = require("razorpay");
 const PDFDocument = require('pdfkit');
+const validateCheckoutCart = async (cart, userId) => {
+  const user = await User.findById(userId);
+  if (!user || user.isBlocked) {
+    return { valid: false, message: "Your account is currently blocked." };
+  }
+  
+  if (!cart || cart.items.length === 0) {
+    return { valid: false, message: "Your cart is empty." };
+  }
+  
+  for (let item of cart.items) {
+    if (!item.product) {
+      return { valid: false, message: "One of the timepieces in your cart is no longer available." };
+    }
+    const product = await Product.findById(item.product._id).populate("category").populate("brand");
+    if (!product || !product.isListed || !product.category || !product.category.isListed || !product.brand || !product.brand.isListed) {
+      return { valid: false, message: `The timepiece "${product ? product.productName : 'Product'}" is currently unavailable.` };
+    }
+    if (product.quantity <= 0) {
+      return { valid: false, message: `${product.productName} is out of stock.` };
+    }
+    if (item.quantity > product.quantity) {
+      return { valid: false, message: `Only ${product.quantity} items left in stock for ${product.productName}.` };
+    }
+  }
+  return { valid: true };
+};
 
+const resolveOrderStatus = (orderedItems) => {
+  const activeItems = orderedItems.filter(item => item.status !== "Cancelled" && item.status !== "Returned");
+  
+  if (activeItems.length === 0) {
+    const statuses = orderedItems.map(item => item.status);
+    if (statuses.every(s => s === "Cancelled")) {
+      return "Cancelled";
+    }
+    if (statuses.every(s => s === "Returned")) {
+      return "Returned";
+    }
+    return "Cancelled";
+  }
+  
+  const activeStatuses = activeItems.map(item => item.status);
+  
+  if (activeStatuses.some(s => s === "Return request")) {
+    return "Return request";
+  }
+  if (activeStatuses.some(s => s === "Shipped")) {
+    return "Shipped";
+  }
+  if (activeStatuses.some(s => s === "Processing")) {
+    return "Processing";
+  }
+  if (activeStatuses.some(s => s === "pending")) {
+    return "pending";
+  }
+  if (activeStatuses.every(s => s === "delivered")) {
+    return "delivered";
+  }
+  return "pending";
+};
 
 const getCheckoutPage = async (req, res) => {
   try {
     const userId = req.session.user;
     const cart = await Cart.findOne({ user: userId }).populate("items.product");
 
-    if (cart) {
-      for (let item of cart.items) {
-        if (!item.product || item.product.quantity <= 0) {
-          return res.redirect("/cart?error=" + encodeURIComponent(MESSAGES.USER_ORDER.PRODUCT_OUT_OF_STOCK(item.product ? item.product.productName : 'Product')));
-        }
-        if (item.quantity > item.product.quantity) {
-          return res.redirect("/cart?error=" + encodeURIComponent(`Only ${item.product.quantity} items left in stock for ${item.product.productName}. Please reduce quantity.`));
-        }
-      }
+    const validation = await validateCheckoutCart(cart, userId);
+    if (!validation.valid) {
+      return res.redirect("/cart?error=" + encodeURIComponent(validation.message));
     }
 
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    const coupon = await Coupon.find({
-      isList: true,
-      expireOn: { $gte: currentDate }
-    }); 
-
-
-    let filteredCoupons = [] 
-
-    for(let c of coupon) {
-      const couponUsed = await Order.countDocuments({couponId:c._id, user: userId});
-      if(!c.UsageLimit || couponUsed < c.UsageLimit) {
-        filteredCoupons.push(c);
-      }
-    }
-
-
-   
     if (!cart || cart.items.length == 0) {
       return res.render("cart", { message: MESSAGES.USER_CART.EMPTY });
     }
@@ -64,6 +98,23 @@ const getCheckoutPage = async (req, res) => {
     cart.items.forEach((item) => {
       subtotal += item.price;
     });
+
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    const coupon = await Coupon.find({
+      isList: true,
+      expireOn: { $gte: currentDate }
+    }); 
+
+    let filteredCoupons = [] 
+    for(let c of coupon) {
+      const couponUsed = await Order.countDocuments({couponId:c._id, user: userId});
+      const isUserIncluded = c.userId.includes(userId);
+      if((!c.UsageLimit || couponUsed < c.UsageLimit) && subtotal >= c.minimumPrice && !isUserIncluded) {
+        filteredCoupons.push(c);
+      }
+    }
 
     const user = await User.findById({ _id: userId });
     let cartId = cart?._id;
@@ -99,7 +150,13 @@ const createOrder = async (req, res) => {
     }
 
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");
-    console.log(cart, "cart");
+    if (!cart) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Cart not found." });
+    }
+    const validation = await validateCheckoutCart(cart, cart.user);
+    if (!validation.valid) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: validation.message });
+    }
     const user = cart.user;
 
     let discountTotalPrice = 0;
@@ -170,18 +227,12 @@ const orderRazorpay = async (req, res) => {
     console.log(cartId, "cartId");
    
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");
-    
-    
-    for (let item of cart.items) {
-      const product = item.product;
-      const quantity = item.quantity;
-      
-      if (product.quantity < quantity) {
-        return res.status(STATUS_CODES.BAD_REQUEST).json({
-          success: false,
-          message: `Not enough stock for product ${product.productName}`
-        });
-      }
+    if (!cart) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Cart not found." });
+    }
+    const validation = await validateCheckoutCart(cart, cart.user);
+    if (!validation.valid) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: validation.message });
     }
     
     const options = {       
@@ -241,9 +292,14 @@ const verifyRazorPayOrder = async (req, res) => {
     const orderPaymentStatus = paymentStatus || 
       (paymentVerificationStatus ? 'Paid' : 'Failed');
 
-    const cart = await Cart.findById({ _id: cartId }).populate(
-      "items.product"
-    );
+    const cart = await Cart.findById({ _id: cartId }).populate("items.product");
+    if (!cart) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Cart not found." });
+    }
+    const validation = await validateCheckoutCart(cart, cart.user);
+    if (!validation.valid) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: validation.message });
+    }
     const user = cart.user;
 
     let coupon;
@@ -336,6 +392,13 @@ const walletPayment = async (req, res) => {
         .json({ message: "insufficient blance in your wallet" });
     }
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");
+    if (!cart) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Cart not found." });
+    }
+    const validation = await validateCheckoutCart(cart, userId);
+    if (!validation.valid) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: validation.message });
+    }
 
     let coupon;
     if (couponCode) {
@@ -546,7 +609,11 @@ console.log(order.couponId,'coupon id')
             order.couponDiscount =  0 ;
             order.couponId = null;
             isCouponRemoved = true;
-
+            const userIndex = coupon.userId.indexOf(order.user);
+            if (userIndex !== -1) {
+              coupon.userId.splice(userIndex, 1);
+              await coupon.save();
+            }
           }
     }
 
@@ -570,25 +637,7 @@ console.log(order.couponId,'coupon id')
 
     await order.save();
     console.log(order, "order");
-    const itemStatuses = order.orderedItems.map((item) => item.status);
-    console.log(itemStatuses, "itemStatuses");
-    if (itemStatuses.every((s) => s === "delivered")) {
-      order.status = "delivered";
-    } else if (
-      itemStatuses.some((s) => s === "Processing" || s === "Shipped")
-    ) {
-      order.status = "Processing";
-    } else if (itemStatuses.some((s) => s === "Pending")) {
-      order.status = "Pending";
-    } else if (
-      itemStatuses.every(
-        (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
-      )
-    ) {
-      order.status = "Cancelled";
-    } else {
-      order.status = "pending";
-    }
+    order.status = resolveOrderStatus(order.orderedItems);
     await order.save();
     console.log(order, "order2");
     console.log(orderItem, "orderItem2");
@@ -651,13 +700,14 @@ const returnOrder = async (req, res) => {
   
       item.status = "Return request";
       item.returnReason = reason;
-  
+   
       const product = await Product.findById(productId).populate("category");
       if (!product) {
         return res.status(STATUS_CODES.NOT_FOUND).json({ message: MESSAGES.USER_ORDER.PRODUCT_NOT_FOUND });
       }
-  
-     order.save()
+   
+      order.status = resolveOrderStatus(order.orderedItems);
+      await order.save();
       res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.USER_ORDER.RETURN_SUCCESS });
   
     } catch (error) {

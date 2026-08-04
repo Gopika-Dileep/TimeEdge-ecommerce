@@ -10,8 +10,39 @@ const Order = require("../../models/orderSchema");
 const walletHelper = require("../../helpers/walletHelper");
 const Coupon = require("../../models/couponSchema");
 
-
-
+const resolveOrderStatus = (orderedItems) => {
+  const activeItems = orderedItems.filter(item => item.status !== "Cancelled" && item.status !== "Returned");
+  
+  if (activeItems.length === 0) {
+    const statuses = orderedItems.map(item => item.status);
+    if (statuses.every(s => s === "Cancelled")) {
+      return "Cancelled";
+    }
+    if (statuses.every(s => s === "Returned")) {
+      return "Returned";
+    }
+    return "Cancelled";
+  }
+  
+  const activeStatuses = activeItems.map(item => item.status);
+  
+  if (activeStatuses.some(s => s === "Return request")) {
+    return "Return request";
+  }
+  if (activeStatuses.some(s => s === "Shipped")) {
+    return "Shipped";
+  }
+  if (activeStatuses.some(s => s === "Processing")) {
+    return "Processing";
+  }
+  if (activeStatuses.some(s => s === "pending")) {
+    return "pending";
+  }
+  if (activeStatuses.every(s => s === "delivered")) {
+    return "delivered";
+  }
+  return "pending";
+};
 
 const loadAdminLogin = async (req, res) => {
   try {
@@ -67,12 +98,18 @@ const loadUsers = async (req, res) => {
     let page = req.query.page || 1;
     const limit = 7;
 
+    let queryConditions = [
+      { name: { $regex: ".*" + search + ".*", $options: "i" } },
+      { email: { $regex: ".*" + search + ".*", $options: "i" } },
+    ];
+
+    if (/^\d+$/.test(search)) {
+      queryConditions.push({ phone: Number(search) });
+    }
+
     const user = await User.find({
       isAdmin: false,
-      $or: [
-        { name: { $regex: ".*" + search + ".*", $options: "i" } },
-        { email: { $regex: ".*" + search + ".*", $options: "i" } },
-      ],
+      $or: queryConditions,
     })
       .limit(limit)
       .skip((page - 1) * limit)
@@ -81,10 +118,7 @@ const loadUsers = async (req, res) => {
 
     const count = await User.countDocuments({
       isAdmin: false,
-      $or: [
-        { name: { $regex: ".*" + search + ".*", $options: "i" } },
-        { email: { $regex: ".*" + search + ".*", $options: "i" } },
-      ],
+      $or: queryConditions,
     });
 
     const totalpage = Math.ceil(count / limit);
@@ -469,7 +503,12 @@ const getOrders = async (req, res) => {
     let query = {};
     if (search) {
       const User = require("../../models/userSchema");
-      const matchingUsers = await User.find({ name: { $regex: search, $options: 'i' } });
+      const matchingUsers = await User.find({
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } }
+        ]
+      });
       const userIds = matchingUsers.map(u => u._id);
 
       query.$or = [
@@ -565,8 +604,28 @@ const changeStatus = async (req, res) => {
       });
     }
 
-    const previousStatus = item.status;
+    const statusSequence = {
+      "pending": ["Processing", "Cancelled"],
+      "Processing": ["Shipped", "Cancelled"],
+      "Shipped": ["delivered"],
+      "delivered": [],
+      "Cancelled": [],
+      "Returned": [],
+      "Return request": [],
+      "payment failed": []
+    };
 
+    if (status !== item.status) {
+      const allowedNext = statusSequence[item.status] || [];
+      if (!allowedNext.includes(status)) {
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          error: `Cannot transition status from "${item.status}" to "${status}".`
+        });
+      }
+    }
+
+    const previousStatus = item.status;
 
     if (status === 'Cancelled') {
       if (!cancelReason) {
@@ -632,6 +691,11 @@ const changeStatus = async (req, res) => {
           order.couponDiscount = 0;
           order.couponId = null;
           isCouponRemoved = true;
+          const userIndex = coupon.userId.indexOf(order.user);
+          if (userIndex !== -1) {
+            coupon.userId.splice(userIndex, 1);
+            await coupon.save();
+          }
         }
       }
 
@@ -665,21 +729,7 @@ const changeStatus = async (req, res) => {
 
     await order.save();
 
-    const itemStatuses = order.orderedItems.map((item) => item.status);
-    if (itemStatuses.every((s) => s === "Cancelled" || s === "Returned")) {
-      order.status = "Cancelled";
-    } else if (itemStatuses.some((s) => s === "Pending")) {
-      order.status = "Pending";
-    } else if (itemStatuses.some((s) => s === "Processing")) {
-      order.status = "Processing";
-    } else if (itemStatuses.every((s) => s === "delivered")) {
-      order.status = "delivered";
-    } else if (itemStatuses.every((s) => s === "Shipped")) {
-      order.status = "Shipped";
-    } else {
-      order.status = "pending";
-    }
-
+    order.status = resolveOrderStatus(order.orderedItems);
     await order.save();
 
 
@@ -817,34 +867,16 @@ const approveReturn = async (req, res) => {
           order.couponDiscount = 0;
           order.couponId = null;
           isCouponRemoved = true;
+          const userIndex = coupon.userId.indexOf(order.user);
+          if (userIndex !== -1) {
+            coupon.userId.splice(userIndex, 1);
+            await coupon.save();
+          }
         }
       }
 
       console.log(order.orderedItems, "order9.orderedItems")
-      const itemStatuses = order.orderedItems.map((item) => item.status);
-
-      console.log(itemStatuses, "itemStatuses");
-      if (itemStatuses.every((s) => s === "Returned")) {
-        order.status = "Returned";
-      } else if (
-        itemStatuses.some((s) => s === "delivered")
-      ) {
-        order.status = "delivered";
-      } else if (
-        itemStatuses.some((s) => s === "Processing" || s === "Shipped")
-      ) {
-        order.status = "Processing";
-      } else if (itemStatuses.some((s) => s === "Pending")) {
-        order.status = "Pending";
-      } else if (
-        itemStatuses.some(
-          (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
-        )
-      ) {
-        order.status = "Cancelled";
-      } else {
-        order.status = "pending";
-      }
+      order.status = resolveOrderStatus(order.orderedItems);
 
 
       console.log(order, "orderfinal")
@@ -912,6 +944,7 @@ const declineReturn = async (req, res) => {
 
     item.status = "delivered";
     item.returnReason = null;
+    order.status = resolveOrderStatus(order.orderedItems);
     await order.save();
 
     return res.status(STATUS_CODES.OK).json({

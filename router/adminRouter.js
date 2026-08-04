@@ -32,8 +32,6 @@ router.get('/product',adminAuth,productController.LoadProduct)
 router.get('/addProducts',adminAuth,productController.loadAddProduct)
 router.post('/addProducts',adminAuth,upload.array("images",4),productController.addProducts)
 router.get('/editProduct',adminAuth,productController.loadeditproduct)
-
-router.post("/editProduct/:id",adminAuth,upload.array("images",4),productController.updateproduct);
 router.post("/editProduct/:id",adminAuth,upload.array("images",4),productController.editproduct);
 
 router.post('/deleteImage', adminAuth, productController.deleteSingleImage);

@@ -43,7 +43,9 @@ const userProfile = async (req, res) => {
 
 const changeEmail = async(req,res)=>{
     try {
-        res.render('change-email', { path: '/change-email' })
+        const userId = req.session.user;
+        const user = await User.findById(userId);
+        res.render('change-email', { path: '/change-email', user })
     } catch (error) {
        console.error(error)
        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR}) 
@@ -91,18 +93,18 @@ const changeEmailValid = async(req,res)=>{
         const currentUser = await User.findById(userId);
 
         if (!email) {
-            return res.render('change-email', { message: MESSAGES.USER_PROFILE.EMAIL_REQUIRED });
+            return res.render('change-email', { path: '/change-email', user: currentUser, message: MESSAGES.USER_PROFILE.EMAIL_REQUIRED });
         }
 
         // If the user enters their current email address
         if (email.toLowerCase() === currentUser.email.toLowerCase()) {
-            return res.render('change-email', { message: MESSAGES.USER_PROFILE.SAME_EMAIL });
+            return res.render('change-email', { path: '/change-email', user: currentUser, message: MESSAGES.USER_PROFILE.SAME_EMAIL });
         }
 
         // If the entered email already belongs to another user
         const existUser = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
         if (existUser) {
-            return res.render('change-email', { message: MESSAGES.USER_PROFILE.EMAIL_TAKEN });
+            return res.render('change-email', { path: '/change-email', user: currentUser, message: MESSAGES.USER_PROFILE.EMAIL_TAKEN });
         }
 
         // Send verification OTP to the new email address
@@ -121,7 +123,7 @@ const changeEmailValid = async(req,res)=>{
 
             return res.render('change-email-otp', { success: MESSAGES.USER_PROFILE.OTP_SENT_NEW })
         } else {
-            return res.render('change-email', { message: MESSAGES.USER_PROFILE.OTP_SEND_ERROR })
+            return res.render('change-email', { path: '/change-email', user: currentUser, message: MESSAGES.USER_PROFILE.OTP_SEND_ERROR })
         }
     } catch (error) {
         console.error(error)
@@ -138,7 +140,7 @@ const verifyEmailOtp = async(req,res)=>{
         if (userOtp && userOtp === otp) {
             const newEmail = req.session.tempNewEmail;
             if (!newEmail) {
-                return res.render('change-email', { message: MESSAGES.USER_PROFILE.SESSION_EXPIRED });
+                return res.render('change-email', { path: '/change-email', user, message: MESSAGES.USER_PROFILE.SESSION_EXPIRED });
             }
 
             // Update user email
@@ -147,7 +149,8 @@ const verifyEmailOtp = async(req,res)=>{
             await User.updateOne({ _id: userId }, { $unset: { otp: 1 } });
             delete req.session.tempNewEmail;
 
-            return res.render('change-email', { successMessage: MESSAGES.USER_PROFILE.EMAIL_UPDATED });
+            const updatedUser = await User.findById(userId);
+            return res.render('change-email', { path: '/change-email', user: updatedUser, successMessage: MESSAGES.USER_PROFILE.EMAIL_UPDATED });
         } else {
             return res.render('change-email-otp', { message: MESSAGES.USER_PROFILE.INVALID_OTP });
         }
@@ -177,22 +180,42 @@ const newChangePassword = async(req,res)=>{
 
         const {confirmPassword,newPassword,currentPassword} = req.body
         const user = await User.findById({_id:userId})
+        
+        if (!user.password) {
+            const passwordHash = await securepassword(newPassword);
+            user.password = passwordHash;
+            await user.save();
+            return res.render('newchangepassword', {
+                path: '/password',
+                user,
+                success: "Password set successfully!"
+            });
+        }
+
         const passwordMatch = await bcrypt.compare(currentPassword,user.password)
         if(!passwordMatch){
-               return res.status(STATUS_CODES.BAD_REQUEST).json({message:MESSAGES.USER_PROFILE.PASSWORD_MISMATCH})
+            return res.render('newchangepassword', {
+                path: '/password',
+                user,
+                message: MESSAGES.USER_PROFILE.PASSWORD_MISMATCH
+            });
         }
         if(newPassword!==confirmPassword){
-            return res.status(STATUS_CODES.BAD_REQUEST).json({message:MESSAGES.USER_PROFILE.CONFIRM_PASSWORD_MISMATCH})
+            return res.render('newchangepassword', {
+                path: '/password',
+                user,
+                message: MESSAGES.USER_PROFILE.CONFIRM_PASSWORD_MISMATCH
+            });
         }
-        // const diffpass = await bcrypt.compare(currentPassword,newPassword)
-        // if(diffpass){
-        //    return res.status(STATUS_CODES.BAD_REQUEST).json({message:"new password should be different from old password"})
-        // }
         const passwordHash= await securepassword(newPassword)
         user.password = passwordHash
 
         await user.save()
-       return res.redirect('/accountdetails')
+        return res.render('newchangepassword', {
+            path: '/password',
+            user,
+            success: "Password updated successfully!"
+        });
     } catch (error) {
         console.error(error)
         res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})

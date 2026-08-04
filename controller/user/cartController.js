@@ -82,9 +82,9 @@ const addToCart = async (req, res) => {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.USER_CART.USER_ID_REQUIRED });
         }
 
-        const product = await Product.findById(productId).populate('category')
-        if (!product) {
-            return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: MESSAGES.USER_CART.PRODUCT_NOT_FOUND });
+        const product = await Product.findById(productId).populate('category').populate('brand');
+        if (!product || !product.isListed || !product.category || !product.category.isListed || !product.brand || !product.brand.isListed) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "This timepiece is currently unavailable." });
         }
 
        
@@ -183,7 +183,10 @@ const incrementQuantity = async (req, res) => {
             return res.status(STATUS_CODES.NOT_FOUND).json(MESSAGES.USER_CART.ITEM_NOT_FOUND);
         }
 
-        const product = await Product.findById(item.product).populate('category')
+        const product = await Product.findById(item.product).populate('category').populate('brand');
+        if (!product || !product.isListed || !product.category || !product.category.isListed || !product.brand || !product.brand.isListed) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "This timepiece is currently unavailable." });
+        }
 
 
         const currentQuantity = item.quantity
@@ -231,7 +234,10 @@ const decrementQuantity = async (req, res) => {
         if (item.quantity === 1) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_CART.MIN_QTY_REACHED })
         }
-        const product = await Product.findById(item.product).populate('category')
+        const product = await Product.findById(item.product).populate('category').populate('brand');
+        if (!product || !product.isListed || !product.category || !product.category.isListed || !product.brand || !product.brand.isListed) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "This timepiece is currently unavailable." });
+        }
 
         const currentQuantity = item.quantity
 

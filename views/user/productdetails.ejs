@@ -275,10 +275,10 @@
 
         <!-- Info -->
         <div class="pd-info animate-up">
-            <div class="pd-brand"><%= product.brand ? product.brand.brandName : '' %></div>
+             <div class="pd-brand"><%= product.brand ? product.brand.name : '' %></div>
             <h1 class="pd-name"><%= product.productName %></h1>
             <div class="pd-divider"></div>
-
+ 
             <!-- Price -->
             <div class="pd-price-block">
                 <% if (product.bestOffer > 0) { %>
@@ -303,24 +303,16 @@
                 You save ₹<%= (product.regularPrice - product.salePrice).toLocaleString('en-IN') %>
             </div>
             <% } %>
-
+ 
             <!-- Specs -->
             <div class="pd-specs">
                 <div class="pd-spec-row">
                     <span class="pd-spec-key">Brand</span>
-                    <span class="pd-spec-val"><%= product.brand ? product.brand.brandName : '' %></span>
-                </div>
-                <div class="pd-spec-row">
-                    <span class="pd-spec-key">Color</span>
-                    <span class="pd-spec-val"><%= product.color %></span>
+                    <span class="pd-spec-val"><%= product.brand ? product.brand.name : '' %></span>
                 </div>
                 <div class="pd-spec-row">
                     <span class="pd-spec-key">Availability</span>
                     <span class="pd-spec-val"><%= product.quantity > 0 ? 'In Stock' : 'Out of Stock' %></span>
-                </div>
-                <div class="pd-spec-row">
-                    <span class="pd-spec-key">Status</span>
-                    <span class="pd-spec-val"><%= product.status %></span>
                 </div>
             </div>
 

@@ -266,9 +266,11 @@
                                         </h3>
                                         <div class="product-details">
                                             <span class="price" style="color: var(--text-primary);">₹<%= product.finalPrice %></span>
-                                            <span class="status <%= product.productId.status.toLowerCase() %>">
-                                                <%= product.productId.status %>
-                                            </span>
+                                            <% if (product.productId.quantity > 0) { %>
+                                            <span class="status available">In Stock</span>
+                                            <% } else { %>
+                                            <span class="status unavailable">Out of Stock</span>
+                                            <% } %>
                                         </div>
                                         <button class="add-cart-btn" onclick="addToCart('<%= product.productId._id %>', 1)" style="background: var(--gold); color: #080808; border-radius: 0;">
                                             Add to Cart
