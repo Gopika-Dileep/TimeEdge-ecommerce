@@ -98,7 +98,7 @@
                 <div class="profile-section-title">Share the <span>Experience</span></div>
                 
                 <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.6; margin-bottom: 20px;">
-                    Invite your friends to TimeEdge. Share your unique referral code and both you and your friend will receive flat <strong style="color: var(--gold);">₹100</strong> added directly to your wallets when they sign up!
+                    Invite your friends to TimeEdge. Share your unique referral code and both you and your friend will receive flat <strong style="color: var(--gold);">₹100</strong> added directly to your wallets when they place their first order and it is successfully delivered!
                 </p>
 
                 <div class="referral-box-new">
@@ -124,7 +124,11 @@
                     </div>
                 </div>
 
-                <% if (!user.referredBy) { %>
+                <% 
+                  const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+                  const isWithinThreeDays = (new Date() - new Date(user.createdAt)) <= threeDaysInMs;
+                %>
+                <% if (!user.referredBy && isWithinThreeDays) { %>
                 <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 32px;">
                     <label class="form-label" style="display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px;">Apply a Referral Code</label>
                     <div class="apply-group">
@@ -135,7 +139,7 @@
                 <% } %>
 
                 <div class="terms-text-new">
-                    * Terms and conditions apply. Wallet rewards are credited instantly upon code verification. Valid for new user registrations only.
+                    * Terms and conditions apply. Wallet rewards are credited upon first successful purchase delivery of the referred friend. Valid for new user registrations only.
                 </div>
             </div>
 

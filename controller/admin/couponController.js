@@ -67,13 +67,27 @@ const addCoupon = async (req, res) => {
         const code = req.body.code || req.body.name;
         const { offerPrice, createon, expireOn, minimumPrice, UsageLimit } = req.body
         
+        if (!code || !/^[a-zA-Z0-9]+$/.test(code)) {
+            return res.status(400).json({ error: 'Coupon code must be alphanumeric only (letters and numbers)' });
+        }
+        
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        if (!expireOn || new Date(expireOn) < today) {
+            return res.status(400).json({ error: 'Expiry date cannot be in the past' });
+        }
+
+        const limit = parseInt(UsageLimit);
+        if (isNaN(limit) || limit <= 0) {
+            return res.status(400).json({ error: 'Usage limit must be at least 1' });
+        }
         
         const discountAmount = parseFloat(offerPrice);
         const minAmount = parseFloat(minimumPrice);
         
        
         if (discountAmount >= minAmount) {
-            return res.status(400).json({ error: 'Discount amount must be less than minimum amount' });
+            return res.status(400).json({ error: 'Discount amount must be less than minimum purchase amount' });
         }
         
        
@@ -146,21 +160,33 @@ const editCoupon = async(req,res)=>{
         res.status(500).json({message:"server error"})
     }
 }
-const deleteCoupon = async (req,res)=>{
+const listCoupon = async (req, res) => {
     try {
-        const couponId= req.query.id
-        const coupon = await Coupon.findByIdAndDelete({_id:couponId})
-        res.redirect('/admin/coupon')
+        const couponId = req.query.id;
+        await Coupon.findByIdAndUpdate(couponId, { isList: true });
+        res.redirect('/admin/coupon');
     } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"server error"})
+        console.error(error);
+        res.status(500).json({ message: "server error" });
     }
-}
+};
+
+const unlistCoupon = async (req, res) => {
+    try {
+        const couponId = req.query.id;
+        await Coupon.findByIdAndUpdate(couponId, { isList: false });
+        res.redirect('/admin/coupon');
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "server error" });
+    }
+};
 
 module.exports={
     loadCouponPage,
     addCoupon,
     loadEditCoupon,
     editCoupon,
-    deleteCoupon
+    listCoupon,
+    unlistCoupon
 }

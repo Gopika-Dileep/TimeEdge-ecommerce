@@ -19,6 +19,10 @@ const applycoupon = async(req,res)=>{
             return res.json({ success: false, message: 'Invalid coupon code' });
         }
 
+        if (coupon.userId && coupon.userId.some(id => id.toString() === userId.toString())) {
+            return res.json({ success: false, message: 'You have already used this coupon' });
+        }
+
         const couponUsed = await Order.countDocuments({couponId:coupon._id, user: userId})
 
         if(coupon.UsageLimit && couponUsed >= coupon.UsageLimit) {

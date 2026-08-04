@@ -63,6 +63,13 @@ const getReferAndEarnPage = async (req, res) => {
         return res.status(400).json({ success: false, message: 'You have already applied a referral code' });
       }
       
+      const signupDate = new Date(user.createdAt);
+      const diffInMs = new Date() - signupDate;
+      const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+      if (diffInMs > threeDaysInMs) {
+        return res.status(400).json({ success: false, message: 'Referral codes can only be applied within the first 3 days of registration' });
+      }
+      
       if (user.referralCode === code) {
         return res.status(400).json({ success: false, message: 'Cannot use your own referral code' });
       }
@@ -71,6 +78,10 @@ const getReferAndEarnPage = async (req, res) => {
       
       if (!referrer) {
         return res.status(404).json({ success: false, message: 'Invalid referral code' });
+      }
+
+      if (referrer.referredBy === user.referralCode) {
+        return res.status(400).json({ success: false, message: 'Mutual referrals are not allowed (this friend is already referred by you)' });
       }
       
       user.referredBy = code;

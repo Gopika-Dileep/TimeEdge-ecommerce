@@ -611,17 +611,17 @@ const changeStatus = async (req, res) => {
         
         if (user) {
           if (user.referredBy && !user.referralBonusApplied) {
-            await walletHelper.updateWalletBalance(user._id, 25, 'credit');
+            await walletHelper.updateWalletBalance(user._id, 100, 'credit');
             
             const referrer = await User.findOne({ referralCode: user.referredBy });
             
             if (referrer) {
-              await walletHelper.updateWalletBalance(referrer._id, 50, 'credit');
+              await walletHelper.updateWalletBalance(referrer._id, 100, 'credit');
             }
             user.referralBonusApplied = true;
             await user.save();
             
-            console.log(`Referral bonus applied: User ${user._id} received 25 rupees, Referrer received 50 rupees`);
+            console.log(`Referral bonus applied: User ${user._id} received 100 rupees, Referrer received 100 rupees`);
           }
         }
       } catch (error) {

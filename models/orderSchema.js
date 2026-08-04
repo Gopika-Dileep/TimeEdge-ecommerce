@@ -20,7 +20,7 @@
             status:{
                 type:String,
                 default:"pending",
-                enum:["pending","Processing","Shipped","delivered","Cancelled","Return request","Returned"]
+                enum:["pending","Processing","Shipped","delivered","Cancelled","Return request","Returned","payment failed"]
             },
             returnReason:{
                 type:String
@@ -63,7 +63,7 @@
         status:{
             type:String,
             default:"pending",
-            enum:["pending","Processing","Shipped","delivered","Cancelled","Return request","Returned"]
+            enum:["pending","Processing","Shipped","delivered","Cancelled","Return request","Returned","payment failed"]
         },
         createdOn:{
             type:Date,

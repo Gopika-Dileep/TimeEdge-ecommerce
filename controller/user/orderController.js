@@ -252,9 +252,10 @@ const verifyRazorPayOrder = async (req, res) => {
 
       discountTotalPrice += (item.product.salePrice * quantity) - item.price
       
-     
-      product.quantity -= quantity;
-      await product.save();
+      if (orderPaymentStatus !== 'Failed') {
+        product.quantity -= quantity;
+        await product.save();
+      }
     }
 
     const newOrder = new Order({
@@ -262,14 +263,14 @@ const verifyRazorPayOrder = async (req, res) => {
         products: item.product,
         quantity: item.quantity,
         price: item.product.salePrice,
-        status: "pending" 
+        status: orderPaymentStatus === 'Failed' ? 'payment failed' : 'pending'
       })),
       productdiscount: Math.abs(discountTotalPrice),
       subtotal: subtotal + discountTotalPrice,
       finalAmount,
       address: addressId,
       invoiceDate: new Date(),
-      status: "pending", 
+      status: orderPaymentStatus === 'Failed' ? 'payment failed' : 'pending',
       paymentMethod,
       couponDiscount,
       couponId: coupon?._id || null,
@@ -542,13 +543,16 @@ console.log(order.couponId,'coupon id')
       order.subtotal -= orderItem.price
       order.productdiscount -= price
       await order.save()
-      const transactionType = "credit";
-      const userId = req.session.user;
-      await walletHelper.updateWalletBalance(
-        userId,
-        cancelAmount,
-        transactionType
-      );
+      
+      if (order.paymentStatus === "Paid") {
+        const transactionType = "credit";
+        const userId = req.session.user;
+        await walletHelper.updateWalletBalance(
+          userId,
+          cancelAmount,
+          transactionType
+        );
+      }
     }
 
     await order.save();
@@ -845,6 +849,16 @@ const initiateRepayment = async (req, res) => {
       });
     }
 
+    for (let item of order.orderedItems) {
+      const product = await Product.findById(item.products);
+      if (!product || product.quantity < item.quantity) {
+        return res.status(400).json({
+          success: false,
+          message: `Not enough stock for product ${product ? product.productName : 'Product'}`
+        });
+      }
+    }
+
     const options = {       
       amount: order.finalAmount * 100,  
       currency: "INR",
@@ -910,11 +924,20 @@ const verifyRepaymentOrder = async (req, res) => {
 
 
     if (paymentVerificationStatus) {
-    console.log("check333")
+      console.log("check333")
       
       order.paymentStatus = 'Paid';
+      order.status = 'pending';
+      for (let item of order.orderedItems) {
+        item.status = 'pending';
+        const product = await Product.findById(item.products);
+        if (product) {
+          product.quantity -= item.quantity;
+          await product.save();
+        }
+      }
       await order.save();
-    console.log(order,"check333")
+      console.log(order,"check333")
 
 
       res.json({

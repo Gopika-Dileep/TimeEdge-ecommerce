@@ -51,6 +51,10 @@
                             <input type="number" name="minimumPrice" id="minimumPrice" placeholder="e.g. 2999" class="form-control" min="0" required />
                         </div>
                         <div class="mb-4">
+                            <label for="UsageLimit" class="form-label">Usage Limit (Max Uses)</label>
+                            <input type="number" name="UsageLimit" id="UsageLimit" placeholder="e.g. 100" class="form-control" min="1" required />
+                        </div>
+                        <div class="mb-4">
                             <label for="expireOn" class="form-label">Expiry Date</label>
                             <input type="date" name="expireOn" id="expireOn" class="form-control" required />
                         </div>
@@ -78,8 +82,10 @@
                                     <th>Coupon Code</th>
                                     <th>Discount</th>
                                     <th>Min. Spend</th>
+                                    <th>Usage Limit</th>
                                     <th>Expires On</th>
-                                    <th style="width: 120px; text-align: right; padding-right: 24px !important;">Action</th>
+                                    <th>Status</th>
+                                    <th style="width: 160px; text-align: right; padding-right: 24px !important;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,17 +95,36 @@
                                             <td class="coupon-code"><%= coupon.name %></td>
                                             <td style="font-weight: 600; color: var(--text-primary);">₹<%= coupon.offerPrice.toLocaleString('en-IN') %></td>
                                             <td>₹<%= coupon.minimumPrice.toLocaleString('en-IN') %></td>
+                                            <td><%= coupon.UsageLimit || 'N/A' %></td>
                                             <td><%= new Date(coupon.expireOn).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %></td>
+                                            <td>
+                                                <% if (coupon.isList) { %>
+                                                    <span class="badge bg-success" style="color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 3px;">Listed</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-danger" style="color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 3px;">Unlisted</span>
+                                                <% } %>
+                                            </td>
                                             <td style="text-align: right; padding-right: 24px !important;">
-                                                <a href="/admin/deleteCoupon?id=<%= coupon._id %>" class="action-del">
-                                                    <i class="fa-solid fa-trash-can"></i> Delete
-                                                </a>
+                                                <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
+                                                    <a href="/admin/editCoupon?id=<%= coupon._id %>" style="color: var(--gold); text-decoration: none; font-size: 13px; font-weight: 600;">
+                                                        <i class="fa-solid fa-edit"></i> Edit
+                                                    </a>
+                                                    <% if (coupon.isList) { %>
+                                                        <a href="/admin/unlistCoupon?id=<%= coupon._id %>" style="color: #e07070; text-decoration: none; font-size: 13px; font-weight: 600;">
+                                                            Unlist
+                                                        </a>
+                                                    <% } else { %>
+                                                        <a href="/admin/listCoupon?id=<%= coupon._id %>" style="color: #6dbf7f; text-decoration: none; font-size: 13px; font-weight: 600;">
+                                                            List
+                                                        </a>
+                                                    <% } %>
+                                                </div>
                                             </td>
                                         </tr>
                                     <% }) %>
                                 <% } else { %>
                                     <tr>
-                                        <td colspan="5" class="text-center py-5 text-muted">No Coupons Found</td>
+                                        <td colspan="7" class="text-center py-5 text-muted">No Coupons Found</td>
                                     </tr>
                                 <% } %>
                             </tbody>
@@ -140,10 +165,15 @@ $(document).ready(function() {
         const name = $('#coupon_name').val().trim().toUpperCase();
         const offerPrice = parseFloat($('#offerPrice').val());
         const minimumPrice = parseFloat($('#minimumPrice').val());
+        const UsageLimit = parseInt($('#UsageLimit').val());
         const expireOn = $('#expireOn').val();
         
         if (!name) {
             Swal.fire('Error', 'Coupon Code is required', 'error');
+            return;
+        }
+        if (!/^[A-Z0-9]+$/.test(name)) {
+            Swal.fire('Error', 'Coupon Code must contain alphanumeric characters only (letters and numbers)', 'error');
             return;
         }
         if (isNaN(offerPrice) || offerPrice <= 0) {
@@ -158,8 +188,19 @@ $(document).ready(function() {
             Swal.fire('Error', 'Discount amount must be less than minimum purchase amount', 'error');
             return;
         }
+        if (isNaN(UsageLimit) || UsageLimit <= 0) {
+            Swal.fire('Error', 'Usage Limit must be at least 1', 'error');
+            return;
+        }
         if (!expireOn) {
             Swal.fire('Error', 'Expiry Date is required', 'error');
+            return;
+        }
+        
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        if (new Date(expireOn) < today) {
+            Swal.fire('Error', 'Expiry Date cannot be in the past', 'error');
             return;
         }
         
@@ -170,6 +211,7 @@ $(document).ready(function() {
                 name: name,
                 offerPrice: offerPrice,
                 minimumPrice: minimumPrice,
+                UsageLimit: UsageLimit,
                 expireOn: expireOn
             },
             success: function(response) {
@@ -185,24 +227,6 @@ $(document).ready(function() {
             error: function(xhr) {
                 const errorMsg = xhr.responseJSON ? (xhr.responseJSON.error || xhr.responseJSON.message) : 'Failed to create coupon';
                 Swal.fire('Error', errorMsg, 'error');
-            }
-        });
-    });
-
-    $(document).on('click', '.action-del', function(e) {
-        e.preventDefault();
-        const href = $(this).attr('href');
-        Swal.fire({
-            title: 'Delete Coupon?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#b39343',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = href;
             }
         });
     });
