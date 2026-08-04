@@ -21,13 +21,13 @@ const PDFDocument = require('pdfkit');
 const getCheckoutPage = async (req, res) => {
   try {
     const userId = req.session.user;
-
     const cart = await Cart.findOne({ user: userId }).populate("items.product");
     const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
     const coupon = await Coupon.find({
       isList: true,
-      expireOn: { $gt: currentDate }
+      expireOn: { $gte: currentDate }
     }); 
 
 

@@ -8,6 +8,7 @@ const Coupon = require('../../models/couponSchema')
 const loadCouponPage = async(req,res)=>{
     try {
         const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
         
         // Get all coupons and update their status if needed
         const coupons = await Coupon.find();

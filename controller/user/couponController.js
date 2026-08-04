@@ -29,7 +29,11 @@ const applycoupon = async(req,res)=>{
             return res.json({ success: false, message: 'Coupon usage limit exceeded' });
         }
 
-        if (new Date() > coupon.expireOn) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const expiryDate = new Date(coupon.expireOn);
+        expiryDate.setHours(0, 0, 0, 0);
+        if (today > expiryDate) {
             console.log('coupon2')
             return res.json({ success: false, message: 'Coupon has expired' });
         }
