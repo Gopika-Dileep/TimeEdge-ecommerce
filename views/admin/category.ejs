@@ -63,6 +63,9 @@
         <form action="/admin/category" method="GET" class="w-100 d-flex gap-2">
             <input type="text" class="form-control" placeholder="Search categories..." name="search" value="<%= locals.searchQuery || '' %>" />
             <button class="btn-primary" type="submit">Search</button>
+            <% if (locals.searchQuery) { %>
+                <a href="/admin/category" class="btn btn-secondary" style="padding: 12px 20px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">Clear</a>
+            <% } %>
         </form>
     </div>
 

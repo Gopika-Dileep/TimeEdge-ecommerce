@@ -46,8 +46,11 @@
     <!-- Search Form -->
     <div class="search-container animate-up delay-1">
         <form action="/admin/users" method="GET" class="w-100 d-flex gap-2">
-            <input type="text" class="form-control" placeholder="Search customer name or email..." name="search" value="<%= search %>" required />
+            <input type="text" class="form-control" placeholder="Search customer name or email..." name="search" value="<%= search %>" />
             <button class="btn-primary" type="submit">Search</button>
+            <% if (search) { %>
+                <a href="/admin/users" class="btn btn-secondary" style="padding: 12px 20px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">Clear</a>
+            <% } %>
         </form>
     </div>
 

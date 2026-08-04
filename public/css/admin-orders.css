@@ -1,0 +1,40 @@
+.order-status-select {
+    background: rgba(0,0,0,0.01);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 6px 12px;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.order-status-select:focus {
+    border-color: var(--gold);
+}
+.order-ref {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+.badge-status {
+    padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display: inline-block;
+}
+.badge-status.delivered {
+    background:rgba(109,191,127,0.08); color:#6dbf7f; border:1px solid rgba(109,191,127,0.15);
+}
+.badge-status.cancelled, .badge-status.returned {
+    background:rgba(224,112,112,0.08); color:#e07070; border:1px solid rgba(224,112,112,0.15);
+}
+.badge-status.other {
+    background:rgba(240,180,48,0.08); color:#f0b430; border:1px solid rgba(240,180,48,0.15);
+}
+/* Pagination */
+.pagination-container { display: flex; justify-content: center; gap: 8px; margin-top: 32px; }
+.pagination-container a, .pagination-container .current-page {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border: 1px solid var(--border);
+    text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);
+}
+.pagination-container a:hover, .pagination-container .current-page {
+    border-color: var(--gold); color: var(--gold); background: var(--gold-glow);
+}

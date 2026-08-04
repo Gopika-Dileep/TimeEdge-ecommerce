@@ -55,6 +55,9 @@
         <form action="/admin/brand" method="GET" class="w-100 d-flex gap-2">
             <input type="text" class="form-control" placeholder="Search brands by name..." name="search" value="<%= locals.search || '' %>" />
             <button class="btn-primary" type="submit">Search</button>
+            <% if (locals.search) { %>
+                <a href="/admin/brand" class="btn btn-secondary" style="padding: 12px 20px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">Clear</a>
+            <% } %>
         </form>
     </div>
 

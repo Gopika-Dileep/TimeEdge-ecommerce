@@ -74,6 +74,9 @@
         <form action="/admin/product" method="get" class="search-form-te">
             <input type="text" class="form-control" placeholder="Search product name or brand..." name="search" value="<%= locals.search || '' %>">
             <button class="btn-primary" type="submit">Search</button>
+            <% if (locals.search) { %>
+                <a href="/admin/product" class="btn btn-secondary" style="padding: 12px 20px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">Clear</a>
+            <% } %>
         </form>
         <a href="/admin/addProducts" class="btn-primary" style="text-decoration: none;">
             <i class="fa-solid fa-plus"></i> &nbsp; Add Product

@@ -69,9 +69,12 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h4>Active Coupons</h4>
-                    <form action="/admin/coupon" method="GET" style="max-width: 250px; display: flex; gap: 8px; margin: 0;">
+                    <form action="/admin/coupon" method="GET" style="max-width: 320px; display: flex; gap: 8px; margin: 0;">
                         <input type="text" class="form-control form-control-sm" placeholder="Search coupons..." name="search" value="<%= locals.search || '' %>" style="height: 32px; font-size: 12px;" />
                         <button class="btn btn-primary btn-sm" type="submit" style="padding: 4px 12px !important; font-size: 11px; height: 32px;">Search</button>
+                        <% if (locals.search) { %>
+                            <a href="/admin/coupon" class="btn btn-secondary btn-sm" style="padding: 4px 12px !important; font-size: 11px; height: 32px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Clear</a>
+                        <% } %>
                     </form>
                 </div>
                 <div class="card-body p-0">
