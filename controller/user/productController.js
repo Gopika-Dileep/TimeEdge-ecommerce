@@ -5,6 +5,25 @@ const Brand = require("../../models/brandSchema")
 const User = require("../../models/userSchema")
 const Wishlist = require("../../models/wishlistSchema")
 
+const getProductsWithOffers = (products, wishlist = null) => {
+    return products.map(product => {
+        const productObj = product.toObject();
+        const productOffer = product.productOffer || 0;
+        const categoryOffer = (product.category && product.category.categoryOffer) || 0;
+        const bestOffer = Math.max(productOffer, categoryOffer);
+        
+        productObj.bestOffer = bestOffer;
+        productObj.finalPrice = bestOffer > 0 
+            ? Math.floor(product.salePrice - (product.salePrice * bestOffer / 100))
+            : product.salePrice;
+        
+        productObj.inWishlist = wishlist ? wishlist.products.some(item =>
+            item.productId.toString() === product._id.toString()
+        ) : false;
+        
+        return productObj;
+    });
+};
 
 const loadhome = async (req, res) => {
     try {
@@ -22,17 +41,8 @@ const loadhome = async (req, res) => {
             .populate('category')
             .populate('brand');
 
-        let productsWithWishlist = [...products];
-        if (userId) {
-            const wishlist = await Wishlist.findOne({ userId: userId });
-            productsWithWishlist = products.map(product => {
-                const productObj = product.toObject();
-                productObj.inWishlist = wishlist ? wishlist.products.some(item =>
-                    item.productId.toString() === product._id.toString()
-                ) : false;
-                return productObj;
-            });
-        }
+        const wishlist = userId ? await Wishlist.findOne({ userId: userId }) : null;
+        const productsWithWishlist = getProductsWithOffers(products, wishlist);
 
         if (userId) {
             const user = await User.findById({ _id: userId })
@@ -60,7 +70,7 @@ const loadshop = async (req, res) => {
         const search = req.query.search || '';
         const query = search ? { productName: { $regex: search, $options: 'i' } } : {};
 
-        const product = await Product.find({
+        const products = await Product.find({
             ...query, isListed: true, category: { $in: category.map(cat => cat._id) },
             brand: { $in: brand.map(brand => brand._id) }
         })
@@ -73,12 +83,15 @@ const loadshop = async (req, res) => {
         const totalproduct = await Product.countDocuments({ ...query, isListed: true });
         const totalpage = Math.ceil(totalproduct / limit);
 
+        const wishlist = userId ? await Wishlist.findOne({ userId: userId }) : null;
+        const productsWithOffers = getProductsWithOffers(products, wishlist);
+
         if (userId) {
             const userData = await User.findById({ _id: userId });
             if (userData) {
                 return res.render("shop", {
                     user: userData,
-                    product: product,
+                    product: productsWithOffers,
                     category: category,
                     brand: brand,
                     totalproduct: totalproduct,
@@ -89,7 +102,7 @@ const loadshop = async (req, res) => {
             }
         } else {
             return res.render("shop", {
-                product: product,
+                product: productsWithOffers,
                 category: category,
                 brand: brand,
                 totalproduct: totalproduct,
@@ -103,7 +116,6 @@ const loadshop = async (req, res) => {
         res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(MESSAGES.SERVER_ERROR);
     }
 }
-
 
 const productDetails = async (req, res) => {
     try {
@@ -134,7 +146,7 @@ const productDetails = async (req, res) => {
             category: findCategory._id,
             _id: { $ne: productId },
             isListed: true
-        }).limit(3)
+        }).limit(3).populate('category').populate('brand');
 
         // Check if product is in user's wishlist
         let isInWishlist = false;
@@ -149,24 +161,38 @@ const productDetails = async (req, res) => {
             }
         }
 
+        // Calculate offer price for details product
+        const productObj = product.toObject();
+        const productOffer = product.productOffer || 0;
+        const categoryOffer = (product.category && product.category.categoryOffer) || 0;
+        const bestOffer = Math.max(productOffer, categoryOffer);
+        productObj.bestOffer = bestOffer;
+        productObj.finalPrice = bestOffer > 0 
+            ? Math.floor(product.salePrice - (product.salePrice * bestOffer / 100))
+            : product.salePrice;
+
+        // Calculate offer prices for related products
+        const wishlist = userId ? await Wishlist.findOne({ userId: userId }) : null;
+        const relatedWithOffers = getProductsWithOffers(relatedProducts, wishlist);
+
         if (userId) {
             const user = await User.findById(userId);
             res.render('productdetails', {
                 user: user,
-                product: product,
+                product: productObj,
                 quantity: product.quantity,
                 category: findCategory,
                 brand: findBrand,
-                relatedProducts: relatedProducts,
+                relatedProducts: relatedWithOffers,
                 isInWishlist: isInWishlist
             })
         } else {
             res.render('productdetails', {
-                product: product,
+                product: productObj,
                 quantity: product.quantity,
                 category: findCategory,
                 brand: findBrand,
-                relatedProducts: relatedProducts,
+                relatedProducts: relatedWithOffers,
                 isInWishlist: false
             })
         }
@@ -188,14 +214,11 @@ const shopProducts = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const itemsPerPage = 6;
 
-
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isListed: true });
 
-
         const listedCategoryIds = categories.map(cat => cat._id);
         const listedBrandIds = brands.map(brand => brand._id);
-
 
         let query = {
             isListed: true,
@@ -216,11 +239,9 @@ const shopProducts = async (req, res) => {
             query.category = categoryId;
         }
 
-
         if (brandId && listedBrandIds.some(id => id.toString() === brandId)) {
             query.brand = brandId;
         }
-
 
         if (priceGt !== null && priceLt !== null) {
             query.salePrice = { $gte: priceGt, $lte: priceLt };
@@ -229,7 +250,6 @@ const shopProducts = async (req, res) => {
         } else if (priceLt !== null) {
             query.salePrice = { $lte: priceLt };
         }
-
 
         let sortOption = {};
         if (priceSort === 'price-asc' || priceSort === 'asc') {
@@ -254,22 +274,11 @@ const shopProducts = async (req, res) => {
             .skip((page - 1) * itemsPerPage)
             .limit(itemsPerPage);
 
-
-        let productsWithWishlist = [...products];
-        if (user) {
-            const wishlist = await Wishlist.findOne({ userId: user });
-            productsWithWishlist = products.map(product => {
-                const productObj = product.toObject();
-                productObj.inWishlist = wishlist ? wishlist.products.some(item =>
-                    item.productId.toString() === product._id.toString()
-                ) : false;
-                return productObj;
-            });
-        }
-
+        const wishlist = user ? await Wishlist.findOne({ userId: user }) : null;
+        const productsWithOffers = getProductsWithOffers(products, wishlist);
 
         const renderOptions = {
-            product: productsWithWishlist,
+            product: productsWithOffers,
             category: categories,
             brand: brands,
             search: search,
@@ -284,7 +293,6 @@ const shopProducts = async (req, res) => {
             totalPages: totalPages,
             totalProducts: totalProducts
         };
-
 
         if (user) {
             const userData = await User.findOne({ _id: user });

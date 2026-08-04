@@ -456,7 +456,7 @@
                     </div>
 
                     <% if (i === 0) { %><span class="card-badge">New</span><% } %>
-                    <% if (product.productOffer > 0) { %><span class="card-badge" style="background:transparent; border:1px solid var(--gold); color:var(--gold);">-<%= product.productOffer %>%</span><% } %>
+                    <% if (product.bestOffer > 0) { %><span class="card-badge" style="background:transparent; border:1px solid var(--gold); color:var(--gold);">-<%= product.bestOffer %>%</span><% } %>
 
                     <a href="/productDetails?id=<%= product._id %>" style="text-decoration:none; display:block;">
                         <div class="product-img-wrap">
@@ -473,9 +473,14 @@
                         <div class="product-name"><%= product.productName %></div>
                         <div class="product-price-row" style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
+                                <% if (product.bestOffer > 0) { %>
+                                <span class="price-sale">₹<%= product.finalPrice.toLocaleString('en-IN') %></span>
+                                <span class="price-original">₹<%= product.salePrice.toLocaleString('en-IN') %></span>
+                                <% } else { %>
                                 <span class="price-sale">₹<%= product.salePrice.toLocaleString('en-IN') %></span>
                                 <% if (product.regularPrice > product.salePrice) { %>
                                 <span class="price-original">₹<%= product.regularPrice.toLocaleString('en-IN') %></span>
+                                <% } %>
                                 <% } %>
                             </div>
                             <button class="add-to-cart btn-gold" data-id="<%= product._id %>" data-quantity="1" data-price="<%= product.salePrice %>" style="padding: 6px 12px; font-size: 9px; letter-spacing: 1px; border: 1px solid var(--gold); background: transparent;">

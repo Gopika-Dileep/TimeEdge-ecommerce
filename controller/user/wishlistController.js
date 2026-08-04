@@ -42,20 +42,17 @@ const loadWishlist = async (req, res) => {
 
             const productsWithPrices = validProducts.map(item => {
                 const product = item.productId;
-                let price = product.salePrice;
-
-                if (product.productOffer > 0) {
-                    price -= product.offerAmount;
-                }
-
-                if (product.category && product.category.categoryOffer > 0) {
-                    const categoryDiscount = (price * product.category.categoryOffer) / 100;
-                    price -= categoryDiscount;
-                }
+                const productOffer = product.productOffer || 0;
+                const categoryOffer = (product.category && product.category.categoryOffer) || 0;
+                const bestOffer = Math.max(productOffer, categoryOffer);
+                const finalPrice = bestOffer > 0
+                    ? Math.floor(product.salePrice - (product.salePrice * bestOffer / 100))
+                    : product.salePrice;
 
                 return {
                     ...item.toObject(),
-                    finalPrice: Math.floor(price)
+                    finalPrice: finalPrice,
+                    bestOffer: bestOffer
                 };
             });
 

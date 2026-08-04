@@ -281,15 +281,23 @@
 
             <!-- Price -->
             <div class="pd-price-block">
+                <% if (product.bestOffer > 0) { %>
+                <span class="pd-price">₹<%= product.finalPrice.toLocaleString('en-IN') %></span>
+                <span class="pd-price-old">₹<%= product.salePrice.toLocaleString('en-IN') %></span>
+                <span class="pd-offer-badge"><%= product.bestOffer %>% OFF</span>
+                <% } else { %>
                 <span class="pd-price">₹<%= product.salePrice.toLocaleString('en-IN') %></span>
                 <% if (product.regularPrice > product.salePrice) { %>
                 <span class="pd-price-old">₹<%= product.regularPrice.toLocaleString('en-IN') %></span>
-                <% if (product.productOffer > 0) { %>
-                <span class="pd-offer-badge"><%= product.productOffer %>% OFF</span>
                 <% } %>
                 <% } %>
             </div>
-            <% if (product.regularPrice > product.salePrice) { %>
+            <% if (product.bestOffer > 0) { %>
+            <div class="pd-savings">
+                <i class="fa-solid fa-tag"></i>
+                You save ₹<%= (product.salePrice - product.finalPrice).toLocaleString('en-IN') %>
+            </div>
+            <% } else if (product.regularPrice > product.salePrice) { %>
             <div class="pd-savings">
                 <i class="fa-solid fa-tag"></i>
                 You save ₹<%= (product.regularPrice - product.salePrice).toLocaleString('en-IN') %>
