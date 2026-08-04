@@ -1,219 +1,126 @@
 <%- include("../../views/partials/admin/header") %>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            padding: 20px;
-            color: #333;
-        }
+<div class="content-container">
+    <div class="content-header mb-5 animate-up">
+        <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Marketing Tools</span>
+        <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:500; margin-top:4px;">Edit Coupon</h2>
+    </div>
 
-        .coupon-page {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .coupon-form {
-            flex: 1;
-            max-width: 700px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .coupon-form h2 {
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-
-        .coupon-form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .coupon-form input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .coupon-form .btn {
-            background-color: #28a745;
-            color: #fff;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .coupon-form .btn:hover {
-            background-color: #218838;
-        }
-
-        .error {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .coupon-form {
-                flex-direction: column;
-            }
-        }
-
-        .coupon-form {
-            width: 100%;
-            max-width: 600px;
-            padding: 2rem 0;
-        }
-
-        @media (max-width: 1000px) {
-            .coupon-form {
-                padding: 1rem 0;
-            }
-        }
-    </style>
-
-    <body>
-
-        <div class="coupon-form">
-            <h2>Edit Coupon</h2>
-            <form id="add-coupon-form" method="post" action="/admin/editCoupon?id=<%= coupon._id%>">
-                <label for="coupon-code">Coupon Code:</label>
-                <input type="text" id="coupon-code" name="code" value="<%= coupon.name%>"
-                    placeholder="Enter coupon code">
-                <span class="error" id="code-error"></span>
-
-                <label for="offer-price">Discount Amount (₹):</label>
-                <input type="number" id="offer-price" name="offerPrice" value="<%= coupon.offerPrice%>"
-                    placeholder="Enter offer price">
-                <span class="error" id="offer-error"></span>
-
-                <label for="start-date">Start Date:</label>
-                <input type="date" id="start-date" name="createon" 
-                    value="<%= new Date(coupon.createon).toISOString().split('T')[0] %>">
-                <span class="error" id="start-error"></span>
-
-                <label for="expiry-date">Expiry Date:</label>
-                <input type="date" id="expiry-date" name="expireOn" 
-                    value="<%= new Date(coupon.expireOn).toISOString().split('T')[0] %>">
-                <span class="error" id="expiry-error"></span>
-
-                <label for="min-amount">Minimum Amount (₹):</label>
-                <input type="number" id="min-amount" name="minimumPrice" value="<%= coupon.minimumPrice%>"
-                    placeholder="Enter minimum order amount">
-                <span class="error" id="min-error"></span>
-
-                <label for="usage-limit">Usage Limit:</label>
-                <input type="number" id="usage-limit" name="UsageLimit" value="<%= coupon.UsageLimit%>"
-                    placeholder="Enter usage limit">
-                <span class="error" id="usage-error"></span>
-
-
-                </select>
-
-                <button type="submit" class="btn">Add Coupon</button>
-            </form>
+    <div class="row g-4 animate-up delay-1 justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Edit Coupon Details</h4>
+                </div>
+                <div class="card-body">
+                    <form id="editCouponForm">
+                        <div class="mb-4">
+                            <label for="coupon_name" class="form-label">Coupon Code</label>
+                            <input type="text" name="name" id="coupon_name" value="<%= coupon.name %>" placeholder="e.g. TIMEDGE15" class="form-control" required style="text-transform: uppercase;" />
+                        </div>
+                        <div class="mb-4">
+                            <label for="offerPrice" class="form-label">Discount Amount (₹)</label>
+                            <input type="number" name="offerPrice" id="offerPrice" value="<%= coupon.offerPrice %>" placeholder="e.g. 500" class="form-control" min="1" required />
+                        </div>
+                        <div class="mb-4">
+                            <label for="minimumPrice" class="form-label">Minimum Purchase (₹)</label>
+                            <input type="number" name="minimumPrice" id="minimumPrice" value="<%= coupon.minimumPrice %>" placeholder="e.g. 2999" class="form-control" min="0" required />
+                        </div>
+                        <div class="mb-4">
+                            <label for="UsageLimit" class="form-label">Usage Limit (Max Uses)</label>
+                            <input type="number" name="UsageLimit" id="UsageLimit" value="<%= coupon.UsageLimit %>" placeholder="e.g. 100" class="form-control" min="1" required />
+                        </div>
+                        <div class="mb-4">
+                            <label for="expireOn" class="form-label">Expiry Date</label>
+                            <input type="date" name="expireOn" id="expireOn" value="<%= new Date(coupon.expireOn).toISOString().split('T')[0] %>" class="form-control" required />
+                        </div>
+                        <div class="d-flex gap-3">
+                            <button class="btn-primary flex-grow-1" type="submit">Update Coupon</button>
+                            <a href="/admin/coupon" class="btn btn-secondary flex-grow-1" style="display: flex; align-items: center; justify-content: center; height: 45px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; transition: var(--transition);">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const form = document.getElementById("add-coupon-form");
+    </div>
+</div>
 
-                form.addEventListener("submit", function (event) {
-                    let isValid = true;
-
-
-                    function validateField(input, errorElement, errorMessage) {
-                        if (input.value.trim() === "") {
-                            errorElement.textContent = errorMessage;
-                            isValid = false;
-                        } else {
-                            errorElement.textContent = "";
-                        }
-                    }
-
-
-                    const couponCode = document.getElementById("coupon-code");
-                    const codeError = document.getElementById("code-error");
-                    validateField(couponCode, codeError, "Coupon code is required.");
-                    if (couponCode.value.trim().length < 3) {
-                        codeError.textContent = "Coupon code must be at least 3 characters.";
-                        isValid = false;
-                    }
-
-
-                    const offerPrice = document.getElementById("offer-price");
-                    const offerError = document.getElementById("offer-error");
-                    validateField(offerPrice, offerError, "Offer price is required.");
-                    if (offerPrice.value <= 0 || isNaN(offerPrice.value)) {
-                        offerError.textContent = "Offer price must be a positive number.";
-                        isValid = false;
-                    }
-
-
-                    const startDate = document.getElementById("start-date");
-                    const startError = document.getElementById("start-error");
-                    validateField(startDate, startError, "Start date is required.");
-                    const today = new Date().toISOString().split("T")[0];
-                    if (startDate.value && startDate.value < today) {
-                        startError.textContent = "Start date cannot be in the past.";
-                        isValid = false;
-                    }
-
-
-                    const expiryDate = document.getElementById("expiry-date");
-                    const expiryError = document.getElementById("expiry-error");
-                    validateField(expiryDate, expiryError, "Expiry date is required.");
-                    if (expiryDate.value && expiryDate.value <= startDate.value) {
-                        expiryError.textContent = "Expiry date must be after the start date.";
-                        isValid = false;
-                    }
-
-
-                    const minAmount = document.getElementById("min-amount");
-                    const minError = document.getElementById("min-error");
-                    validateField(minAmount, minError, "Minimum amount is required.");
-                    if (minAmount.value <= 0 || isNaN(minAmount.value)) {
-                        minError.textContent = "Minimum amount must be a positive number.";
-                        isValid = false;
-                    }
-
-
-                    const usageLimit = document.getElementById("usage-limit");
-                    const usageError = document.getElementById("usage-error");
-                    validateField(usageLimit, usageError, "Usage limit is required.");
-                    if (usageLimit.value <= 0 || isNaN(usageLimit.value)) {
-                        usageError.textContent = "Usage limit must be a positive number.";
-                        isValid = false;
-                    }
-
-
-                    if (!isValid) {
-                        event.preventDefault();
-                    }
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#editCouponForm').submit(function(event) {
+        event.preventDefault();
+        
+        const name = $('#coupon_name').val().trim().toUpperCase();
+        const offerPrice = parseFloat($('#offerPrice').val());
+        const minimumPrice = parseFloat($('#minimumPrice').val());
+        const UsageLimit = parseInt($('#UsageLimit').val());
+        const expireOn = $('#expireOn').val();
+        
+        if (!name) {
+            Swal.fire('Error', 'Coupon Code is required', 'error');
+            return;
+        }
+        if (!/^[A-Z0-9]+$/.test(name)) {
+            Swal.fire('Error', 'Coupon Code must contain alphanumeric characters only (letters and numbers)', 'error');
+            return;
+        }
+        if (isNaN(offerPrice) || offerPrice <= 0) {
+            Swal.fire('Error', 'Discount Amount must be greater than 0', 'error');
+            return;
+        }
+        if (isNaN(minimumPrice) || minimumPrice < 0) {
+            Swal.fire('Error', 'Minimum Purchase must be at least 0', 'error');
+            return;
+        }
+        if (offerPrice >= minimumPrice) {
+            Swal.fire('Error', 'Discount amount must be less than minimum purchase amount', 'error');
+            return;
+        }
+        if (isNaN(UsageLimit) || UsageLimit <= 0) {
+            Swal.fire('Error', 'Usage Limit must be at least 1', 'error');
+            return;
+        }
+        if (!expireOn) {
+            Swal.fire('Error', 'Expiry Date is required', 'error');
+            return;
+        }
+        
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        if (new Date(expireOn) < today) {
+            Swal.fire('Error', 'Expiry Date cannot be in the past', 'error');
+            return;
+        }
+        
+        $.ajax({
+            url: '/admin/editCoupon?id=<%= coupon._id %>',
+            method: 'POST',
+            data: {
+                code: name,
+                offerPrice: offerPrice,
+                minimumPrice: minimumPrice,
+                UsageLimit: UsageLimit,
+                expireOn: expireOn
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Updated',
+                    text: 'Coupon has been successfully updated.',
+                    confirmButtonColor: '#b39343'
+                }).then(() => {
+                    window.location.href = '/admin/coupon';
                 });
+            },
+            error: function(xhr) {
+                const errorMsg = xhr.responseJSON ? (xhr.responseJSON.error || xhr.responseJSON.message) : 'Failed to update coupon';
+                Swal.fire('Error', errorMsg, 'error');
+            }
+        });
+    });
+});
+</script>
 
-
-                document.querySelectorAll("input").forEach((input) => {
-                    input.addEventListener("input", function () {
-                        document.getElementById(`${input.id}-error`).textContent = "";
-                    });
-                });
-            });
-
-        </script>
-    </body>
+<%- include("../../views/partials/admin/footer") %>
