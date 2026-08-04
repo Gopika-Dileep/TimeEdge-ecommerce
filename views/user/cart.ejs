@@ -99,6 +99,15 @@
                             <div class="cart-product-brand"><%= item.product.brand ? item.product.brand.name : '' %></div>
                             <div class="cart-product-name"><%= item.product.productName %></div>
                             <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">₹<%= item.product.salePrice.toLocaleString('en-IN') %> each</div>
+                            <% if (item.product.quantity <= 0) { %>
+                                <div style="color: #e07070; font-size: 11px; font-weight: 600; margin-top: 6px; letter-spacing: 0.5px;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Out of Stock
+                                </div>
+                            <% } else if (item.product.quantity < item.quantity) { %>
+                                <div style="color: #c9a84c; font-size: 11px; font-weight: 600; margin-top: 6px; letter-spacing: 0.5px;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Only <%= item.product.quantity %> stock left (selected: <%= item.quantity %>)
+                                </div>
+                            <% } %>
                         </td>
                         <td class="cart-qty-cell">
                             <div class="qty-control-sm">
@@ -227,6 +236,20 @@ async function removeItem(itemId) {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMsg = urlParams.get('error');
+    if (errorMsg) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Stock Issue',
+            text: errorMsg,
+            confirmButtonColor: '#c9a84c'
+        });
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
 </script>
 
 <%- include("../../views/partials/user/footer") %>

@@ -22,6 +22,18 @@ const getCheckoutPage = async (req, res) => {
   try {
     const userId = req.session.user;
     const cart = await Cart.findOne({ user: userId }).populate("items.product");
+
+    if (cart) {
+      for (let item of cart.items) {
+        if (!item.product || item.product.quantity <= 0) {
+          return res.redirect("/cart?error=" + encodeURIComponent(`${item.product ? item.product.productName : 'Product'} is out of stock. Please remove it from your cart.`));
+        }
+        if (item.quantity > item.product.quantity) {
+          return res.redirect("/cart?error=" + encodeURIComponent(`Only ${item.product.quantity} items left in stock for ${item.product.productName}. Please reduce quantity.`));
+        }
+      }
+    }
+
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
 
