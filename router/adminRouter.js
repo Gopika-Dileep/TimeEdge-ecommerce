@@ -52,8 +52,6 @@ router.post("/orders/decline-return/:itemId", adminAuth, adminController.decline
 
 router.get('/coupon',adminAuth,couponController.loadCouponPage)
 router.post('/addCoupon',adminAuth,couponController.addCoupon)
-router.get('/editCoupon',adminAuth,couponController.loadEditCoupon)
-router.post('/editCoupon',adminAuth,couponController.editCoupon)
 router.get('/listCoupon',adminAuth,couponController.listCoupon)
 router.get('/unlistCoupon',adminAuth,couponController.unlistCoupon)
 router.get('/salesreport',adminAuth,salesController.loadSalesReport)

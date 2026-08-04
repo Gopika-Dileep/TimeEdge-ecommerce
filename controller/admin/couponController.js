@@ -126,41 +126,6 @@ const addCoupon = async (req, res) => {
         res.status(500).json({ message: "server err" })
     }
 }
-const loadEditCoupon = async(req,res)=>{
-    try {
-       const couponId = req.query.id
-
-       const coupon = await Coupon.findById({_id:couponId})
-       res.render('editcoupon',{coupon:coupon})
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"server error"})
-    }
-}
-
-const editCoupon = async(req,res)=>{
-    try {
-        const couponId=req.query.id
-        console.log(couponId,'couponId')
-        const code = req.body.code || req.body.name;
-        const {offerPrice,createon,expireOn,minimumPrice,UsageLimit,isList} = req.body
-        const coupon = await Coupon.findById({_id:couponId})
-        coupon.name = code
-        coupon.offerPrice =offerPrice
-        coupon.createon=createon
-        coupon.expireOn=expireOn
-        coupon.minimumPrice=minimumPrice
-        coupon.UsageLimit=UsageLimit
-        coupon.isList=isList
-
-        await coupon.save()
-        res.redirect('/admin/coupon')
-        
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"server error"})
-    }
-}
 const listCoupon = async (req, res) => {
     try {
         const couponId = req.query.id;
@@ -186,8 +151,6 @@ const unlistCoupon = async (req, res) => {
 module.exports={
     loadCouponPage,
     addCoupon,
-    loadEditCoupon,
-    editCoupon,
     listCoupon,
     unlistCoupon
 }
