@@ -414,7 +414,7 @@
 </div>
 
 <script>
-const maxQty = <%= product.maxQtyPerPerson || 5 %>;
+const maxQty = Number('<%= product.maxQtyPerPerson || 5 %>');
 const productId = '<%= product._id %>';
 let qty = 1;
 
@@ -484,7 +484,7 @@ async function addToCart() {
 
 async function toggleWishlist() {
     try {
-        const isUserLoggedIn = <%= typeof user !== 'undefined' && user ? 'true' : 'false' %>;
+        const isUserLoggedIn = '<%= locals.user ? "true" : "false" %>' === 'true';
         if (!isUserLoggedIn) {
             Swal.fire({
                 title: 'Login Required',

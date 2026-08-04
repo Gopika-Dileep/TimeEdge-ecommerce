@@ -145,7 +145,7 @@
                 <i class="fa-solid fa-bag-shopping text-primary" style="color: #4A90E2 !important;"></i>
             </div>
             <h6 style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Total Orders</h6>
-            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
+            <h3 id="total-orders-count" style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
                 <%= saleCount %>
             </h3>
         </div>
@@ -155,7 +155,7 @@
                 <i class="fa-solid fa-indian-rupee-sign text-success" style="color: #2ECC71 !important;"></i>
             </div>
             <h6 style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Total Revenue</h6>
-            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
+            <h3 id="total-revenue-count" style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
                 ₹<%= totalSalePrice.toLocaleString('en-IN') %>
             </h3>
         </div>
@@ -165,7 +165,7 @@
                 <i class="fa-solid fa-tags text-warning" style="color: #E67E22 !important;"></i>
             </div>
             <h6 style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Total Discounts</h6>
-            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
+            <h3 id="total-discounts-count" style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
                 ₹<%= Math.round(totalDiscount).toLocaleString('en-IN') %>
             </h3>
         </div>
@@ -175,7 +175,7 @@
                 <i class="fa-solid fa-gift text-danger" style="color: #E74C3C !important;"></i>
             </div>
             <h6 style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">Coupon Discount</h6>
-            <h3 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
+            <h3 id="coupon-discount-count" style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:600; color:var(--text-primary); margin:0;">
                 ₹<%= couponDiscount.toLocaleString('en-IN') %>
             </h3>
         </div>
@@ -238,8 +238,7 @@
       </div>
     </div>
 
-    <% if (totalPage > 1) { %>
-    <div class="pagination-container animate-up" style="display: flex; justify-content: center; gap: 8px; margin-top: 32px;">
+    <div class="pagination-container animate-up <%= totalPage > 1 ? '' : 'd-none' %>" style="display: flex; justify-content: center; gap: 8px; margin-top: 32px;">
         <% if (page > 1) { %>
             <a href="?page=<%= page - 1 %>" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);"><i class="fa-solid fa-chevron-left"></i></a>
         <% } %>
@@ -254,7 +253,6 @@
             <a href="?page=<%= page + 1 %>" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border); text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);"><i class="fa-solid fa-chevron-right"></i></a>
         <% } %>
     </div>
-    <% } %>
   </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -359,6 +357,54 @@
       }
     });
 
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function formatCurrency(val) {
+      return '₹' + Math.round(Number(val) || 0).toLocaleString('en-IN');
+    }
+
+    function renderOrderRow(order) {
+      let paymentBadge = '';
+      const method = order.paymentMethod ? order.paymentMethod.trim() : '';
+      if (method === 'COD') {
+        paymentBadge = `<span style="background:rgba(179,147,67,0.08); color:#b39343; border:1px solid rgba(179,147,67,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">COD</span>`;
+      } else if (method === 'Online' || method === 'RazorPay' || method === 'razorpay') {
+        paymentBadge = `<span style="background:rgba(74,144,226,0.08); color:#4a90e2; border:1px solid rgba(74,144,226,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
+      } else {
+        paymentBadge = `<span style="background:rgba(46,204,113,0.08); color:#2ecc71; border:1px solid rgba(46,204,113,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod || 'N/A'}</span>`;
+      }
+
+      return `
+        <tr>
+          <td>${formatDate(order.createdOn)}</td>
+          <td style="font-weight: 600; color: var(--text-primary);">${order.user ? order.user.name : "Guest User"}</td>
+          <td class="order-ref">${order.orderId}</td>
+          <td>${formatCurrency(order.subtotal)}</td>
+          <td>${formatCurrency(order.productdiscount || 0)}</td>
+          <td>${formatCurrency(order.couponDiscount || 0)}</td>
+          <td style="font-weight: 600; color: var(--text-primary);">${formatCurrency(order.finalAmount)}</td>
+          <td>${paymentBadge}</td>
+        </tr>`;
+    }
+
+    function updateSummaryCards(data) {
+      const totalOrdersEl = document.getElementById("total-orders-count");
+      const totalRevenueEl = document.getElementById("total-revenue-count");
+      const totalDiscountsEl = document.getElementById("total-discounts-count");
+      const couponDiscountEl = document.getElementById("coupon-discount-count");
+
+      if (totalOrdersEl) totalOrdersEl.textContent = data.saleCount;
+      if (totalRevenueEl) totalRevenueEl.textContent = formatCurrency(data.totalSalePrice);
+      if (totalDiscountsEl) totalDiscountsEl.textContent = formatCurrency(data.totalDiscount);
+      if (couponDiscountEl) couponDiscountEl.textContent = formatCurrency(data.couponDiscount);
+    }
+
     async function filterOrder() {
       if (validateDates()) {
         const filtervalue = document.getElementById("filter-order").value;
@@ -375,43 +421,15 @@
         if (response.orders) {
           const filterTable = document.querySelector("table tbody");
           filterTable.textContent = "";
-          response.orders.forEach((order) => {
-            let paymentBadge = '';
-            if (order.paymentMethod === 'COD') {
-              paymentBadge = `<span style="background:rgba(179,147,67,0.08); color:#b39343; border:1px solid rgba(179,147,67,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">COD</span>`;
-            } else if (order.paymentMethod === 'Online' || order.paymentMethod === 'RazorPay' || order.paymentMethod === 'razorpay') {
-              paymentBadge = `<span style="background:rgba(74,144,226,0.08); color:#4a90e2; border:1px solid rgba(74,144,226,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
-            } else {
-              paymentBadge = `<span style="background:rgba(46,204,113,0.08); color:#2ecc71; border:1px solid rgba(46,204,113,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
-            }
-            const row = `
-              <tr>
-                <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-                <td>${order.user ? order.user.name : "N/A"}</td>
-                <td>${order.orderId}</td>
-                <td>₹ ${order.subtotal}</td>
-               <td>₹  ${order.productdiscount || 0}
-                            </td>
-                            <td>₹ ${order.couponDiscount || 0}
-                            </td>
-                            <td>₹  ${order.finalAmount} 
-                            </td>
-                <td>${paymentBadge}</td>
-              </tr>`;
-            filterTable.insertAdjacentHTML("beforeend", row);
-          });
+          if (response.orders.length > 0) {
+            response.orders.forEach((order) => {
+              filterTable.insertAdjacentHTML("beforeend", renderOrderRow(order));
+            });
+          } else {
+            filterTable.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">No orders found.</td></tr>`;
+          }
 
-          document.querySelector(".text-primary").innerHTML = response.saleCount;
-          document.querySelector(
-            ".text-success"
-          ).innerHTML = `₹ ${response.totalSalePrice}`;
-          document.querySelector(
-            ".text-warning"
-          ).innerHTML = `₹ ${response.totalDiscount}`;
-          document.querySelector(
-            ".text-danger"
-          ).innerHTML = `₹ ${response.couponDiscount}`;
-
+          updateSummaryCards(response);
           updatePagination(response.totalPage, 1);
         }
       }
@@ -432,43 +450,15 @@
         if (response.orders) {
           const filterTable = document.querySelector("table tbody");
           filterTable.textContent = "";
-          response.orders.forEach((order) => {
-            let paymentBadge = '';
-            if (order.paymentMethod === 'COD') {
-              paymentBadge = `<span style="background:rgba(179,147,67,0.08); color:#b39343; border:1px solid rgba(179,147,67,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">COD</span>`;
-            } else if (order.paymentMethod === 'Online' || order.paymentMethod === 'RazorPay' || order.paymentMethod === 'razorpay') {
-              paymentBadge = `<span style="background:rgba(74,144,226,0.08); color:#4a90e2; border:1px solid rgba(74,144,226,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
-            } else {
-              paymentBadge = `<span style="background:rgba(46,204,113,0.08); color:#2ecc71; border:1px solid rgba(46,204,113,0.15); padding:4px 10px; font-size:9px; letter-spacing:0.5px; font-weight:600; text-transform:uppercase; border-radius:2px; display:inline-block;">${order.paymentMethod}</span>`;
-            }
-            const row = `
-              <tr>
-                <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-                <td>${order.user ? order.user.name : "N/A"}</td>
-                <td>${order.orderId}</td>
-                <td>₹ ${order.subtotal}</td>
-                <td>₹  ${order.productdiscount || 0}
-                            </td>
-                            <td>₹ ${order.couponDiscount || 0}
-                            </td>
-                            <td>₹  ${order.finalAmount} 
-                            </td>
-                <td>${paymentBadge}</td>
-              </tr>`;
-            filterTable.insertAdjacentHTML("beforeend", row);
-          });
+          if (response.orders.length > 0) {
+            response.orders.forEach((order) => {
+              filterTable.insertAdjacentHTML("beforeend", renderOrderRow(order));
+            });
+          } else {
+            filterTable.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">No orders found.</td></tr>`;
+          }
 
-          document.querySelector(".text-primary").innerHTML = response.saleCount;
-          document.querySelector(
-            ".text-success"
-          ).innerHTML = `₹ ${response.totalSalePrice}`;
-          document.querySelector(
-            ".text-warning"
-          ).innerHTML = `₹ ${response.totalDiscount}`;
-          document.querySelector(
-            ".text-danger"
-          ).innerHTML = `₹ ${response.couponDiscount}`;
-
+          updateSummaryCards(response);
           updatePagination(response.totalPage, 1);
         }
       }
@@ -476,14 +466,22 @@
 
     function updatePagination(totalPage, currentPage) {
       const paginationContainer = document.querySelector(".pagination-container");
+      if (!paginationContainer) return;
+
+      if (totalPage <= 1) {
+        paginationContainer.classList.add("d-none");
+        paginationContainer.innerHTML = "";
+        return;
+      }
+
+      paginationContainer.classList.remove("d-none");
       const pagination = document.createElement("ul");
       pagination.className = "pagination";
 
       if (currentPage > 1) {
         const prevPage = document.createElement("li");
         prevPage.className = "page-item";
-        prevPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage - 1
-          })">&laquo; Previous</a>`;
+        prevPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage - 1})">&laquo; Previous</a>`;
         pagination.appendChild(prevPage);
       }
 
@@ -497,8 +495,7 @@
       if (currentPage < totalPage) {
         const nextPage = document.createElement("li");
         nextPage.className = "page-item";
-        nextPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage + 1
-          })">Next &raquo;</a>`;
+        nextPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage + 1})">Next &raquo;</a>`;
         pagination.appendChild(nextPage);
       }
 
@@ -513,7 +510,7 @@
         const endDate = document.getElementById("end-date").value;
 
         const response = await $.ajax({
-          url: `/admin/salesreport?page=${page}&filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
+          url: `/admin/filterOrder?page=${page}&filtervalue=${filtervalue}&startDate=${startDate}&endDate=${endDate}`,
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -523,35 +520,15 @@
         if (response.orders) {
           const filterTable = document.querySelector("table tbody");
           filterTable.textContent = "";
-          response.orders.forEach((order) => {
-            const row = `
-              <tr>
-                <td>${new Date(order.createdOn).toLocaleDateString()}</td>
-                <td>${order.user ? order.user.name : "N/A"}</td>
-                <td>${order.orderId}</td>
-                <td>₹ ${order.subtotal}</td>
-               <td>₹  ${order.productdiscount || 0}
-                            </td>
-                            <td>₹ ${order.couponDiscount || 0}
-                            </td>
-                            <td>₹  ${order.finalAmount} 
-                            </td>
-                <td>${order.paymentMethod}</td>
-              </tr>`;
-            filterTable.insertAdjacentHTML("beforeend", row);
-          });
+          if (response.orders.length > 0) {
+            response.orders.forEach((order) => {
+              filterTable.insertAdjacentHTML("beforeend", renderOrderRow(order));
+            });
+          } else {
+            filterTable.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">No orders found.</td></tr>`;
+          }
 
-          document.querySelector(".text-primary").innerHTML = response.saleCount;
-          document.querySelector(
-            ".text-success"
-          ).innerHTML = `₹ ${response.totalSalePrice}`;
-          document.querySelector(
-            ".text-warning"
-          ).innerHTML = `₹ ${response.totalDiscount}`;
-          document.querySelector(
-            ".text-danger"
-          ).innerHTML = `₹ ${response.couponDiscount}`;
-
+          updateSummaryCards(response);
           updatePagination(response.totalPage, page);
         }
       }
@@ -563,14 +540,15 @@
 
       tableRows.forEach((row) => {
         const cells = row.querySelectorAll("td");
+        if (cells.length < 8) return;
         salesData.push({
           date: cells[0].innerText,
           userName: cells[1].innerText,
           orderId: cells[2].innerText,
-          subtotal: parseFloat(cells[3].innerText.replace("₹", "").trim()),
-          productDiscount: parseFloat(cells[4].innerText.replace("₹", "").trim()),
-          couponDiscount: parseFloat(cells[5].innerText.replace("₹", "").trim()),
-          finalAmount: parseFloat(cells[6].innerText.replace("₹", "").trim()),
+          subtotal: parseFloat(cells[3].innerText.replace("₹", "").replace(/,/g, "").trim()),
+          productDiscount: parseFloat(cells[4].innerText.replace("₹", "").replace(/,/g, "").trim()),
+          couponDiscount: parseFloat(cells[5].innerText.replace("₹", "").replace(/,/g, "").trim()),
+          finalAmount: parseFloat(cells[6].innerText.replace("₹", "").replace(/,/g, "").trim()),
           paymentMethod: cells[7].innerText,
         });
       });
