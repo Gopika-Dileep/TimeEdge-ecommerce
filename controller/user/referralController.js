@@ -1,3 +1,4 @@
+const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 const User = require("../../models/userSchema");
 const crypto = require('crypto');
 
@@ -9,19 +10,17 @@ const getReferAndEarnPage = async (req, res) => {
         return res.redirect('/login');
       }
       
-      const user = await User.findById({_id: userId});
+      const user = await User.findById({ _id: userId });
       
       if (!user) {
         return res.redirect('/login');
       }
       
-  
       if (!user.referralCode) {
         user.referralCode = crypto.randomBytes(4).toString('hex').toUpperCase();
         await user.save();
       }
       
-     
       const referralCount = await User.countDocuments({ referredBy: user.referralCode });
       
       res.render('refer', {
@@ -33,69 +32,68 @@ const getReferAndEarnPage = async (req, res) => {
       });
       
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error(error);
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.INTERNAL_SERVER_ERROR });
     }
-  };
+};
   
-  const applyReferralCode = async (req, res) => {
+const applyReferralCode = async (req, res) => {
     try {
-      
       const userId = req.session.user;
       
       if (!userId) {
-        return res.status(401).json({ success: false, message: 'Please login first' });
+        return res.status(STATUS_CODES.UNAUTHORIZED).json({ success: false, message: MESSAGES.USER_REFERRAL.LOGIN_REQUIRED });
       }
       
       const { code } = req.body;
       
       if (!code) {
-        return res.status(400).json({ success: false, message: 'Please provide a referral code' });
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.USER_REFERRAL.PROVIDE_CODE });
       }
       
-      const user = await User.findById({_id: userId});
+      const user = await User.findById({ _id: userId });
       
       if (!user) {
-        return res.status(404).json({ success: false, message: 'User not found' });
+        return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: MESSAGES.USER_REFERRAL.USER_NOT_FOUND });
       }
       
       if (user.referredBy) {
-        return res.status(400).json({ success: false, message: 'You have already applied a referral code' });
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.USER_REFERRAL.ALREADY_APPLIED });
       }
       
       const signupDate = new Date(user.createdAt);
       const diffInMs = new Date() - signupDate;
       const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
       if (diffInMs > threeDaysInMs) {
-        return res.status(400).json({ success: false, message: 'Referral codes can only be applied within the first 3 days of registration' });
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.USER_REFERRAL.TIME_EXCEEDED });
       }
       
       if (user.referralCode === code) {
-        return res.status(400).json({ success: false, message: 'Cannot use your own referral code' });
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.USER_REFERRAL.OWN_CODE });
       }
       
       const referrer = await User.findOne({ referralCode: code });
       
       if (!referrer) {
-        return res.status(404).json({ success: false, message: 'Invalid referral code' });
+        return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: MESSAGES.USER_REFERRAL.INVALID_CODE });
       }
 
       if (referrer.referredBy === user.referralCode) {
-        return res.status(400).json({ success: false, message: 'Mutual referrals are not allowed (this friend is already referred by you)' });
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.USER_REFERRAL.MUTUAL_NOT_ALLOWED });
       }
       
       user.referredBy = code;
       await user.save();
       
-      return res.status(200).json({ success: true, message: 'Referral code applied successfully' });
+      return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.USER_REFERRAL.SUCCESS_APPLY });
       
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: 'Internal server error' });
+      console.error(error);
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.INTERNAL_SERVER_ERROR });
     }
-  };
+};
   
-  module.exports = {
+module.exports = {
     getReferAndEarnPage,
     applyReferralCode
-  };
+};

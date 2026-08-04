@@ -47,7 +47,7 @@ const productSchema = mongoose.Schema({
     },
     quantity:{
         type:Number,
-        default:true
+        default:0
     },
     isListed:{
         type:Boolean,

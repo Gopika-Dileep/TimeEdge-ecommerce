@@ -1,6 +1,7 @@
 const Product = require("../../models/productSchema");
 const Order = require("../../models/orderSchema");
 const User = require("../../models/userSchema");
+const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 
 const loadDashboard = async (req, res) => {
   try {
@@ -190,7 +191,7 @@ const loadDashboard = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in Loading Admin Dashboard", error);
-    res.status(500).send("Internal Server Error");
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send(MESSAGES.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -216,19 +217,19 @@ const filterData = async (req, res) => {
           },
         };
         break;
-        case "weekly":
-            const today = new Date();
-            const startOfWeek = new Date(today);
-            const firstDayOfWeek = startOfWeek.getDate() - startOfWeek.getDay();
-            const weekStart = new Date(today);
-            weekStart.setDate(firstDayOfWeek);
-            weekStart.setHours(0, 0, 0, 0);
-            const weekEnd = new Date(today);
-            weekEnd.setDate(firstDayOfWeek + 6);
-            weekEnd.setHours(23, 59, 59, 999);
-            filterCondition = { createdOn: { $gte: weekStart, $lte: weekEnd } };
-            userFilterCondition = { createdAt: { $gte: weekStart, $lte: weekEnd } };
-            break;
+      case "weekly":
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        const firstDayOfWeek = startOfWeek.getDate() - startOfWeek.getDay();
+        const weekStart = new Date(today);
+        weekStart.setDate(firstDayOfWeek);
+        weekStart.setHours(0, 0, 0, 0);
+        const weekEnd = new Date(today);
+        weekEnd.setDate(firstDayOfWeek + 6);
+        weekEnd.setHours(23, 59, 59, 999);
+        filterCondition = { createdOn: { $gte: weekStart, $lte: weekEnd } };
+        userFilterCondition = { createdAt: { $gte: weekStart, $lte: weekEnd } };
+        break;
       case "monthly":
         const monthAgo = new Date(now);
         monthAgo.setMonth(now.getMonth() - 1);
@@ -439,7 +440,7 @@ const filterData = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in filtering dashboard data", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.INTERNAL_SERVER_ERROR });
   }
 };
 

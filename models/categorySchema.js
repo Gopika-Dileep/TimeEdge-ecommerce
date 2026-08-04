@@ -20,7 +20,7 @@ const categorySchema = mongoose.Schema({
     },
     createdAt:{
         type:Date,
-        deafult:Date.now
+        default:Date.now
     }
 })
 

@@ -5,20 +5,20 @@ const Wallet = require('../models/walletSchema');
 async function updateWalletBalance(userId, amount, transactionType) {
 
   try {
-    console.log(userId,'userid')
+    console.log(userId, 'userid')
     let wallet = await Wallet.findOne({ userId });
 
     if (!wallet) {
       wallet = new Wallet({
         userId,
-        balance: 0, 
-        transactions: [], 
-      });0
+        balance: 0,
+        transactions: [],
+      });
     }
-    
+
     if (transactionType === 'debit') {
       if (wallet.balance >= amount) {
-        wallet.balance -= Math.abs(amount); 
+        wallet.balance -= Math.abs(amount);
       } else {
         throw new Error('Insufficient balance in wallet');
       }
@@ -36,7 +36,7 @@ async function updateWalletBalance(userId, amount, transactionType) {
     wallet.transactions.push(newTransaction);
 
     const walletcreated = await wallet.save();
- 
+
     return { success: true, message: 'Wallet updated successfully' };
   } catch (error) {
     console.error(error);

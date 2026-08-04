@@ -1,3 +1,4 @@
+const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 const User = require('../../models/userSchema')
 const Product = require('../../models/productSchema')
 const Category = require('../../models/categorySchema')
@@ -89,12 +90,12 @@ const loadWishlist = async (req, res) => {
                 path: '/wishlist',
                 user: user,
                 wishlist: null,
-                message: "Wishlist is empty"
+                message: MESSAGES.USER_WISHLIST.EMPTY
             });
         }
     } catch (error) {
         console.error("Wishlist loading error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 };
 
@@ -107,7 +108,7 @@ const addToWishlist = async (req, res) => {
         const product = await Product.findById(productId);
 
         if (!product) {
-            return res.status(404).json({ success: false, message: "Product not found" });
+            return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: MESSAGES.USER_WISHLIST.PRODUCT_NOT_FOUND });
         }
 
         if (!wishlist) {
@@ -116,7 +117,7 @@ const addToWishlist = async (req, res) => {
                 products: [{ productId, price: product.salePrice, stockStatus: product.status }]
             });
             await newWishlist.save();
-            return res.status(200).json({ success: true, action: 'added', message: "Product added to wishlist" });
+            return res.status(STATUS_CODES.OK).json({ success: true, action: 'added', message: MESSAGES.USER_WISHLIST.ADDED });
         }
 
    
@@ -125,15 +126,15 @@ const addToWishlist = async (req, res) => {
         if (productIndex !== -1) {
             wishlist.products.splice(productIndex, 1);
             await wishlist.save();
-            return res.status(200).json({ success: true, action: 'removed', message: "Product removed from wishlist" });
+            return res.status(STATUS_CODES.OK).json({ success: true, action: 'removed', message: MESSAGES.USER_WISHLIST.REMOVED });
         } else {
             wishlist.products.push({ productId, price: product.salePrice, stockStatus: product.status });
             await wishlist.save();
-            return res.status(200).json({ success: true, action: 'added', message: "Product added to wishlist" });
+            return res.status(STATUS_CODES.OK).json({ success: true, action: 'added', message: MESSAGES.USER_WISHLIST.ADDED });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server error" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 };
 
@@ -147,7 +148,7 @@ const removeItem = async(req,res)=>{
         const wishlist = await Wishlist.findOne({userId:userId})
         console.log(wishlist,'wishlist')
         if (!wishlist) {
-            return res.status(404).json({ success: false, message: 'Wishlist not found' });
+            return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: MESSAGES.USER_WISHLIST.NOT_FOUND });
         }
 
         const exists = wishlist.products.some(
@@ -165,10 +166,10 @@ const removeItem = async(req,res)=>{
 
        
         
-        res.status(200).json({ success: true, message: 'Product removed from wishlist' });
+        res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.USER_WISHLIST.REMOVED });
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -182,7 +183,7 @@ const loadAboutus = async(req,res)=>{
        return  res.render('aboutus')
     }catch{
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
     
 }
@@ -197,7 +198,7 @@ const loadContact = async(req,res)=>{
        return res.render('contact')
     } catch (error) {
         console.log(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 

@@ -1,3 +1,4 @@
+const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 const User = require("../../models/userSchema");
 const nodemailer = require("nodemailer")
 const bcrypt = require("bcrypt")
@@ -10,7 +11,7 @@ const loadlogin = async (req,res)=>{
         res.render("login", { message });
     } catch (error) {
         console.error(error);
-        res.status(400).json({message:"an error occured while loading loginpage"})
+        res.status(STATUS_CODES.BAD_REQUEST).json({message:MESSAGES.USER_AUTH.LOGIN_PAGE_ERROR})
     }}else{
         res.redirect('/')
     }
@@ -27,14 +28,14 @@ const googleAuthCallback = async (req, res) => {
         const user = await User.findById(req.user._id);
 
         if (!user) {
-            return res.redirect("/login?error=" + encodeURIComponent("User not found"));
+            return res.redirect("/login?error=" + encodeURIComponent(MESSAGES.USER_AUTH.USER_NOT_FOUND));
         }
 
        
         if (user.isBlocked === true) {
             await req.logout(); 
             req.session.destroy((err) => {
-                res.redirect("/login?error=" + encodeURIComponent("User is blocked by admin"));
+                res.redirect("/login?error=" + encodeURIComponent(MESSAGES.USER_AUTH.USER_BLOCKED));
             });
             return;
         }
@@ -56,24 +57,24 @@ const login = async (req,res)=>{
     
         if (user) {
             if (user.isVerified === false) {
-                return res.redirect('/login?error=' + encodeURIComponent("Please verify your email before logging in."));
+                return res.redirect('/login?error=' + encodeURIComponent(MESSAGES.USER_AUTH.UNVERIFIED_EMAIL));
             }
             if (user.isBlocked === true) {
-                return res.redirect('/login?error=' + encodeURIComponent("User is blocked by admin"));
+                return res.redirect('/login?error=' + encodeURIComponent(MESSAGES.USER_AUTH.USER_BLOCKED));
             }
             const userPassword = await bcrypt.compare(password, user.password);
             if (userPassword) {
                 req.session.user = user._id;
                 res.redirect("/");
             } else {
-                return res.redirect("/login?error=" + encodeURIComponent("Incorrect password"));
+                return res.redirect("/login?error=" + encodeURIComponent(MESSAGES.USER_AUTH.INCORRECT_PASSWORD));
             }
         } else {
-            return res.redirect("/login?error=" + encodeURIComponent("User not found"));
+            return res.redirect("/login?error=" + encodeURIComponent(MESSAGES.USER_AUTH.USER_NOT_FOUND));
         }
     } catch (error) {
         console.error(error);
-        res.redirect("/login?error=" + encodeURIComponent("An error occurred while loading the home page"));
+        res.redirect("/login?error=" + encodeURIComponent(MESSAGES.USER_AUTH.HOME_PAGE_ERROR));
     }
     
 }
@@ -81,14 +82,14 @@ const logout = async(req,res)=>{
     try {
         req.session.destroy((err)=>{
             if(err){
-                return res.json({message:"error"})
+                return res.json({message:MESSAGES.USER_AUTH.GENERIC_ERROR})
             }else{
                 return res.redirect('/')
             }
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 const loadSignup = async (req, res) => {
@@ -96,7 +97,7 @@ const loadSignup = async (req, res) => {
         res.render("signup");
     } catch (error) {
         console.error("Error loading signup page:", error);
-        res.status(500).json({ message: "Error loading signup page" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.USER_AUTH.SIGNUP_PAGE_ERROR });
     }
 };
 
@@ -147,23 +148,23 @@ const signup = async (req, res) => {
         
         // Backend Validation
         if (!name || name.trim().length < 3) {
-            return res.status(400).json({ message: "Username must be at least 3 characters" });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_AUTH.INVALID_USERNAME });
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email || !emailRegex.test(email)) {
-            return res.status(400).json({ message: "Please enter a valid email address" });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_AUTH.INVALID_EMAIL });
         }
         const phoneRegex = /^[6-9]\d{9}$/;
         if (!phone || !phoneRegex.test(phone)) {
-            return res.status(400).json({ message: "Please enter a valid mobile number." });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_AUTH.INVALID_PHONE });
         }
         if (!password || password.length < 8 || !/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/.test(password)) {
-            return res.status(400).json({ message: "Password must include uppercase, lowercase, number and special character" });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_AUTH.WEAK_PASSWORD });
         }
         
         const existingUser = await User.findOne({ email, isVerified: true });
         if (existingUser) {
-            return res.status(400).json({ message: "A user with this email already exists." });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_AUTH.DUPLICATE_EMAIL });
         }
 
         // Clean up previous unverified registrations for this email
@@ -176,7 +177,7 @@ const signup = async (req, res) => {
         console.log(otp, "otp");
         
         if (!emailSent) {
-            return res.status(500).json({ message: "Failed to send verification email" });
+            return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.USER_AUTH.EMAIL_SEND_FAILED });
         }
        
         const newUser = await new User({
@@ -191,10 +192,10 @@ const signup = async (req, res) => {
             await User.updateOne({ _id: newUser._id, isVerified: false }, { $unset: { otp: 1 } });
         }, 60000); 
         
-        res.status(200).json({ userId: newUser._id });
+        res.status(STATUS_CODES.OK).json({ userId: newUser._id });
     } catch (error) {
         console.error("Error in signup:", error);
-        res.status(500).json({ message: "Error creating user" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.USER_AUTH.CREATE_USER_ERROR });
     }
 };
 
@@ -204,7 +205,7 @@ const loadotp = async (req, res) => {
         res.render("otpVerification", { userId });
     } catch (error) {
         console.error("Error loading OTP page:", error);
-        res.status(500).json({ message: "Error loading OTP verification page" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.USER_AUTH.OTP_PAGE_ERROR });
     }
 };
 
@@ -214,15 +215,15 @@ const otpverify = async (req, res) => {
         
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(STATUS_CODES.NOT_FOUND).json({ message: MESSAGES.USER_AUTH.USER_NOT_FOUND });
         }
 
         if (!user.otp) {
-            return res.status(400).json({ message: "OTP has expired" });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_AUTH.OTP_EXPIRED });
         }
 
         if (user.otp !== otp) {
-            return res.status(400).json({ message: "Invalid OTP" });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_AUTH.OTP_INVALID });
         }
 
         await User.findByIdAndUpdate(userId, {
@@ -230,10 +231,10 @@ const otpverify = async (req, res) => {
             $unset: { otp: 1 }
         });
 
-        res.status(200).json({ message: "succesfull" });
+        res.status(STATUS_CODES.OK).json({ message: MESSAGES.USER_AUTH.VERIFY_SUCCESS });
     } catch (error) {
         console.error("Error in OTP verification:", error);
-        res.status(500).json({ message: "Error verifying OTP" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.USER_AUTH.OTP_VERIFY_ERROR });
     }
 };
 
@@ -247,12 +248,12 @@ const resendOtp = async (req, res) => {
         const now = Date.now();
         if (req.session.lastOtpTime && (now - req.session.lastOtpTime < 60000)) {
             const waitSecs = Math.ceil((60000 - (now - req.session.lastOtpTime)) / 1000);
-            return res.status(400).json({ message: `Please wait ${waitSecs} seconds before resending OTP.` });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.USER_AUTH.OTP_RESEND_WAIT(waitSecs) });
         }
 
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(STATUS_CODES.NOT_FOUND).json({ message: MESSAGES.USER_AUTH.USER_NOT_FOUND });
         }
 
         const otp = generateOtp();
@@ -260,7 +261,7 @@ const resendOtp = async (req, res) => {
         console.log(otp,"otp")
         
         if (!emailSent) {
-            return res.status(500).json({ message: "Failed to send OTP" });
+            return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.USER_AUTH.OTP_SEND_FAILED });
         }
 
         req.session.lastOtpTime = now;
@@ -271,10 +272,10 @@ const resendOtp = async (req, res) => {
             await User.updateOne({ _id: userId, isVerified: false }, { $unset: { otp: 1 } });
         }, 60000); 
 
-        res.status(200).json({ message: "OTP sent successfully" });
+        res.status(STATUS_CODES.OK).json({ message: MESSAGES.USER_AUTH.OTP_SEND_SUCCESS });
     } catch (error) {
         console.error("Error in resend OTP:", error);
-        res.status(500).json({ message: "Error sending OTP" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.USER_AUTH.OTP_SEND_ERROR });
     }
 };
 

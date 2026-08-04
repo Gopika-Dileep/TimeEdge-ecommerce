@@ -1,3 +1,4 @@
+const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 const mongoose = require("mongoose");
 const User = require("../../models/userSchema");
 const bcrypt = require("bcrypt");
@@ -16,11 +17,11 @@ const loadAdminLogin = async (req, res) => {
   try {
     res.render("adminlogin", {
       error: null,
-      email: null 
+      email: null
     });
   } catch (error) {
-    console.error(error);
-    res.status(200).json({ message: "Error while load adminlogin page" });
+
+    res.status(STATUS_CODES.OK).json({ message: MESSAGES.ADMIN.LOAD_LOGIN_ERROR });
   }
 };
 const adminLogin = async (req, res) => {
@@ -28,18 +29,18 @@ const adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.render("adminlogin", { error: "Email and password are required", email });
+      return res.render("adminlogin", { error: MESSAGES.ADMIN.EMAIL_PASSWORD_REQUIRED, email });
     }
 
     const admin = await User.findOne({ email, isAdmin: true });
 
     if (!admin) {
-      return res.render("adminlogin", { error: "Invalid email or you are not an admin", email });
+      return res.render("adminlogin", { error: MESSAGES.ADMIN.INVALID_ADMIN_CREDENTIALS, email });
     }
 
     const passwordMatch = await bcrypt.compare(password, admin.password);
     if (!passwordMatch) {
-      return res.render("adminlogin", { error: "Incorrect password", email });
+      return res.render("adminlogin", { error: MESSAGES.ADMIN.INCORRECT_PASSWORD, email });
     }
 
     req.session.admin = admin._id;
@@ -47,7 +48,7 @@ const adminLogin = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.render("adminlogin", { error: "Error while logging in", email });
+    res.render("adminlogin", { error: MESSAGES.ADMIN.LOGIN_ERROR, email });
   }
 };
 
@@ -56,7 +57,7 @@ const loadDashboard = async (req, res) => {
     res.render("dashboard");
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while loading dashboard" });
+    res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.DASHBOARD_LOAD_ERROR });
   }
 };
 
@@ -98,7 +99,7 @@ const loadUsers = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while loaading users" });
+    res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.USERS_LOAD_ERROR });
   }
 };
 const blockUser = async (req, res) => {
@@ -106,24 +107,24 @@ const blockUser = async (req, res) => {
     const userId = req.params.userId;
 
     if (!userId) {
-      res.status(400).json({ message: "invalid user id" });
+      res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.INVALID_USER_ID });
     } else {
       await User.findByIdAndUpdate({ _id: userId }, { isBlocked: true });
-      return res.status(200).json("user blocked");
+      return res.status(STATUS_CODES.OK).json(MESSAGES.ADMIN.USER_BLOCKED_SUCCESS);
     }
   } catch (error) {
     console.error(error);
-    res.status(400).json("error while blocking user");
+    res.status(STATUS_CODES.BAD_REQUEST).json(MESSAGES.ADMIN.USER_BLOCK_ERROR);
   }
 };
 const unblockUser = async (req, res) => {
   try {
     const userId = req.params.userId;
     await User.findByIdAndUpdate({ _id: userId }, { isBlocked: false });
-    return res.status(200).json("user blocked");
+    return res.status(STATUS_CODES.OK).json(MESSAGES.ADMIN.USER_UNBLOCKED_SUCCESS);
   } catch (error) {
     console.error(error);
-    res.status(400).json("error while unblocking user");
+    res.status(STATUS_CODES.BAD_REQUEST).json(MESSAGES.ADMIN.USER_UNBLOCK_ERROR);
   }
 };
 
@@ -162,7 +163,7 @@ const loadcategory = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in loadcategory:", error);
-    res.status(500).json({ error: "Error while loading categories" });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.ADMIN.CATEGORY_LOAD_ERROR });
   }
 };
 const unlistCategory = async (req, res) => {
@@ -200,39 +201,66 @@ const listCategory = async (req, res) => {
 const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-    console.log(req.body, "cat body");
+    const trimmedName = name ? name.trim() : "";
+    const trimmedDesc = description ? description.trim() : "";
 
-    if (!name || !description) {
-      return res.status(400).json({
+    if (!trimmedName) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: "Name and description are required",
+        message: MESSAGES.ADMIN.CATEGORY_NAME_REQUIRED,
       });
     }
+
+    if (!trimmedDesc) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_DESC_REQUIRED,
+      });
+    }
+
+    if (!/^[A-Za-z0-9\s]+$/.test(trimmedName)) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_NAME_INVALID,
+      });
+    }
+
+    if (trimmedName.length < 3 || trimmedName.length > 30) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_NAME_LENGTH,
+      });
+    }
+
+    if (trimmedDesc.length < 5 || trimmedDesc.length > 150) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_DESC_LENGTH,
+      });
+    }
+
     const existCategory = await Category.findOne({
-      name: { $regex: new RegExp(`^${name}$`, "i") },
+      name: { $regex: new RegExp(`^${trimmedName}$`, "i") },
     });
-    console.log(existCategory, "cat existCategory");
 
     if (existCategory) {
-      return res.status(400).json({
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: "Category already exists",
+        message: MESSAGES.ADMIN.CATEGORY_EXISTS,
       });
     }
 
-    const category = new Category({ name, description });
-    console.log(category, "cat category");
-
+    const category = new Category({ name: trimmedName, description: trimmedDesc });
     await category.save();
-    return res.status(200).json({
+    return res.status(STATUS_CODES.OK).json({
       success: true,
-      message: "Category added successfully",
+      message: MESSAGES.ADMIN.CATEGORY_ADD_SUCCESS,
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: "Error while adding category",
+      message: MESSAGES.ADMIN.CATEGORY_ADD_ERROR,
     });
   }
 };
@@ -243,33 +271,83 @@ const loadEditCategory = async (req, res) => {
     res.render("editcategory", { category: category });
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while loading edit page" });
+    res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.CATEGORY_EDIT_LOAD_ERROR });
   }
 };
 const editCategory = async (req, res) => {
   try {
     const catid = req.params.categoryId;
     const { name, description } = req.body;
+    const trimmedName = name ? name.trim() : "";
+    const trimmedDesc = description ? description.trim() : "";
 
     const category = await Category.findById({ _id: catid });
-
-    if (category) {
-      const updatedCategory = await Category.findByIdAndUpdate(
-        { _id: category._id },
-        {
-          name: name || category.name,
-          description: description || category.description,
-        },
-        { new: true }
-      );
-      if (updatedCategory) {
-        return res.json({ success: true, message: "Category updated successfully" });
-      }
+    if (!category) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.ADMIN.CATEGORY_NOT_FOUND });
     }
-    return res.status(400).json({ success: false, message: "Category not found" });
+
+    if (!trimmedName) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_NAME_REQUIRED,
+      });
+    }
+
+    if (!trimmedDesc) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_DESC_REQUIRED,
+      });
+    }
+
+    if (!/^[A-Za-z0-9\s]+$/.test(trimmedName)) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_NAME_INVALID,
+      });
+    }
+
+    if (trimmedName.length < 3 || trimmedName.length > 30) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_NAME_LENGTH,
+      });
+    }
+
+    if (trimmedDesc.length < 5 || trimmedDesc.length > 150) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_DESC_LENGTH,
+      });
+    }
+
+    const existCategory = await Category.findOne({
+      name: { $regex: new RegExp(`^${trimmedName}$`, "i") },
+      _id: { $ne: catid }
+    });
+
+    if (existCategory) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: MESSAGES.ADMIN.CATEGORY_EXISTS,
+      });
+    }
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      { _id: catid },
+      {
+        name: trimmedName,
+        description: trimmedDesc,
+      },
+      { new: true }
+    );
+    if (updatedCategory) {
+      return res.json({ success: true, message: MESSAGES.ADMIN.CATEGORY_UPDATE_SUCCESS });
+    }
+    return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: MESSAGES.ADMIN.CATEGORY_NOT_FOUND });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server error while editing the category" });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.ADMIN.CATEGORY_EDIT_ERROR });
   }
 };
 const addOffer = async (req, res) => {
@@ -278,10 +356,10 @@ const addOffer = async (req, res) => {
     const category = await Category.findById(categoryId);
     category.categoryOffer = percentage;
     await category.save();
-    res.status(200).json({ status: true });
+    res.status(STATUS_CODES.OK).json({ status: true });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ status: false, message: "Server error" });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ status: false, message: MESSAGES.SERVER_ERROR });
   }
 };
 
@@ -291,10 +369,10 @@ const removeOffer = async (req, res) => {
     const category = await Category.findById(categoryId);
     category.categoryOffer = 0;
     await category.save();
-    res.status(200).json({ status: true });
+    res.status(STATUS_CODES.OK).json({ status: true });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ status: false, message: "Server error" });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ status: false, message: MESSAGES.SERVER_ERROR });
   }
 };
 const loadbrand = async (req, res) => {
@@ -330,7 +408,7 @@ const loadbrand = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error while loading brand page" });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.ADMIN.BRAND_LOAD_ERROR });
   }
 };
 const addBrand = async (req, res) => {
@@ -339,7 +417,7 @@ const addBrand = async (req, res) => {
     console.log(req.body, "name");
     const existBrand = await Brand.findOne({ name: name });
     if (existBrand) {
-      res.status(400).json({ message: "Brand already exist" });
+      res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.BRAND_EXISTS });
     } else {
       const newBrand = new Brand({ name });
       await newBrand.save();
@@ -347,7 +425,7 @@ const addBrand = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while adding brand" });
+    res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.BRAND_ADD_ERROR });
   }
 };
 
@@ -363,7 +441,7 @@ const listBrand = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while listing brand" });
+    res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.BRAND_LIST_ERROR });
   }
 };
 const unlistBrand = async (req, res) => {
@@ -378,7 +456,7 @@ const unlistBrand = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while unlisting brand" });
+    res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.BRAND_UNLIST_ERROR });
   }
 };
 const getOrders = async (req, res) => {
@@ -393,13 +471,13 @@ const getOrders = async (req, res) => {
       const User = require("../../models/userSchema");
       const matchingUsers = await User.find({ name: { $regex: search, $options: 'i' } });
       const userIds = matchingUsers.map(u => u._id);
-      
+
       query.$or = [
         { orderId: { $regex: search, $options: 'i' } },
         { user: { $in: userIds } }
       ];
     }
-    
+
     if (status) {
       query.status = status;
     }
@@ -423,7 +501,7 @@ const getOrders = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "error while getting orders" });
+    res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.ORDERS_LOAD_ERROR });
   }
 };
 
@@ -441,13 +519,13 @@ const getOrderDetails = async (req, res) => {
       (addr) => addr._id.toString() == order.address.toString()
     );
     if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+      return res.status(STATUS_CODES.NOT_FOUND).json({ error: MESSAGES.ADMIN.ORDER_NOT_FOUND });
     }
 
     res.render("orderdetails", { order, specificAddress });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to fetch order details" });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.ADMIN.ORDER_DETAILS_ERROR });
   }
 };
 
@@ -459,59 +537,59 @@ const changeStatus = async (req, res) => {
 
     const order = await Order.findOne({ "orderedItems._id": itemId });
     if (!order) {
-      return res.status(404).json({ success: false, error: "Order not found" });
+      return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, error: MESSAGES.ADMIN.ORDER_NOT_FOUND });
     }
 
     const item = order.orderedItems.id(itemId);
     if (!item) {
-      return res.status(404).json({ success: false, error: "Item not found" });
+      return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, error: MESSAGES.ADMIN.ITEM_NOT_FOUND });
     }
 
     if (item.status === "Returned") {
-      return res.status(400).json({
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
         error: "Cannot change status of a returned item",
       });
     }
 
     if (item.status === "Cancelled") {
-      return res.status(400).json({
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
         error: "Cannot change status of a cancelled item",
       });
     }
     if (item.status === "delivered") {
-      return res.status(400).json({
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
         error: "Cannot change status of a delivered item",
       });
     }
 
     const previousStatus = item.status;
-    
-    
+
+
     if (status === 'Cancelled') {
       if (!cancelReason) {
-        return res.status(400).json({ 
-          success: false, 
-          error: "Cancellation reason is required" 
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          error: MESSAGES.ADMIN.CANCEL_REASON_REQUIRED
         });
       }
-      
+
       const itemQuantity = item.quantity;
       let itemSalePrice = 0;
-      
-      
+
+
       if (item) {
         const product = await Product.findById({
           _id: item.products,
         }).populate("category");
-        
+
         if (product) {
-          
+
           product.quantity += item.quantity;
           await product.save();
-          
+
           const productOffer = product.productOffer || 0;
           const categoryOffer = product.category.categoryOffer || 0;
           const bestOffer = Math.max(productOffer, categoryOffer);
@@ -519,24 +597,24 @@ const changeStatus = async (req, res) => {
           itemSalePrice = bestOffer > 0 ? Math.floor(salePrice - (salePrice * bestOffer) / 100) : salePrice;
         }
       }
-        
+
 
       const price = item.price - itemSalePrice;
       let couponRefundAmount = 0;
       let isCouponRemoved = false;
-      
+
       if (order.couponId) {
         const remainingItems = order.orderedItems.filter(
           item => item.status !== "Returned" && item.status !== "Cancelled" && item._id.toString() !== itemId
         );
-        
+
         let newTotal = 0;
         if (remainingItems.length >= 0) {
           for (let i = 0; i < remainingItems.length; i++) {
             const items = await Product.findById({
               _id: remainingItems[i].products,
             }).populate("category");
-            
+
             const productOffer = items.productOffer || 0;
             const categoryOffer = items.category.categoryOffer || 0;
             const bestOffer = Math.max(productOffer, categoryOffer);
@@ -547,7 +625,7 @@ const changeStatus = async (req, res) => {
                 : salePrice * remainingItems[i].quantity;
           }
         }
-        
+
         const coupon = await Coupon.findById({ _id: order.couponId });
         if (coupon && newTotal < coupon.minimumPrice) {
           couponRefundAmount = order.couponDiscount;
@@ -556,35 +634,35 @@ const changeStatus = async (req, res) => {
           isCouponRemoved = true;
         }
       }
-      
-      
+
+
       if (order.paymentMethod !== "COD") {
-        const cancelAmount = isCouponRemoved 
-          ? (itemSalePrice * itemQuantity) - couponRefundAmount 
+        const cancelAmount = isCouponRemoved
+          ? (itemSalePrice * itemQuantity) - couponRefundAmount
           : itemSalePrice * itemQuantity;
-          
+
         order.finalAmount -= cancelAmount;
         order.subtotal -= item.price;
         order.productdiscount -= price;
-        
-      
+
+
         const userId = order.user;
         const transactionType = "credit";
-        
+
         await walletHelper.updateWalletBalance(
           userId,
           cancelAmount,
           transactionType
         );
       }
-      
+
       item.status = status;
       item.cancelReason = cancelReason;
     } else {
-     
+
       item.status = status;
     }
-    
+
     await order.save();
 
     const itemStatuses = order.orderedItems.map((item) => item.status);
@@ -601,26 +679,26 @@ const changeStatus = async (req, res) => {
     } else {
       order.status = "pending";
     }
-    
+
     await order.save();
-    
-   
+
+
     if (previousStatus !== "delivered" && status === "delivered") {
       try {
         const user = await User.findById(order.user);
-        
+
         if (user) {
           if (user.referredBy && !user.referralBonusApplied) {
             await walletHelper.updateWalletBalance(user._id, 100, 'credit');
-            
+
             const referrer = await User.findOne({ referralCode: user.referredBy });
-            
+
             if (referrer) {
               await walletHelper.updateWalletBalance(referrer._id, 100, 'credit');
             }
             user.referralBonusApplied = true;
             await user.save();
-            
+
             console.log(`Referral bonus applied: User ${user._id} received 100 rupees, Referrer received 100 rupees`);
           }
         }
@@ -635,55 +713,55 @@ const changeStatus = async (req, res) => {
     console.error("Error in changeStatus:", error);
     res.setHeader("Content-Type", "application/json");
     return res
-      .status(500)
-      .json({ success: false, error: "Failed to update order status" });
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ success: false, error: MESSAGES.ADMIN.ORDER_UPDATE_ERROR });
   }
 };
 
 const approveReturn = async (req, res) => {
   try {
-  
+
     const { itemId } = req.params;
     const order = await Order.findOne({ "orderedItems._id": itemId });
     if (!order) {
-      return res.status(404).json({ success: false, error: "Order not found" });
+      return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, error: MESSAGES.ADMIN.ORDER_NOT_FOUND });
     }
     const currentDate = new Date();
     const item = order.orderedItems.find(
       (item) => item._id.toString() === itemId
     );
     if (!item) {
-      return res.status(404).json({ success: false, error: "Item not found" });
+      return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, error: MESSAGES.ADMIN.ITEM_NOT_FOUND });
     }
-    console.log(order,"order1")
+    console.log(order, "order1")
 
     if (item.status !== "Return request") {
-      return res.status(400).json({ 
-        success: false, 
-        error: "This item is not in return request status" 
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        error: MESSAGES.ADMIN.ITEM_NOT_IN_RETURN_STATUS
       });
     }
-    
+
     const deliveryDate = new Date(item.deliveryDate);
     const diffDays = (currentDate - deliveryDate) / (1000 * 60 * 60 * 24);
-    console.log(order,"order2")
+    console.log(order, "order2")
 
     if (diffDays > 10) {
-      return res.status(400).json({
-        message: "You cannot return an item after 10 days of delivery",
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        message: MESSAGES.ADMIN.RETURN_DAYS_EXCEEDED,
       });
     }
-    console.log(order,"order3")
+    console.log(order, "order3")
     try {
- 
-      console.log(order,"order4")
-     
+
+      console.log(order, "order4")
+
       const product = await Product.findById(item.products).populate("category");
       if (!product) {
-        return res.status(404).json({ success: false, error: "Product not found" });
+        return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, error: MESSAGES.ADMIN.PRODUCT_NOT_FOUND });
       }
 
-      console.log(order,"order5")
+      console.log(order, "order5")
 
 
       const getSalePrice = (product) => {
@@ -693,27 +771,27 @@ const approveReturn = async (req, res) => {
         return bestOffer > 0 ? Math.floor(product.salePrice - (product.salePrice * bestOffer) / 100) : product.salePrice;
       };
 
-    
 
-      console.log(order,"order6")
+
+      console.log(order, "order6")
       item.status = "Returned";
       const itemSalePrice = getSalePrice(product);
 
       const updatedQuantity = item.quantity;
-      console.log(item.price,itemSalePrice,"order6.1")
-     
+      console.log(item.price, itemSalePrice, "order6.1")
+
       const price = item.price - itemSalePrice;
-      console.log(price,"price")
+      console.log(price, "price")
 
 
       let couponRefundAmount = 0;
       let isCouponRemoved = false;
-      console.log(order,"order7")
+      console.log(order, "order7")
       if (order.couponId) {
         const remainingItems = order.orderedItems.filter(
           item => item.status !== "Returned" && item.status !== "Cancelled"
-        );   
-        console.log(remainingItems,"remainingItems")
+        );
+        console.log(remainingItems, "remainingItems")
         let newtotal = 0;
         if (remainingItems.length >= 0) {
           for (let i = 0; i < remainingItems.length; i++) {
@@ -730,58 +808,58 @@ const approveReturn = async (req, res) => {
                 : salePrice * remainingItems[i].quantity;
           }
         }
-        console.log(order,"order8")
-        const coupon = await Coupon.findById({_id:order.couponId});
-        console.log(coupon,"coupon")
-        console.log(newtotal,coupon.minimumPrice,"newtotal")
-        if ( newtotal < coupon.minimumPrice) {
+        console.log(order, "order8")
+        const coupon = await Coupon.findById({ _id: order.couponId });
+        console.log(coupon, "coupon")
+        console.log(newtotal, coupon.minimumPrice, "newtotal")
+        if (newtotal < coupon.minimumPrice) {
           couponRefundAmount = order.couponDiscount;
           order.couponDiscount = 0;
           order.couponId = null;
           isCouponRemoved = true;
         }
       }
-     
-        console.log(order.orderedItems,"order9.orderedItems")
-        const itemStatuses = order.orderedItems.map((item) => item.status);
-     
-        console.log(itemStatuses, "itemStatuses");
-        if (itemStatuses.every((s) => s === "Returned")) {
-          order.status = "Returned";
-        } else if (
-          itemStatuses.some((s) => s === "delivered")
-        ) {
-          order.status = "delivered";
-        } else if (
-          itemStatuses.some((s) => s === "Processing" || s === "Shipped")
-        ) {
-          order.status = "Processing";
-        } else if (itemStatuses.some((s) => s === "Pending")) {
-          order.status = "Pending";
-        } else if (
-          itemStatuses.some(
-            (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
-          )
-        ) {
-          order.status = "Cancelled";
-        } else {
-          order.status = "pending";
-        }
-      
-     
-       console.log(order,"orderfinal")
-      const refundAmount = isCouponRemoved 
-        ? (itemSalePrice * updatedQuantity) - couponRefundAmount 
+
+      console.log(order.orderedItems, "order9.orderedItems")
+      const itemStatuses = order.orderedItems.map((item) => item.status);
+
+      console.log(itemStatuses, "itemStatuses");
+      if (itemStatuses.every((s) => s === "Returned")) {
+        order.status = "Returned";
+      } else if (
+        itemStatuses.some((s) => s === "delivered")
+      ) {
+        order.status = "delivered";
+      } else if (
+        itemStatuses.some((s) => s === "Processing" || s === "Shipped")
+      ) {
+        order.status = "Processing";
+      } else if (itemStatuses.some((s) => s === "Pending")) {
+        order.status = "Pending";
+      } else if (
+        itemStatuses.some(
+          (s) => s === "Cancelled" || s === "Return request" || s === "Returned"
+        )
+      ) {
+        order.status = "Cancelled";
+      } else {
+        order.status = "pending";
+      }
+
+
+      console.log(order, "orderfinal")
+      const refundAmount = isCouponRemoved
+        ? (itemSalePrice * updatedQuantity) - couponRefundAmount
         : itemSalePrice * updatedQuantity;
-      
-     
+
+
       product.quantity += updatedQuantity;
       await product.save();
 
-      
-      
-      
-      
+
+
+
+
       order.finalAmount -= refundAmount;
       order.subtotal -= item.price;
       order.productdiscount -= price;
@@ -791,22 +869,22 @@ const approveReturn = async (req, res) => {
         await walletHelper.updateWalletBalance(order.user, refundAmount, "credit");
       }
 
-      return res.status(200).json({ 
-        success: true, 
-        message: "Return request approved successfully" 
+      return res.status(STATUS_CODES.OK).json({
+        success: true,
+        message: MESSAGES.ADMIN.RETURN_APPROVE_SUCCESS
       });
     } catch (innerError) {
       console.error("Error in processing return:", innerError);
-      return res.status(500).json({ 
-        success: false, 
-        error: "Error processing return request" 
+      return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        error: MESSAGES.ADMIN.RETURN_APPROVE_ERROR
       });
     }
   } catch (error) {
     console.error("Error in approveReturn:", error);
-    return res.status(500).json({ 
-      success: false, 
-      error: "Failed to approve return" 
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      error: MESSAGES.ADMIN.RETURN_APPROVE_ERROR
     });
   }
 };
@@ -815,20 +893,20 @@ const declineReturn = async (req, res) => {
   try {
     const { itemId } = req.params;
     const order = await Order.findOne({ "orderedItems._id": itemId });
-    
+
     if (!order) {
-      return res.status(404).json({ success: false, error: "Order not found" });
+      return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, error: MESSAGES.ADMIN.ORDER_NOT_FOUND });
     }
 
     const item = order.orderedItems.id(itemId);
     if (!item) {
-      return res.status(404).json({ success: false, error: "Item not found" });
+      return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, error: MESSAGES.ADMIN.ITEM_NOT_FOUND });
     }
 
     if (item.status !== "Return request") {
-      return res.status(400).json({ 
-        success: false, 
-        error: "This item is not in return request status" 
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        error: MESSAGES.ADMIN.ITEM_NOT_IN_RETURN_STATUS
       });
     }
 
@@ -836,15 +914,15 @@ const declineReturn = async (req, res) => {
     item.returnReason = null;
     await order.save();
 
-    return res.status(200).json({ 
-      success: true, 
-      message: "Return request declined successfully" 
+    return res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: MESSAGES.ADMIN.RETURN_DECLINE_SUCCESS
     });
   } catch (error) {
     console.error("Error in declineReturn:", error);
-    return res.status(500).json({ 
-      success: false, 
-      error: "Failed to decline return" 
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      error: MESSAGES.ADMIN.RETURN_DECLINE_ERROR
     });
   }
 };
@@ -854,7 +932,7 @@ const logout = async (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         console.log("Error desroying session", err);
-        return res.status(400).json({ success:false, error: "error while logout" });
+        return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, error: MESSAGES.ADMIN.LOGOUT_ERROR });
       } else {
         console.log("back to lgin");
         res.redirect("/admin");
@@ -862,7 +940,7 @@ const logout = async (req, res) => {
     });
   } catch (error) {
     console.log("unexpected error during logout", error);
-    res.status(500).json({success:false, error: "server error" });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, error: MESSAGES.SERVER_ERROR });
   }
 };
 module.exports = {

@@ -1,3 +1,4 @@
+const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
@@ -36,7 +37,7 @@ const userProfile = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "server error" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 }
 
@@ -45,7 +46,7 @@ const changeEmail = async(req,res)=>{
         res.render('change-email', { path: '/change-email' })
     } catch (error) {
        console.error(error)
-       res.status(500).json({message:"server error"}) 
+       res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR}) 
     }
 }
 
@@ -90,18 +91,18 @@ const changeEmailValid = async(req,res)=>{
         const currentUser = await User.findById(userId);
 
         if (!email) {
-            return res.render('change-email', { message: "Email is required." });
+            return res.render('change-email', { message: MESSAGES.USER_PROFILE.EMAIL_REQUIRED });
         }
 
         // If the user enters their current email address
         if (email.toLowerCase() === currentUser.email.toLowerCase()) {
-            return res.render('change-email', { message: "This is already your current email address." });
+            return res.render('change-email', { message: MESSAGES.USER_PROFILE.SAME_EMAIL });
         }
 
         // If the entered email already belongs to another user
         const existUser = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
         if (existUser) {
-            return res.render('change-email', { message: "This email is already in use." });
+            return res.render('change-email', { message: MESSAGES.USER_PROFILE.EMAIL_TAKEN });
         }
 
         // Send verification OTP to the new email address
@@ -118,13 +119,13 @@ const changeEmailValid = async(req,res)=>{
                 await User.updateOne({ _id: userId }, { $unset: { otp: 1 } })
             }, 60000)
 
-            return res.render('change-email-otp', { success: "Verification OTP has been sent to your new email." })
+            return res.render('change-email-otp', { success: MESSAGES.USER_PROFILE.OTP_SENT_NEW })
         } else {
-            return res.render('change-email', { message: "Error sending OTP verification email. Please try again." })
+            return res.render('change-email', { message: MESSAGES.USER_PROFILE.OTP_SEND_ERROR })
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -137,7 +138,7 @@ const verifyEmailOtp = async(req,res)=>{
         if (userOtp && userOtp === otp) {
             const newEmail = req.session.tempNewEmail;
             if (!newEmail) {
-                return res.render('change-email', { message: "Session expired. Please start the process again." });
+                return res.render('change-email', { message: MESSAGES.USER_PROFILE.SESSION_EXPIRED });
             }
 
             // Update user email
@@ -146,13 +147,13 @@ const verifyEmailOtp = async(req,res)=>{
             await User.updateOne({ _id: userId }, { $unset: { otp: 1 } });
             delete req.session.tempNewEmail;
 
-            return res.render('change-email', { successMessage: "Email updated successfully!" });
+            return res.render('change-email', { successMessage: MESSAGES.USER_PROFILE.EMAIL_UPDATED });
         } else {
-            return res.render('change-email-otp', { message: "Invalid OTP code. Please try again." });
+            return res.render('change-email-otp', { message: MESSAGES.USER_PROFILE.INVALID_OTP });
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -166,7 +167,7 @@ const securepassword = async (password) => {
         return passwordHash;
     } catch (error) {
            console.error(error)
-           res.status(500).json({message:"server error"})
+           res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -178,14 +179,14 @@ const newChangePassword = async(req,res)=>{
         const user = await User.findById({_id:userId})
         const passwordMatch = await bcrypt.compare(currentPassword,user.password)
         if(!passwordMatch){
-               return res.status(400).json({message:"current password is not matching"})
+               return res.status(STATUS_CODES.BAD_REQUEST).json({message:MESSAGES.USER_PROFILE.PASSWORD_MISMATCH})
         }
         if(newPassword!==confirmPassword){
-            return res.status(400).json({message:"confirmpassword not matching"})
+            return res.status(STATUS_CODES.BAD_REQUEST).json({message:MESSAGES.USER_PROFILE.CONFIRM_PASSWORD_MISMATCH})
         }
         // const diffpass = await bcrypt.compare(currentPassword,newPassword)
         // if(diffpass){
-        //    return res.status(400).json({message:"new password should be different from old password"})
+        //    return res.status(STATUS_CODES.BAD_REQUEST).json({message:"new password should be different from old password"})
         // }
         const passwordHash= await securepassword(newPassword)
         user.password = passwordHash
@@ -194,7 +195,7 @@ const newChangePassword = async(req,res)=>{
        return res.redirect('/accountdetails')
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:'server error'})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -224,14 +225,14 @@ const forgotEmailValid = async(req,res)=>{
                },60000)
                res.render("forgotPass-otp",{email}) 
             }else{
-                res.render('forgot-password',{message:"error while sending mail"})
+                res.render('forgot-password',{message:MESSAGES.USER_PROFILE.EMAIL_SEND_ERROR})
             }
         }else{
-            res.render('forgot-password',{message:'user not found'})
+            res.render('forgot-password',{message:MESSAGES.USER_AUTH.USER_NOT_FOUND})
         }
      } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
      }
 }
 
@@ -246,13 +247,13 @@ const verifyForgotPassOtp = async(req,res)=>{
             res.json({success:true,redirectUrl:`/reset-password?email=${encodeURIComponent(email)}`});
 
         }else{
-            res.json({success:false,message:"OTP not matching"})
+            res.json({success:false,message:MESSAGES.USER_PROFILE.OTP_MISMATCH})
         }
         
         
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 const resendOtp = async(req,res)=>{
@@ -263,7 +264,7 @@ const resendOtp = async(req,res)=>{
         const now = Date.now();
         if (req.session.lastOtpTime && (now - req.session.lastOtpTime < 60000)) {
             const waitSecs = Math.ceil((60000 - (now - req.session.lastOtpTime)) / 1000);
-            return res.status(400).json({ success: false, message: `Please wait ${waitSecs} seconds before resending OTP.` });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: `Please wait ${waitSecs} seconds before resending OTP.` });
         }
 
         const findUser = await User.findOne({email:email})
@@ -278,16 +279,16 @@ const resendOtp = async(req,res)=>{
                 setTimeout(async()=>{
                      await User.updateOne({email:email},{$unset:{otp:1}})
                 },60000)
-                res.status(200).json({success:true,message:"Otp resent successfully"})
+                res.status(STATUS_CODES.OK).json({success:true,message:MESSAGES.USER_PROFILE.OTP_RESENT})
             } else {
-                res.status(400).json({success:false,message:"error while sending otp"})
+                res.status(STATUS_CODES.BAD_REQUEST).json({success:false,message:MESSAGES.USER_PROFILE.OTP_SEND_ERROR})
             }
         } else {
-            res.status(404).json({success:false,message:"User not found"})
+            res.status(STATUS_CODES.NOT_FOUND).json({success:false,message:MESSAGES.USER_AUTH.USER_NOT_FOUND})
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -301,7 +302,7 @@ const changePassword = async(req,res)=>{
         });
     } catch (error) {
        console.error(error)
-       res.status(500).json({message:"server error"})
+       res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -321,18 +322,18 @@ const changePasswordValid = async(req,res)=>{
 
             },60000)
 
-            res.render('change-password-otp',{message:"email send to your mail"})
+            res.render('change-password-otp',{message:MESSAGES.USER_PROFILE.EMAIL_SENT})
         }else{
-            res.render('change-password',{message:"error while sending mail"})
+            res.render('change-password',{message:MESSAGES.USER_PROFILE.EMAIL_SEND_ERROR})
         }
 
     }else{
-        res.render('change-password',{message:"user not found"})
+        res.render('change-password',{message:MESSAGES.USER_AUTH.USER_NOT_FOUND})
 
     }
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -346,12 +347,12 @@ const verifychangePasswordOtp = async(req,res)=>{
         if(userOtp===otp){
             res.json({success:true,redirectUrl:'/reset-password'})
         }else{
-            res.json({success:false,message:"OTP not matching"})
+            res.json({success:false,message:MESSAGES.USER_PROFILE.OTP_MISMATCH})
         }
 
     } catch (error) {
        console.error(error)
-       res.status(500).json({message:"server error"}) 
+       res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR}) 
     }
 }
 
@@ -375,12 +376,12 @@ const postNewPassword = async(req,res)=>{
          const user = await User.updateOne({email:email},{$set:{password:passwordHash}})
          return res.json({ success: true, redirectUrl: "/login" });
         }else{
-            res.render("reset-password",{message:"Passwords do not match"});
+            res.render("reset-password",{message:MESSAGES.USER_PROFILE.PASSWORDS_DO_NOT_MATCH});
         }
 
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -417,7 +418,7 @@ const postAddAddress = async(req,res)=>{
 
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -429,7 +430,7 @@ const postAddAddress = async(req,res)=>{
 //         res.render('edit-address',{currentAdd:currentAdd,user:user})
 //        } catch (error) {
 //           console.error(error)
-//           res.status(500).json({message:"server error"})
+//           res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
 //        }
 // }
 
@@ -456,7 +457,7 @@ const editAddress = async (req,res)=>{
         res.render("edit-address",{address : addressData, user:user})
     } catch (error) {
       console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -489,7 +490,7 @@ const postEditAddress = async(req,res)=>{
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 
@@ -504,7 +505,7 @@ const deleteAddress = async(req,res)=>{
         res.redirect("/address")
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 // -------------------------------------------
@@ -538,7 +539,7 @@ const getOrderlistPage = async (req, res) => {
     
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.SERVER_ERROR });
   }
 }
 
@@ -551,7 +552,7 @@ const getAddressPage = async(req,res)=>{
         res.render('useraddress',{path:'/address',userAddress,user})
     } catch (error) {
         console.error(error);
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
  
@@ -562,7 +563,7 @@ const getProfilePage = async(req,res)=>{
         res.render('userprofile',{path:'/accountdetails',user})
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 const getWalletPage = async(req,res)=>{
@@ -600,7 +601,7 @@ const getWalletPage = async(req,res)=>{
 
     } catch (error) {
         console.error(error)
-        res.status(500).json({message:"server error"})
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
     }
 }
 

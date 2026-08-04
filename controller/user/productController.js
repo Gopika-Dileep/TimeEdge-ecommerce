@@ -1,3 +1,4 @@
+const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 const Product = require("../../models/productSchema")
 const Category = require("../../models/categorySchema")
 const Brand = require("../../models/brandSchema")
@@ -36,7 +37,7 @@ const loadhome = async (req, res) => {
         if (userId) {
             const user = await User.findById({ _id: userId })
             if (user.isBlocked === true) {
-                return res.render('login', { message: "User is blocked by admin" });
+                return res.render('login', { message: MESSAGES.USER_AUTH.USER_BLOCKED });
             }
             res.render('home', { user: user, product: productsWithWishlist })
         } else {
@@ -44,7 +45,7 @@ const loadhome = async (req, res) => {
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json("server error")
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(MESSAGES.SERVER_ERROR)
     }
 }
 
@@ -99,7 +100,7 @@ const loadshop = async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json("server error");
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(MESSAGES.SERVER_ERROR);
     }
 }
 
@@ -123,7 +124,7 @@ const productDetails = async (req, res) => {
             })
 
         if (!product || !product.category || !product.brand) {
-            return res.status(404).render('product-not-found');
+            return res.status(STATUS_CODES.NOT_FOUND).render('product-not-found');
         }
 
         const findCategory = product.category
@@ -141,7 +142,7 @@ const productDetails = async (req, res) => {
             const user = await User.findById(userId);
             if (user) {
                 if (user.isBlocked === true) {
-                    return res.render('login', { message: "User is blocked by admin" });
+                    return res.render('login', { message: MESSAGES.USER_AUTH.USER_BLOCKED });
                 }
                 const wishlist = await Wishlist.findOne({ userId: userId });
                 isInWishlist = wishlist ? wishlist.products.some(item => item.productId.toString() === productId) : false;
@@ -171,7 +172,7 @@ const productDetails = async (req, res) => {
         }
     } catch (error) {
         console.error(error)
-        res.status(500).json("server error")
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(MESSAGES.SERVER_ERROR)
     }
 }
 
@@ -288,7 +289,7 @@ const shopProducts = async (req, res) => {
         if (user) {
             const userData = await User.findOne({ _id: user });
             if (userData.isBlocked === true) {
-                return res.render('login', { message: "User is blocked by admin" });
+                return res.render('login', { message: MESSAGES.USER_AUTH.USER_BLOCKED });
             }
 
             renderOptions.user = userData;
@@ -298,7 +299,7 @@ const shopProducts = async (req, res) => {
 
     } catch (error) {
         console.error('Shop Products Error:', error);
-        res.status(500).json({ error: "Server error occurred" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.SERVER_ERROR });
     }
 };
 

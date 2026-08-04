@@ -3,6 +3,13 @@ const excelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 const fs = require("fs");
 const path = require("path");
+const { STATUS_CODES } = require("../../helpers/constants");
+
+const MESSAGES = {
+    SERVER_ERROR: "server error",
+    PDF_ERROR: "Failed to generate PDF",
+    EXCEL_ERROR: "Failed to generate Excel"
+};
 
 const loadSalesReport = async (req, res) => {
     try {
@@ -58,18 +65,18 @@ const loadSalesReport = async (req, res) => {
             query.createdOn = { $gte: new Date(startDate), $lte: new Date(endDate) };
         }
 
-        const totalOrders = await Order.find(query).sort({ createdOn: -1 }).populate('user').populate({path:'orderedItems.products',populate:{path:'category',model:'Category'}});
+        const totalOrders = await Order.find(query).sort({ createdOn: -1 }).populate('user').populate({ path: 'orderedItems.products', populate: { path: 'category', model: 'Category' } });
         const totalSalePrice = totalOrders.reduce((sum, order) => sum + order.finalAmount, 0);
         const saleCount = totalOrders.length;
         const couponDiscount = totalOrders.reduce((sum, order) => sum + order.couponDiscount, 0);
-        const totalDiscount = totalOrders.reduce((sum, order) => sum + order.productdiscount, 0)
+        const totalDiscount = totalOrders.reduce((sum, order) => sum + order.productdiscount, 0);
         const totalOrder = saleCount;
         const totalPage = Math.ceil(totalOrder / limit);
-        const order = await Order.find(query).sort({ createdOn: -1 }).skip((page - 1) * limit).limit(limit).populate('user').populate({path:'orderedItems.products',populate:{path:'category',model:'Category'}});
+        const order = await Order.find(query).sort({ createdOn: -1 }).skip((page - 1) * limit).limit(limit).populate('user').populate({ path: 'orderedItems.products', populate: { path: 'category', model: 'Category' } });
         
         res.render('salesreport', {
             order,
-            totalSalePrice : Math.round(totalSalePrice),
+            totalSalePrice: Math.round(totalSalePrice),
             saleCount,
             couponDiscount,
             totalDiscount,
@@ -82,7 +89,7 @@ const loadSalesReport = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "server error" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 };
 
@@ -197,8 +204,8 @@ const filterOrder = async (req, res) => {
             query.createdOn = { $gte: start, $lte: end };
         }
 
-const totalOrders = await Order.countDocuments(query);
-const totalPage = Math.ceil(totalOrders / limit);
+        const totalOrders = await Order.countDocuments(query);
+        const totalPage = Math.ceil(totalOrders / limit);
 
         const orders = await Order.find(query)
             .sort({ createdOn: -1 })
@@ -213,8 +220,7 @@ const totalPage = Math.ceil(totalOrders / limit);
         const couponDiscount = allOrders.reduce((sum, order) => sum + (order.couponDiscount || 0), 0);
         const totalDiscount = allOrders.reduce((sum, order) => sum + (order.productdiscount || 0), 0);
 
-
-        return res.status(200).json({
+        return res.status(STATUS_CODES.OK).json({
             orders,
             saleCount,
             totalSalePrice: Math.round(totalSalePrice),
@@ -222,12 +228,13 @@ const totalPage = Math.ceil(totalOrders / limit);
             couponDiscount: Math.round(couponDiscount),
             totalPage,
             currentPage: page
-          });
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server error" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 };
+
 const filterbyDate = async (req, res) => {
     try {
         let { startDate, endDate } = req.query;
@@ -257,7 +264,7 @@ const filterbyDate = async (req, res) => {
         const totalDiscount = orders.reduce((sum, order) => sum + order.productdiscount, 0);
         const totalPage = Math.ceil(saleCount / 5);
 
-        return res.status(200).json({
+        return res.status(STATUS_CODES.OK).json({
             orders,
             saleCount,
             totalSalePrice,
@@ -268,14 +275,13 @@ const filterbyDate = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Server error" });
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 };
 
 const downloadpdf = async (req, res) => {
     try {
         const { filtervalue, startDate, endDate } = req.body;
-        console.log(req.body,"tessttt")
         
         const orders = await getFilteredOrders(filtervalue, startDate, endDate);
         
@@ -290,111 +296,112 @@ const downloadpdf = async (req, res) => {
             paymentMethod: order.paymentMethod
         }));
 
-      const PDFDocument = require('pdfkit');
-      const doc = new PDFDocument({
-        margins: { top: 50, bottom: 50, left: 50, right: 50 },
-        size: 'A4'
-      });
-  
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
-      doc.pipe(res);
-  
-      const formatCurrency = (amount) => `₹${amount.toFixed(2)}`;
-  
-      doc.fontSize(20)
-         .font('Helvetica-Bold')
-         .text('Sales Report', { align: 'center' });
-      
-      doc.moveDown();
-      doc.fontSize(10)
-         .font('Helvetica')
-         .text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'right' });
-  
-      doc.moveDown();
-      doc.fontSize(14)
-         .font('Helvetica-Bold')
-         .text('Summary');
-      
-      const totalOrders = salesData.length;
-      const totalRevenue = salesData.reduce((sum, sale) => sum + sale.finalAmount, 0);
-      const totalProductDiscount = salesData.reduce((sum, sale) => sum + sale.productDiscount, 0);
-      const totalCouponDiscount = salesData.reduce((sum, sale) => sum + sale.couponDiscount, 0);
-  
-      doc.fontSize(10)
-         .font('Helvetica')
-         .text(`Total Orders: ${totalOrders}`)
-         .text(`Total Revenue: ${formatCurrency(totalRevenue)}`)
-         .text(`Total Product Discounts: ${formatCurrency(totalProductDiscount)}`)
-         .text(`Total Coupon Discounts: ${formatCurrency(totalCouponDiscount)}`);
-  
-      doc.moveDown();
-      doc.fontSize(14)
-         .font('Helvetica-Bold')
-         .text('Sales Details');
-  
-      const startX = 50;
-      const columnWidths = [80, 90, 80, 80, 80, 80];
-      let currentY = doc.y + 10;
-  
-      const headers = ['Date', 'Order ID', 'Subtotal', 'Product Disc.', 'Coupon Disc.', 'Final Amount'];
-      
-      doc.rect(startX, currentY, doc.page.width - 100, 20)
-         .fill('#f0f0f0');
-  
-      let currentX = startX;
-      doc.fontSize(8)
-         .font('Helvetica-Bold')
-         .fillColor('#000000');
-      
-      headers.forEach((header, i) => {
-        doc.text(header, currentX + 5, currentY + 5, {
-          width: columnWidths[i],
-          align: 'left'
-        });
-        currentX += columnWidths[i];
-      });
-  
-      currentY += 20;
-      doc.font('Helvetica').fontSize(8);
-  
-      salesData.forEach((sale, index) => {
-        if (currentY > doc.page.height - 100) {
-          doc.addPage();
-          currentY = 50;
-        }
-  
-        const rowData = [
-          new Date(sale.date).toLocaleDateString(),
-          sale.orderId,
-          formatCurrency(sale.subtotal),
-          formatCurrency(sale.productDiscount),
-          formatCurrency(sale.couponDiscount),
-          formatCurrency(sale.finalAmount)
-        ];
-  
-        currentX = startX;
-        rowData.forEach((data, i) => {
-          doc.text(data, currentX + 5, currentY + 5, {
-            width: columnWidths[i],
-            align: 'left'
-          });
-          currentX += columnWidths[i];
+        const PDFDocument = require('pdfkit');
+        const doc = new PDFDocument({
+            margins: { top: 50, bottom: 50, left: 50, right: 50 },
+            size: 'A4'
         });
   
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
+        doc.pipe(res);
+  
+        const formatCurrency = (amount) => `₹${amount.toFixed(2)}`;
+  
+        doc.fontSize(20)
+           .font('Helvetica-Bold')
+           .text('Sales Report', { align: 'center' });
+      
+        doc.moveDown();
+        doc.fontSize(10)
+           .font('Helvetica')
+           .text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'right' });
+  
+        doc.moveDown();
+        doc.fontSize(14)
+           .font('Helvetica-Bold')
+           .text('Summary');
+      
+        const totalOrders = salesData.length;
+        const totalRevenue = salesData.reduce((sum, sale) => sum + sale.finalAmount, 0);
+        const totalProductDiscount = salesData.reduce((sum, sale) => sum + sale.productDiscount, 0);
+        const totalCouponDiscount = salesData.reduce((sum, sale) => sum + sale.couponDiscount, 0);
+  
+        doc.fontSize(10)
+           .font('Helvetica')
+           .text(`Total Orders: ${totalOrders}`)
+           .text(`Total Revenue: ${formatCurrency(totalRevenue)}`)
+           .text(`Total Product Discounts: ${formatCurrency(totalProductDiscount)}`)
+           .text(`Total Coupon Discounts: ${formatCurrency(totalCouponDiscount)}`);
+  
+        doc.moveDown();
+        doc.fontSize(14)
+           .font('Helvetica-Bold')
+           .text('Sales Details');
+  
+        const startX = 50;
+        const columnWidths = [80, 90, 80, 80, 80, 80];
+        let currentY = doc.y + 10;
+  
+        const headers = ['Date', 'Order ID', 'Subtotal', 'Product Disc.', 'Coupon Disc.', 'Final Amount'];
+      
         doc.rect(startX, currentY, doc.page.width - 100, 20)
-           .stroke('#dddddd');
+           .fill('#f0f0f0');
+  
+        let currentX = startX;
+        doc.fontSize(8)
+           .font('Helvetica-Bold')
+           .fillColor('#000000');
+      
+        headers.forEach((header, i) => {
+            doc.text(header, currentX + 5, currentY + 5, {
+                width: columnWidths[i],
+                align: 'left'
+            });
+            currentX += columnWidths[i];
+        });
   
         currentY += 20;
-      });
+        doc.font('Helvetica').fontSize(8);
   
-      doc.end();
+        salesData.forEach((sale, index) => {
+            if (currentY > doc.page.height - 100) {
+                doc.addPage();
+                currentY = 50;
+            }
+  
+            const rowData = [
+                new Date(sale.date).toLocaleDateString(),
+                sale.orderId,
+                formatCurrency(sale.subtotal),
+                formatCurrency(sale.productDiscount),
+                formatCurrency(sale.couponDiscount),
+                formatCurrency(sale.finalAmount)
+            ];
+  
+            currentX = startX;
+            rowData.forEach((data, i) => {
+                doc.text(data, currentX + 5, currentY + 5, {
+                    width: columnWidths[i],
+                    align: 'left'
+                });
+                currentX += columnWidths[i];
+            });
+  
+            doc.rect(startX, currentY, doc.page.width - 100, 20)
+               .stroke('#dddddd');
+  
+            currentY += 20;
+        });
+  
+        doc.end();
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      res.status(500).send('Failed to generate PDF');
+        console.error('Error generating PDF:', error);
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send(MESSAGES.PDF_ERROR);
     }
-  };
-  const downloadexcel = async (req, res) => {
+};
+
+const downloadexcel = async (req, res) => {
     try {
         const { filtervalue, startDate, endDate } = req.body;
         
@@ -497,12 +504,13 @@ const downloadpdf = async (req, res) => {
         );
 
         await workbook.xlsx.write(res);
-        res.status(200).end();
+        res.status(STATUS_CODES.OK).end();
     } catch (error) {
         console.error('Error generating Excel:', error);
-        res.status(500).send('Failed to generate Excel');
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send(MESSAGES.EXCEL_ERROR);
     }
 };
+
 module.exports = {
     loadSalesReport,
     filterOrder,
@@ -510,4 +518,3 @@ module.exports = {
     downloadpdf,
     downloadexcel
 };
-

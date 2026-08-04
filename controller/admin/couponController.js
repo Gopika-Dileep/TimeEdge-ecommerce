@@ -1,11 +1,11 @@
 const Category = require("../../models/categorySchema")
 const Brand = require('../../models/brandSchema'); 
-const Product= require('../../models/productSchema');
+const Product = require('../../models/productSchema');
 const Order = require("../../models/orderSchema");
-const Coupon = require('../../models/couponSchema')
+const Coupon = require('../../models/couponSchema');
+const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 
-
-const loadCouponPage = async(req,res)=>{
+const loadCouponPage = async (req, res) => {
     try {
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
@@ -14,23 +14,23 @@ const loadCouponPage = async(req,res)=>{
         const coupons = await Coupon.find();
         
         // Update status for expired or maxed out coupons
-        for(let coupon of coupons) {
+        for (let coupon of coupons) {
             let shouldUpdate = false;
             
             // Check if coupon is expired
-            if(coupon.expireOn < currentDate && coupon.isList) {
+            if (coupon.expireOn < currentDate && coupon.isList) {
                 coupon.isList = false;
                 shouldUpdate = true;
             }
             
             // Check if usage limit is reached
-            if(coupon.UsageLimit && coupon.userId.length >= coupon.UsageLimit && coupon.isList) {
+            if (coupon.UsageLimit && coupon.userId.length >= coupon.UsageLimit && coupon.isList) {
                 coupon.isList = false;
                 shouldUpdate = true;
             }
 
             // Save coupon if status changed
-            if(shouldUpdate) {
+            if (shouldUpdate) {
                 await coupon.save();
             }
         }
@@ -59,46 +59,44 @@ const loadCouponPage = async(req,res)=>{
         });
 
     } catch (error) {
-        console.error(error)
-        res.status(500).json({message:"server error"})
+        console.error(error);
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 }
+
 const addCoupon = async (req, res) => {
     try {
         const code = req.body.code || req.body.name;
-        const { offerPrice, createon, expireOn, minimumPrice, UsageLimit } = req.body
+        const { offerPrice, createon, expireOn, minimumPrice, UsageLimit } = req.body;
         
         if (!code || !/^[a-zA-Z0-9]+$/.test(code)) {
-            return res.status(400).json({ error: 'Coupon code must be alphanumeric only (letters and numbers)' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.COUPON_ALPHANUMERIC });
         }
         
         const today = new Date();
-        today.setHours(0,0,0,0);
+        today.setHours(0, 0, 0, 0);
         if (!expireOn || new Date(expireOn) < today) {
-            return res.status(400).json({ error: 'Expiry date cannot be in the past' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.EXPIRY_PAST });
         }
 
         const limit = parseInt(UsageLimit);
         if (isNaN(limit) || limit <= 0) {
-            return res.status(400).json({ error: 'Usage limit must be at least 1' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.USAGE_LIMIT_MIN });
         }
         
         const discountAmount = parseFloat(offerPrice);
         const minAmount = parseFloat(minimumPrice);
         
-       
         if (discountAmount >= minAmount) {
-            return res.status(400).json({ error: 'Discount amount must be less than minimum purchase amount' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.DISCOUNT_LIMIT });
         }
         
-       
         const existingCoupon = await Coupon.findOne({
             name: { $regex: new RegExp(`^${code}$`, 'i') }
         });
         
         if (existingCoupon) {
-           
-            return res.status(409).json({ error: 'Coupon code already exists' });
+            return res.status(STATUS_CODES.CONFLICT).json({ error: MESSAGES.ADMIN_COUPON.DUPLICATE_COUPON });
         }
         
         const coupon = new Coupon({
@@ -108,24 +106,24 @@ const addCoupon = async (req, res) => {
             expireOn: expireOn,
             minimumPrice: minimumPrice,
             UsageLimit: UsageLimit,
-           
-        })
-        await coupon.save()
+        });
+        await coupon.save();
         
         // Return success response for AJAX request
         if (req.xhr || req.headers.accept.includes('application/json')) {
-            return res.status(200).json({ success: true });
+            return res.status(STATUS_CODES.OK).json({ success: true });
         }
         // Regular form submission fallback
-        res.redirect('/admin/coupon')
+        res.redirect('/admin/coupon');
     } catch (error) {
-        console.error(error)
+        console.error(error);
         if (req.xhr || req.headers.accept.includes('application/json')) {
-            return res.status(500).json({ message: "server err" });
+            return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
         }
-        res.status(500).json({ message: "server err" })
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 }
+
 const listCoupon = async (req, res) => {
     try {
         const couponId = req.query.id;
@@ -133,7 +131,7 @@ const listCoupon = async (req, res) => {
         res.redirect('/admin/coupon');
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "server error" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 };
 
@@ -144,7 +142,7 @@ const unlistCoupon = async (req, res) => {
         res.redirect('/admin/coupon');
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "server error" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 };
 
@@ -158,7 +156,7 @@ const loadEditCoupon = async (req, res) => {
         res.render('editcoupon', { coupon });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "server error" });
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: MESSAGES.SERVER_ERROR });
     }
 };
 
@@ -169,36 +167,36 @@ const editCoupon = async (req, res) => {
 
         const coupon = await Coupon.findById(couponId);
         if (!coupon) {
-            return res.status(404).json({ error: 'Coupon not found' });
+            return res.status(STATUS_CODES.NOT_FOUND).json({ error: MESSAGES.ADMIN_COUPON.NOT_FOUND });
         }
 
         const name = (code || '').trim().toUpperCase();
         if (!name || !/^[A-Z0-9]+$/.test(name)) {
-            return res.status(400).json({ error: 'Coupon code must be alphanumeric only (letters and numbers)' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.COUPON_ALPHANUMERIC });
         }
 
         const discountAmount = parseFloat(offerPrice);
         const minAmount = parseFloat(minimumPrice);
         
         if (isNaN(discountAmount) || discountAmount <= 0) {
-            return res.status(400).json({ error: 'Discount amount must be greater than 0' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.DISCOUNT_MIN });
         }
         if (isNaN(minAmount) || minAmount < 0) {
-            return res.status(400).json({ error: 'Minimum purchase must be at least 0' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.MIN_PURCHASE_LIMIT });
         }
         if (discountAmount >= minAmount) {
-            return res.status(400).json({ error: 'Discount amount must be less than minimum purchase amount' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.DISCOUNT_LIMIT });
         }
 
         const limit = parseInt(UsageLimit);
         if (isNaN(limit) || limit <= 0) {
-            return res.status(400).json({ error: 'Usage limit must be at least 1' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.USAGE_LIMIT_MIN });
         }
 
         const today = new Date();
-        today.setHours(0,0,0,0);
+        today.setHours(0, 0, 0, 0);
         if (!expireOn || new Date(expireOn) < today) {
-            return res.status(400).json({ error: 'Expiry date cannot be in the past' });
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_COUPON.EXPIRY_PAST });
         }
 
         const existingCoupon = await Coupon.findOne({
@@ -207,7 +205,7 @@ const editCoupon = async (req, res) => {
         });
         
         if (existingCoupon) {
-            return res.status(409).json({ error: 'Coupon code already exists' });
+            return res.status(STATUS_CODES.CONFLICT).json({ error: MESSAGES.ADMIN_COUPON.DUPLICATE_COUPON });
         }
 
         coupon.name = name;
@@ -218,18 +216,18 @@ const editCoupon = async (req, res) => {
 
         await coupon.save();
 
-        return res.status(200).json({ success: true, message: 'Coupon updated successfully' });
+        return res.status(STATUS_CODES.OK).json({ success: true, message: MESSAGES.ADMIN_COUPON.UPDATE_SUCCESS });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: 'Server error while editing coupon' });
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.SERVER_ERROR });
     }
 };
 
-module.exports={
+module.exports = {
     loadCouponPage,
     addCoupon,
     listCoupon,
     unlistCoupon,
     loadEditCoupon,
     editCoupon
-}
+};
