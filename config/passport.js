@@ -16,6 +16,10 @@ passport.use(
       try {
         let user = await User.findOne({ googleId: profile.id });
         if (user) {
+          if (!user.isVerified) {
+            user.isVerified = true;
+            await user.save();
+          }
           return done(null, user);
         } else {
           const email = profile.emails && profile.emails[0] && profile.emails[0].value;
@@ -23,6 +27,7 @@ passport.use(
             let existingUser = await User.findOne({ email: email });
             if (existingUser) {
               existingUser.googleId = profile.id;
+              existingUser.isVerified = true;
               if (!existingUser.name) {
                 existingUser.name = profile.displayName;
               }
@@ -34,6 +39,7 @@ passport.use(
             name: profile.displayName,
             email: email,
             googleId: profile.id,
+            isVerified: true,
           });
           await user.save();
           return done(null, user);
