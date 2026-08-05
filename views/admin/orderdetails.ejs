@@ -1,573 +1,214 @@
 <%- include("../../views/partials/admin/header") %>
+<link rel="stylesheet" href="/css/admin-orders.css">
 
-    <style>
-        .content-header {
-            padding: 2rem;
-            background: #f4f4f4;
-            border-radius: 0.5rem;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
+<div class="content-container">
+    <div class="order-details-header animate-up">
+        <a href="/admin/orders" class="back-link-btn">
+            <i class="fa-solid fa-arrow-left"></i> Back to Orders
+        </a>
+        <div style="margin-top: 12px;">
+            <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Order Management</span>
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:500; margin-top:4px;">Order Details</h2>
+        </div>
+    </div>
 
-        .status-select {
-            height: 50px;
-            border-radius: 6px;
-        }
-
-        .breadcrumb {
-            color: #4b5563;
-            margin-bottom: 1.5rem;
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-
-        .back-link {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #2563eb;
-            text-decoration: none;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .page-title {
-            color: #1e293b;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-        }
-
-        .cards-container {
-            display: flex;
-            flex-direction: row;
-            flex: 50% 50%;
-            gap: 1.5rem;
-            width: 100%;
-        }
-
-        .info-card {
-            background: #ffffff;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-            width: 100%;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 1rem;
-        }
-
-        .info-item {
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .info-label {
-            font-weight: 500;
-            color: #64748b;
-            margin-right: 0.75rem;
-            min-width: 130px;
-        }
-
-        .info-value {
-            color: #475569;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 0.5rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-transform: capitalize;
-        }
-
-        .status-pending {
-            background-color: #fde047;
-            color: #78350f;
-        }
-
-        .status-processing {
-            background-color: #bfdbfe;
-            color: #1e3a8a;
-        }
-
-        .status-shipped {
-            background-color: #cbd5e1;
-            color: #334155;
-        }
-
-        .status-delivered {
-            background-color: #bbf7d0;
-            color: #064e3b;
-        }
-
-        .status-cancelled {
-            background-color: #fecaca;
-            color: #7f1d1d;
-        }
-
-        .status-return-request {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-returned {
-            background-color: #fef08a;
-            color: #854d0e;
-        }
-
-        .items-card {
-            background: #ffffff;
-            border-radius: 0.5rem;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-            margin-top: 1.5rem;
-            overflow: hidden;
-        }
-
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .items-table th {
-            background: #e5e7eb;
-            padding: 0.875rem 1rem;
-            text-align: left;
-            color: #1f2937;
-            font-weight: 600;
-            border-bottom: 2px solid #d1d5db;
-        }
-
-        .items-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            color: #374151;
-        }
-
-        .edit-status-btn {
-            padding: 0.375rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            background: #f9fafb;
-            color: #1f2937;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .edit-status-btn:hover {
-            background: #e5e7eb;
-        }
-
-        .cancelled-section {
-            background-color: #fee2e2;
-            border-radius: 0.5rem;
-            padding: 1rem 1.5rem;
-            margin: 1rem;
-            color: #7f1d1d;
-            font-weight: 500;
-        }
-
-        .returned-section {
-            background-color: #fefbe2;
-            border-radius: 0.5rem;
-            padding: 1rem 1.5rem;
-            margin: 1rem;
-            color: #cad80b;
-            font-weight: 500;
-        }
-
-        .total-amount {
-            text-align: right;
-            padding: 1.5rem;
-            font-weight: 600;
-            font-size: 1rem;
-            color: #1f2937;
-            border-top: 2px solid #d1d5db;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1050;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background-color: var(--bg-card, #ffffff);
-            margin: auto;
-            padding: 28px;
-            border: 1px solid var(--border, #edece8);
-            width: 90%;
-            max-width: 440px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            color: var(--text-primary, #1c1a17);
-            position: relative;
-        }
-
-        .modal-content h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-        }
-
-        .close-modal {
-            position: absolute;
-            right: 20px;
-            top: 16px;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-muted, #948c82);
-            line-height: 1;
-            transition: var(--transition);
-        }
-        .close-modal:hover {
-            color: var(--gold, #b39343);
-        }
-
-        .save-status-btn {
-            background: var(--gold, #b39343);
-            color: #ffffff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 16px;
-            transition: var(--transition);
-        }
-
-        .save-status-btn:hover {
-            background: var(--gold-light, #d4b66a);
-            box-shadow: 0 0 12px rgba(179,147,67,0.3);
-        }
-
-        .status-select {
-            width: 100%;
-            height: 42px;
-            border: 1px solid var(--border, #edece8);
-            background-color: var(--bg-body, #fbfbf9);
-            color: var(--text-primary, #1c1a17);
-            border-radius: 4px;
-            padding: 8px 12px;
-            outline: none;
-            transition: var(--transition);
-        }
-        .status-select:focus {
-            border-color: var(--gold, #b39343);
-        }
-
-        #cancelReason {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            outline: none;
-            transition: var(--transition);
-            margin-top: 8px;
-            resize: vertical;
-        }
-        #cancelReason:focus {
-            border-color: var(--gold);
-        }
-
-        .content-header {
-            width: 100%;
-            padding: 0;
-        }
-
-        .negative-value {
-            color: #16a34a;
-        }
-
-        @media (max-width: 1000px) {
-            .content-header {
-                padding: 0;
-            }
-        }
-
-        .approve-btn {
-            background-color: #bbf7d0;
-            color: #064e3b;
-            margin-right: 5px;
-        }
-
-        .decline-btn {
-            background-color: #fecaca;
-            color: #7f1d1d;
-        }
-
-
-        #cancelReasonContainer {
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-
-        #cancelReason {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            resize: vertical;
-            min-height: 80px;
-            margin-top: 8px;
-        }
-
-        .cancel-reason-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #4b5563;
-        }
-    </style>
-
-    <div class="content-header">
-        <div style="width: 100%;">
-            <div class="breadcrumb">
-                <span>Admin</span> &gt; <span>Orders</span>
+    <!-- 3-Column Info Cards Grid -->
+    <div class="cards-container animate-up delay-1">
+        <div class="info-card">
+            <h2 class="card-title">Order <span>Information</span></h2>
+            <div class="info-item">
+                <div class="info-label">Order ID</div>
+                <div class="info-value order-ref">#<%= order.orderId %></div>
             </div>
-
-            <a href="/admin/orders" class="btn btn-outline-primary" style="margin-bottom: 30px;">
-                <i class="fas fa-arrow-left"></i> Back to Orders
-            </a>
-
-            <h1 class="page-title">Order Details</h1>
-
-            <div class="cards-container">
-                <div class="info-card">
-                    <h2 class="card-title">Order Information</h2>
-                    <div class="info-item">
-                        <div class="info-label">Order ID:</div>
-                        <div class="info-value">
-                            <%= order.orderId %>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Date:</div>
-                        <div class="info-value">
-                            <%= new Date(order.createdOn).toLocaleDateString() %>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Payment Method:</div>
-                        <div class="info-value">
-                            <%= order.paymentMethod %>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Overall Status:</div>
-                        <div class="info-value">
-                            <span class="status-badge status-<%= order.status.toLowerCase() %>">
-                                <%= order.status %>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-card">
-                    <h2 class="card-title">Customer Details</h2>
-                    <div class="info-item">
-                        <div class="info-label">Name:</div>
-                        <div class="info-value">
-                            <%= order.user.name %>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Phone:</div>
-                        <div class="info-value">
-                            <%= order.user.phone %>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Address:</div>
-                        <div class="info-value">
-                            <% if (locals.specificAddress) { %>
-                                <h6 class="mb-2">
-                                    <%= specificAddress.name %>
-                                </h6>
-                                <p class="mb-1 text-muted">
-                                    <%= specificAddress.addressType %>
-                                </p>
-                                <p class="mb-1 text-muted">
-                                    <%= specificAddress.landMark %>
-                                </p>
-                                <p class="mb-1 text-muted">
-                                    <%= specificAddress.city %>, <%= specificAddress.state %>
-                                            <%= specificAddress.pincode %>
-                                </p>
-                            <% } else { %>
-                                <p class="text-danger mb-0">Address deleted or not found</p>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-card">
-                    <h2 class="card-title">Order Summary</h2>
-                    <div class="info-item">
-                        <div class="info-label">Subtotal:</div>
-                        <div class="info-value">₹<%= order.subtotal.toFixed(2) %>
-                        </div>
-                    </div>
-                    <% if (order.productdiscount>0) { %>
-                        <div class="info-item">
-                            <div class="info-label">Product Discount:</div>
-                            <div class="info-value negative-value">-₹<%= order.productdiscount.toFixed(2) %>
-                            </div>
-                        </div>
-                        <% } %>
-                            <% if (order.couponDiscount> 0) { %>
-                                <div class="info-item">
-                                    <div class="info-label">Coupon Discount:</div>
-                                    <div class="info-value">-₹<%= order.couponDiscount.toFixed(2) %>
-                                    </div>
-                                </div>
-                                <% } %>
-                                    <div class="info-item">
-                                        <div class="info-label">Total:</div>
-                                        <div class="info-value">₹<%= order.finalAmount.toFixed(2) %>
-                                        </div>
-                                    </div>
-                </div>
+            <div class="info-item">
+                <div class="info-label">Date</div>
+                <div class="info-value"><%= new Date(order.createdOn).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %></div>
             </div>
-            <div class="items-card">
-                <table class="items-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% order.orderedItems.forEach(item=> { %>
-                            <tr>
-                                <td>
-                                    <%= item.products.productName %>
-                                </td>
-                                <td>
-                                    <%= item.quantity %>
-                                </td>
-                                <td>₹<%= item.price.toFixed(2) %>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-<%= item.status.toLowerCase() %>">
-                                        <%= item.status %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <% if (item.status==='Return request' ) { %>
-                                        <button class="edit-status-btn approve-btn"
-                                            onclick="approveReturn('<%= item._id %>')">
-                                            Approve Return
-                                        </button>
-                                        <button class="edit-status-btn decline-btn"
-                                            onclick="declineReturn('<%= item._id %>')">
-                                            Decline Return
-                                        </button>
-                                        <% } else if (!['Cancelled', 'Returned' , 'Return request'
-                                            ].includes(item.status)) { %>
-                                            <button class="edit-status-btn" onclick="status('<%= item._id %>')">
-                                                Edit Status
-                                            </button>
-                                            <% } %>
-                                </td>
-                            </tr>
-                            <% }); %>
-                    </tbody>
-                </table>
-
-                <% if (order.orderedItems.some((s)=> s.cancelReason)) { %>
-                    <div class="cancelled-section">
-                        <div class="info-label">Cancelled Items:</div>
-                        <% order.orderedItems.forEach(item=> { %>
-                            <% if (item.cancelReason) { %>
-                                <div>
-                                    <%= item.products.productName %>: <%= item.cancelReason %>
-                                </div>
-                                <% } %>
-                                    <% }); %>
-                    </div>
-                    <% } %>
-                        <% if (order.orderedItems.some((s)=> s.returnReason )) { %>
-
-                            <div class="returned-section">
-                                <div class="info-label">Returned Items:</div>
-
-                                <% order.orderedItems.forEach(item=> { %>
-                                    <% if (item.returnReason) { %>
-                                        <div>
-                                            <%= item.products.productName %>: <%= item.returnReason %>
-                                        </div>
-                                        <% } %>
-                                            <% }); %>
-                            </div>
-                            <% } %>
-
-
-                                <div class="total-amount">
-                                    Total: ₹<%= order.finalAmount.toFixed(2) %>
-                                </div>
+            <div class="info-item">
+                <div class="info-label">Payment</div>
+                <div class="info-value"><%= order.paymentMethod %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Status</div>
+                <div class="info-value">
+                    <span class="badge-status <%= order.status.toLowerCase().replace(/\s+/g, '_') %>">
+                        <%= order.status %>
+                    </span>
+                </div>
             </div>
         </div>
 
-        <div id="status" class="modal">
-            <div class="modal-content">
-                <span class="close-modal" onclick="changeStatus()">&times;</span>
-                <h2>Edit Status</h2>
-                <br>
-                <select id="statusSelect" class="status-select">
-                    <option value="pending">Pending</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                    <option value="Return request">Return Request</option>
-                    <option value="Returned">Returned</option>
-                </select>
-                <br>
-
-                <div id="cancelReasonContainer" style="display: none;">
-                    <label for="cancelReason" class="cancel-reason-label">Cancellation Reason:</label>
-                    <textarea id="cancelReason" rows="3"
-                        placeholder="Please provide a reason for cancellation"></textarea>
+        <div class="info-card">
+            <h2 class="card-title">Customer <span>Details</span></h2>
+            <div class="info-item">
+                <div class="info-label">Name</div>
+                <div class="info-value" style="font-weight: 600;"><%= order.user ? order.user.name : 'Guest User' %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Phone</div>
+                <div class="info-value"><%= order.user ? order.user.phone : 'N/A' %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Shipping Address</div>
+                <div class="info-value" style="text-align: right; line-height: 1.5;">
+                    <% if (locals.specificAddress) { %>
+                        <strong><%= specificAddress.name %></strong> (<%= specificAddress.addressType %>)<br>
+                        <% if (specificAddress.landMark) { %><%= specificAddress.landMark %><br><% } %>
+                        <%= specificAddress.city %>, <%= specificAddress.state %><br>
+                        PIN: <%= specificAddress.pincode %>
+                    <% } else { %>
+                        <span style="color: #e07070;">Address unavailable</span>
+                    <% } %>
                 </div>
-                <button class="save-status-btn" onclick="updateStatus()">Save Changes</button>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h2 class="card-title">Order <span>Summary</span></h2>
+            <div class="info-item">
+                <div class="info-label">Subtotal</div>
+                <div class="info-value">₹<%= order.subtotal.toLocaleString('en-IN', {minimumFractionDigits: 2}) %></div>
+            </div>
+            <% if (order.productdiscount > 0) { %>
+                <div class="info-item">
+                    <div class="info-label">Product Discount</div>
+                    <div class="info-value negative-value">-₹<%= order.productdiscount.toLocaleString('en-IN', {minimumFractionDigits: 2}) %></div>
+                </div>
+            <% } %>
+            <% if (order.couponDiscount > 0) { %>
+                <div class="info-item">
+                    <div class="info-label">Coupon Discount</div>
+                    <div class="info-value negative-value">-₹<%= order.couponDiscount.toLocaleString('en-IN', {minimumFractionDigits: 2}) %></div>
+                </div>
+            <% } %>
+            <div class="info-item" style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 8px;">
+                <div class="info-label" style="color: var(--text-primary);">Total Amount</div>
+                <div class="info-value" style="font-family:'Playfair Display',serif; font-size: 1.2rem; font-weight: 600; color: var(--gold);">
+                    ₹<%= order.finalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2}) %>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Ordered Items Table Card -->
+    <div class="items-card animate-up delay-2">
+        <div class="items-card-header">
+            Ordered Items
+        </div>
+        <div class="table-responsive">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Product Item</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Status</th>
+                        <th style="text-align: right; padding-right: 28px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.orderedItems.forEach(item => { %>
+                        <tr>
+                            <td style="font-weight: 600; color: var(--text-primary);">
+                                <%= item.products ? item.products.productName : 'Product' %>
+                            </td>
+                            <td><%= item.quantity %></td>
+                            <td>₹<%= item.price.toLocaleString('en-IN', {minimumFractionDigits: 2}) %></td>
+                            <td>
+                                <span class="badge-status <%= item.status.toLowerCase().replace(/\s+/g, '_') %>">
+                                    <%= item.status %>
+                                </span>
+                            </td>
+                            <td style="text-align: right; padding-right: 28px;">
+                                <% if (item.status === 'Return request') { %>
+                                    <button class="edit-status-btn approve-btn" onclick="approveReturn('<%= item._id %>')">
+                                        Approve Return
+                                    </button>
+                                    <button class="edit-status-btn decline-btn" onclick="declineReturn('<%= item._id %>')">
+                                        Decline Return
+                                    </button>
+                                <% } else if (!['Cancelled', 'Returned', 'Return request'].includes(item.status)) { %>
+                                    <button class="edit-status-btn" onclick="status('<%= item._id %>')">
+                                        Edit Status
+                                    </button>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <% if (order.orderedItems.some((s) => s.cancelReason)) { %>
+            <div class="cancelled-section">
+                <div class="info-label" style="color: #e07070; margin-bottom: 6px;">Cancellation Reasons:</div>
+                <% order.orderedItems.forEach(item => { %>
+                    <% if (item.cancelReason) { %>
+                        <div><strong><%= item.products ? item.products.productName : 'Item' %>:</strong> <%= item.cancelReason %></div>
+                    <% } %>
+                <% }); %>
+            </div>
+        <% } %>
+
+        <% if (order.orderedItems.some((s) => s.returnReason)) { %>
+            <div class="returned-section">
+                <div class="info-label" style="color: #f0b430; margin-bottom: 6px;">Return Reasons:</div>
+                <% order.orderedItems.forEach(item => { %>
+                    <% if (item.returnReason) { %>
+                        <div><strong><%= item.products ? item.products.productName : 'Item' %>:</strong> <%= item.returnReason %></div>
+                    <% } %>
+                <% }); %>
+            </div>
+        <% } %>
+
+        <div class="items-total-footer">
+            <span>Final Amount Paid:</span>
+            <span class="total-val">₹<%= order.finalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2}) %></span>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Status Modal -->
+<div id="status" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="changeStatus()">&times;</span>
+        <h3 style="font-family:'Playfair Display',serif; font-size: 1.3rem; margin-bottom: 20px;">Edit Item Status</h3>
+        
+        <div class="mb-4">
+            <label class="form-label" style="font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 8px;">Select New Status</label>
+            <select id="statusSelect" style="display: none;">
+                <option value="pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="Returned">Returned</option>
+            </select>
+
+            <div class="custom-select-wrapper" id="customSelectWrapper">
+                <div class="custom-select-trigger" onclick="toggleCustomDropdown(event)">
+                    <span id="customStatusText">Pending</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--gold);"></i>
+                </div>
+                <div class="custom-options-menu" id="customOptionsMenu">
+                    <div class="custom-option active" data-val="pending" onclick="selectCustomOption('pending', 'Pending')">Pending</div>
+                    <div class="custom-option" data-val="Processing" onclick="selectCustomOption('Processing', 'Processing')">Processing</div>
+                    <div class="custom-option" data-val="Shipped" onclick="selectCustomOption('Shipped', 'Shipped')">Shipped</div>
+                    <div class="custom-option" data-val="delivered" onclick="selectCustomOption('delivered', 'Delivered')">Delivered</div>
+                    <div class="custom-option" data-val="Cancelled" onclick="selectCustomOption('Cancelled', 'Cancelled')">Cancelled</div>
+                    <div class="custom-option" data-val="Returned" onclick="selectCustomOption('Returned', 'Returned')">Returned</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cancelReasonContainer" class="mb-4" style="display: none;">
+            <label for="cancelReason" class="form-label" style="font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 8px;">Cancellation Reason</label>
+            <textarea id="cancelReason" class="form-control" rows="3" placeholder="Provide reason for cancellation"></textarea>
+        </div>
+
+        <button class="btn-primary w-100" onclick="updateStatus()" style="height: 44px;">Save Changes</button>
+    </div>
+</div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -575,36 +216,55 @@
     <script>
         let currentItemId = '';
 
+        function toggleCustomDropdown(e) {
+            if (e) e.stopPropagation();
+            const wrapper = document.getElementById('customSelectWrapper');
+            wrapper.classList.toggle('open');
+        }
+
+        function selectCustomOption(val, text) {
+            const selectEl = document.getElementById('statusSelect');
+            selectEl.value = val;
+            document.getElementById('customStatusText').innerText = text;
+
+            document.querySelectorAll('.custom-option').forEach(opt => {
+                opt.classList.toggle('active', opt.getAttribute('data-val') === val);
+            });
+
+            const cancelReasonContainer = document.getElementById('cancelReasonContainer');
+            if (val === 'Cancelled') {
+                cancelReasonContainer.style.display = 'block';
+            } else {
+                cancelReasonContainer.style.display = 'none';
+            }
+
+            const wrapper = document.getElementById('customSelectWrapper');
+            wrapper.classList.remove('open');
+        }
+
         function status(itemId) {
             currentItemId = itemId;
             document.getElementById('status').style.display = 'flex';
-
 
             const cancelReasonContainer = document.getElementById('cancelReasonContainer');
             cancelReasonContainer.style.display = 'none';
             document.getElementById('cancelReason').value = '';
 
-
-            const statusSelect = document.getElementById('statusSelect');
-            statusSelect.value = "pending";
-
-
-            const newStatusSelect = statusSelect.cloneNode(true);
-            statusSelect.parentNode.replaceChild(newStatusSelect, statusSelect);
-
-
-            newStatusSelect.addEventListener('change', function () {
-                if (this.value === 'Cancelled') {
-                    cancelReasonContainer.style.display = 'block';
-                } else {
-                    cancelReasonContainer.style.display = 'none';
-                }
-            });
+            selectCustomOption('pending', 'Pending');
         }
 
         function changeStatus() {
             document.getElementById('status').style.display = 'none';
+            const wrapper = document.getElementById('customSelectWrapper');
+            if (wrapper) wrapper.classList.remove('open');
         }
+
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('customSelectWrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                wrapper.classList.remove('open');
+            }
+        });
 
         function updateStatus() {
             const newStatus = document.getElementById('statusSelect').value;

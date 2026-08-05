@@ -607,7 +607,7 @@ const getWalletPage = async(req,res)=>{
         const wallet = await Wallet.findOne({ userId:userId});
 
         const page = parseInt(req.query.page) || 1;
-        const limit = 10; 
+        const limit = 5; 
         if (wallet && wallet.transactions) {
             const totalTransactions = wallet.transactions.length;
             const totalpage = Math.ceil(totalTransactions / limit);

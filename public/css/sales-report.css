@@ -1,0 +1,94 @@
+/* ── Sales Report Page Styles ────────────────────────── */
+
+/* Summary cards layout grid */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.summary-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #edece8);
+  padding: 24px;
+  transition: var(--transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.summary-card:hover {
+  border-color: var(--gold, #b39343);
+  box-shadow: 0 4px 20px rgba(179, 147, 67, 0.08);
+}
+
+.icon-container {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-light-green {
+  background-color: rgba(46, 204, 113, 0.08);
+}
+
+.bg-light-blue {
+  background-color: rgba(74, 144, 226, 0.08);
+}
+
+.bg-light-orange {
+  background-color: rgba(230, 126, 34, 0.08);
+}
+
+.bg-light-red {
+  background-color: rgba(231, 76, 60, 0.08);
+}
+
+/* Pagination container styling */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.pagination-container a,
+.pagination-container .current-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border, #edece8);
+  text-decoration: none;
+  font-size: 13px;
+  color: var(--text-secondary, #5c554c);
+  transition: var(--transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+  background: transparent;
+}
+
+.pagination-container a:hover,
+.pagination-container .current-page {
+  border-color: var(--gold, #b39343) !important;
+  color: var(--gold, #b39343) !important;
+  background: var(--gold-glow, rgba(179, 147, 67, 0.05)) !important;
+}
+
+/* Table Row Hover Effects */
+#salesTable tbody tr:hover {
+  background-color: rgba(179, 147, 67, 0.02) !important;
+  transition: background-color 0.2s ease;
+}
+
+@media (max-width: 1024px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+}

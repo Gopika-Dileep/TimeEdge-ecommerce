@@ -77,3 +77,363 @@
     .profile-layout { grid-template-columns: 1fr; }
     .profile-sidebar { position: static; }
 }
+
+/* ── Pagination ─────────────────────────────────── */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+}
+
+.pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: all 0.25s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.pagination-link:hover {
+    background: var(--gold-glow);
+    color: var(--gold);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(179, 147, 67, 0.15);
+}
+
+.pagination-link.active {
+    background: var(--gold);
+    color: #0a0a0a;
+    border-color: var(--gold);
+    font-weight: 700;
+    cursor: default;
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgba(179, 147, 67, 0.3);
+}
+
+.pagination-link:first-child,
+.pagination-link:last-child {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* ── Wallet Card & Transactions Table ───────────── */
+.wallet-balance-card {
+    background: rgba(212, 175, 55, 0.03);
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.balance-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+.balance-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--gold);
+    margin: 0;
+}
+.wallet-icon-large {
+    font-size: 40px;
+    color: rgba(212, 175, 55, 0.2);
+}
+.tx-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.tx-table th {
+    padding: 16px 20px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+.tx-table td {
+    padding: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+}
+.badge-credit {
+    color: #6dbf7f;
+    background: rgba(109, 191, 127, 0.08);
+    border: 1px solid rgba(109, 191, 127, 0.2);
+    padding: 4px 10px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+.badge-debit {
+    color: #e07070;
+    background: rgba(224, 112, 112, 0.08);
+    border: 1px solid rgba(224, 112, 112, 0.2);
+    padding: 4px 10px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+.amt-credit {
+    color: #6dbf7f;
+    font-weight: 600;
+}
+.amt-debit {
+    color: #e07070;
+    font-weight: 600;
+}
+
+/* ── Wishlist Styles ────────────────────────────── */
+.wishlist-page {
+    background-color: #f8f9fa;
+    width: 100%;
+    min-height: calc(100vh - 100px);
+}
+
+.wishlist-container {
+    margin-top: 30px;
+}
+
+.wishlist-header {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wishlist-header h1 {
+    font-size: 25px;
+    color: #1a1a1a;
+    margin: 0;
+    font-weight: 600;
+}
+
+.items-count {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 300px));
+    gap: 20px;
+}
+
+.product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 300px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    max-height: 400px;
+    min-height: 400px;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.product-image {
+    position: relative;
+    width: 100%;
+    background: #f8f9fa;
+    padding-top: 84%;
+}
+
+.product-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #dc3545;
+    transition: all 0.2s;
+}
+
+.remove-btn:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.product-info {
+    padding: 20px;
+}
+
+.product-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 6px 0;
+    line-height: 1.4;
+}
+
+.product-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.price {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status.available {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status.unavailable {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.add-cart-btn {
+    width: 100%;
+    padding: 12px;
+    background: #1a1a1a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.add-cart-btn:hover {
+    background: #333;
+}
+
+.empty-wishlist {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-wishlist h2 {
+    font-size: 24px;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+}
+
+.empty-wishlist p {
+    color: #666;
+    margin: 0 0 25px 0;
+}
+
+.shop-now-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #1a1a1a;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.shop-now-btn:hover {
+    background: #333;
+}
+
+@media (max-width: 768px) {
+    .wishlist-page {
+        padding: 20px 0;
+    }
+
+    .wishlist-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .product-name {
+        font-size: 16px;
+    }
+
+    .price {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wishlist-container {
+        padding: 0 15px;
+    }
+
+    .product-info {
+        padding: 15px;
+    }
+
+    .empty-wishlist {
+        padding: 40px 15px;
+    }
+}
+
+
+

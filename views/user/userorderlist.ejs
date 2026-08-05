@@ -58,6 +58,24 @@
                     <a href="/shop" class="btn-gold-fill" style="text-decoration: none;"><span>Start Shopping</span></a>
                 </div>
                 <% } %>
+
+                <!-- Pagination -->
+                <% if (totalpage > 1) { %>
+                <div class="pagination-container" style="display:flex; justify-content:center; gap:8px; margin-top:24px; flex-wrap:wrap;">
+                    <% if (currentpage > 1) { %>
+                    <a href="/orders?page=<%= currentpage - 1 %>" class="pagination-link">&laquo;</a>
+                    <% } %>
+
+                    <% for(let i = 1; i <= totalpage; i++) { %>
+                    <a href="/orders?page=<%= i %>" class="pagination-link <%= i === currentpage ? 'active' : '' %>"><%= i %></a>
+                    <% } %>
+
+                    <% if (currentpage < totalpage) { %>
+                    <a href="/orders?page=<%= currentpage + 1 %>" class="pagination-link">&raquo;</a>
+                    <% } %>
+                </div>
+                <% } %>
+
             </div>
 
         </div>
@@ -65,3 +83,4 @@
 </div>
 
 <%- include("../../views/partials/user/footer") %>
+

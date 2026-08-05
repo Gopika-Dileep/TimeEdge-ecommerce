@@ -1,42 +1,5 @@
 <%- include("../../views/partials/admin/header") %>
 
-<head>
-    <style>
-        .search-container {
-            max-width: 500px;
-            margin-bottom: 28px;
-            display: flex;
-            gap: 10px;
-        }
-        .btn-table-action {
-            background: none !important;
-            border: 1px solid var(--border) !important;
-            padding: 8px 16px !important;
-            font-size: 11px !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1px !important;
-            font-weight: 600 !important;
-            border-radius: 0 !important;
-            transition: var(--transition);
-        }
-        .btn-table-action.block { color: #e07070 !important; }
-        .btn-table-action.block:hover { background: rgba(224,112,112,0.05) !important; border-color: #e07070 !important; }
-        .btn-table-action.unblock { color: #6dbf7f !important; }
-        .btn-table-action.unblock:hover { background: rgba(109,191,127,0.05) !important; border-color: #6dbf7f !important; }
-
-        /* Pagination */
-        .pagination-container { display: flex; justify-content: center; gap: 8px; margin-top: 32px; }
-        .pagination-container a, .pagination-container .current-page {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px; border: 1px solid var(--border);
-            text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);
-        }
-        .pagination-container a:hover, .pagination-container .current-page {
-            border-color: var(--gold); color: var(--gold); background: var(--gold-glow);
-        }
-    </style>
-</head>
-
 <div class="content-container">
     <div class="content-header mb-5 animate-up">
         <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">User Management</span>

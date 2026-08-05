@@ -1,95 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
+<link rel="stylesheet" href="/css/sales-report.css">
 
-  <style>
-    .truncate {
-      max-width: 150px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .truncate-tooltip {
-      position: relative;
-    }
-
-    .truncate-tooltip:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      background: #333;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      white-space: normal;
-      z-index: 100;
-    }
-
-    /* Summary cards layout styling */
-    .summary-cards {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-    }
-
-    .summary-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 24px;
-      transition: var(--transition);
-    }
-    .summary-card:hover {
-      border-color: var(--gold);
-      box-shadow: 0 4px 20px rgba(179,147,67,0.08);
-    }
-
-    .icon-container {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .bg-light-green {
-      background-color: rgba(46, 204, 113, 0.08);
-    }
-
-    .bg-light-blue {
-      background-color: rgba(74, 144, 226, 0.08);
-    }
-
-    .bg-light-orange {
-      background-color: rgba(230, 126, 34, 0.08);
-    }
-
-    .bg-light-red {
-      background-color: rgba(231, 76, 60, 0.08);
-    }
-
-    @media (max-width: 1024px) {
-      .summary-cards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-      }
-    }
-    @media (max-width: 576px) {
-      .summary-cards {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    /* Table Row Hover Effects */
-    #salesTable tbody tr:hover {
-      background-color: rgba(179, 147, 67, 0.02) !important;
-      transition: background-color 0.2s ease;
-    }
-  </style>
-
-  <div class="content-container">
+<div class="content-container">
     <div class="content-header mb-5 d-flex justify-content-between align-items-center animate-up">
       <div>
         <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Business Analytics</span>
@@ -475,32 +387,25 @@
       }
 
       paginationContainer.classList.remove("d-none");
-      const pagination = document.createElement("ul");
-      pagination.className = "pagination";
+      let html = "";
 
       if (currentPage > 1) {
-        const prevPage = document.createElement("li");
-        prevPage.className = "page-item";
-        prevPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage - 1})">&laquo; Previous</a>`;
-        pagination.appendChild(prevPage);
+        html += `<a href="#" onclick="goToPage(${currentPage - 1}); return false;"><i class="fa-solid fa-chevron-left"></i></a>`;
       }
 
       for (let i = 1; i <= totalPage; i++) {
-        const pageItem = document.createElement("li");
-        pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
-        pageItem.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i})">${i}</a>`;
-        pagination.appendChild(pageItem);
+        if (i === currentPage) {
+          html += `<span class="current-page">${i}</span>`;
+        } else {
+          html += `<a href="#" onclick="goToPage(${i}); return false;">${i}</a>`;
+        }
       }
 
       if (currentPage < totalPage) {
-        const nextPage = document.createElement("li");
-        nextPage.className = "page-item";
-        nextPage.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage + 1})">Next &raquo;</a>`;
-        pagination.appendChild(nextPage);
+        html += `<a href="#" onclick="goToPage(${currentPage + 1}); return false;"><i class="fa-solid fa-chevron-right"></i></a>`;
       }
 
-      paginationContainer.innerHTML = "";
-      paginationContainer.appendChild(pagination);
+      paginationContainer.innerHTML = html;
     }
 
     async function goToPage(page) {

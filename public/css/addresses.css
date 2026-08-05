@@ -82,3 +82,13 @@
     .profile-sidebar { position: static; }
     .address-grid { grid-template-columns: 1fr; }
 }
+
+.error-message {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.is-invalid {
+    border-color: #ff3333 !important;
+}
+

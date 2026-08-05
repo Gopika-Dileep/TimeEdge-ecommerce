@@ -9,7 +9,7 @@ const Wishlist= require('../../models/wishlistSchema')
 const loadWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
-        const itemsPerPage = 10; 
+        const itemsPerPage = 6; 
         const page = parseInt(req.query.page) || 1;
 
        

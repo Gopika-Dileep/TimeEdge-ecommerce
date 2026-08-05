@@ -1,89 +1,4 @@
-body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    font-family: 'Jost', sans-serif;
-    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
-}
-
-.login {
-    width: 350px;
-    height: 450px;
-    background: #1e1e2e;
-    border-radius: 10px;
-    box-shadow: 5px 20px 50px #000;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-form {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-label {
-    color: #fff;
-    font-size: 2.3em;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-input {
-    width: 80%;
-    height: 40px;
-    background: #e0dede;
-    margin: 10px 0;
-    padding: 10px;
-    border: none;
-    outline: none;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-button {
-    width: 80%;
-    height: 40px;
-    margin: 20px 0;
-    background: #573b8a;
-    color: #fff;
-    font-size: 1em;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-button:hover {
-    background: #6d44b8;
-}
-
-.text-center {
-    text-align: center;
-    color: #fff;
-    margin-top: 20px;
-    font-size: 0.9em;
-}
-
-.text-center a {
-    color: #6d44b8;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.text-center a:hover {
-    text-decoration: underline;
-}
-
-/* ── Admin Login Styles ────────────────────────── */
+/* ── Admin Login Page Styles ─────────────────────── */
 :root {
     --bg-body: #fbfbf9;
     --bg-card: #ffffff;
@@ -97,7 +12,13 @@ button:hover {
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.admin-login-body {
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
     background-color: var(--bg-body);
     color: var(--text-primary);
     font-family: 'Inter', sans-serif;
@@ -105,7 +26,6 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
     padding: 20px;
 }
 
@@ -140,6 +60,32 @@ button:hover {
     color: var(--text-muted);
 }
 
+.form-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 500;
+}
+
+.form-control {
+    background: rgba(0, 0, 0, 0.01) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 0 !important;
+    color: var(--text-primary) !important;
+    font-size: 13px !important;
+    padding: 12px 14px !important;
+    outline: none !important;
+    width: 100%;
+}
+.form-control:focus {
+    border-color: var(--gold) !important;
+    background: var(--gold-glow) !important;
+    box-shadow: none !important;
+}
+
 .btn-submit {
     width: 100%;
     background: var(--gold) !important;
@@ -161,3 +107,11 @@ button:hover {
     box-shadow: 0 4px 15px rgba(179, 147, 67, 0.15) !important;
 }
 
+/* Keyframe for card fade-in */
+@keyframes animateUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.animate-up {
+    animation: animateUp 0.5s ease forwards;
+}
