@@ -306,7 +306,7 @@ const downloadpdf = async (req, res) => {
         res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
         doc.pipe(res);
   
-        const formatCurrency = (amount) => `₹${amount.toFixed(2)}`;
+        const formatCurrency = (amount) => `Rs. ${(amount || 0).toFixed(2)}`;
   
         doc.fontSize(20)
            .font('Helvetica-Bold')
