@@ -572,15 +572,18 @@ const getOrderDetails = async (req, res) => {
     const order = await Order.findById(orderId)
       .populate("user")
       .populate("orderedItems.products");
-    const address = await Address.findOne({ userId: order.user });
 
-    const addressess = address.address;
-
-    const specificAddress = addressess.find(
-      (addr) => addr._id.toString() == order.address.toString()
-    );
     if (!order) {
       return res.status(STATUS_CODES.NOT_FOUND).json({ error: MESSAGES.ADMIN.ORDER_NOT_FOUND });
+    }
+
+    const address = await Address.findOne({ userId: order.user });
+    let specificAddress = null;
+
+    if (address && address.address) {
+      specificAddress = address.address.find(
+        (addr) => addr._id.toString() === order.address.toString()
+      );
     }
 
     res.render("orderdetails", { order, specificAddress });

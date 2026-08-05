@@ -411,19 +411,23 @@
                     <div class="info-item">
                         <div class="info-label">Address:</div>
                         <div class="info-value">
-                            <h6 class="mb-2">
-                                <%= specificAddress.name %>
-                            </h6>
-                            <p class="mb-1 text-muted">
-                                <%= specificAddress.addressType %>
-                            </p>
-                            <p class="mb-1 text-muted">
-                                <%= specificAddress.landMark %>
-                            </p>
-                            <p class="mb-1 text-muted">
-                                <%= specificAddress.city %>, <%= specificAddress.state %>
-                                        <%= specificAddress.pincode %>
-                            </p>
+                            <% if (locals.specificAddress) { %>
+                                <h6 class="mb-2">
+                                    <%= specificAddress.name %>
+                                </h6>
+                                <p class="mb-1 text-muted">
+                                    <%= specificAddress.addressType %>
+                                </p>
+                                <p class="mb-1 text-muted">
+                                    <%= specificAddress.landMark %>
+                                </p>
+                                <p class="mb-1 text-muted">
+                                    <%= specificAddress.city %>, <%= specificAddress.state %>
+                                            <%= specificAddress.pincode %>
+                                </p>
+                            <% } else { %>
+                                <p class="text-danger mb-0">Address deleted or not found</p>
+                            <% } %>
                         </div>
                     </div>
                 </div>
