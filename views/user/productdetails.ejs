@@ -337,10 +337,17 @@
 
             <!-- CTA -->
             <div class="pd-cta">
+                <% if (product.quantity > 0) { %>
                 <button class="btn-gold-fill" id="addToCartBtn" onclick="addToCart()">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span>Add to Cart</span>
                 </button>
+                <% } else { %>
+                <button class="btn-gold-fill" id="addToCartBtn" disabled style="background: var(--border); color: var(--text-muted); border-color: var(--border); cursor: not-allowed;">
+                    <i class="fa-solid fa-ban"></i>
+                    <span>Out of Stock</span>
+                </button>
+                <% } %>
                 <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlist()" title="Add to Wishlist">
                     <i class="bi <%= locals.isInWishlist ? 'bi-heart-fill text-danger' : 'bi-heart' %>" id="wishlistIcon"></i>
                 </button>

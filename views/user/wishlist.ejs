@@ -272,9 +272,15 @@
                                             <span class="status unavailable">Out of Stock</span>
                                             <% } %>
                                         </div>
+                                        <% if (product.productId.quantity > 0) { %>
                                         <button class="add-cart-btn" onclick="addToCart('<%= product.productId._id %>', 1)" style="background: var(--gold); color: #080808; border-radius: 0;">
                                             Add to Cart
                                         </button>
+                                        <% } else { %>
+                                        <button class="add-cart-btn" disabled style="background: var(--border); color: var(--text-muted); border-radius: 0; cursor: not-allowed;">
+                                            Out of Stock
+                                        </button>
+                                        <% } %>
                                     </div>
                                 </div>
                             <% }) %>
