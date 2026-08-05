@@ -311,6 +311,10 @@
                     <span class="pd-spec-val"><%= product.brand ? product.brand.name : '' %></span>
                 </div>
                 <div class="pd-spec-row">
+                    <span class="pd-spec-key">Category</span>
+                    <span class="pd-spec-val"><%= product.category ? product.category.name : '' %></span>
+                </div>
+                <div class="pd-spec-row">
                     <span class="pd-spec-key">Availability</span>
                     <span class="pd-spec-val"><%= product.quantity > 0 ? 'In Stock' : 'Out of Stock' %></span>
                 </div>
