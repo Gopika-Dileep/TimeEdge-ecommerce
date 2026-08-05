@@ -35,6 +35,19 @@
             ><%= category.description %></textarea>
             <div class="invalid-feedback" id="descriptionError" style="display:block; color:#ff3333; margin-top:4px;"></div>
           </div>
+          <div class="mb-4">
+            <label for="category_offer" class="form-label">Category Offer (%)</label>
+            <input
+            type="number"
+            name="categoryOffer"
+            value="<%= category.categoryOffer || 0 %>"
+            class="form-control"
+            id="category_offer"
+            min="0"
+            max="100"
+            />
+            <div class="invalid-feedback" id="offerError" style="display:block; color:#ff3333; margin-top:4px;"></div>
+          </div>
           <div class="d-grid">
             <button class="btn btn-primary" type="submit">Save</button>
           </div>
@@ -56,13 +69,14 @@
         const categoryId = this.getAttribute('data-id');
         const name = document.getElementsByName("name")[0].value.trim();
         const description = document.getElementById("descriptionId").value.trim();
+        const categoryOffer = document.getElementById("category_offer").value.trim() || 0;
 
         fetch(`/admin/editCategory/${categoryId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ name, description })
+            body: JSON.stringify({ name, description, categoryOffer })
         })
         .then(response => response.json())
         .then(data => {
@@ -88,9 +102,11 @@
     function validateForm() {
         document.getElementById("nameError").innerText = "";
         document.getElementById("descriptionError").innerText = "";
+        document.getElementById("offerError").innerText = "";
         
         const name = document.getElementsByName("name")[0].value.trim();
         const description = document.getElementById("descriptionId").value.trim();
+        const categoryOffer = document.getElementById("category_offer").value.trim();
         let isValid = true;
     
         if (name === "") {
@@ -104,6 +120,14 @@
         if (description === "") {
             document.getElementById("descriptionError").innerText = "Please enter a description";
             isValid = false;
+        }
+
+        if (categoryOffer !== "") {
+            const offerNum = Number(categoryOffer);
+            if (isNaN(offerNum) || offerNum < 0 || offerNum > 100) {
+                document.getElementById("offerError").innerText = "Category offer must be a number between 0 and 100";
+                isValid = false;
+            }
         }
     
         return isValid;

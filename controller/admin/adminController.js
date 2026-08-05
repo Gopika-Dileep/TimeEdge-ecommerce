@@ -234,9 +234,10 @@ const listCategory = async (req, res) => {
 
 const addCategory = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, categoryOffer } = req.body;
     const trimmedName = name ? name.trim() : "";
     const trimmedDesc = description ? description.trim() : "";
+    const parsedOffer = categoryOffer ? parseInt(categoryOffer) : 0;
 
     if (!trimmedName) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -273,6 +274,13 @@ const addCategory = async (req, res) => {
       });
     }
 
+    if (isNaN(parsedOffer) || parsedOffer < 0 || parsedOffer > 100) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: "Category offer must be a number between 0 and 100",
+      });
+    }
+
     const existCategory = await Category.findOne({
       name: { $regex: new RegExp(`^${trimmedName}$`, "i") },
     });
@@ -284,7 +292,11 @@ const addCategory = async (req, res) => {
       });
     }
 
-    const category = new Category({ name: trimmedName, description: trimmedDesc });
+    const category = new Category({ 
+      name: trimmedName, 
+      description: trimmedDesc, 
+      categoryOffer: parsedOffer 
+    });
     await category.save();
     return res.status(STATUS_CODES.OK).json({
       success: true,
@@ -311,9 +323,10 @@ const loadEditCategory = async (req, res) => {
 const editCategory = async (req, res) => {
   try {
     const catid = req.params.categoryId;
-    const { name, description } = req.body;
+    const { name, description, categoryOffer } = req.body;
     const trimmedName = name ? name.trim() : "";
     const trimmedDesc = description ? description.trim() : "";
+    const parsedOffer = categoryOffer !== undefined ? parseInt(categoryOffer) : 0;
 
     const category = await Category.findById({ _id: catid });
     if (!category) {
@@ -355,6 +368,13 @@ const editCategory = async (req, res) => {
       });
     }
 
+    if (isNaN(parsedOffer) || parsedOffer < 0 || parsedOffer > 100) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: "Category offer must be a number between 0 and 100",
+      });
+    }
+
     const existCategory = await Category.findOne({
       name: { $regex: new RegExp(`^${trimmedName}$`, "i") },
       _id: { $ne: catid }
@@ -372,6 +392,7 @@ const editCategory = async (req, res) => {
       {
         name: trimmedName,
         description: trimmedDesc,
+        categoryOffer: parsedOffer,
       },
       { new: true }
     );

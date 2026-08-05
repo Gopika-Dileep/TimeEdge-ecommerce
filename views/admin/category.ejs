@@ -88,6 +88,11 @@
                             <textarea placeholder="e.g. High precision stopwatch functional watches" name="description" class="form-control" id="descriptionId" rows="4" required></textarea>
                             <div class="invalid-feedback" id="descriptionError"></div>
                         </div>
+                        <div class="mb-4">
+                            <label class="form-label" for="category_offer">Category Offer (%)</label>
+                            <input type="number" name="categoryOffer" placeholder="e.g. 10" class="form-control" id="category_offer" min="0" max="100" />
+                            <div class="invalid-feedback" id="offerError" style="display:block; color:#ff3333; margin-top:4px;"></div>
+                        </div>
                         <button class="btn-primary w-100" type="submit">Create Category</button>
                     </form>
                 </div>
@@ -108,6 +113,7 @@
                                     <th style="width: 60px;">#</th>
                                     <th>Category Name</th>
                                     <th>Description</th>
+                                    <th>Offer</th>
                                     <th>Status</th>
                                     <th style="width: 180px; text-align: right; padding-right: 24px !important;">Actions</th>
                                 </tr>
@@ -119,6 +125,7 @@
                                              <td><%= index + 1 %></td>
                                              <td style="font-weight: 600; color: var(--text-primary);"><%= catItem.name %></td>
                                              <td><%= catItem.description %></td>
+                                             <td><%= catItem.categoryOffer || 0 %>%</td>
                                              <td>
                                                  <% if (catItem.isListed) { %>
                                                      <span class="badge-success-te">Listed</span>
@@ -127,6 +134,11 @@
                                                  <% } %>
                                              </td>
                                              <td style="text-align: right; padding-right: 24px !important;">
+                                                 <% if (catItem.categoryOffer && catItem.categoryOffer > 0) { %>
+                                                     <button onclick="removeOffer('<%= catItem._id %>')" class="btn-table-action block" style="padding: 4px 8px !important; font-size: 10px; margin-right: 6px;">Remove Offer</button>
+                                                 <% } else { %>
+                                                     <button onclick="addOffer('<%= catItem._id %>')" class="btn-table-action unblock" style="padding: 4px 8px !important; font-size: 10px; margin-right: 6px;">Add Offer</button>
+                                                 <% } %>
                                                  <% if (catItem.isListed) { %>
                                                      <a href="/admin/unlistCategory?id=<%= catItem._id %>" class="btn-table-action block">Unlist</a>
                                                  <% } else { %>
@@ -179,11 +191,12 @@ document.getElementById('categoryCreateForm').addEventListener('submit', functio
     }
     const name = document.getElementById("product_name").value.trim();
     const description = document.getElementById("descriptionId").value.trim();
+    const categoryOffer = document.getElementById("category_offer").value.trim() || 0;
 
     $.ajax({
         url: "/admin/addCategory",
         method: "POST",
-        data: { name, description },
+        data: { name, description, categoryOffer },
         success: (response) => {
             if (response.success) {
                 Swal.fire({
@@ -208,6 +221,7 @@ document.getElementById('categoryCreateForm').addEventListener('submit', functio
 function validateCategoryForm() {
     var name = document.getElementById("product_name").value.trim();
     var desc = document.getElementById("descriptionId").value.trim();
+    var categoryOffer = document.getElementById("category_offer").value.trim();
     var isValid = true;
     if (name === "") {
         document.getElementById("nameError").innerText = "Category Name is required";
@@ -225,7 +239,136 @@ function validateCategoryForm() {
         document.getElementById("descriptionError").innerText = "";
         document.getElementById("descriptionId").classList.remove("is-invalid");
     }
+    if (categoryOffer !== "") {
+        var offerNum = Number(categoryOffer);
+        if (isNaN(offerNum) || offerNum < 0 || offerNum > 100) {
+            document.getElementById("offerError").innerText = "Category offer must be a number between 0 and 100";
+            document.getElementById("category_offer").classList.add("is-invalid");
+            isValid = false;
+        } else {
+            document.getElementById("offerError").innerText = "";
+            document.getElementById("category_offer").classList.remove("is-invalid");
+        }
+    } else {
+        document.getElementById("offerError").innerText = "";
+        document.getElementById("category_offer").classList.remove("is-invalid");
+    }
     return isValid;
+}
+
+async function addOffer(categoryId) {
+    const { value: amount } = await Swal.fire({
+        title: "Offer in Percentage",
+        input: "number",
+        inputLabel: "Percentage",
+        inputPlaceholder: "%",
+        inputAttributes: {
+            min: 0,
+            max: 100,
+            step: 1
+        }
+    });
+
+    if (amount) {
+        if (amount < 0 || amount > 100 || isNaN(amount)) {
+            Swal.fire("Invalid Input", "Please enter a valid percentage between 0 and 100", "error");
+            return;
+        }
+
+        try {
+            Swal.fire({
+                title: "Adding Offer...",
+                text: "Please wait while the offer is being added",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            const response = await fetch("/admin/addCategoryOffer", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    percentage: amount,
+                    categoryId: categoryId,
+                }),
+            });
+
+            const data = await response.json();
+
+            Swal.close(); 
+
+            if (response.ok && data.status === true) {
+                Swal.fire("Offer Added", "The offer has been added successfully", "success").then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire("Failed", data.message || "Adding offer failed", "error");
+            }
+        } catch (error) {
+            Swal.fire(
+                "Error",
+                "An error occurred while adding the offer. Please try again.",
+                "error"
+            );
+            console.error("Error adding offer:", error);
+        }
+    }
+}
+
+async function removeOffer(categoryId) {
+    const confirm = await Swal.fire({
+        title: "Remove Offer",
+        text: "Are you sure you want to remove the offer from this category?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Remove",
+        cancelButtonText: "Cancel",
+    });
+
+    if (confirm.isConfirmed) {
+        try {
+            Swal.fire({
+                title: "Removing Offer...",
+                text: "Please wait while the offer is being removed",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            const response = await fetch("/admin/removeCategoryOffer", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    categoryId: categoryId,
+                }),
+            });
+
+            const data = await response.json();
+
+            Swal.close(); 
+
+            if (response.ok && data.status === true) {
+                Swal.fire("Offer Removed", "The offer has been successfully removed", "success").then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire("Failed", data.message || "Removing offer failed", "error");
+            }
+        } catch (error) {
+            Swal.fire(
+                "Error",
+                "An error occurred while removing the offer. Please try again.",
+                "error"
+            );
+            console.error("Error removing offer:", error);
+        }
+    }
 }
 </script>
 

@@ -167,8 +167,8 @@ const editproduct = async (req, res) => {
         const product = await Product.findOne({ _id: id });
         const data = req.body;
         const existingProduct = await Product.findOne({
-            productName: data.productName,
-            id: { $ne: id }
+            productName: { $regex: new RegExp(`^${data.productName.trim()}$`, "i") },
+            _id: { $ne: id }
         });
 
         if (existingProduct) {
@@ -177,7 +177,7 @@ const editproduct = async (req, res) => {
         
         const images = [];
         if (req.files && req.files.length > 0) {
-            for (let i = 0; i < req.files; i++) {
+            for (let i = 0; i < req.files.length; i++) {
                 images.push(req.files[i].filename);
             }
         }

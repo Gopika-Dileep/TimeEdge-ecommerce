@@ -1,7 +1,7 @@
 <%- include("../../views/partials/admin/header") %>
 
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <style>
         .error-message {
             color: #e07070;
@@ -208,7 +208,7 @@
             <h5 style="font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 500; margin: 0; color: var(--text-primary);">Crop Product Image</h5>
             <button type="button" onclick="closeCropperModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
         </div>
-        <div id="cropperTargetContainer" style="max-height: 360px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border: 1px solid var(--border); margin-bottom: 20px; height: 300px;">
+        <div id="cropperTargetContainer" style="max-height: 360px; overflow: hidden; background: #f8f9fa; border: 1px solid var(--border); margin-bottom: 20px; height: 300px; position: relative;">
             <img id="cropperTargetImage" src="" alt="To Crop" style="max-width: 100%; max-height: 360px; display: block;">
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 12px;">
@@ -218,7 +218,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
 let currentCropperIndex = null;
@@ -271,25 +271,42 @@ function openCropper(event, index) {
             const modal = document.getElementById("cropperModal");
             modal.style.display = "flex";
             
-            const initCropper = () => {
-                if (cropperInstance) return;
-                cropperInstance = new Cropper(targetImage, {
-                    aspectRatio: 1 / 1,
-                    viewMode: 1,
-                    dragMode: 'move',
-                    guides: true,
-                    background: true,
-                    autoCropArea: 0.8,
-                    zoomable: true,
-                    scalable: true,
-                    movable: true
-                });
-            };
-
-            targetImage.onload = initCropper;
-            targetImage.src = dataURL;
+            // 1. Append to container FIRST
             container.appendChild(targetImage);
 
+            let isInitializing = false;
+            const initCropper = () => {
+                if (cropperInstance || isInitializing) return;
+                isInitializing = true;
+
+                if (typeof Cropper === 'undefined') {
+                    console.error("CropperJS library is not loaded!");
+                    alert("Error: CropperJS library could not be loaded. Please check your internet connection.");
+                    return;
+                }
+
+                setTimeout(() => {
+                    cropperInstance = new Cropper(targetImage, {
+                        aspectRatio: 1 / 1,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        guides: true,
+                        background: true,
+                        autoCropArea: 0.8,
+                        zoomable: true,
+                        scalable: true,
+                        movable: true
+                    });
+                }, 150);
+            };
+
+            // 2. Set onload handler
+            targetImage.onload = initCropper;
+
+            // 3. Set src LAST
+            targetImage.src = dataURL;
+
+            // 4. Fallback if already complete
             if (targetImage.complete) {
                 initCropper();
             }
@@ -361,7 +378,6 @@ function validateForm() {
     const brand = document.getElementsByName('brand')[0].value;
     const price = document.getElementsByName('regularPrice')[0].value;
     const saleprice = document.getElementsByName('salePrice')[0].value;
-    const color = document.getElementsByName('color')[0].value;
     const quantity = document.getElementsByName('quantity')[0].value;
     let isValid = true;
 
