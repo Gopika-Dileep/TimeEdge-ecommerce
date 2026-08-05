@@ -450,13 +450,6 @@
                     </div>
 
                     <% if (i === 0) { %><span class="card-badge">New</span><% } %>
-                    <% if (product.bestOffer > 0) { %>
-                        <% if (i === 0) { %>
-                            <span class="card-badge" style="left: 75px; background: var(--gold); color: #080808; font-weight: 700;">-<%= product.bestOffer %>%</span>
-                        <% } else { %>
-                            <span class="card-badge" style="background: var(--gold); color: #080808; font-weight: 700;">-<%= product.bestOffer %>%</span>
-                        <% } %>
-                    <% } %>
 
                     <a href="/productDetails?id=<%= product._id %>" style="text-decoration:none; display:block;">
                         <div class="product-img-wrap">
@@ -474,7 +467,12 @@
                         </div>
                     </a>
                     <div class="product-info">
-                        <div class="product-brand"><%= product.brand ? product.brand.brandName : '' %></div>
+                        <div class="product-brand-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div class="product-brand" style="margin-bottom: 0;"><%= product.brand ? product.brand.brandName : '' %></div>
+                            <% if (product.bestOffer > 0) { %>
+                                <span class="discount-badge" style="background: var(--gold); color: #080808; font-size: 9px; font-weight: 700; padding: 2px 8px; letter-spacing: 1px; text-transform: uppercase;">-<%= product.bestOffer %>%</span>
+                            <% } %>
+                        </div>
                         <div class="product-name"><%= product.productName %></div>
                         <div class="product-price-row" style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
