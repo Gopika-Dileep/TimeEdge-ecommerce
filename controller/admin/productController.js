@@ -11,7 +11,7 @@ const LoadProduct = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 5;
         const search = req.query.search || '';
-        
+
         let query = {};
         if (search) {
             const matchingBrands = await Brand.find({ name: { $regex: search, $options: 'i' } });
@@ -57,25 +57,25 @@ const LoadProduct = async (req, res) => {
 }
 
 const loadAddProduct = async (req, res) => {
-     try {
+    try {
         const category = await Category.find({ isListed: true });
         const brand = await Brand.find({ isListed: true });
         res.render("addproduct", {
             cat: category,
             brand: brand
         });
-     } catch (error) {
+    } catch (error) {
         console.error(error);
         res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN_PRODUCT.LOAD_ADD_PRODUCT_ERROR });
-     }
+    }
 }
 
 const addProducts = async (req, res) => {
     try {
         const products = req.body;
 
-        const productExists = await Product.findOne({ 
-            productName: { $regex: new RegExp(`^${products.productName}$`, 'i') } 
+        const productExists = await Product.findOne({
+            productName: { $regex: new RegExp(`^${products.productName}$`, 'i') }
         });
 
         if (productExists) {
@@ -112,7 +112,7 @@ const addProducts = async (req, res) => {
             });
         }
         const newcat = categoryId._id;
-        
+
         const brandId = await Brand.findOne({ name: products.brand });
         const newbrand = brandId._id;
 
@@ -129,7 +129,7 @@ const addProducts = async (req, res) => {
             productImage: images,
             status: "Available",
         });
-        
+
         await newProduct.save();
 
         return res.redirect('/admin/product');
@@ -146,8 +146,8 @@ const loadeditproduct = async (req, res) => {
     try {
         const productId = req.query.id;
         const product = await Product.findById({ _id: productId })
-            .populate('category')  
-            .populate('brand');  
+            .populate('category')
+            .populate('brand');
         const category = await Category.find({});
         const brand = await Brand.find({});
         res.render("editproduct", {
@@ -174,7 +174,7 @@ const editproduct = async (req, res) => {
         if (existingProduct) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ error: MESSAGES.ADMIN_PRODUCT.PRODUCT_EXISTS_OTHER });
         }
-        
+
         const images = [];
         if (req.files && req.files.length > 0) {
             for (let i = 0; i < req.files.length; i++) {
@@ -210,7 +210,7 @@ const editproduct = async (req, res) => {
 const deleteSingleImage = async (req, res) => {
     try {
         const { imageNameToserver, productIdToServer } = req.body;
-        
+
         // Find the product
         const product = await Product.findById(productIdToServer);
         if (!product) {
@@ -225,7 +225,7 @@ const deleteSingleImage = async (req, res) => {
 
         // Remove image from array
         product.productImage.splice(imageIndex, 1);
-        
+
         // Save the product
         await product.save();
 
@@ -246,9 +246,9 @@ const updateproduct = async (req, res) => {
         const data = req.body;
         const categoryDoc = await Category.findOne({ name: data.category });
         const brandDoc = await Brand.findOne({ name: data.brand });
-        
+
         const categoryId = categoryDoc._id;
-        
+
         const image = [];
         const product = await Product.findById({ _id: id });
 
@@ -263,7 +263,7 @@ const updateproduct = async (req, res) => {
             description: data.description,
             brand: brandDoc._id,
             category: categoryId,
-            regularPrice: data.regularPrice, 
+            regularPrice: data.regularPrice,
             salePrice: data.salePrice,
             quantity: data.quantity || product.quantity
         };
@@ -281,32 +281,32 @@ const updateproduct = async (req, res) => {
 };
 
 const listproduct = async (req, res) => {
-     try {
+    try {
         const product = req.query.id;
         await Product.findByIdAndUpdate({ _id: product }, { isListed: true });
         return res.redirect('/admin/product');
-     } catch (error) {
+    } catch (error) {
         console.error(error);
         res.status(STATUS_CODES.BAD_REQUEST).json(MESSAGES.SERVER_ERROR);
-     }
+    }
 }
 
 const unlistproduct = async (req, res) => {
-      try {
+    try {
         const product = req.query.id;
         await Product.findByIdAndUpdate({ _id: product }, { isListed: false });
         return res.redirect('/admin/product');
-      } catch (error) {
+    } catch (error) {
         console.error(error);
         res.status(STATUS_CODES.BAD_REQUEST).json(MESSAGES.SERVER_ERROR);
-      }
+    }
 }
 
 const addOffer = async (req, res) => {
     try {
         const { productId, percentage } = req.body;
         const percentNum = parseFloat(percentage);
-        if (isNaN(percentNum) || percentNum < 0 || percentNum > 99) {
+        if (isNaN(percentNum) || percentNum < 1 || percentNum > 100) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({ status: false, message: MESSAGES.ADMIN_PRODUCT.INVALID_PERCENT });
         }
         const product = await Product.findById(productId);

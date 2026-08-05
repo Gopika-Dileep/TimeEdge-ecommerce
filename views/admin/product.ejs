@@ -1,264 +1,328 @@
 <%- include("../../views/partials/admin/header") %>
 
-<head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-    <style>
-        .product-thumbnail {
-            width: 64px;
-            height: 64px;
-            object-fit: cover;
-            border: 1px solid var(--border);
-            background: #fff;
-        }
-        .btn-action-icon {
-            background: none !important;
-            border: 1px solid var(--border) !important;
-            color: var(--text-secondary) !important;
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0 !important;
-            transition: var(--transition);
-            text-decoration: none;
-        }
-        .btn-action-icon:hover {
-            border-color: var(--gold) !important;
-            color: var(--gold) !important;
-            background: var(--gold-glow) !important;
-        }
-        .btn-action-icon.block:hover {
-            border-color: #e07070 !important;
-            color: #e07070 !important;
-            background: rgba(224,112,112,0.05) !important;
-        }
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+        <style>
+            .product-thumbnail {
+                width: 64px;
+                height: 64px;
+                object-fit: cover;
+                border: 1px solid var(--border);
+                background: #fff;
+            }
 
-        /* Top controls row */
-        .controls-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-        }
-        .search-form-te {
-            display: flex;
-            gap: 10px;
-            max-width: 480px;
-            flex: 1;
-        }
+            .btn-action-icon {
+                background: none !important;
+                border: 1px solid var(--border) !important;
+                color: var(--text-secondary) !important;
+                width: 36px;
+                height: 36px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 0 !important;
+                transition: var(--transition);
+                text-decoration: none;
+            }
 
-        /* Pagination */
-        .pagination-container { display: flex; justify-content: center; gap: 8px; margin-top: 32px; }
-        .pagination-container a, .pagination-container .current-page {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px; border: 1px solid var(--border);
-            text-decoration: none; font-size: 13px; color: var(--text-secondary); transition: var(--transition);
-        }
-        .pagination-container a:hover, .pagination-container .current-page {
-            border-color: var(--gold); color: var(--gold); background: var(--gold-glow);
-        }
-    </style>
-</head>
+            .btn-action-icon:hover {
+                border-color: var(--gold) !important;
+                color: var(--gold) !important;
+                background: var(--gold-glow) !important;
+            }
 
-<div class="content-container">
-    <div class="content-header mb-5 animate-up">
-        <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Catalog Management</span>
-        <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:500; margin-top:4px;">Products List</h2>
-    </div>
+            .btn-action-icon.block:hover {
+                border-color: #e07070 !important;
+                color: #e07070 !important;
+                background: rgba(224, 112, 112, 0.05) !important;
+            }
 
-    <!-- Controls Bar -->
-    <div class="controls-row animate-up delay-1">
-        <form action="/admin/product" method="get" class="search-form-te">
-            <input type="text" class="form-control" placeholder="Search product name or brand..." name="search" value="<%= locals.search || '' %>">
-            <button class="btn-primary" type="submit">Search</button>
-            <% if (locals.search) { %>
-                <a href="/admin/product" class="btn btn-secondary" style="padding: 12px 20px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">Clear</a>
-            <% } %>
-        </form>
-        <a href="/admin/addProducts" class="btn-primary" style="text-decoration: none;">
-            <i class="fa-solid fa-plus"></i> &nbsp; Add Product
-        </a>
-    </div>
+            /* Top controls row */
+            .controls-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 20px;
+                margin-bottom: 32px;
+                flex-wrap: wrap;
+            }
 
-    <!-- Products Card Table -->
-    <div class="card animate-up delay-2">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table mb-0" style="vertical-align: middle;">
-                    <thead>
-                        <tr>
-                            <th style="width: 100px;">Thumbnail</th>
-                            <th>Product Name</th>
-                            <th>Brand</th>
-                            <th>Category</th>
-                            <th>Reg. Price</th>
-                            <th>Sale Price</th>
-                            <th>Offer (%)</th>
-                            <th>Qty</th>
-                            <th>Status</th>
-                            <th>Promo</th>
-                            <th style="width: 100px; text-align: right; padding-right: 24px !important;">Edit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if (locals.product && product.length > 0) { %>
-                            <% for(let i = product.length - 1; i >= 0; i--) { %>
-                                <tr>
-                                    <td>
-                                        <% if (product[i].productImage && product[i].productImage.length > 0) { %>
-                                            <img src="/uploads/productImages/<%= product[i].productImage[0] %>" class="product-thumbnail" alt="Product Image">
-                                        <% } else { %>
-                                            <span style="font-size:11px; color:var(--text-muted);">No Image</span>
-                                        <% } %>
-                                    </td>
-                                    <td style="font-weight: 600; color: var(--text-primary);"><%= product[i].productName %></td>
-                                    <td><%= product[i].brand ? product[i].brand.name : 'No Brand' %></td>
-                                    <td><%= product[i].category ? product[i].category.name : 'No Category' %></td>
-                                    <td style="color: var(--text-muted);">₹<%= product[i].regularPrice ? product[i].regularPrice.toLocaleString('en-IN') : '0' %></td>
-                                    <td style="font-weight: 600; color: var(--text-primary);">₹<%= product[i].salePrice.toLocaleString('en-IN') %></td>
-                                    <td style="color: var(--gold); font-weight: 500;"><%= product[i].productOffer %>%</td>
-                                    <td><%= product[i].quantity %></td>
-                                    <td>
-                                        <% if (product[i].isListed === false) { %>
-                                            <a href="/admin/listProduct?id=<%= product[i]._id %>" class="btn-action-icon block" title="Currently Unlisted: Click to List">
-                                                <i class="fa-regular fa-eye-slash"></i>
-                                            </a>
-                                        <% } else { %>
-                                            <a href="/admin/unlistProduct?id=<%= product[i]._id %>" class="btn-action-icon" title="Currently Listed: Click to Unlist">
-                                                <i class="fa-regular fa-eye"></i>
-                                            </a>
-                                        <% } %>
-                                    </td>
-                                    <td>
-                                        <% if (product[i].productOffer) { %>
-                                            <button onclick="removeOffer('<%= product[i]._id %>')" class="btn-action-icon block" title="Remove Offer">
-                                                <i class="fa-regular fa-trash-can"></i>
-                                            </button>
-                                        <% } else { %>
-                                            <button onclick="addOffer('<%= product[i]._id %>')" class="btn-action-icon" title="Add Offer Percentage">
-                                                <i class="fa-regular fa-plus"></i>
-                                            </button>
-                                        <% } %>
-                                    </td>
-                                    <td style="text-align: right; padding-right: 24px !important;">
-                                        <a href="/admin/editProduct?id=<%= product[i]._id %>" class="btn-action-icon" title="Edit Product details">
-                                            <i class="fa-regular fa-pen-to-square"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            <% } %>
-                        <% } else { %>
+            .search-form-te {
+                display: flex;
+                gap: 10px;
+                max-width: 480px;
+                flex: 1;
+            }
+
+            /* Pagination */
+            .pagination-container {
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                margin-top: 32px;
+            }
+
+            .pagination-container a,
+            .pagination-container .current-page {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                border: 1px solid var(--border);
+                text-decoration: none;
+                font-size: 13px;
+                color: var(--text-secondary);
+                transition: var(--transition);
+            }
+
+            .pagination-container a:hover,
+            .pagination-container .current-page {
+                border-color: var(--gold);
+                color: var(--gold);
+                background: var(--gold-glow);
+            }
+        </style>
+    </head>
+
+    <div class="content-container">
+        <div class="content-header mb-5 animate-up">
+            <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted);">Catalog
+                Management</span>
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:500; margin-top:4px;">
+                Products List</h2>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="controls-row animate-up delay-1">
+            <form action="/admin/product" method="get" class="search-form-te">
+                <input type="text" class="form-control" placeholder="Search product name or brand..." name="search"
+                    value="<%= locals.search || '' %>">
+                <button class="btn-primary" type="submit">Search</button>
+                <% if (locals.search) { %>
+                    <a href="/admin/product" class="btn btn-secondary"
+                        style="padding: 12px 20px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">Clear</a>
+                    <% } %>
+            </form>
+            <a href="/admin/addProducts" class="btn-primary" style="text-decoration: none;">
+                <i class="fa-solid fa-plus"></i> &nbsp; Add Product
+            </a>
+        </div>
+
+        <!-- Products Card Table -->
+        <div class="card animate-up delay-2">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0" style="vertical-align: middle;">
+                        <thead>
                             <tr>
-                                <td colspan="11" class="text-center py-5 text-muted">No Products Found</td>
+                                <th style="width: 100px;">Thumbnail</th>
+                                <th>Product Name</th>
+                                <th>Brand</th>
+                                <th>Category</th>
+                                <th>Reg. Price</th>
+                                <th>Sale Price</th>
+                                <th>Offer (%)</th>
+                                <th>Qty</th>
+                                <th>Status</th>
+                                <th>Promo</th>
+                                <th style="width: 100px; text-align: right; padding-right: 24px !important;">Edit</th>
                             </tr>
-                        <% } %>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <% if (locals.product && product.length > 0) { %>
+                                <% product.forEach(function(p) { %>
+                                    <tr>
+                                        <td>
+                                            <% if (p.productImage && p.productImage.length > 0) { %>
+                                                <img src="/uploads/productImages/<%= p.productImage[0] %>"
+                                                    class="product-thumbnail" alt="Product Image">
+                                                <% } else { %>
+                                                    <span style="font-size:11px; color:var(--text-muted);">No
+                                                        Image</span>
+                                                    <% } %>
+                                        </td>
+                                        <td style="font-weight: 600; color: var(--text-primary);">
+                                            <%= p.productName %>
+                                        </td>
+                                        <td>
+                                            <%= p.brand ? p.brand.name : 'No Brand' %>
+                                        </td>
+                                        <td>
+                                            <%= p.category ? p.category.name : 'No Category' %>
+                                        </td>
+                                        <td style="color: var(--text-muted);">₹<%= p.regularPrice ?
+                                                p.regularPrice.toLocaleString('en-IN') : '0' %>
+                                        </td>
+                                        <td style="font-weight: 600; color: var(--text-primary);">₹<%=
+                                                p.salePrice.toLocaleString('en-IN') %>
+                                        </td>
+                                        <td style="color: var(--gold); font-weight: 500;">
+                                            <%= p.productOffer %>%
+                                        </td>
+                                        <td>
+                                            <%= p.quantity %>
+                                        </td>
+                                        <td>
+                                            <% if (p.isListed === false) { %>
+                                                <a href="/admin/listProduct?id=<%= p._id %>"
+                                                    class="btn-action-icon block"
+                                                    title="Currently Unlisted: Click to List">
+                                                    <i class="fa-regular fa-eye-slash"></i>
+                                                </a>
+                                                <% } else { %>
+                                                    <a href="/admin/unlistProduct?id=<%= p._id %>"
+                                                        class="btn-action-icon"
+                                                        title="Currently Listed: Click to Unlist">
+                                                        <i class="fa-regular fa-eye"></i>
+                                                    </a>
+                                                    <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (p.productOffer) { %>
+                                                <button onclick="removeOffer('<%= p._id %>')"
+                                                    class="btn-action-icon block" title="Remove Offer">
+                                                    <i class="fa-regular fa-trash-can"></i>
+                                                </button>
+                                                <% } else { %>
+                                                    <button onclick="addOffer('<%= p._id %>')"
+                                                        class="btn-action-icon" title="Add Offer Percentage">
+                                                        <i class="fa-regular fa-plus"></i>
+                                                    </button>
+                                                    <% } %>
+                                        </td>
+                                        <td style="text-align: right; padding-right: 24px !important;">
+                                            <a href="/admin/editProduct?id=<%= p._id %>"
+                                                class="btn-action-icon" title="Edit Product details">
+                                                <i class="fa-regular fa-pen-to-square"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="11" class="text-center py-5 text-muted">No Products Found
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Pagination block -->
-    <% if (locals.totalpage && totalpage > 1) { %>
-    <div class="pagination-container animate-up">
-        <% if (currentpage > 1) { %>
-            <a href="?page=<%= currentpage - 1 %><%= locals.search ? '&search=' + locals.search : '' %>"><i class="fa-solid fa-chevron-left"></i></a>
-        <% } %>
-        <% for (let i = 1; i <= totalpage; i++) { %>
-            <% if (i === currentpage) { %>
-                <span class="current-page"><%= i %></span>
-            <% } else { %>
-                <a href="?page=<%= i %><%= locals.search ? '&search=' + locals.search : '' %>"><%= i %></a>
+        <!-- Pagination block -->
+        <% if (locals.totalpage && totalpage> 1) { %>
+            <div class="pagination-container animate-up">
+                <% if (currentpage> 1) { %>
+                    <a href="?page=<%= currentpage - 1 %><%= locals.search ? '&search=' + locals.search : '' %>"><i
+                            class="fa-solid fa-chevron-left"></i></a>
+                    <% } %>
+                        <% for (let i=1; i <=totalpage; i++) { %>
+                            <% if (i===currentpage) { %>
+                                <span class="current-page">
+                                    <%= i %>
+                                </span>
+                                <% } else { %>
+                                    <a href="?page=<%= i %><%= locals.search ? '&search=' + locals.search : '' %>">
+                                        <%= i %>
+                                    </a>
+                                    <% } %>
+                                        <% } %>
+                                            <% if (currentpage < totalpage) { %>
+                                                <a
+                                                    href="?page=<%= currentpage + 1 %><%= locals.search ? '&search=' + locals.search : '' %>"><i
+                                                        class="fa-solid fa-chevron-right"></i></a>
+                                                <% } %>
+            </div>
             <% } %>
-        <% } %>
-        <% if (currentpage < totalpage) { %>
-            <a href="?page=<%= currentpage + 1 %><%= locals.search ? '&search=' + locals.search : '' %>"><i class="fa-solid fa-chevron-right"></i></a>
-        <% } %>
     </div>
-    <% } %>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script>
-async function addOffer(productId) {
-    const { value: amount } = await Swal.fire({
-        title: "Add Product Offer Percentage",
-        input: "number",
-        inputLabel: "Offer percentage (1-100%)",
-        inputPlaceholder: '%',
-        inputAttributes: {
-            min: 1,
-            max: 100,
-            step: 1
-        }
-    });
-
-    if (amount !== null && amount !== "") { 
-        const offerVal = Number(amount);
-        if (isNaN(offerVal) || offerVal < 1 || offerVal > 100) {
-            Swal.fire('Invalid Input', 'Offer percentage must be a number between 1 and 100', 'error');
-            return;
-        }
-        $.ajax({
-            url: "/admin/addProductOffer",
-            method: "POST",
-            data: {
-                percentage: amount,
-                productId: productId,
-            },
-            success: (response) => {
-                if (response.status === true) {
-                    Swal.fire('Offer added', 'The offer has been added successfully', 'success').then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire('Failed', 'Unable to add the offer', 'error');
-                }
-            },
-            error: (err) => {
-                Swal.fire('Error', 'An error occurred while adding the offer', 'error');
-            },
-        });
-    }
-}
-
-function removeOffer(productId) {
-    Swal.fire({
-        title: "Remove Offer?",
-        text: "This will revert the product price back to regular pricing.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: '#b39343',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, remove it!',
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: "/admin/removeProductOffer",
-                method: 'POST',
-                data: {
-                    productId: productId
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        async function addOffer(productId) {
+            const { value: amount } = await Swal.fire({
+                title: "Add Product Offer Percentage",
+                input: "number",
+                inputLabel: "Offer percentage (1-100%)",
+                inputPlaceholder: '%',
+                inputAttributes: {
+                    step: 1
                 },
-                success: (response) => {
-                    if (response.status === true) {
-                        Swal.fire("Removed!", "The offer has been removed.", "success").then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire('Failed', 'Unable to remove the offer', 'error');
+                inputValidator: (value) => {
+                    if (!value || value.trim() === "") {
+                        return "You need to enter a percentage value";
                     }
-                },
-                error: (err) => {
-                    Swal.fire('Error', 'An error occurred while removing the offer', 'error');
+                    const val = Number(value);
+                    if (isNaN(val) || val < 1 || val > 100) {
+                        return "Please enter a valid percentage between 1 and 100";
+                    }
+                }
+            });
+
+            if (amount !== null && amount !== "") {
+                const offerVal = Number(amount);
+                if (isNaN(offerVal) || offerVal < 1 || offerVal > 100) {
+                    Swal.fire('Invalid Input', 'Offer percentage must be a number between 1 and 100', 'error');
+                    return;
+                }
+                $.ajax({
+                    url: "/admin/addProductOffer",
+                    method: "POST",
+                    data: {
+                        percentage: amount,
+                        productId: productId,
+                    },
+                    success: (response) => {
+                        if (response.status === true) {
+                            Swal.fire('Offer added', 'The offer has been added successfully', 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Failed', response.message || 'Unable to add the offer', 'error');
+                        }
+                    },
+                    error: (err) => {
+                        Swal.fire('Error', err.responseJSON?.message || 'An error occurred while adding the offer', 'error');
+                    },
+                });
+            }
+        }
+
+        function removeOffer(productId) {
+            Swal.fire({
+                title: "Remove Offer?",
+                text: "This will revert the product price back to regular pricing.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#b39343',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, remove it!',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/removeProductOffer",
+                        method: 'POST',
+                        data: {
+                            productId: productId
+                        },
+                        success: (response) => {
+                            if (response.status === true) {
+                                Swal.fire("Removed!", "The offer has been removed.", "success").then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Failed', 'Unable to remove the offer', 'error');
+                            }
+                        },
+                        error: (err) => {
+                            Swal.fire('Error', 'An error occurred while removing the offer', 'error');
+                        }
+                    });
                 }
             });
         }
-    });
-}
-</script>
+    </script>
 
-<%- include("../../views/partials/admin/footer") %>
+    <%- include("../../views/partials/admin/footer") %>

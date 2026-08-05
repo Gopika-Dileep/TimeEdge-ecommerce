@@ -470,15 +470,26 @@ const loadbrand = async (req, res) => {
 const addBrand = async (req, res) => {
   try {
     const { name } = req.body;
-    console.log(req.body, "name");
-    const existBrand = await Brand.findOne({ name: name });
-    if (existBrand) {
-      res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.BRAND_EXISTS });
-    } else {
-      const newBrand = new Brand({ name });
-      await newBrand.save();
-      res.redirect("/admin/brand");
+    const trimmed = (name || '').trim();
+
+    if (!trimmed) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ message: 'Brand name is required.' });
     }
+    if (/^[0-9]/.test(trimmed)) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ message: 'Brand name cannot start with a number.' });
+    }
+    if (trimmed.length < 2) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ message: 'Brand name must be at least 2 characters.' });
+    }
+
+    const existBrand = await Brand.findOne({ name: { $regex: new RegExp(`^${trimmed}$`, 'i') } });
+    if (existBrand) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.BRAND_EXISTS });
+    }
+
+    const newBrand = new Brand({ name: trimmed });
+    await newBrand.save();
+    res.redirect("/admin/brand");
   } catch (error) {
     console.error(error);
     res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.BRAND_ADD_ERROR });
@@ -513,6 +524,39 @@ const unlistBrand = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(STATUS_CODES.BAD_REQUEST).json({ message: MESSAGES.ADMIN.BRAND_UNLIST_ERROR });
+  }
+};
+
+const editBrand = async (req, res) => {
+  try {
+    const { brandId } = req.params;
+    const { name } = req.body;
+    const trimmed = (name || '').trim();
+
+    if (!trimmed) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ status: false, message: 'Brand name is required.' });
+    }
+    if (/^[0-9]/.test(trimmed)) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ status: false, message: 'Brand name cannot start with a number.' });
+    }
+    if (trimmed.length < 2) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ status: false, message: 'Brand name must be at least 2 characters.' });
+    }
+
+    const duplicate = await Brand.findOne({
+      name: { $regex: new RegExp(`^${trimmed}$`, 'i') },
+      _id: { $ne: brandId }
+    });
+
+    if (duplicate) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ status: false, message: 'A brand with this name already exists' });
+    }
+
+    await Brand.findByIdAndUpdate(brandId, { name: trimmed });
+    res.json({ status: true, message: 'Brand updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ status: false, message: MESSAGES.SERVER_ERROR });
   }
 };
 const getOrders = async (req, res) => {
@@ -1030,6 +1074,7 @@ module.exports = {
   addBrand,
   listBrand,
   unlistBrand,
+  editBrand,
   getOrders,
   getOrderDetails,
   changeStatus,

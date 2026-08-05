@@ -77,20 +77,20 @@
                     <h4>Add New Category</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="/admin/addCategory" id="categoryCreateForm" onsubmit="return validateCategoryForm()">
+                    <form method="POST" action="/admin/addCategory" id="categoryCreateForm" onsubmit="return validateCategoryForm()" novalidate>
                         <div class="mb-4">
                             <label for="product_name" class="form-label">Category Name</label>
-                            <input type="text" name="name" placeholder="e.g. Chronographs" class="form-control" id="product_name" required />
+                            <input type="text" name="name" placeholder="e.g. Chronographs" class="form-control" id="product_name" />
                             <div class="invalid-feedback" id="nameError"></div>
                         </div>
                         <div class="mb-4">
                             <label class="form-label" for="descriptionId">Description</label>
-                            <textarea placeholder="e.g. High precision stopwatch functional watches" name="description" class="form-control" id="descriptionId" rows="4" required></textarea>
+                            <textarea placeholder="e.g. High precision stopwatch functional watches" name="description" class="form-control" id="descriptionId" rows="4"></textarea>
                             <div class="invalid-feedback" id="descriptionError"></div>
                         </div>
                         <div class="mb-4">
                             <label class="form-label" for="category_offer">Category Offer (%)</label>
-                            <input type="number" name="categoryOffer" placeholder="e.g. 10" class="form-control" id="category_offer" min="0" max="100" />
+                            <input type="number" name="categoryOffer" placeholder="e.g. 10" class="form-control" id="category_offer" />
                             <div class="invalid-feedback" id="offerError" style="display:block; color:#ff3333; margin-top:4px;"></div>
                         </div>
                         <button class="btn-primary w-100" type="submit">Create Category</button>
@@ -241,8 +241,8 @@ function validateCategoryForm() {
     }
     if (categoryOffer !== "") {
         var offerNum = Number(categoryOffer);
-        if (isNaN(offerNum) || offerNum < 0 || offerNum > 100) {
-            document.getElementById("offerError").innerText = "Category offer must be a number between 0 and 100";
+        if (isNaN(offerNum) || offerNum < 1 || offerNum > 100) {
+            document.getElementById("offerError").innerText = "Category offer must be a number between 1 and 100";
             document.getElementById("category_offer").classList.add("is-invalid");
             isValid = false;
         } else {
@@ -260,21 +260,23 @@ async function addOffer(categoryId) {
     const { value: amount } = await Swal.fire({
         title: "Offer in Percentage",
         input: "number",
-        inputLabel: "Percentage",
+        inputLabel: "Percentage (1-100%)",
         inputPlaceholder: "%",
         inputAttributes: {
-            min: 0,
-            max: 100,
             step: 1
+        },
+        inputValidator: (value) => {
+            if (!value || value.trim() === "") {
+                return "You need to enter a percentage value";
+            }
+            const val = Number(value);
+            if (isNaN(val) || val < 1 || val > 100) {
+                return "Please enter a valid percentage between 1 and 100";
+            }
         }
     });
 
     if (amount) {
-        if (amount < 0 || amount > 100 || isNaN(amount)) {
-            Swal.fire("Invalid Input", "Please enter a valid percentage between 0 and 100", "error");
-            return;
-        }
-
         try {
             Swal.fire({
                 title: "Adding Offer...",

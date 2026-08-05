@@ -72,7 +72,8 @@
                     <form id="addBrandForm" method="POST" action="/admin/addBrand">
                         <div class="mb-4">
                             <label for="brand_name" class="form-label">Brand Name</label>
-                            <input type="text" name="name" id="brand_name" placeholder="e.g. Audemars Piguet" class="form-control" required />
+                            <input type="text" name="name" id="brand_name" placeholder="e.g. Audemars Piguet" class="form-control" />
+                            <span id="brand_name_error" style="color:#e07070; font-size:12px; margin-top:5px; display:none;"></span>
                         </div>
                         <button class="btn-primary w-100" type="submit">Create Brand</button>
                     </form>
@@ -93,7 +94,7 @@
                                 <tr>
                                     <th>Brand Name</th>
                                     <th>Status</th>
-                                    <th style="width: 140px; text-align: right; padding-right: 24px !important;">Action</th>
+                                    <th style="width: 220px; text-align: right; padding-right: 24px !important;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,6 +110,7 @@
                                                 <% } %>
                                             </td>
                                             <td style="text-align: right; padding-right: 24px !important;">
+                                                <button class="btn-table-action" style="color: var(--gold); margin-right: 6px;" onclick="editBrand('<%= brandItem._id %>', '<%= brandItem.name %>')">Edit</button>
                                                 <% if (brandItem.isListed) { %>
                                                     <form method="POST" action="/admin/blockBrand/<%= brandItem._id %>" style="display: inline;">
                                                         <button class="btn-table-action block" type="submit">Block</button>
@@ -158,17 +160,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
 $(document).ready(function() {
+    const $nameInput  = $('#brand_name');
+    const $nameError  = $('#brand_name_error');
+
+    function showError(msg) {
+        $nameError.text(msg).show();
+        $nameInput.css('border-color', '#e07070');
+    }
+
+    function clearError() {
+        $nameError.text('').hide();
+        $nameInput.css('border-color', '');
+    }
+
+    // Clear error as user types
+    $nameInput.on('input', function() { clearError(); });
+
     $('#addBrandForm').on('submit', function(e) {
         e.preventDefault();
-        
-        const name = $('#brand_name').val().trim();
-        if (!name) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Required Field',
-                text: 'Brand name is required.',
-                confirmButtonColor: '#b39343'
-            });
+        clearError();
+
+        const name = $nameInput.val().trim();
+        const validationError = validateBrandName(name);
+        if (validationError) {
+            showError(validationError);
             return;
         }
 
@@ -180,20 +195,68 @@ $(document).ready(function() {
                 window.location.href = '/admin/brand';
             },
             error: function(xhr) {
-                let errorMsg = 'Error while adding brand';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: errorMsg,
-                    confirmButtonColor: '#b39343'
-                });
+                const msg = (xhr.responseJSON && xhr.responseJSON.message)
+                    ? xhr.responseJSON.message
+                    : 'Error while adding brand';
+                showError(msg);
             }
         });
     });
 });
+
+function validateBrandName(name) {
+    if (!name || name.trim() === '') return 'Brand name is required.';
+    if (/^[0-9]/.test(name)) return 'Brand name cannot start with a number.';
+    if (name.trim().length < 2) return 'Brand name must be at least 2 characters.';
+    return null;
+}
+
+async function editBrand(brandId, currentName) {
+    const { value: newName } = await Swal.fire({
+        title: 'Edit Brand',
+        input: 'text',
+        inputLabel: 'Brand Name',
+        inputValue: currentName,
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#b39343',
+        inputValidator: (value) => {
+            const err = validateBrandName(value ? value.trim() : '');
+            if (err) return err;
+            if (value.trim().toLowerCase() === currentName.trim().toLowerCase()) {
+                return 'New name must be different from the current name';
+            }
+        }
+    });
+
+    if (newName) {
+        $.ajax({
+            url: '/admin/editBrand/' + brandId,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ name: newName.trim() }),
+            success: function(response) {
+                if (response.status === true) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated!',
+                        text: 'Brand name has been updated successfully.',
+                        confirmButtonColor: '#b39343',
+                        timer: 1800,
+                        showConfirmButton: false
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire('Failed', response.message || 'Failed to update brand', 'error');
+                }
+            },
+            error: function(xhr) {
+                const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while updating the brand';
+                Swal.fire('Error', msg, 'error');
+            }
+        });
+    }
+}
 </script>
 
 <%- include("../../views/partials/admin/footer") %>
