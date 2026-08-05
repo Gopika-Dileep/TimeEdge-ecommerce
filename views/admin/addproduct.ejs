@@ -143,12 +143,6 @@
                                 <div id="quantity-error" class="error-message"></div>
                             </div>
                         </div>
-
-                        <div class="mb-4" style="max-width: 280px;">
-                            <label class="form-label" for="colorInput">Watch Color / Dial Finish</label>
-                            <input name="color" id="colorInput" type="text" placeholder="e.g. Rose Gold / Black" class="form-control" required>
-                            <div id="color-error" class="error-message"></div>
-                        </div>
                     </div>
 
                     <!-- Right Column: Images & Upload -->
@@ -252,17 +246,23 @@ function openCropper(event, index) {
             
             // Re-create the image element dynamically to clear sizing/caching artifacts
             const container = document.getElementById("cropperTargetContainer");
-            container.innerHTML = `<img id="cropperTargetImage" src="${dataURL}" alt="To Crop" style="max-width: 100%; max-height: 300px; display: block;">`;
+            container.innerHTML = '';
             
-            const targetImage = document.getElementById("cropperTargetImage");
+            const targetImage = document.createElement('img');
+            targetImage.id = "cropperTargetImage";
+            targetImage.alt = "To Crop";
+            targetImage.style.maxWidth = "100%";
+            targetImage.style.maxHeight = "360px";
+            targetImage.style.display = "block";
+            
             currentCropperIndex = index;
             
             // Open modal
             const modal = document.getElementById("cropperModal");
             modal.style.display = "flex";
             
-            // Wait for image loading before initializing Cropper
-            targetImage.onload = function() {
+            const initCropper = () => {
+                if (cropperInstance) return;
                 cropperInstance = new Cropper(targetImage, {
                     aspectRatio: 1 / 1,
                     viewMode: 1,
@@ -275,6 +275,14 @@ function openCropper(event, index) {
                     movable: true
                 });
             };
+
+            targetImage.onload = initCropper;
+            targetImage.src = dataURL;
+            container.appendChild(targetImage);
+
+            if (targetImage.complete) {
+                initCropper();
+            }
         };
         reader.readAsDataURL(fileInput.files[0]);
     }
@@ -391,11 +399,6 @@ function validateForm() {
     const categorySelect = document.getElementById('categorySelect');
     if (!categorySelect.value) {
         displayErrorMessage('category-error', 'Please select a category.');
-        isValid = false;
-    }
-
-    if (color.trim() === "") {
-        displayErrorMessage('color-error', 'Please enter a color.');
         isValid = false;
     }
 

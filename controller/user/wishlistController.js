@@ -108,6 +108,29 @@ const addToWishlist = async (req, res) => {
             return res.status(STATUS_CODES.NOT_FOUND).json({ success: false, message: MESSAGES.USER_WISHLIST.PRODUCT_NOT_FOUND });
         }
 
+        const User = require("../../models/userSchema");
+        const Category = require("../../models/categorySchema");
+        const Brand = require("../../models/brandSchema");
+
+        const user = await User.findById(userId);
+        if (!user || user.isBlocked === true) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "User is blocked or not found." });
+        }
+
+        const category = await Category.findById(product.category);
+        if (!category || category.isListed === false) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Product category is blocked or unlisted." });
+        }
+
+        const brand = await Brand.findById(product.brand);
+        if (!brand || brand.isListed === false) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Product brand is blocked or unlisted." });
+        }
+
+        if (product.isListed === false) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Product is blocked or unlisted." });
+        }
+
         if (!wishlist) {
             const newWishlist = new Wishlist({
                 userId: userId,

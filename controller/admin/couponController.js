@@ -17,19 +17,15 @@ const loadCouponPage = async (req, res) => {
         for (let coupon of coupons) {
             let shouldUpdate = false;
             
-            // Check if coupon is expired
-            if (coupon.expireOn < currentDate && coupon.isList) {
-                coupon.isList = false;
-                shouldUpdate = true;
-            }
-            
-            // Check if usage limit is reached
-            if (coupon.UsageLimit && coupon.userId.length >= coupon.UsageLimit && coupon.isList) {
+            const expiry = new Date(coupon.expireOn);
+            expiry.setHours(23, 59, 59, 999);
+            const isExpired = new Date() > expiry;
+
+            if (isExpired && coupon.isList) {
                 coupon.isList = false;
                 shouldUpdate = true;
             }
 
-            // Save coupon if status changed
             if (shouldUpdate) {
                 await coupon.save();
             }

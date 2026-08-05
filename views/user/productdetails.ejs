@@ -332,9 +332,9 @@
             <div class="pd-qty-wrap">
                 <span class="qty-label">Quantity</span>
                 <div class="qty-control">
-                    <button class="qty-btn" onclick="changeQty(-1)"><i class="fa-solid fa-minus"></i></button>
+                    <button class="qty-btn" onclick="changeQty(-1)" <%= product.quantity <= 0 ? 'disabled' : '' %>><i class="fa-solid fa-minus"></i></button>
                     <span class="qty-val" id="qtyDisplay">1</span>
-                    <button class="qty-btn" onclick="changeQty(1)"><i class="fa-solid fa-plus"></i></button>
+                    <button class="qty-btn" onclick="changeQty(1)" <%= product.quantity <= 0 ? 'disabled' : '' %>><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <span style="font-size:11px; color:var(--text-muted);">Max <%= product.maxQtyPerPerson %> per order</span>
             </div>
@@ -429,7 +429,10 @@ const maxQty = Number('<%= product.maxQtyPerPerson || 5 %>');
 const productId = '<%= product._id %>';
 let qty = 1;
 
+const productQuantity = Number('<%= product.quantity %>');
+
 function changeQty(d) {
+    if (productQuantity <= 0) return;
     qty = Math.min(Math.max(1, qty + d), maxQty);
     document.getElementById('qtyDisplay').textContent = qty;
 }

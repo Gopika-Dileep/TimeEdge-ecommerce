@@ -17,22 +17,15 @@ const applycoupon = async (req, res) => {
             return res.json({ success: false, message: MESSAGES.USER_COUPON.INVALID_CODE });
         }
 
-        if (coupon.userId && coupon.userId.some(id => id.toString() === userId.toString())) {
-            return res.json({ success: false, message: MESSAGES.USER_COUPON.ALREADY_USED });
-        }
-
-        const couponUsed = await Order.countDocuments({ couponId: coupon._id, user: userId });
-
-        if (coupon.UsageLimit && couponUsed >= coupon.UsageLimit) {
+        const usageCount = coupon.userId.filter(id => id.toString() === userId.toString()).length;
+        if (coupon.UsageLimit && usageCount >= coupon.UsageLimit) {
             return res.json({ success: false, message: MESSAGES.USER_COUPON.LIMIT_EXCEEDED });
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
         const expiryDate = new Date(coupon.expireOn);
-        expiryDate.setHours(0, 0, 0, 0);
+        expiryDate.setHours(23, 59, 59, 999);
         
-        if (today > expiryDate) {
+        if (new Date() > expiryDate) {
             return res.json({ success: false, message: MESSAGES.USER_COUPON.EXPIRED });
         }
 

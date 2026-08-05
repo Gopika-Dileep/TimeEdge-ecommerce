@@ -101,7 +101,14 @@
                                             <td><%= coupon.UsageLimit || 'N/A' %></td>
                                             <td><%= new Date(coupon.expireOn).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %></td>
                                             <td>
-                                                <% if (coupon.isList) { %>
+                                                <% 
+                                                    const expiry = new Date(coupon.expireOn);
+                                                    expiry.setHours(23, 59, 59, 999);
+                                                    const isExpired = new Date() > expiry;
+                                                %>
+                                                <% if (isExpired) { %>
+                                                    <span class="badge bg-secondary" style="color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 3px;">Expired</span>
+                                                <% } else if (coupon.isList) { %>
                                                     <span class="badge bg-success" style="color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 3px;">Listed</span>
                                                 <% } else { %>
                                                     <span class="badge bg-danger" style="color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 3px;">Unlisted</span>
@@ -112,14 +119,16 @@
                                                     <a href="/admin/editCoupon?id=<%= coupon._id %>" style="color: #b39343; text-decoration: none; font-size: 13px; font-weight: 600;">
                                                         Edit
                                                     </a>
-                                                    <% if (coupon.isList) { %>
-                                                        <a href="/admin/unlistCoupon?id=<%= coupon._id %>" style="color: #e07070; text-decoration: none; font-size: 13px; font-weight: 600;">
-                                                            Unlist
-                                                        </a>
-                                                    <% } else { %>
-                                                        <a href="/admin/listCoupon?id=<%= coupon._id %>" style="color: #6dbf7f; text-decoration: none; font-size: 13px; font-weight: 600;">
-                                                            List
-                                                        </a>
+                                                    <% if (!isExpired) { %>
+                                                        <% if (coupon.isList) { %>
+                                                            <a href="/admin/unlistCoupon?id=<%= coupon._id %>" style="color: #e07070; text-decoration: none; font-size: 13px; font-weight: 600;">
+                                                                Unlist
+                                                            </a>
+                                                        <% } else { %>
+                                                            <a href="/admin/listCoupon?id=<%= coupon._id %>" style="color: #6dbf7f; text-decoration: none; font-size: 13px; font-weight: 600;">
+                                                                List
+                                                            </a>
+                                                        <% } %>
                                                     <% } %>
                                                 </div>
                                             </td>

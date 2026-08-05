@@ -109,9 +109,8 @@ const getCheckoutPage = async (req, res) => {
 
     let filteredCoupons = [] 
     for(let c of coupon) {
-      const couponUsed = await Order.countDocuments({couponId:c._id, user: userId});
-      const isUserIncluded = c.userId.includes(userId);
-      if((!c.UsageLimit || couponUsed < c.UsageLimit) && subtotal >= c.minimumPrice && !isUserIncluded) {
+      const usageCount = c.userId.filter(id => id.toString() === userId.toString()).length;
+      if((!c.UsageLimit || usageCount < c.UsageLimit) && subtotal >= c.minimumPrice) {
         filteredCoupons.push(c);
       }
     }
@@ -179,7 +178,8 @@ const createOrder = async (req, res) => {
     if (couponCode) {
       coupon = await Coupon.findOne({ name: couponCode });
       if (coupon) {
-        if (!coupon.userId.includes(user)) {
+        const usageCount = coupon.userId.filter(id => id.toString() === user.toString()).length;
+        if (!coupon.UsageLimit || usageCount < coupon.UsageLimit) {
           coupon.userId.push(user);
           await coupon.save();
         }
@@ -306,7 +306,8 @@ const verifyRazorPayOrder = async (req, res) => {
     if (couponCode) {
       coupon = await Coupon.findOne({ name: couponCode });
       if (coupon && user) {
-        if (!coupon.userId.includes(user)) {
+        const usageCount = coupon.userId.filter(id => id.toString() === user.toString()).length;
+        if (!coupon.UsageLimit || usageCount < coupon.UsageLimit) {
           coupon.userId.push(user);
           await coupon.save();
         }
@@ -404,7 +405,8 @@ const walletPayment = async (req, res) => {
     if (couponCode) {
       coupon = await Coupon.findOne({ name: couponCode });
       if (coupon && userId) {
-        if (!coupon.userId.includes(userId)) {
+        const usageCount = coupon.userId.filter(id => id.toString() === userId.toString()).length;
+        if (!coupon.UsageLimit || usageCount < coupon.UsageLimit) {
           coupon.userId.push(userId);
           await coupon.save();
         }
