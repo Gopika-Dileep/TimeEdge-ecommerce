@@ -271,10 +271,10 @@ const addCategory = async (req, res) => {
       });
     }
 
-    if (parsedOffer !== 0 && (parsedOffer < 1 || parsedOffer > 100)) {
+    if (parsedOffer < 0 || parsedOffer > 100) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: "Category offer must be between 1 and 100",
+        message: "Category offer must be between 0 and 100",
       });
     }
 
@@ -365,10 +365,10 @@ const editCategory = async (req, res) => {
       });
     }
 
-    if (parsedOffer !== 0 && (parsedOffer < 1 || parsedOffer > 100)) {
+    if (parsedOffer < 0 || parsedOffer > 100) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: "Category offer must be between 1 and 100",
+        message: "Category offer must be between 0 and 100",
       });
     }
 

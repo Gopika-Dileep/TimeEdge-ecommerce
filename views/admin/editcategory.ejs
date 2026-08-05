@@ -120,8 +120,8 @@
 
         if (categoryOffer !== "") {
             const offerNum = Number(categoryOffer);
-            if (isNaN(offerNum) || offerNum < 1 || offerNum > 100) {
-                document.getElementById("offerError").innerText = "Category offer must be a number between 1 and 100";
+            if (isNaN(offerNum) || offerNum < 0 || offerNum > 100) {
+                document.getElementById("offerError").innerText = "Category offer must be a number between 0 and 100";
                 isValid = false;
             }
         }
