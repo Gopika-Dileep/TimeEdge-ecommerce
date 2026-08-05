@@ -180,6 +180,14 @@ const newChangePassword = async(req,res)=>{
 
         const {confirmPassword,newPassword,currentPassword} = req.body
         const user = await User.findById({_id:userId})
+
+        if(newPassword!==confirmPassword){
+            return res.render('newchangepassword', {
+                path: '/password',
+                user,
+                message: MESSAGES.USER_PROFILE.CONFIRM_PASSWORD_MISMATCH
+            });
+        }
         
         if (!user.password) {
             const passwordHash = await securepassword(newPassword);
@@ -200,13 +208,16 @@ const newChangePassword = async(req,res)=>{
                 message: MESSAGES.USER_PROFILE.PASSWORD_MISMATCH
             });
         }
-        if(newPassword!==confirmPassword){
+
+        const isSameAsCurrent = await bcrypt.compare(newPassword, user.password);
+        if (isSameAsCurrent) {
             return res.render('newchangepassword', {
                 path: '/password',
                 user,
-                message: MESSAGES.USER_PROFILE.CONFIRM_PASSWORD_MISMATCH
+                message: "New password cannot be the same as the current password."
             });
         }
+
         const passwordHash= await securepassword(newPassword)
         user.password = passwordHash
 
@@ -628,12 +639,49 @@ const getWalletPage = async(req,res)=>{
     }
 }
 
+const resendChangeEmailOtp = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const newEmail = req.session.tempNewEmail;
+        if (!newEmail) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Session expired. Please try changing your email again." });
+        }
+
+        // Cooldown check
+        const now = Date.now();
+        if (req.session.lastChangeEmailOtpTime && (now - req.session.lastChangeEmailOtpTime < 60000)) {
+            const waitSecs = Math.ceil((60000 - (now - req.session.lastChangeEmailOtpTime)) / 1000);
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: `Please wait ${waitSecs} seconds before resending OTP.` });
+        }
+
+        const otp = generateOtp();
+        console.log("Resent OTP to new email:", otp);
+        const emailsend = await sendVerificationMail(newEmail, otp);
+        if (emailsend) {
+            req.session.lastChangeEmailOtpTime = now;
+            await User.updateOne({ _id: userId }, { $set: { otp: otp } });
+
+            // Clear OTP in 60 seconds
+            setTimeout(async () => {
+                await User.updateOne({ _id: userId }, { $unset: { otp: 1 } });
+            }, 60000);
+
+            return res.status(STATUS_CODES.OK).json({ success: true, message: "OTP has been resent successfully." });
+        } else {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Failed to send verification email. Please try again." });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.SERVER_ERROR });
+    }
+};
 
 module.exports={
     userProfile,
     changeEmail,
     changeEmailValid,
     verifyEmailOtp,
+    resendChangeEmailOtp,
     updateEmail,
     changePassword,
     changePasswordValid,

@@ -188,11 +188,21 @@ async function addOffer(productId) {
     const { value: amount } = await Swal.fire({
         title: "Add Product Offer Percentage",
         input: "number",
-        inputLabel: "Offer percentage (0-99%)",
+        inputLabel: "Offer percentage (1-100%)",
         inputPlaceholder: '%',
+        inputAttributes: {
+            min: 1,
+            max: 100,
+            step: 1
+        }
     });
 
     if (amount !== null && amount !== "") { 
+        const offerVal = Number(amount);
+        if (isNaN(offerVal) || offerVal < 1 || offerVal > 100) {
+            Swal.fire('Invalid Input', 'Offer percentage must be a number between 1 and 100', 'error');
+            return;
+        }
         $.ajax({
             url: "/admin/addProductOffer",
             method: "POST",

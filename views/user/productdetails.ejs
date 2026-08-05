@@ -38,7 +38,6 @@
 .pd-thumb:hover, .pd-thumb.active { border-color:var(--gold); }
 
 /* Product Info */
-.pd-info { }
 .pd-brand { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
 .pd-name {
     font-family:'Playfair Display',serif;
@@ -452,6 +451,24 @@ function switchTab(btn, tab) {
 
 async function addToCart() {
     const btn = document.getElementById('addToCartBtn');
+    
+    const isUserLoggedIn = '<%= locals.user ? "true" : "false" %>' === 'true';
+    if (!isUserLoggedIn) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Login Required',
+            text: 'Please login to add items to your cart',
+            showCancelButton: true,
+            confirmButtonText: 'Go to Login',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/login';
+            }
+        });
+        return;
+    }
+
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Adding...</span>';
 

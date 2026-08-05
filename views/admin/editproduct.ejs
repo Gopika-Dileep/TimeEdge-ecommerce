@@ -426,6 +426,25 @@ function validateForm() {
         displayErrorMessage('category-error', 'Please select a category.');
         isValid = false;
     }
+
+    let totalImages = 0;
+    // 1. Count remaining existing images
+    const existingImages = document.querySelectorAll('input[value][id="imageDatas"]');
+    totalImages += existingImages.length;
+
+    // 2. Count newly selected files
+    for (let slot = 1; slot <= 4; slot++) {
+        const fileInput = document.getElementById("input" + slot);
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            totalImages++;
+        }
+    }
+
+    if (totalImages === 0) {
+        displayErrorMessage("images-error", 'Please keep or upload at least one product image.');
+        isValid = false;
+    }
+
     return isValid;
 }
 

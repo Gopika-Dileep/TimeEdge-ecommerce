@@ -435,7 +435,7 @@
                             id="wishlist-icon-<%= product._id %>" data-id="<%= product._id %>"></i>
                     </div>
 
-                    <% if (product.bestOffer > 0) { %><span class="card-badge" style="background:transparent; border:1px solid var(--gold); color:var(--gold);">-<%= product.bestOffer %>%</span><% } %>
+                    <% if (product.bestOffer > 0) { %><span class="card-badge" style="background: var(--gold); color: #080808; font-weight: 700;">-<%= product.bestOffer %>%</span><% } %>
 
                     <a href="/productDetails?id=<%= product._id %>" style="text-decoration:none; display:block;">
                         <div class="product-img-wrap">

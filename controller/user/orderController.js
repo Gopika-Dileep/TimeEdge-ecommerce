@@ -50,10 +50,7 @@ const resolveOrderStatus = (orderedItems) => {
   
   if (activeItems.length === 0) {
     const statuses = orderedItems.map(item => item.status);
-    if (statuses.every(s => s === "Cancelled")) {
-      return "Cancelled";
-    }
-    if (statuses.every(s => s === "Returned")) {
+    if (statuses.includes("Returned")) {
       return "Returned";
     }
     return "Cancelled";

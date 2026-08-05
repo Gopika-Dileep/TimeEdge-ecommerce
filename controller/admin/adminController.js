@@ -15,10 +15,7 @@ const resolveOrderStatus = (orderedItems) => {
   
   if (activeItems.length === 0) {
     const statuses = orderedItems.map(item => item.status);
-    if (statuses.every(s => s === "Cancelled")) {
-      return "Cancelled";
-    }
-    if (statuses.every(s => s === "Returned")) {
+    if (statuses.includes("Returned")) {
       return "Returned";
     }
     return "Cancelled";
@@ -274,10 +271,10 @@ const addCategory = async (req, res) => {
       });
     }
 
-    if (isNaN(parsedOffer) || parsedOffer < 0 || parsedOffer > 100) {
+    if (parsedOffer !== 0 && (parsedOffer < 1 || parsedOffer > 100)) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: "Category offer must be a number between 0 and 100",
+        message: "Category offer must be between 1 and 100",
       });
     }
 
@@ -368,10 +365,10 @@ const editCategory = async (req, res) => {
       });
     }
 
-    if (isNaN(parsedOffer) || parsedOffer < 0 || parsedOffer > 100) {
+    if (parsedOffer !== 0 && (parsedOffer < 1 || parsedOffer > 100)) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
-        message: "Category offer must be a number between 0 and 100",
+        message: "Category offer must be between 1 and 100",
       });
     }
 
@@ -408,8 +405,12 @@ const editCategory = async (req, res) => {
 const addOffer = async (req, res) => {
   try {
     const { categoryId, percentage } = req.body;
+    const percentNum = parseFloat(percentage);
+    if (isNaN(percentNum) || percentNum < 1 || percentNum > 100) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ status: false, message: "Category offer must be a number between 1 and 100" });
+    }
     const category = await Category.findById(categoryId);
-    category.categoryOffer = percentage;
+    category.categoryOffer = percentNum;
     await category.save();
     res.status(STATUS_CODES.OK).json({ status: true });
   } catch (error) {
@@ -625,20 +626,31 @@ const changeStatus = async (req, res) => {
       });
     }
 
-    const statusSequence = {
-      "pending": ["Processing", "Cancelled"],
-      "Processing": ["Shipped", "Cancelled"],
-      "Shipped": ["delivered"],
-      "delivered": [],
-      "Cancelled": [],
-      "Returned": [],
-      "Return request": [],
-      "payment failed": []
+    const stateIndices = {
+      "pending": 0,
+      "Processing": 1,
+      "Shipped": 2,
+      "delivered": 3
     };
 
     if (status !== item.status) {
-      const allowedNext = statusSequence[item.status] || [];
-      if (!allowedNext.includes(status)) {
+      const currentIdx = stateIndices[item.status];
+      const newIdx = stateIndices[status];
+      let isAllowed = false;
+
+      // 1. Moving between progress states: must move strictly forward
+      if (currentIdx !== undefined && newIdx !== undefined) {
+        if (newIdx > currentIdx) {
+          isAllowed = true;
+        }
+      }
+
+      // 2. Cancellation: only allowed from pending or Processing
+      if (status === "Cancelled" && (item.status === "pending" || item.status === "Processing")) {
+        isAllowed = true;
+      }
+
+      if (!isAllowed) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
           error: `Cannot transition status from "${item.status}" to "${status}".`
