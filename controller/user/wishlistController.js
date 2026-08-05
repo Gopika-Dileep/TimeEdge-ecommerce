@@ -208,24 +208,9 @@ const loadAboutus = async(req,res)=>{
     
 }
 
-const loadContact = async(req,res)=>{
-    try {
-        const userId = req.session.user
-        if(userId){
-            const user = await User.findById({_id:userId})
-           return  res.render('contact',{user:user})
-        }
-       return res.render('contact')
-    } catch (error) {
-        console.log(error)
-        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({message:MESSAGES.SERVER_ERROR})
-    }
-}
-
 module.exports ={
     loadWishlist,
     addToWishlist,
     removeItem,
-    loadAboutus,
-    loadContact
+    loadAboutus
 }
