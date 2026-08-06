@@ -158,10 +158,10 @@
                 <div class="summary-total-val" id="summaryTotal">₹<%= totalPrice.toLocaleString('en-IN') %></div>
             </div>
 
-            <a href="/checkout" class="btn-gold-fill" style="width:100%; justify-content:center; padding:16px; display:flex; text-decoration:none;">
+            <button type="button" onclick="proceedToCheckout()" class="btn-gold-fill" style="width:100%; justify-content:center; padding:16px; display:flex; border:none; cursor:pointer;">
                 <span>Proceed to Checkout</span>
                 <i class="fa-solid fa-arrow-right"></i>
-            </a>
+            </button>
 
             <div style="margin-top:16px; text-align:center; font-size:11px; color:var(--text-muted); display:flex; align-items:center; justify-content:center; gap:8px;">
                 <i class="fa-solid fa-lock" style="color:var(--gold);"></i>
@@ -190,9 +190,31 @@ async function changeQty(itemId, delta) {
     const action = delta > 0 ? 'increment' : 'decrement';
     const res = await fetch(`/${action}/${itemId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
     });
+    if (res.status === 401) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Login Required',
+            text: 'Please log in to continue',
+            confirmButtonColor: '#c9a84c'
+        }).then(() => {
+            window.location.href = '/login';
+        });
+        return;
+    }
     const data = await res.json();
+    if (data.notLoggedIn || data.redirectUrl) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Login Required',
+            text: data.message || 'Please log in to continue',
+            confirmButtonColor: '#c9a84c'
+        }).then(() => {
+            window.location.href = data.redirectUrl || '/login';
+        });
+        return;
+    }
     if (res.ok && (data.success || data.status === true)) {
         location.reload();
     } else {
@@ -219,9 +241,31 @@ async function removeItem(itemId) {
         if (result.isConfirmed) {
             const res = await fetch(`/remove/${itemId}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
             });
+            if (res.status === 401) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Login Required',
+                    text: 'Please log in to continue',
+                    confirmButtonColor: '#c9a84c'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                return;
+            }
             const data = await res.json();
+            if (data.notLoggedIn) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Login Required',
+                    text: data.message || 'Please log in to continue',
+                    confirmButtonColor: '#c9a84c'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                return;
+            }
             if (data.success || data.status === true) {
                 document.getElementById('row-' + itemId)?.remove();
                 location.reload();
@@ -235,6 +279,47 @@ async function removeItem(itemId) {
             }
         }
     });
+}
+
+function proceedToCheckout() {
+    fetch('/check-auth')
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.isLoggedIn) {
+                window.location.href = '/checkout';
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Login Required',
+                    text: 'Please login to place an order',
+                    showCancelButton: true,
+                    confirmButtonText: 'Go to Login',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#7066e0',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+            }
+        })
+        .catch(() => {
+            Swal.fire({
+                icon: 'info',
+                title: 'Login Required',
+                text: 'Please login to place an order',
+                showCancelButton: true,
+                confirmButtonText: 'Go to Login',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#7066e0',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/login';
+                }
+            });
+        });
 }
 
 document.addEventListener("DOMContentLoaded", function() {

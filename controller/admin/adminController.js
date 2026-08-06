@@ -92,7 +92,7 @@ const loadDashboard = async (req, res) => {
 const loadUsers = async (req, res) => {
   try {
     let search = req.query.search || "";
-    let page = req.query.page || 1;
+    let page = parseInt(req.query.page, 10) || 1;
     const limit = 7;
 
     let queryConditions = [
@@ -176,7 +176,7 @@ const loadcategory = async (req, res) => {
     }
 
     const category = await Category.find(condition)
-      .sort({ createdAt: -1 })
+      .sort({ _id: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
@@ -815,6 +815,11 @@ const changeStatus = async (req, res) => {
 
     if (previousStatus !== "delivered" && status === "delivered") {
       try {
+        if (order.paymentMethod === "COD") {
+          order.paymentStatus = "Paid";
+          await order.save();
+        }
+
         const user = await User.findById(order.user);
 
         if (user) {
@@ -833,7 +838,7 @@ const changeStatus = async (req, res) => {
           }
         }
       } catch (error) {
-        console.error("Error processing referral bonus:", error);
+        console.error("Error processing delivery status updates / referral bonus:", error);
       }
     }
 

@@ -360,6 +360,8 @@
                     <option value="">Sort By</option>
                     <option value="price-asc" <%= locals.priceSort === 'price-asc' || locals.priceSort === 'asc' ? 'selected' : '' %>>Price: Low to High</option>
                     <option value="price-desc" <%= locals.priceSort === 'price-desc' || locals.priceSort === 'desc' ? 'selected' : '' %>>Price: High to Low</option>
+                    <option value="name-asc" <%= locals.priceSort === 'name-asc' || locals.priceSort === 'aToZ' ? 'selected' : '' %>>Name: A to Z</option>
+                    <option value="name-desc" <%= locals.priceSort === 'name-desc' || locals.priceSort === 'zToA' ? 'selected' : '' %>>Name: Z to A</option>
                     <option value="newest" <%= locals.priceSort === 'newest' ? 'selected' : '' %>>Newest First</option>
                 </select>
             </div>
@@ -613,6 +615,23 @@ function addProductToCart(productId, quantity) {
             });
         },
         error: function (xhr, status, error) {
+            if (xhr.status === 401 || (xhr.responseJSON && xhr.responseJSON.notLoggedIn)) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Login Required',
+                    text: 'Please login to add items to your cart',
+                    showCancelButton: true,
+                    confirmButtonText: 'Go to Login',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#7066e0',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                return;
+            }
             let errorMessage = "Error while adding to cart. Please try again!";
             try {
                 const response = JSON.parse(xhr.responseText);

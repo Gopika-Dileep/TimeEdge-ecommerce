@@ -614,6 +614,23 @@
                 });
             },
             error: function (xhr, status, error) {
+                if (xhr.status === 401 || (xhr.responseJSON && xhr.responseJSON.notLoggedIn)) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Login Required',
+                        text: 'Please login to add items to your cart',
+                        showCancelButton: true,
+                        confirmButtonText: 'Go to Login',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#7066e0',
+                        cancelButtonColor: '#6c757d'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/login';
+                        }
+                    });
+                    return;
+                }
                 let errorMessage = "Error while adding to cart. Please try again!";
                 try {
                     const response = JSON.parse(xhr.responseText);

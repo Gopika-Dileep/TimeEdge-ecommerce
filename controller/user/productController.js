@@ -37,7 +37,7 @@ const loadhome = async (req, res) => {
             brand: { $in: brands.map(brand => brand._id) }
         })
             .sort({ createdAt: -1 })
-            .limit(9)
+            .limit(6)
             .populate('category')
             .populate('brand');
 
@@ -256,6 +256,10 @@ const shopProducts = async (req, res) => {
             sortOption = { salePrice: 1 };
         } else if (priceSort === 'price-desc' || priceSort === 'desc') {
             sortOption = { salePrice: -1 };
+        } else if (priceSort === 'name-asc' || priceSort === 'aToZ') {
+            sortOption = { productName: 1 };
+        } else if (priceSort === 'name-desc' || priceSort === 'zToA') {
+            sortOption = { productName: -1 };
         } else if (priceSort === 'newest') {
             sortOption = { createdAt: -1 };
         } else if (priceSort === 'oldest') {
@@ -268,6 +272,7 @@ const shopProducts = async (req, res) => {
         const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
         const products = await Product.find(query)
+            .collation({ locale: 'en', strength: 2 })
             .populate('category')
             .populate('brand')
             .sort(sortOption)

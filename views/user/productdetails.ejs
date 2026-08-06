@@ -245,6 +245,8 @@
 @media (max-width:1024px) { .pd-layout { grid-template-columns:1fr; gap:48px; } .pd-gallery { position:static; } }
 @media (max-width:768px) { .related-grid { grid-template-columns: 1fr; } }
 @media (max-width:600px) { .pd-cta { flex-direction:column; } .pd-thumbs { grid-template-columns:repeat(4,1fr); } }
+.pd-status-available { color: #6dbf7f; }
+.pd-status-out { color: #e07070; }
 </style>
 
 <div class="te-container pd-hero">
@@ -390,10 +392,10 @@
         </div>
         <div class="pd-tab-content" id="tab-spec">
             <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px; max-width:600px;">
-                <div class="pd-spec-row"><span class="pd-spec-key">Brand</span><span class="pd-spec-val"><%= product.brand ? product.brand.brandName : '' %></span></div>
-                <div class="pd-spec-row"><span class="pd-spec-key">Color</span><span class="pd-spec-val"><%= product.color %></span></div>
-                <div class="pd-spec-row"><span class="pd-spec-key">Stock</span><span class="pd-spec-val"><%= product.quantity %> units</span></div>
-                <div class="pd-spec-row"><span class="pd-spec-key">Status</span><span class="pd-spec-val"><%= product.status %></span></div>
+                <div class="pd-spec-row"><span class="pd-spec-key">Brand</span><span class="pd-spec-val"><%= product.brand ? product.brand.name : '' %></span></div>
+                <div class="pd-spec-row"><span class="pd-spec-key">Category</span><span class="pd-spec-val"><%= product.category ? product.category.name : '' %></span></div>
+                <div class="pd-spec-row"><span class="pd-spec-key">Stock</span><span class="pd-spec-val"><%= product.quantity > 0 ? product.quantity + ' units' : 'Out of stock' %></span></div>
+                <div class="pd-spec-row"><span class="pd-spec-key">Status</span><span class="pd-spec-val <%= product.quantity > 0 ? 'pd-status-available' : 'pd-status-out' %>"><%= product.quantity > 0 ? 'Available' : 'Out of Stock' %></span></div>
             </div>
         </div>
         <div class="pd-tab-content" id="tab-ship">
@@ -412,7 +414,7 @@
                     <div class="related-img-container">
                         <img src="/uploads/productImages/<%= rel.productImage[0] %>" alt="<%= rel.productName %>">
                     </div>
-                    <div class="related-brand"><%= rel.brand ? rel.brand.brandName : '' %></div>
+                    <div class="related-brand"><%= rel.brand ? rel.brand.name : '' %></div>
                     <span class="related-name"><%= rel.productName %></span>
                     <div class="related-price">₹<%= rel.salePrice.toLocaleString('en-IN') %></div>
                 </a>
@@ -496,7 +498,25 @@ async function addToCart() {
         } else {
             btn.innerHTML = '<i class="fa-solid fa-bag-shopping"></i> <span>Add to Cart</span>';
             btn.disabled = false;
-            const data = await res.json();
+            let data = {};
+            try { data = await res.json(); } catch(err) {}
+            if (res.status === 401 || data.notLoggedIn) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Login Required',
+                    text: 'Please login to add items to your cart',
+                    showCancelButton: true,
+                    confirmButtonText: 'Go to Login',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#7066e0',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+                return;
+            }
             Swal.fire({
                 icon: 'error',
                 title: 'Add to Cart Failed',
@@ -515,17 +535,26 @@ async function addToCart() {
 
 async function toggleWishlist() {
     try {
-        const isUserLoggedIn = '<%= locals.user ? "true" : "false" %>' === 'true';
-        if (!isUserLoggedIn) {
+        const icon = document.getElementById('wishlistIcon');
+        const res = await fetch(`/addToWishlist/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId })
+        });
+        
+        let response = {};
+        try { response = await res.json(); } catch(err) {}
+        
+        if (res.status === 401 || response.notLoggedIn) {
             Swal.fire({
+                icon: 'info',
                 title: 'Login Required',
-                text: 'Please login to add products to your wishlist.',
-                icon: 'warning',
+                text: 'Please login to add items to your wishlist',
                 showCancelButton: true,
-                confirmButtonColor: '#c9a84c',
-                cancelButtonColor: '#757575',
-                confirmButtonText: 'Login Now',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: 'Go to Login',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#7066e0',
+                cancelButtonColor: '#6c757d'
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = '/login';
@@ -534,13 +563,6 @@ async function toggleWishlist() {
             return;
         }
 
-        const icon = document.getElementById('wishlistIcon');
-        const res = await fetch(`/addToWishlist/${productId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId })
-        });
-        const response = await res.json();
         if (response.success) {
             if (response.action === 'added') {
                 icon.classList.remove('bi-heart');

@@ -71,7 +71,7 @@
                             </thead>
                             <tbody>
                                  <% if (locals.category && category.length > 0) { %>
-                                     <% category.reverse().forEach((catItem, index) => { %>
+                                     <% category.forEach((catItem, index) => { %>
                                          <tr>
                                              <td style="font-weight: 600; color: var(--text-primary);"><%= catItem.name %></td>
                                              <td><%= catItem.description %></td>

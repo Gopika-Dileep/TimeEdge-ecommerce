@@ -1204,45 +1204,85 @@
       });
 
       $("#place-order").click(function () {
-        const selectedAddress = document.querySelector('input[name="deliveryAddress"]:checked');
-        if (!selectedAddress) {
-          Swal.fire({
-            title: "Error",
-            text: "Please select a delivery address.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-          return;
-        }
-        const addressId = selectedAddress.value;
+        $.ajax({
+          url: "/check-auth",
+          method: "GET",
+          success: function (authRes) {
+            if (!authRes || !authRes.isLoggedIn) {
+              Swal.fire({
+                icon: "info",
+                title: "Login Required",
+                text: "Please login to place an order",
+                showCancelButton: true,
+                confirmButtonText: "Go to Login",
+                cancelButtonText: "Cancel",
+                confirmButtonColor: "#7066e0",
+                cancelButtonColor: "#6c757d"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = "/login";
+                }
+              });
+              return;
+            }
 
-        const cartElement = document.querySelector("[data-cart-id]");
-        const cartId = cartElement.getAttribute("data-cart-id");
+            const selectedAddress = document.querySelector('input[name="deliveryAddress"]:checked');
+            if (!selectedAddress) {
+              Swal.fire({
+                title: "Error",
+                text: "Please select a delivery address.",
+                icon: "error",
+                confirmButtonText: "OK",
+              });
+              return;
+            }
+            const addressId = selectedAddress.value;
 
-        const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
-        if (!selectedPayment) {
-          Swal.fire({
-            title: "Error",
-            text: "Please select a payment method.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-          return;
-        }
-        const paymentMethod = selectedPayment.value;
+            const cartElement = document.querySelector("[data-cart-id]");
+            const cartId = cartElement ? cartElement.getAttribute("data-cart-id") : null;
 
-        const couponDiscount = parseFloat($("#couponDiscount").text()) || 0;
-        const subtotal = parseFloat($("#subtotal").text());
-        const finalTotal = parseFloat($("#total").val());
-        const couponCode = getAppliedCouponCode();
+            const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+            if (!selectedPayment) {
+              Swal.fire({
+                title: "Error",
+                text: "Please select a payment method.",
+                icon: "error",
+                confirmButtonText: "OK",
+              });
+              return;
+            }
+            const paymentMethod = selectedPayment.value;
 
-        if (paymentMethod === "COD") {
-          placeOrder(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal);
-        } else if (paymentMethod === "Online") {
-          initiateRazorpayPayment(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal);
-        } else if (paymentMethod === "wallet") {
-          processWalletPayment(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal);
-        }
+            const couponDiscount = parseFloat($("#couponDiscount").text()) || 0;
+            const subtotal = parseFloat($("#subtotal").text());
+            const finalTotal = parseFloat($("#total").val());
+            const couponCode = getAppliedCouponCode();
+
+            if (paymentMethod === "COD") {
+              placeOrder(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal);
+            } else if (paymentMethod === "Online") {
+              initiateRazorpayPayment(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal);
+            } else if (paymentMethod === "wallet") {
+              processWalletPayment(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal);
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "info",
+              title: "Login Required",
+              text: "Please login to place an order",
+              showCancelButton: true,
+              confirmButtonText: "Go to Login",
+              cancelButtonText: "Cancel",
+              confirmButtonColor: "#7066e0",
+              cancelButtonColor: "#6c757d"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = "/login";
+              }
+            });
+          }
+        });
       });
       function placeOrder(addressId, cartId, paymentMethod, couponCode, subtotal, couponDiscount, finalTotal) {
         $.ajax({
@@ -1278,6 +1318,23 @@
             }
           },
           error: function (error) {
+            if (error.status === 401 || (error.responseJSON && error.responseJSON.notLoggedIn)) {
+              Swal.fire({
+                icon: "info",
+                title: "Login Required",
+                text: "Please login to place an order",
+                showCancelButton: true,
+                confirmButtonText: "Go to Login",
+                cancelButtonText: "Cancel",
+                confirmButtonColor: "#7066e0",
+                cancelButtonColor: "#6c757d"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = "/login";
+                }
+              });
+              return;
+            }
             Swal.fire({
               title: "Error",
               text: error.responseJSON?.message || "An error occurred while placing your order.",

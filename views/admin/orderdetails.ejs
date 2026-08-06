@@ -21,8 +21,8 @@
                 <div class="info-value order-ref">#<%= order.orderId %></div>
             </div>
             <div class="info-item">
-                <div class="info-label">Date</div>
-                <div class="info-value"><%= new Date(order.createdOn).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) %></div>
+                <div class="info-label">Date & Time</div>
+                <div class="info-value"><%= new Date(order.createdOn).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', year:'numeric', month:'short', day:'numeric' }) %> at <%= new Date(order.createdOn).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true }) %></div>
             </div>
             <div class="info-item">
                 <div class="info-label">Payment</div>

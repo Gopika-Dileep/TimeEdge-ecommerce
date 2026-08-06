@@ -103,6 +103,7 @@ router.get('/getAddress/:addressId', userAuth, orderController.getAddress)
 router.get('/orders',userAuth,profileController.getOrderlistPage)
 router.get('/address',userAuth,profileController.getAddressPage)
 router.get('/accountdetails',userAuth,profileController.getProfilePage)
+router.post('/updateProfile',userAuth,profileController.updateProfile)
 router.get('/wallet',userAuth,profileController.getWalletPage)
 
 

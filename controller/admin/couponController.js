@@ -44,6 +44,7 @@ const loadCouponPage = async (req, res) => {
         const totalpage = Math.ceil(totalCoupons / limit) || 1;
 
         const paginatedCoupons = await Coupon.find(query)
+            .sort({ createdOn: -1, _id: -1 })
             .skip((page - 1) * limit)
             .limit(limit);
 

@@ -116,7 +116,24 @@
                                 });
                             }
                         },
-                        error: function () {
+                        error: function (xhr) {
+                            if (xhr.status === 401 || (xhr.responseJSON && xhr.responseJSON.notLoggedIn)) {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Login Required',
+                                    text: 'Please login to manage your wishlist',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Go to Login',
+                                    cancelButtonText: 'Cancel',
+                                    confirmButtonColor: '#7066e0',
+                                    cancelButtonColor: '#6c757d'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '/login';
+                                    }
+                                });
+                                return;
+                            }
                             Swal.fire('Error', 'Could not remove item', 'error');
                         }
                     });
@@ -150,6 +167,23 @@
                     });
                 },
                 error: function (xhr) {
+                    if (xhr.status === 401 || (xhr.responseJSON && xhr.responseJSON.notLoggedIn)) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Login Required',
+                            text: 'Please login to manage your wishlist',
+                            showCancelButton: true,
+                            confirmButtonText: 'Go to Login',
+                            cancelButtonText: 'Cancel',
+                            confirmButtonColor: '#7066e0',
+                            cancelButtonColor: '#6c757d'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/login';
+                            }
+                        });
+                        return;
+                    }
                     const message = xhr.responseJSON?.message || 'Could not add to cart. Please try again.';
                     Swal.fire({
                         icon: 'error',

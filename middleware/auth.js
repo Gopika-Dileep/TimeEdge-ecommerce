@@ -1,19 +1,25 @@
 const User = require("../models/userSchema");
 
-const userAuth = async (req,res,next)=>{
-    
-    if(req.session.user){
-        const user=await User.findById({_id:req.session.user})
-            if(user && !user.isBlocked){
-                next();
-            }else{
-                res.redirect("/login")
+const userAuth = async (req, res, next) => {
+    const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest' || (req.headers.accept && req.headers.accept.includes('application/json')) || (req.headers['content-type'] && req.headers['content-type'].includes('application/json')) || req.method !== 'GET';
+
+    if (req.session.user) {
+        const user = await User.findById({ _id: req.session.user });
+        if (user && !user.isBlocked) {
+            return next();
+        } else {
+            if (isAjax) {
+                return res.status(401).json({ success: false, notLoggedIn: true, message: 'Please log in to continue', redirectUrl: '/login' });
             }
-      
-    }else{
-        res.redirect("/login")
+            return res.redirect("/login");
+        }
+    } else {
+        if (isAjax) {
+            return res.status(401).json({ success: false, notLoggedIn: true, message: 'Please log in to continue', redirectUrl: '/login' });
+        }
+        return res.redirect("/login");
     }
-}
+};
 
 const checkUser = (req, res, next) => {
     if(req.session.user) {

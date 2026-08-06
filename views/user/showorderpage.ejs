@@ -93,6 +93,13 @@
 </style>
 
 <div class="container order-details-wrapper">
+  <!-- Back Link Button -->
+  <div class="mb-3 animate-up">
+    <a href="/orders" class="btn btn-outline-secondary btn-sm" style="color: var(--gold, #c9a84c); border-color: rgba(201, 168, 76, 0.3); background: rgba(201, 168, 76, 0.05); font-size: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; padding: 8px 16px;">
+      <i class="bi bi-arrow-left"></i> Back to My Orders
+    </a>
+  </div>
+
   <!-- Header Row -->
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
@@ -102,7 +109,7 @@
         </span>
       </h5>
       <p class="text-muted mb-0" style="font-size: 13px;">
-        Placed on <%= new Date(order.createdOn).toLocaleDateString('en-IN') %> at <%= new Date(order.createdOn).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) %>
+        Placed on <%= new Date(order.createdOn).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }) %> at <%= new Date(order.createdOn).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true }) %>
       </p>
     </div>
     <div>

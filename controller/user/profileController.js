@@ -676,6 +676,32 @@ const resendChangeEmailOtp = async (req, res) => {
     }
 };
 
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const { name, phone } = req.body;
+
+        if (!name || name.trim() === "") {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Full Name cannot be empty" });
+        }
+
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phone || !phoneRegex.test(phone.toString().trim())) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({ success: false, message: "Please enter a valid 10-digit phone number" });
+        }
+
+        await User.findByIdAndUpdate(userId, {
+            name: name.trim(),
+            phone: phone.toString().trim()
+        });
+
+        return res.json({ success: true, message: "Personal details updated successfully" });
+    } catch (error) {
+        console.error("Error in updateProfile:", error);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.SERVER_ERROR });
+    }
+};
+
 module.exports={
     userProfile,
     changeEmail,
@@ -701,5 +727,6 @@ module.exports={
     getOrderlistPage,
     getAddressPage,
     getProfilePage,
-    getWalletPage
+    getWalletPage,
+    updateProfile
 }
