@@ -220,8 +220,6 @@ const razorpayInstance = new Razorpay({
 const orderRazorpay = async (req, res) => {   
   try {     
     const { totalAmount, cartId } = req.body;
-    console.log(totalAmount, "totalAmount");
-    console.log(cartId, "cartId");
    
     const cart = await Cart.findById({ _id: cartId }).populate("items.product");
     if (!cart) {

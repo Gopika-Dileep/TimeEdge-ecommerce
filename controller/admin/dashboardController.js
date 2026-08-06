@@ -3,10 +3,10 @@ const Order = require("../../models/orderSchema");
 const User = require("../../models/userSchema");
 const { STATUS_CODES, MESSAGES } = require("../../helpers/constants");
 
-// Shared helper — all queries use the same filter so cards, charts and tables always match
+
 async function buildDashboardData(orderFilter, userFilter) {
 
-  // 1. Revenue: sum price*qty of delivered items within the filtered orders
+ 
   const revenueAgg = await Order.aggregate([
     { $match: orderFilter },
     { $unwind: "$orderedItems" },
@@ -20,7 +20,7 @@ async function buildDashboardData(orderFilter, userFilter) {
   ]);
   const totalRevenue = revenueAgg.length > 0 ? revenueAgg[0].totalRevenue : 0;
 
-  // 2. Cancelled: item-level cancellations within filtered orders
+  
   const cancelledAgg = await Order.aggregate([
     { $match: orderFilter },
     { $unwind: "$orderedItems" },
@@ -29,7 +29,6 @@ async function buildDashboardData(orderFilter, userFilter) {
   ]);
   const cancelledCount = cancelledAgg.length > 0 ? cancelledAgg[0].totalCancelled : 0;
 
-  // 3. Sales: total product units sold in the filtered period (excluding Cancelled, Returned, payment failed)
   const salesAgg = await Order.aggregate([
     { $match: orderFilter },
     { $unwind: "$orderedItems" },
@@ -38,10 +37,9 @@ async function buildDashboardData(orderFilter, userFilter) {
   ]);
   const salesData = salesAgg.length > 0 ? salesAgg[0].totalQty : 0;
 
-  // 4. New customers: non-admin users registered in the filtered period
   const newUsersCount = await User.countDocuments({ ...userFilter, isAdmin: false });
 
-  // 5. Top 4 products by qty sold (exclude cancelled/returned items)
+
   const products = await Order.aggregate([
     { $match: orderFilter },
     { $unwind: "$orderedItems" },
@@ -54,7 +52,7 @@ async function buildDashboardData(orderFilter, userFilter) {
     { $limit: 4 }
   ]);
 
-  // 6. Top 4 categories by qty sold (exclude cancelled/returned items)
+
   const categories = await Order.aggregate([
     { $match: orderFilter },
     { $unwind: "$orderedItems" },
@@ -69,7 +67,7 @@ async function buildDashboardData(orderFilter, userFilter) {
     { $limit: 4 }
   ]);
 
-  // 7. Top 4 brands by qty sold (exclude cancelled/returned items)
+ 
   const brands = await Order.aggregate([
     { $match: orderFilter },
     { $unwind: "$orderedItems" },
@@ -84,7 +82,7 @@ async function buildDashboardData(orderFilter, userFilter) {
     { $limit: 4 }
   ]);
 
-  // 8. User registration by date (chronological for chart display)
+ 
   const users = await User.aggregate([
     { $match: { ...userFilter, isAdmin: false } },
     {
@@ -108,7 +106,7 @@ async function buildDashboardData(orderFilter, userFilter) {
   };
 }
 
-// Page load — no filter means all-time data
+
 const loadDashboard = async (req, res) => {
   try {
     const data = await buildDashboardData({}, {});
@@ -119,7 +117,7 @@ const loadDashboard = async (req, res) => {
   }
 };
 
-// Filter endpoint — returns JSON for the chosen period
+
 const filterData = async (req, res) => {
   try {
     const { filterValue } = req.query;

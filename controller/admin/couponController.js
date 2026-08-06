@@ -10,10 +10,10 @@ const loadCouponPage = async (req, res) => {
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
         
-        // Get all coupons and update their status if needed
+    
         const coupons = await Coupon.find();
         
-        // Update status for expired or maxed out coupons
+
         for (let coupon of coupons) {
             let shouldUpdate = false;
             
@@ -106,11 +106,11 @@ const addCoupon = async (req, res) => {
         });
         await coupon.save();
         
-        // Return success response for AJAX request
+   
         if (req.xhr || req.headers.accept.includes('application/json')) {
             return res.status(STATUS_CODES.OK).json({ success: true });
         }
-        // Regular form submission fallback
+
         res.redirect('/admin/coupon');
     } catch (error) {
         console.error(error);

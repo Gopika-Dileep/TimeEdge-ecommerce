@@ -170,12 +170,11 @@ function viewImage(event, index) {
             return;
         }
 
-        // Render image inside card boundary box immediately
+
         const previewImg = document.getElementById("imgView" + index);
         previewImg.src = URL.createObjectURL(file);
         previewImg.style.display = 'block';
         
-        // Update visibility controls
         document.getElementById("placeholder" + index).style.display = 'none';
         document.getElementById("actionOverlay" + index).style.display = 'flex';
     }
@@ -195,7 +194,7 @@ function openCropper(event, index) {
                 cropperInstance = null;
             }
             
-            // Re-create the image element dynamically to clear sizing/caching artifacts
+            
             const container = document.getElementById("cropperTargetContainer");
             container.innerHTML = '';
             
@@ -207,12 +206,11 @@ function openCropper(event, index) {
             targetImage.style.display = "block";
             
             currentCropperIndex = index;
-            
-            // Open modal
+          
             const modal = document.getElementById("cropperModal");
             modal.style.display = "flex";
             
-            // 1. Append to container FIRST
+           
             container.appendChild(targetImage);
 
             let isInitializing = false;
@@ -241,13 +239,12 @@ function openCropper(event, index) {
                 }, 150);
             };
 
-            // 2. Set onload handler
+           
             targetImage.onload = initCropper;
 
-            // 3. Set src LAST
+          
             targetImage.src = dataURL;
 
-            // 4. Fallback if already complete
             if (targetImage.complete) {
                 initCropper();
             }
@@ -256,7 +253,7 @@ function openCropper(event, index) {
     }
 }
 
-// Bind crop save button handler
+
 document.getElementById("cropperSaveBtn").addEventListener("click", function () {
     if (!cropperInstance || currentCropperIndex === null) return;
     
@@ -269,7 +266,7 @@ document.getElementById("cropperSaveBtn").addEventListener("click", function () 
     const index = currentCropperIndex;
     const finalDataURL = croppedCanvas.toDataURL("image/jpeg", 1.0);
     
-    // Set preview image in the upload card
+   
     const previewImg = document.getElementById("imgView" + index);
     previewImg.src = finalDataURL;
     previewImg.style.display = 'block';
